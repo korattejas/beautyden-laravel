@@ -96,6 +96,12 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::get('blogs', [BlogController::class, 'getBlogs']);
         Route::get('teamMember', [TeamMemberController::class, 'getTeamMembers']);
         Route::get('customerReview', [CustomerReviewController::class, 'getCustomerReviews']);
+        Route::get('hiring', [HiringController::class, 'getHiring']);
+        Route::get('homeCounter', [HomeCounterController::class, 'getHomeCounter']);
+        Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('faqs', [FaqsController::class, 'getFaqs']);
+        Route::get('settings', [SettingController::class, 'getsettings']);
+        Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
     });
 });
 
