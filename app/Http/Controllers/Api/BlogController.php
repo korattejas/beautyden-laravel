@@ -1,0 +1,101 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\ServiceCategory;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
+use Exception;
+
+class BlogController extends Controller
+{
+    protected mixed $success_status, $exception_status, $backend_error_status, $validation_error_status, $common_error_message;
+
+    protected string $controller_name;
+
+    public function __construct()
+    {
+        $this->controller_name = 'API/BlogController';
+        $this->success_status = config('custom.status_code_for_success');
+        $this->exception_status = config('custom.status_code_for_exception_error');
+        $this->backend_error_status = config('custom.status_code_for_backend_error');
+        $this->validation_error_status = config('custom.status_code_for_validation_error');
+        $this->common_error_message = config('custom.common_error_message');
+    }
+
+    public function getBlogCategory(): JsonResponse
+    {
+        $function_name = 'getBlogCategory';
+        try {
+            $categories = DB::table('blog_categories')->select(
+                'id',
+                'name',
+                DB::raw('CONCAT("' . asset('uploads/blog-category') . '/", icon) AS icon'),
+                'description',
+                'is_popular'
+            )
+                ->where('status', 1)
+                ->orderBy('is_popular', 'desc')
+                ->get();
+
+            if ($categories->isEmpty()) {
+                return $this->sendError('No category found.', $this->backend_error_status);
+            }
+
+            return $this->sendResponse($categories, 'Categories retrieved successfully', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function getBlogs(): JsonResponse
+    {
+        $function_name = 'getBlogs';
+
+        try {
+            $blogs = DB::table('blogs as b')
+                ->join('blog_categories as c', 'b.category_id', '=', 'c.id')
+                ->select(
+                    'b.id',
+                    'b.category_id',
+                    'c.name as category_name',
+                    'b.title',
+                    'b.excerpt',
+                    'b.content',
+                    'b.read_time',
+                    'b.author',
+                    'b.publish_date',
+                    'b.tags',
+                    DB::raw('CONCAT("' . asset('uploads/blogs') . '/", b.icon) AS icon'),
+                    'b.featured',
+                )
+                ->where('b.status', 1)
+                ->orderByDesc('b.featured')
+                ->get()
+                ->map(function ($blog) {
+                    $blog->tags = $blog->tags ? json_decode($blog->tags, true) : [];
+                    return $blog;
+                });
+
+            if ($blogs->isEmpty()) {
+                return $this->sendError('No blog found.', $this->backend_error_status);
+            }
+
+            return $this->sendResponse(
+                $blogs,
+                'Blogs retrieved successfully',
+                $this->success_status
+            );
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
+}

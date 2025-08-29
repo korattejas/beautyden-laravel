@@ -1,0 +1,16 @@
+.link__menu {
+    cursor: pointer;
+}
+
+.link__menu:hover {
+    color: #102365;
+}
+
+.parsley-required {
+    color: red;
+}
+
+.media-grid img, .media-grid video {
+    border-radius: 5px; /* Rounded corners for a cleaner look */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Light shadow */
+}

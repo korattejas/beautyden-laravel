@@ -1,0 +1,102 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\ServiceCategory;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
+use Exception;
+
+class ServiceController extends Controller
+{
+    protected mixed $success_status, $exception_status, $backend_error_status, $validation_error_status, $common_error_message;
+
+    protected string $controller_name;
+
+    public function __construct()
+    {
+        $this->controller_name = 'API/ServiceController';
+        $this->success_status = config('custom.status_code_for_success');
+        $this->exception_status = config('custom.status_code_for_exception_error');
+        $this->backend_error_status = config('custom.status_code_for_backend_error');
+        $this->validation_error_status = config('custom.status_code_for_validation_error');
+        $this->common_error_message = config('custom.common_error_message');
+    }
+
+    public function getServiceCategory(): JsonResponse
+    {
+        $function_name = 'getServiceCategory';
+        try {
+            $categories = DB::table('service_categories')->select(
+                'id',
+                'name',
+                DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'),
+                'description',
+                'is_popular'
+            )
+                ->where('status', 1)
+                ->orderBy('is_popular', 'desc')
+                ->get();
+
+            if ($categories->isEmpty()) {
+                return $this->sendError('No category found.', $this->backend_error_status);
+            }
+
+            return $this->sendResponse($categories, 'Categories retrieved successfully', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function getServices(): JsonResponse
+    {
+        $function_name = 'getServices';
+
+        try {
+            $services = DB::table('services as s')
+                ->join('service_categories as c', 's.category_id', '=', 'c.id')
+                ->select(
+                    's.id',
+                    's.category_id',
+                    'c.name as category_name',
+                    's.name',
+                    's.price',
+                    's.discount_price',
+                    's.duration',
+                    's.rating',
+                    's.reviews',
+                    's.description',
+                    's.includes',
+                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
+                    's.is_popular'
+                )
+                ->where('s.status', 1)
+                ->orderByDesc('s.is_popular')
+                ->get()
+                ->map(function ($service) {
+                    $service->includes = $service->includes ? json_decode($service->includes, true) : [];
+                    return $service;
+                });
+
+            if ($services->isEmpty()) {
+                return $this->sendError('No service found.', $this->backend_error_status);
+            }
+
+            return $this->sendResponse(
+                $services,
+                'Services retrieved successfully',
+                $this->success_status
+            );
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
+}
