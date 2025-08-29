@@ -1,96 +1,117 @@
 @extends('admin.layouts.app')
-@section('header_style_content')
-<!-- <link rel="stylesheet" type="text/css" href="{{ URL::asset('panel-assets/css/plugins/charts/chart-apex.css') }}"> -->
-@endsection
+
 @section('content')
-<div class="app-content content">
-    <div class="content-overlay"></div>
-    <div class="header-navbar-shadow"></div>
-    <div class="content-wrapper">
-        <div class="content-header row">
-        </div>
-        <div class="content-body">
-            <!-- Dashboard Analytics Start -->
-            <section id="dashboard-analytics">
-                <div class="row match-height">
-                    <!-- Greetings Card starts -->
-                    <div class="col-lg-6 col-md-12 col-sm-12">
-                        <div class="card card-congratulations">
-                            <div class="card-body text-center">
-                                <div class="avatar avatar-xl bg-primary shadow">
-                                    <div class="avatar-content">
-                                        <i data-feather="award" class="font-large-1"></i>
+    <style>
+        /* Dashboard Custom Styles */
+
+        /* .text-white {
+            color: #fff !important;
+        }
+
+        .text-white [data-feather],
+        .text-white .feather {
+            stroke: #fff !important;
+            color: #fff !important;
+        }
+
+        #beautyden-dashboard .card {
+            border-radius: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        #beautyden-dashboard .card-body {
+            padding: 2rem 1rem;
+        }
+
+        #beautyden-dashboard i,
+        #beautyden-dashboard [data-feather] {
+            width: 40px;
+            height: 40px;
+            stroke-width: 2.5;
+            margin-bottom: 0.5rem;
+        }
+
+        #beautyden-dashboard h2 {
+            font-weight: 700;
+            margin: 0;
+        }
+
+        #beautyden-dashboard p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        } */
+    </style>
+
+    <div class="app-content content">
+        <div class="content-wrapper">
+            <div class="content-body">
+                <section id="beautyden-dashboard">
+                    <div class="row match-height">
+
+                        <!-- Total Appointments -->
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card text-center bg-gradient-primary text-white shadow">
+                                <a href="{{ route('admin.appointments.index') }}" class="dashboard-card">
+                                <div class="card-body" style="color: #102365;">
+                                    <i data-feather="calendar" class="font-large-2 mb-1"></i>
+                                    <h2 class="fw-bolder">{{ $totalAppointments }}</h2>
+                                    <h5>Total Appointments</h5>
+                                </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Success Appointments -->
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card text-center bg-gradient-success text-white shadow">
+                                <a href="{{ route('admin.appointments.index') }}" class="dashboard-card">
+                                    <div class="card-body" style="color: #102365;">
+                                        <i data-feather="check-circle" class="font-large-2 mb-1"></i>
+                                        <h2 class="fw-bolder">{{ $totalAppoinmentSuccess }}</h2>
+                                        <h5>Appointments Completed</h5>
                                     </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Pending Appointments -->
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card text-center bg-gradient-warning text-white shadow">
+                                <a href="{{ route('admin.appointments.index') }}" class="dashboard-card">
+                                <div class="card-body" style="color: #102365;">
+                                    <i data-feather="clock" class="font-large-2 mb-1"></i>
+                                    <h2 class="fw-bolder">{{ $totalAppoinmentPending }}</h2>
+                                    <h5>Appointments Pending</h5>
                                 </div>
-                                <div class="text-center">
-                                    <h1 class="mb-1 text-white">
-                                        Hi, {{ Auth::guard('admin')->user()->name }},</h1>
-                                    <p class="card-text m-auto w-75">
-                                        You have done <strong>57.6%</strong> more sales today. Check your new badge
-                                        in
-                                        your profile.
-                                    </p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Contact Submissions -->
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card text-center bg-gradient-info text-white shadow">
+                                <a href="{{ route('admin.contact-submissions.index') }}" class="dashboard-card">
+                                <div class="card-body" style="color: #102365;">
+                                    <i data-feather="mail" class="font-large-2 mb-1"></i>
+                                    <h2 class="fw-bolder">{{ $totalContacts }}</h2>
+                                    <h5>Contact Submissions</h5>
                                 </div>
+                                </a>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="row match-height">
-                    <div class="col-xl-6 col-12">
-                        <div class="card">
-                            <div class="card-header border-bottom">
-                                <h4 class="card-title fw-bolder">Total AWS Space</h4>
-                            </div>
-                            <div class="card-body">
-                                <div id="user-donut-chart">{{$awsTotalSpace . ' GB' ?? 0}}</div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header border-bottom">
-                                <h4 class="card-title fw-bolder">Total AWS Space Remaining</h4>
-                            </div>
-                            <div class="card-body">
-                                <div id="user-donut-chart">{{$remainingSpace ?? 0}}</div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header border-bottom">
-                                <h4 class="card-title fw-bolder">Total AWS Space Use</h4>
-                            </div>
-                            <div class="card-body">
-                                <div id="user-donut-chart">{{$totalUsedSpace ?? 0}}</div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header border-bottom">
-                                <h4 class="card-title fw-bolder">AWS Plan Expiry Date:</h4>
-                            </div>
-                            <div class="card-body">
-                                <div id="user-donut-chart">{{ $awsPlanExpire ?? 0}}</div>
-                            </div>
-                        </div>
                     </div>
-
-                    <div class="col-xl-6 col-12">
-                        <div class="card">
-                            <div class="card-header border-bottom">
-                                <h4 class="card-title fw-bolder">Donations</h4>
-                            </div>
-                            <div class="card-body">
-                                <div id="horses-donut-chart"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
+                </section>
+            </div>
         </div>
     </div>
-</div>
-@endsection
-@section('footer_script_content')
-<!-- <script src="{{ URL::asset('panel-assets/vendors/js/charts/apexcharts.min.js') }}"></script> -->
-<!-- <script src="{{ URL::asset('panel-assets/vendors/js/charts/chart.min.js') }}"></script> -->
-<!-- <script src="{{ URL::asset('panel-assets/js/scripts/pages/admin/dashboard.js') }}"></script> -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+    </script>
 @endsection

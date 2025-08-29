@@ -27,6 +27,13 @@
                 <i data-feather="more-horizontal"></i>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.appointments.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.appointments.index') }}">
+                    <i data-feather="users"></i>
+                    <span class="menu-title text-truncate" data-i18n="Email">Appointments</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ Request::routeIs('admin.contact-submissions.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.contact-submissions.index') }}">
                     <i data-feather="users"></i>
