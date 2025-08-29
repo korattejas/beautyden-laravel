@@ -24,15 +24,17 @@ class CustomerReviewController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
-    public function getCustomerReviews(): JsonResponse
+    public function getCustomerReviews(Request $request): JsonResponse
     {
         $function_name = 'getCustomerReviews';
 
         try {
-            $reviews = DB::table('customer_reviews as r')
+            $query = DB::table('customer_reviews as r')
+                ->leftJoin('services as s', 'r.service_id', '=', 's.id')
                 ->select(
                     'r.id',
                     'r.service_id',
+                    's.name as service_name',
                     'r.customer_name',
                     DB::raw('CONCAT("' . asset('uploads/review/customer-photos') . '/", r.customer_photo) AS customer_photo'),
                     'r.rating',
@@ -45,8 +47,39 @@ class CustomerReviewController extends Controller
                     'r.updated_at',
                     'r.photos'
                 )
-                ->where('r.status', 1)
-                ->orderByDesc('r.is_popular')
+                ->where('r.status', 1);
+
+            if ($request->has('search') && !empty($request->search)) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('r.customer_name', 'like', "%{$search}%")
+                        ->orWhere('r.review', 'like', "%{$search}%")
+                        ->orWhere('r.review_date', 'like', "%{$search}%")
+                        ->orWhere('r.helpful_count', 'like', "%{$search}%")
+                        ->orWhere('r.is_popular', 'like', "%{$search}%")
+                        ->orWhere('s.name', 'like', "%{$search}%");
+                });
+            }
+
+            if ($request->has('service_id') && !empty($request->service_id)) {
+                $query->where('r.service_id', $request->service_id);
+            }
+
+            if ($request->has('with_photos') && $request->with_photos) {
+                $query->whereNotNull('r.photos')
+                    ->where('r.photos', '!=', '[]');
+            }
+
+            if ($request->has('with_video') && $request->with_video) {
+                $query->whereNotNull('r.video')
+                    ->where('r.video', '!=', '');
+            }
+
+            if ($request->has('rating') && is_numeric($request->rating)) {
+                $query->where('r.rating', '>=', $request->rating);
+            }
+
+            $reviews = $query->orderByDesc('r.is_popular')
                 ->get()
                 ->map(function ($review) {
                     $photos = $review->photos ? json_decode($review->photos, true) : [];
@@ -55,6 +88,7 @@ class CustomerReviewController extends Controller
                     }, $photos);
                     return $review;
                 });
+
             if ($reviews->isEmpty()) {
                 return $this->sendError('No customer review found.', $this->backend_error_status);
             }

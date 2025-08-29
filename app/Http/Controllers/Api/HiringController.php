@@ -25,12 +25,12 @@ class HiringController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
-    public function getHiring(): JsonResponse
+    public function getHiring(Request $request): JsonResponse
     {
         $function_name = 'getHiring';
 
         try {
-            $hirings = DB::table('hirings as h')
+            $query = DB::table('hirings as h')
                 ->select(
                     'h.id',
                     'h.title',
@@ -45,8 +45,35 @@ class HiringController extends Controller
                     DB::raw('JSON_EXTRACT(h.required_skills, "$") as required_skills'),
                     'h.is_popular',
                 )
-                ->where('h.status', 1)
-                ->orderByDesc('h.is_popular')
+                ->where('h.status', 1);
+
+            if ($request->has('search') && !empty($request->search)) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('h.title', 'like', "%$search%")
+                        ->orWhere('h.description', 'like', "%$search%")
+                        ->orWhere('h.city', 'like', "%$search%")
+                        ->orWhere('h.salary_range', 'like', "%$search%")
+                        ->orWhere('h.experience_level', 'like', "%$search%")
+                        ->orWhere('h.hiring_type', 'like', "%$search%")
+                        ->orWhere('h.gender_preference', 'like', "%$search%")
+                        ->orWhere(DB::raw('JSON_EXTRACT(h.required_skills, "$")'), 'like', "%$search%");
+                });
+            }
+
+            if ($request->has('city') && !empty($request->city)) {
+                $query->where('h.city', $request->city);
+            }
+
+            if ($request->has('experience_level') && !empty($request->experience_level)) {
+                $query->where('h.experience_level', $request->experience_level);
+            }
+
+            if ($request->has('hiring_type') && !empty($request->hiring_type)) {
+                $query->where('h.hiring_type', $request->hiring_type);
+            }
+
+            $hirings = $query->orderByDesc('h.is_popular')
                 ->get()
                 ->map(function ($hiring) {
                     $hiring->required_skills = $hiring->required_skills
