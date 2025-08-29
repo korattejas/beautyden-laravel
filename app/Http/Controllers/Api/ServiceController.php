@@ -51,12 +51,12 @@ class ServiceController extends Controller
         }
     }
 
-    public function getServices(): JsonResponse
+    public function getServices(Request $request): JsonResponse
     {
         $function_name = 'getServices';
 
         try {
-            $services = DB::table('services as s')
+            $query = DB::table('services as s')
                 ->join('service_categories as c', 's.category_id', '=', 'c.id')
                 ->select(
                     's.id',
@@ -73,14 +73,33 @@ class ServiceController extends Controller
                     DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
                     's.is_popular'
                 )
-                ->where('s.status', 1)
-                ->orderByDesc('s.is_popular')
+                ->where('s.status', 1);
+
+            if ($request->has('search') && !empty($request->search)) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('s.name', 'like', "%$search%")
+                        ->orWhere('s.description', 'like', "%$search%")
+                        ->orWhere('c.category_name', 'like', "%$search%")
+                        ->orWhere('s.duration', 'like', "%$search%")
+                        ->orWhere('s.discount_price', 'like', "%$search%")
+                        ->orWhere('s.price', 'like', "%$search%")
+                        ->orWhere('s.reviews', 'like', "%$search%")
+                        ->orWhere('s.includes', 'like', "%$search%")
+                        ->orWhere('s.rating', 'like', "%$search%");
+                });
+            }
+
+            if ($request->has('category_id') && !empty($request->category_id)) {
+                $query->where('s.category_id', $request->category_id);
+            }
+
+            $services = $query->orderByDesc('s.is_popular')
                 ->get()
                 ->map(function ($service) {
                     $service->includes = $service->includes ? json_decode($service->includes, true) : [];
                     return $service;
                 });
-
             if ($services->isEmpty()) {
                 return $this->sendError('No service found.', $this->backend_error_status);
             }

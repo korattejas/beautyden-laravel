@@ -51,12 +51,12 @@ class BlogController extends Controller
         }
     }
 
-    public function getBlogs(): JsonResponse
+    public function getBlogs(Request $request): JsonResponse
     {
         $function_name = 'getBlogs';
 
         try {
-            $blogs = DB::table('blogs as b')
+            $query = DB::table('blogs as b')
                 ->join('blog_categories as c', 'b.category_id', '=', 'c.id')
                 ->select(
                     'b.id',
@@ -72,8 +72,28 @@ class BlogController extends Controller
                     DB::raw('CONCAT("' . asset('uploads/blogs') . '/", b.icon) AS icon'),
                     'b.featured',
                 )
-                ->where('b.status', 1)
-                ->orderByDesc('b.featured')
+                ->where('b.status', 1);
+
+            if ($request->has('search') && !empty($request->search)) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('b.title', 'like', "%{$search}%")
+                        ->orWhere('b.excerpt', 'like', "%{$search}%")
+                        ->orWhere('b.content', 'like', "%{$search}%")
+                        ->orWhere('b.author', 'like', "%{$search}%")
+                        ->orWhere('c.name', 'like', "%{$search}%")
+                        ->orWhere('b.publish_date', 'like', "%{$search}%")
+                        ->orWhere('b.read_time', 'like', "%{$search}%")
+                        ->orWhereRaw('JSON_CONTAINS(b.tags, ?)', [json_encode($search)]);
+                });
+            }
+
+
+            if ($request->has('category_id') && !empty($request->category_id)) {
+                $query->where('b.category_id', $request->category_id);
+            }
+
+            $blogs = $query->orderByDesc('b.featured')
                 ->get()
                 ->map(function ($blog) {
                     $blog->tags = $blog->tags ? json_decode($blog->tags, true) : [];

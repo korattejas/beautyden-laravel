@@ -92,12 +92,12 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
 Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/')->group(function () {
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
-        Route::get('services', [ServiceController::class, 'getServices']);
+        Route::post('services', [ServiceController::class, 'getServices']);
         Route::get('blogCategory', [BlogController::class, 'getBlogCategory']);
-        Route::get('blogs', [BlogController::class, 'getBlogs']);
+        Route::post('blogs', [BlogController::class, 'getBlogs']);
         Route::get('teamMember', [TeamMemberController::class, 'getTeamMembers']);
-        Route::get('customerReview', [CustomerReviewController::class, 'getCustomerReviews']);
-        Route::get('hiring', [HiringController::class, 'getHiring']);
+        Route::post('customerReview', [CustomerReviewController::class, 'getCustomerReviews']);
+        Route::post('hiring', [HiringController::class, 'getHiring']);
         Route::get('homeCounter', [HomeCounterController::class, 'getHomeCounter']);
         Route::get('cities', [CityController::class, 'getCities']);
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
@@ -112,12 +112,12 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
 Route::middleware([])->group(function () {
     Route::prefix('Test/V1/')->group(function () {
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
-        Route::get('services', [ServiceController::class, 'getServices']);
+        Route::post('services', [ServiceController::class, 'getServices']);
         Route::get('blogCategory', [BlogController::class, 'getBlogCategory']);
-        Route::get('blogs', [BlogController::class, 'getBlogs']);
+        Route::post('blogs', [BlogController::class, 'getBlogs']);
         Route::get('teamMember', [TeamMemberController::class, 'getTeamMembers']);
-        Route::get('customerReview', [CustomerReviewController::class, 'getCustomerReviews']);
-        Route::get('hiring', [HiringController::class, 'getHiring']);
+        Route::post('customerReview', [CustomerReviewController::class, 'getCustomerReviews']);
+        Route::post('hiring', [HiringController::class, 'getHiring']);
         Route::get('homeCounter', [HomeCounterController::class, 'getHomeCounter']);
         Route::get('cities', [CityController::class, 'getCities']);
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
