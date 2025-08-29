@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\FaqsController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\ContactSubmissionsController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\AppointmentsController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\PoseImagesController;
 use App\Http\Controllers\Api\User\AuthenticationController;
@@ -101,6 +102,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::get('cities', [CityController::class, 'getCities']);
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
         Route::get('settings', [SettingController::class, 'getsettings']);
+        Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
     });
 });
@@ -120,38 +122,7 @@ Route::middleware([])->group(function () {
         Route::get('cities', [CityController::class, 'getCities']);
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
         Route::get('settings', [SettingController::class, 'getsettings']);
+        Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

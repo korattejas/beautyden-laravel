@@ -15,14 +15,14 @@ use App\Http\Controllers\Admin\HomeCounterController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\CityController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\AppointmentsController;
 use App\Http\Controllers\Admin\ContactSubmissionsController;
 use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 use App\Http\Middleware\AdminCheck;
 
 
 
-Route::get('logs', [LogViewerController::class, 'index']);
+Route::get('logs/BeautyDen@admin.com/8998', [LogViewerController::class, 'index']);
 
 
 Route::get('/', function () {
@@ -148,37 +148,16 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('getDataSetting', [SettingController::class, 'getDataSetting'])->name('getDataSetting');
     Route::get('setting/status/{id}/{status}', [SettingController::class, 'changeStatus']);
 
-    /* user Route */
+    /* Contact Submissions Route */
     Route::get('contact-submissions', [ContactSubmissionsController::class, 'index'])->name('admin.contact-submissions.index');
     Route::get('getDataContactSubmissions', [ContactSubmissionsController::class, 'getDataContactSubmissions'])->name('getDataContactSubmissions');
     Route::get('contact-submissions/status/{id}/{status}', [ContactSubmissionsController::class, 'changeStatus']);
     Route::delete('contact-submissions/{id}', [ContactSubmissionsController::class, 'destroy']);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /* user Route */
-    Route::get('user', [UserController::class, 'index'])->name('admin.user.index');
-    Route::get('getDataUser', [UserController::class, 'getDataUser'])->name('getDataUser');
-    Route::get('user/status/{id}/{status}', [UserController::class, 'changeStatus']);
-    Route::delete('user/{id}', [UserController::class, 'destroy']);
+    /* Contact Submissions Route */
+    Route::get('appointments', [AppointmentsController::class, 'index'])->name('admin.appointments.index');
+    Route::get('getDataAppointments', [AppointmentsController::class, 'getDataAppointments'])->name('getDataAppointments');
+    Route::get('appointments/status/{id}/{status}', [AppointmentsController::class, 'changeStatus']);
+    Route::delete('appointments/{id}', [AppointmentsController::class, 'destroy']);
   });
 });
