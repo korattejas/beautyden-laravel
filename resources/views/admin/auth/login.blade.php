@@ -1513,12 +1513,6 @@
         <!-- Right Side - Premium Login Form -->
         <div class="login-section">
             <div class="login-container">
-                <!-- Admin Badge -->
-                <div class="admin-badge">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Admin Portal</span>
-                </div>
-
                 <!-- Login Form Card -->
                 <div class="login-card">
                     <div class="card-header">
