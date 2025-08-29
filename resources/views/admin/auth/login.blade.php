@@ -863,6 +863,7 @@
         /* Premium Button */
         .btn-premium {
             background: var(--primary-gradient);
+            width: 100%;
             border: none;
             padding: 18px 32px;
             border-radius: 16px;
@@ -1533,7 +1534,7 @@
                                 <input type="text" class="form-control premium-input" id="login_email"
                                     name="login_email" placeholder="Enter your email address"
                                     aria-describedby="login_email" tabindex="1" autofocus />
-                                <div class="input-border"></div>
+                                {{-- <div class="input-border"></div> --}}
                             </div>
                         </div>
 
@@ -1546,7 +1547,7 @@
                                 <input type="password" class="form-control premium-input" id="login_password"
                                     name="login_password" placeholder="Enter your password"
                                     aria-describedby="login_password" tabindex="1" />
-                                <div class="input-border"></div>
+                                {{-- <div class="input-border"></div> --}}
                             </div>
                         </div>
 
