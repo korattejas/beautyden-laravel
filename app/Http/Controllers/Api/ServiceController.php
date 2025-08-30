@@ -80,7 +80,7 @@ class ServiceController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->where('s.name', 'like', "%$search%")
                         ->orWhere('s.description', 'like', "%$search%")
-                        ->orWhere('c.category_name', 'like', "%$search%")
+                        ->orWhere('c.name', 'like', "%$search%")
                         ->orWhere('s.duration', 'like', "%$search%")
                         ->orWhere('s.discount_price', 'like', "%$search%")
                         ->orWhere('s.price', 'like', "%$search%")
