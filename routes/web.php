@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\AppointmentsController;
 use App\Http\Controllers\Admin\ContactSubmissionsController;
+use App\Http\Controllers\Admin\PoliciesController;
 use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 use App\Http\Middleware\AdminCheck;
 
@@ -159,5 +160,9 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('getDataAppointments', [AppointmentsController::class, 'getDataAppointments'])->name('getDataAppointments');
     Route::get('appointments/status/{id}/{status}', [AppointmentsController::class, 'changeStatus']);
     Route::delete('appointments/{id}', [AppointmentsController::class, 'destroy']);
+
+    /* Contact Policies Route */
+    Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');
+    Route::post('policies/store', [PoliciesController::class, 'store']);
   });
 });

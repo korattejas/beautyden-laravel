@@ -25,6 +25,9 @@
 
 <!-- Tags Input -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
+
 <!-- END: Page Vendor JS -->
 
 <!-- BEGIN: Theme JS -->

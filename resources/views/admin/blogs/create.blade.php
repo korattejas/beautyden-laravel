@@ -77,7 +77,7 @@
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Content</label>
-                                                    <textarea class="form-control" name="content" rows="6" placeholder="Blog content"></textarea>
+                                                    <textarea class="form-control editor" name="content" rows="6" placeholder="Blog content"></textarea>
                                                 </div>
                                             </div>
 
@@ -171,5 +171,43 @@
     <script>
         var form_url = 'blogs/store';
         var redirect_url = 'blogs';
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.editor').forEach((el) => {
+                ClassicEditor.create(el, {
+                    toolbar: [
+                        'heading', '|',
+                        'bold', 'italic', 'underline', 'strikethrough',
+                        'subscript', 'superscript', '|',
+                        'link', 'bulletedList', 'numberedList',
+                        'outdent', 'indent', 'alignment', '|',
+                        'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor',
+                        'highlight', '|',
+                        'blockQuote', 'code', 'codeBlock', '|',
+                        'insertTable', 'mediaEmbed', 'imageUpload', 'imageInsert', '|',
+                        'horizontalLine', 'pageBreak', 'specialCharacters', 'removeFormat', '|',
+                        'undo', 'redo'
+                    ],
+                    table: {
+                        contentToolbar: [
+                            'tableColumn', 'tableRow', 'mergeTableCells',
+                            'insertTableRowAbove', 'insertTableRowBelow',
+                            'insertTableColumnLeft', 'insertTableColumnRight'
+                        ]
+                    },
+                    image: {
+                        toolbar: [
+                            'imageStyle:full', 'imageStyle:side',
+                            '|', 'imageTextAlternative', 'linkImage'
+                        ]
+                    },
+                    mediaEmbed: {
+                        previewsInData: true
+                    }
+                }).catch(error => {
+                    console.error(error);
+                });
+            });
+        });
     </script>
 @endsection

@@ -117,6 +117,13 @@
                     <span class="menu-title text-truncate" data-i18n="Email">Setting</span>
                 </a>
             </li>
+
+              <li class="nav-item {{ Request::routeIs('admin.policies.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.policies.index') }}">
+                    <i data-feather="users"></i>
+                    <span class="menu-title text-truncate" data-i18n="Email">Policies</span>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
