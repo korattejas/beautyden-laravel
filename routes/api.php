@@ -17,8 +17,7 @@ use App\Http\Controllers\Api\AppointmentsController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\PoseImagesController;
 use App\Http\Controllers\Api\User\AuthenticationController;
-use App\Http\Controllers\Api\Photographer\AuthenticationController as PhotographerAuthenticationController;
-use App\Http\Controllers\Api\Photographer\PhotographerController;
+use App\Http\Controllers\Api\PoliciesController;
 use App\Http\Middleware\RequestModifier;
 use App\Http\Middleware\ResponseModifier;
 use App\Http\Middleware\SanitizeInput;
@@ -61,30 +60,6 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
 
 /*======================================================== Photographer API ==============================================*/
 
-Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
-    Route::prefix('V1/photographer')->group(function () {
-        Route::post('signUp', [PhotographerAuthenticationController::class, 'registrations']);
-        Route::post('signIn', [PhotographerAuthenticationController::class, 'login']);
-        Route::post('sendOtp', [PhotographerAuthenticationController::class, 'sendResendMobileOrForgotPasswordOtp']);
-        Route::post('verifyMobileOtpRegister', [PhotographerAuthenticationController::class, 'verifyMobileOtpRegister']);
-    });
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -104,6 +79,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::get('settings', [SettingController::class, 'getsettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
+        Route::post('policies', [PoliciesController::class, 'getPolicies']);
     });
 });
 
@@ -124,5 +100,6 @@ Route::middleware([])->group(function () {
         Route::get('settings', [SettingController::class, 'getsettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
+        Route::post('policies', [PoliciesController::class, 'getPolicies']);
     });
 });
