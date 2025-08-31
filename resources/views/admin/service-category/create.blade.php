@@ -33,7 +33,7 @@
                         <div class="col-lg-12 col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <form method="POST" data-parsley-validate="" id="addEditForm" role="form">
+                                    <form method="POST" enctype="multipart/form-data" data-parsley-validate="" id="addEditForm" role="form">
                                         @csrf
                                         <input type="hidden" name="edit_value" value="0">
                                         <input type="hidden" id="form-method" value="add">
@@ -50,7 +50,7 @@
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Icon</label>
-                                                    <input type="file" class="form-control filepond" name="icon">
+                                                    <input type="file" class="filepond" name="icon">
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
@@ -117,6 +117,20 @@
     var form_url = 'service-category/store';
     var redirect_url = 'service-category';
     var is_one_image_and_multiple_image_status = 'is_one_image';
+
+    //   document.addEventListener('DOMContentLoaded', function () {
+    //     // Select all file inputs with class 'filepond'
+    //     FilePond.parse(document.body);
+
+    //     // OR explicitly register
+    //     const inputElement = document.querySelector('input[name="icon"]');
+    //     FilePond.create(inputElement, {
+    //         allowMultiple: false,
+    //         instantUpload: false,
+    //         storeAsFile: false,
+    //         acceptedFileTypes: ['image/*'],
+    //     });
+    // });
 
 </script>
 @endsection

@@ -73,7 +73,7 @@
                                         </div>
 
                                         <!-- Icon -->
-                                        <div class="col-6 mt-2">
+                                        <div class="col-12 mt-2">
                                             <div class="form-group">
                                                 <label>Icon</label>
                                                 <input type="file" class="form-control filepond" name="icon">
@@ -134,5 +134,6 @@
 <script>
     var form_url = 'city/store';
     var redirect_url = 'city';
+    var is_one_image_and_multiple_image_status = 'is_one_image';
 </script>
 @endsection

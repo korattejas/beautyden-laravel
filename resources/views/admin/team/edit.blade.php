@@ -92,19 +92,20 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 mt-2">
+                                            <div class="col-md-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Profile Photo</label>
-                                                    <input type="file" class="form-control filepond" name="photo">
-                                                    @if($team->photo)
-                                                        <div class="mt-1">
-                                                            <img src="{{ asset('uploads/team-member/' . $team->photo) }}" alt="Photo" width="80">
-                                                        </div>
-                                                    @endif
+                                                    @if(isset($team->icon) && !empty($team->icon))
+                                                    <div class="mb-3">
+                                                        <img src="{{ asset('uploads/team-member/' . $team->icon) }}"
+                                                            alt="Service Icon" style="width: 120px; height: auto;" />
+                                                    </div>
+                                                @endif
+                                                    <input type="file" class="form-control filepond" name="icon">
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-3 mt-2">
+                                            <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Popular</label>
                                                     <select name="is_popular" class="form-control">
@@ -114,7 +115,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-3 mt-2">
+                                            <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Status</label>
                                                     <select name="status" class="form-control">
@@ -148,5 +149,6 @@
     <script>
         var form_url = 'team/store';
         var redirect_url = 'team';
+        var is_one_image_and_multiple_image_status = 'is_one_image';
     </script>
 @endsection

@@ -96,15 +96,15 @@ class TeamMemberController extends Controller
                             'action_array' => $action_array
                         ])->render();
                     })
-                    ->addColumn('photo', function ($members) {
-                        if ($members->photo && file_exists(public_path('uploads/team-member/' . $members->photo))) {
-                            $imageUrl = asset('uploads/team-member/' . $members->photo);
-                            return '<img src="' . $imageUrl . '" style="max-width:100px;" alt="Team Photo" />';
+                    ->addColumn('icon', function ($members) {
+                        if ($members->icon && file_exists(public_path('uploads/team-member/' . $members->icon))) {
+                            $imageUrl = asset('uploads/team-member/' . $members->icon);
+                            return '<img src="' . $imageUrl . '" style="max-width:100px;" alt="Team Icon" />';
                         }
                         return '';
                     })
 
-                    ->rawColumns(['action', 'photo', 'status', 'is_popular'])
+                    ->rawColumns(['action', 'icon', 'status', 'is_popular'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -126,7 +126,7 @@ class TeamMemberController extends Controller
                 'experience_years' => 'nullable|integer|min:0',
                 'specialties' => 'nullable|string|max:255',
                 'bio' => 'nullable|string',
-                'photo' => $id == 0 ? 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048' : 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'icon' => $id == 0 ? 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048' : 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
                 'certifications' => 'nullable',
                 'is_popular' => 'nullable|boolean',
                 'status' => 'nullable|boolean',
@@ -140,10 +140,17 @@ class TeamMemberController extends Controller
 
 
             $photoFilename = null;
-            if ($request->hasFile('photo')) {
-                $photoFilename = ImageUploadHelper::teamMemberImageUpload($request->file('photo'));
+            if ($request->hasFile('icon')) {
+                $team = TeamMember::where('id',$id)->first();
+                if ($team) {
+                    $filePath = public_path('uploads/team-member/' . $team->icon);
+                    if (File::exists($filePath)) {
+                        File::delete($filePath);
+                    }
+                }
+                $photoFilename = ImageUploadHelper::teamMemberImageUpload($request->file('icon'));
             } elseif ($id != 0) {
-                $photoFilename = TeamMember::find($id)?->photo;
+                $photoFilename = TeamMember::find($id)?->icon;
             }
 
             $certifications = null;
@@ -172,7 +179,7 @@ class TeamMemberController extends Controller
                 'experience_years' => $request->experience_years,
                 'specialties' => $specialties,
                 'bio' => $request->bio,
-                'photo' => $photoFilename,
+                'icon' => $photoFilename,
                 'certifications' => $certifications,
                 'is_popular' => (int) $request->input('is_popular', 0),
                 'status' => (int) $request->input('status', 1),
@@ -220,7 +227,7 @@ class TeamMemberController extends Controller
         try {
             $member = TeamMember::find($id);
             if ($member) {
-                $filePath = public_path('uploads/team-member/' . $member->photo);
+                $filePath = public_path('uploads/team-member/' . $member->icon);
 
                 if (File::exists($filePath)) {
                     File::delete($filePath);

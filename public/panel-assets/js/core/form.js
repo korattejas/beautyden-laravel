@@ -13,7 +13,7 @@ $(function () {
         typeof is_one_image_and_multiple_image_status !== "undefined" &&
         is_one_image_and_multiple_image_status === "is_one_image"
     ) {
-        const imageInputElement = document.querySelector('input[name="image"]');
+        const imageInputElement = document.querySelector('input[name="icon"]');
         pond = FilePond.create(imageInputElement, {
             allowMultiple: false,
             instantUpload: false,
@@ -32,7 +32,7 @@ $(function () {
         }
     } else {
         const imageInputElement = document.querySelector(
-            'input[name="image[]"]'
+            'input[name="photos[]"]'
         );
         const thumbnailInputElement = document.querySelector(
             'input[name="thumbnail_image_path[]"]'
@@ -64,7 +64,7 @@ $(function () {
                 is_one_image_and_multiple_image_status == "is_one_image"
             ) {
                 if (pond.getFiles().length > 0) {
-                    formData.append("image", pond.getFiles()[0].file);
+                    formData.append("icon", pond.getFiles()[0].file);
                 }
                 if (thumbnailPond) {
                     if (thumbnailPond.getFiles().length > 0) {
@@ -76,7 +76,7 @@ $(function () {
                 }
             } else {
                 pond.getFiles().forEach((file) => {
-                    formData.append("image[]", file.file);
+                    formData.append("photos[]", file.file);
                 });
 
                 thumbnailPond.getFiles().forEach((file) => {

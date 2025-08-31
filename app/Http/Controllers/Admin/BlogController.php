@@ -59,8 +59,8 @@ class BlogController extends Controller
         try {
             if ($request->ajax()) {
                 $blogs = Blog::query()
-                 ->leftJoin('blog_categories as bc', 'bc.id', '=', 'blogs.category_id')
-                ->select('blogs.*', 'bc.name as category');
+                    ->leftJoin('blog_categories as bc', 'bc.id', '=', 'blogs.category_id')
+                    ->select('blogs.*', 'bc.name as category');
                 return DataTables::of($blogs)
                     ->addColumn('status', function ($b) {
                         $status_array = [
@@ -128,6 +128,13 @@ class BlogController extends Controller
 
             $icon = null;
             if ($request->hasFile('icon')) {
+                $blog = Blog::where('id',$id)->first();
+                if ($blog) {
+                    $filePath = public_path('uploads/blogs/' . $blog->icon);
+                    if (File::exists($filePath)) {
+                        File::delete($filePath);
+                    }
+                }
                 $icon = ImageUploadHelper::blogsimageUpload($request->file('icon'));
             } elseif ($id != 0) {
                 $icon = Blog::find($id)?->icon;
@@ -138,7 +145,7 @@ class BlogController extends Controller
 
                 $array = array_filter($array, fn($val) => $val !== '');
 
-                $tags = json_encode(array_values($array)); 
+                $tags = json_encode(array_values($array));
             }
 
             $data = [

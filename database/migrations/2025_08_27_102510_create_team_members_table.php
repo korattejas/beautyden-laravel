@@ -15,7 +15,7 @@ return new class extends Migration
             $table->integer('experience_years')->nullable();
             $table->json('specialties')->nullable();
             $table->text('bio')->nullable();
-            $table->string('photo', 255)->nullable(); 
+            $table->string('icon', 255)->nullable(); 
             $table->json('certifications')->nullable();
             $table->tinyInteger('is_popular')->default(0)->comment('1 = Yes, 0 = No');
             $table->tinyInteger('status')->default(1)->comment('1 = Active, 0 = InActive');

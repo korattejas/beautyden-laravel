@@ -142,8 +142,15 @@ class CustomerReviewController extends Controller
                 return response()->json(['message' => $validator->errors()->first()], $this->validator_error_code);
             }
 
+            $review = CustomerReview::where('id', $id)->first();
             $photo = null;
             if ($request->hasFile('customer_photo')) {
+                if ($review) {
+                    $filePath = public_path('uploads/review/customer-photos/' . $review->customer_photo);
+                    if (File::exists($filePath)) {
+                        File::delete($filePath);
+                    }
+                }
                 $photo = ImageUploadHelper::reviewCustomerImageUpload($request->file('customer_photo'));
             } elseif ($id != 0) {
                 $photo = CustomerReview::find($id)?->customer_photo;
@@ -153,6 +160,17 @@ class CustomerReviewController extends Controller
             if ($request->hasFile('photos')) {
                 $photos_array = [];
                 foreach ($request->file('photos') as $file) {
+                    if (!empty($review->photos)) {
+                        $oldPhotos = json_decode($review->photos, true);
+                        if (is_array($oldPhotos)) {
+                            foreach ($oldPhotos as $oldFile) {
+                                $filePath = public_path('uploads/review/photos/' . $oldFile);
+                                if (File::exists($filePath)) {
+                                    File::delete($filePath);
+                                }
+                            }
+                        }
+                    }
                     $photos_array[] = ImageUploadHelper::reviewImageUpload($file);
                 }
                 $photos = json_encode($photos_array);
@@ -227,7 +245,7 @@ class CustomerReviewController extends Controller
                     }
                 }
 
-                 if ($review->photos) {
+                if ($review->photos) {
                     $photos = json_decode($review->photos, true);
                     if (!empty($photos)) {
                         foreach ($photos as $photo) {

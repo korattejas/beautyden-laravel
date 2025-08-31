@@ -169,5 +169,6 @@
 <script>
     var form_url = 'reviews/store';
     var redirect_url = 'reviews';
+    var is_one_image_and_multiple_image_status = 'is_multiple_image';
 </script>
 @endsection

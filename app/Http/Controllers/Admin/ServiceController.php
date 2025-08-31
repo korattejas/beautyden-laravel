@@ -136,6 +136,13 @@ class ServiceController extends Controller
 
             $icon = null;
             if ($request->hasFile('icon')) {
+                $service = Service::where('id',$id)->first();
+                if ($service) {
+                    $filePath = public_path('uploads/service/' . $service->icon);
+                    if (File::exists($filePath)) {
+                        File::delete($filePath);
+                    }
+                }
                 $icon = ImageUploadHelper::serviceimageUpload($request->file('icon'));
             } elseif ($id != 0) {
                 $icon = Service::find($id)?->icon;

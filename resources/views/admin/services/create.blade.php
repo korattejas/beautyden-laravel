@@ -172,5 +172,7 @@
 <script>
     var form_url = 'service/store';
     var redirect_url = 'service';
+    var is_one_image_and_multiple_image_status = 'is_one_image';
+
 </script>
 @endsection

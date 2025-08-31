@@ -154,6 +154,13 @@ class HomeCounterController extends Controller
                 $homeCounter = HomeCounter::where('id', $id)->first();
 
                 if ($request->hasFile('icon')) {
+                    $icon = HomeCounter::where('id', $id)->first();
+                    if ($icon) {
+                        $filePath = public_path('uploads/home-counters/' . $icon->icon);
+                        if (File::exists($filePath)) {
+                            File::delete($filePath);
+                        }
+                    }
                     $icon = ImageUploadHelper::homeCounterImageUpload($request->icon);
                 } else {
                     $icon = $homeCounter->icon;
