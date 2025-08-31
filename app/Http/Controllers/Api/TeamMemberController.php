@@ -36,7 +36,7 @@ class TeamMemberController extends Controller
                     't.role',
                     't.experience_years',
                     't.bio',
-                    DB::raw('CONCAT("' . asset('uploads/team-member') . '/", t.photo) AS photo'),
+                    DB::raw('CONCAT("' . asset('uploads/team-member') . '/", t.icon) AS photo'),
                     't.is_popular',
                     't.specialties',
                     't.certifications'

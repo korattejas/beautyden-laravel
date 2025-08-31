@@ -124,6 +124,13 @@ class CityController extends Controller
             $icon = null;
 
             if ($request->hasFile('icon')) {
+                $icon = City::where('id', $id)->first();
+                if ($icon) {
+                    $filePath = public_path('uploads/city/' . $icon->icon);
+                    if (File::exists($filePath)) {
+                        File::delete($filePath);
+                    }
+                }
                 $icon = ImageUploadHelper::cityimageUpload($request->file('icon'));
             } elseif ($id != 0) {
                 $icon = City::find($id)?->icon;

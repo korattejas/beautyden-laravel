@@ -91,8 +91,8 @@
                     name: 'experience_years'
                 },
                 {
-                    data: 'photo',
-                    name: 'photo',
+                    data: 'icon',
+                    name: 'icon',
                     orderable: false
                 },
                 {

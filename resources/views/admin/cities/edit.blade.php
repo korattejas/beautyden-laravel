@@ -79,13 +79,13 @@
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Icon</label>
-                                                    <input type="file" class="form-control filepond" name="icon">
-                                                    @if ($city->icon)
-                                                        <div class="mt-1">
+                                                    @if (isset($city->icon) && !empty($city->icon))
+                                                        <div class="mb-3">
                                                             <img src="{{ asset('uploads/city/' . $city->icon) }}"
-                                                                alt="City Icon" height="50">
+                                                                alt="City Icon" style="width: 120px; height: auto;" />
                                                         </div>
                                                     @endif
+                                                    <input type="file" class="form-control filepond" name="icon">
                                                 </div>
                                             </div>
 
@@ -152,5 +152,6 @@
     <script>
         var form_url = 'city/store';
         var redirect_url = 'city';
+        var is_one_image_and_multiple_image_status = 'is_one_image';
     </script>
 @endsection

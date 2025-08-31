@@ -155,13 +155,13 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('contact-submissions/status/{id}/{status}', [ContactSubmissionsController::class, 'changeStatus']);
     Route::delete('contact-submissions/{id}', [ContactSubmissionsController::class, 'destroy']);
 
-    /* Contact Submissions Route */
+    /* Appointments Route */
     Route::get('appointments', [AppointmentsController::class, 'index'])->name('admin.appointments.index');
     Route::get('getDataAppointments', [AppointmentsController::class, 'getDataAppointments'])->name('getDataAppointments');
     Route::get('appointments/status/{id}/{status}', [AppointmentsController::class, 'changeStatus']);
     Route::delete('appointments/{id}', [AppointmentsController::class, 'destroy']);
 
-    /* Contact Policies Route */
+    /* Policies Route */
     Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');
     Route::post('policies/store', [PoliciesController::class, 'store']);
   });

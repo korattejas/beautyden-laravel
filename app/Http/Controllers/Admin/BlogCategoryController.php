@@ -164,12 +164,17 @@ class BlogCategoryController extends Controller
                     'message' => "Blog category added successfully"
                 ]);
             } else {
-                $category = BlogCategory::where('id', $id)->first();
+                $blog = BlogCategory::where('id', $id)->first();
 
                 if ($request->hasFile('icon')) {
+                    $filePath = public_path('uploads/blog-category/' . $blog->icon);
+
+                    if (File::exists($filePath)) {
+                        File::delete($filePath);
+                    }
                     $icon = ImageUploadHelper::blogCategoryimageUpload($request->icon);
                 } else {
-                    $icon = $category->icon;
+                    $icon = $blog->icon;
                 }
 
                 BlogCategory::where('id', $id)->update([

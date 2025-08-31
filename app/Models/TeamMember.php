@@ -15,7 +15,7 @@ class TeamMember extends Model
         'experience_years',
         'specialties',
         'bio',
-        'photo',
+        'icon',
         'certifications',
         'is_popular',
         'status',

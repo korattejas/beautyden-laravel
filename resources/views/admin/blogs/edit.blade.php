@@ -130,7 +130,7 @@
                                         <div class="col-12 mt-2">
                                             <div class="form-group">
                                                 <label>Icon</label>
-                                                <input type="file" class="form-control filepond" name="icon">
+                                                <input type="file" class="filepond" name="icon">
                                                 @if($blog->icon)
                                                     <img src="{{ asset('uploads/blogs/' . $blog->icon) }}"
                                                         alt="Blog Icon" style="max-width:100px; margin-top:10px;">
@@ -184,6 +184,8 @@
 <script>
     var form_url = 'blogs/store';
     var redirect_url = 'blogs';
+    var is_one_image_and_multiple_image_status = 'is_one_image';
+
 
     document.addEventListener("DOMContentLoaded", function() {
             document.querySelectorAll('.editor').forEach((el) => {

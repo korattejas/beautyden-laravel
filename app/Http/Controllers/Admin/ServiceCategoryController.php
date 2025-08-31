@@ -168,6 +168,11 @@ class ServiceCategoryController extends Controller
                 $category = ServiceCategory::where('id', $id)->first();
 
                 if ($request->hasFile('icon')) {
+                    $filePath = public_path('uploads/service-category/' . $category->icon);
+
+                    if (File::exists($filePath)) {
+                        File::delete($filePath);
+                    }
                     $icon = ImageUploadHelper::serviceCategoryimageUpload($request->icon);
                 } else {
                     $icon = $category->icon;
