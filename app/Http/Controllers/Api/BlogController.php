@@ -63,6 +63,7 @@ class BlogController extends Controller
                     'b.category_id',
                     'c.name as category_name',
                     'b.title',
+                    'b.slug',
                     'b.excerpt',
                     'b.content',
                     'b.read_time',
@@ -125,7 +126,7 @@ class BlogController extends Controller
 
         try {
             $validator = Validator::make($request->all(), [
-                'id' => 'required|integer|exists:blogs,id',
+                'slug' => 'required|exists:blogs,slug',
             ]);
 
             if ($validator->fails()) {
@@ -140,6 +141,7 @@ class BlogController extends Controller
                     'b.category_id',
                     'c.name as category_name',
                     'b.title',
+                    'b.slug',
                     'b.excerpt',
                     'b.content',
                     'b.read_time',
@@ -149,7 +151,7 @@ class BlogController extends Controller
                     DB::raw('CONCAT("' . asset('uploads/blogs') . '/", b.icon) AS icon'),
                     'b.featured',
                 )
-                ->where('b.id', $request->id)->where('b.status', 1);
+                ->where('b.slug', $request->slug)->where('b.status', 1);
 
             if ($request->has('search') && !empty($request->search)) {
                 $search = $request->search;

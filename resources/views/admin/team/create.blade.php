@@ -85,6 +85,45 @@
 
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
+                                                    <label>State</label>
+                                                    <input type="text" class="form-control" name="state"
+                                                        placeholder="State">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>City</label>
+                                                    <input type="text" class="form-control" name="city"
+                                                        placeholder="City">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Taluko</label>
+                                                    <input type="text" class="form-control" name="taluko"
+                                                        placeholder="Taluko">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Village</label>
+                                                    <input type="text" class="form-control" name="village"
+                                                        placeholder="Village">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12 mt-2">
+                                                <div class="form-group">
+                                                    <label>Address</label>
+                                                    <textarea class="form-control" name="address" rows="2" placeholder="Full Address"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
                                                     <label>Popular</label>
                                                     <select name="is_popular" class="form-control">
                                                         <option value="0" selected>No</option>

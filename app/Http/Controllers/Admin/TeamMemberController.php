@@ -141,7 +141,7 @@ class TeamMemberController extends Controller
 
             $photoFilename = null;
             if ($request->hasFile('icon')) {
-                $team = TeamMember::where('id',$id)->first();
+                $team = TeamMember::where('id', $id)->first();
                 if ($team) {
                     $filePath = public_path('uploads/team-member/' . $team->icon);
                     if (File::exists($filePath)) {
@@ -181,6 +181,11 @@ class TeamMemberController extends Controller
                 'bio' => $request->bio,
                 'icon' => $photoFilename,
                 'certifications' => $certifications,
+                'state' => $request->state,
+                'city' => $request->city,
+                'taluko' => $request->taluko,
+                'village' => $request->village,
+                'address' => $request->address,
                 'is_popular' => (int) $request->input('is_popular', 0),
                 'status' => (int) $request->input('status', 1),
             ];

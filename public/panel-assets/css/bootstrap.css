@@ -53,7 +53,7 @@
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.45;
-  --bs-body-color: #6e6b7b;
+  --bs-body-color: #000;
   --bs-body-bg: #f8f8f8; }
 
 *,
@@ -1476,15 +1476,15 @@ progress {
 .table {
   --bs-table-bg: transparent;
   --bs-table-accent-bg: transparent;
-  --bs-table-striped-color: #6e6b7b;
+  --bs-table-striped-color: #000;
   --bs-table-striped-bg: #fafafc;
-  --bs-table-active-color: #6e6b7b;
+  --bs-table-active-color: #000;
   --bs-table-active-bg: rgba(34, 41, 47, 0.1);
-  --bs-table-hover-color: #6e6b7b;
+  --bs-table-hover-color: #000;
   --bs-table-hover-bg: #f6f6f9;
   width: 100%;
   margin-bottom: 1rem;
-  color: #6e6b7b;
+  color: #000;
   vertical-align: middle;
   border-color: #ebe9f1; }
 
@@ -1682,7 +1682,7 @@ progress {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.45;
-  color: #6e6b7b;
+  color: #000;
   background-color: #fff;
   background-clip: padding-box;
   border: 1px solid #d8d6de;
@@ -1701,7 +1701,7 @@ progress {
   cursor: pointer; }
 
 .form-control:focus {
-  color: #6e6b7b;
+  color: #000;
   background-color: #fff;
   border-color: #102365;
   outline: 0;
@@ -1722,7 +1722,7 @@ progress {
   padding: 0.571rem 1rem;
   margin: -0.571rem -1rem;
   margin-inline-end: 1rem;
-  color: #6e6b7b;
+  color: #000;
   background-color: #fff;
   pointer-events: none;
   border-color: inherit;
@@ -1743,7 +1743,7 @@ progress {
   padding: 0.571rem 1rem;
   margin: -0.571rem -1rem;
   margin-inline-end: 1rem;
-  color: #6e6b7b;
+  color: #000;
   background-color: #fff;
   pointer-events: none;
   border-color: inherit;
@@ -1766,7 +1766,7 @@ progress {
   padding: 0.571rem 0;
   margin-bottom: 0;
   line-height: 1.45;
-  color: #6e6b7b;
+  color: #000;
   background-color: transparent;
   border: solid transparent;
   border-width: 1px 0; }
@@ -1840,7 +1840,7 @@ textarea.form-control-lg {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.45;
-  color: #6e6b7b;
+  color: #000;
   background-color: #fff;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d8d6de' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-chevron-down'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
@@ -1869,7 +1869,7 @@ textarea.form-control-lg {
 
 .form-select:-moz-focusring {
   color: transparent;
-  text-shadow: 0 0 0 #6e6b7b; }
+  text-shadow: 0 0 0 #000; }
 
 .form-select-sm {
   padding-top: 0.188rem;
@@ -2144,7 +2144,7 @@ textarea.form-control-lg {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.45;
-  color: #6e6b7b;
+  color: #000;
   text-align: center;
   white-space: nowrap;
   background-color: #fff;
@@ -2350,7 +2350,7 @@ textarea.form-control-lg {
   display: inline-block;
   font-weight: 400;
   line-height: 1;
-  color: #6e6b7b;
+  color: #000;
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
@@ -2367,7 +2367,7 @@ textarea.form-control-lg {
     transition: none; } }
 
 .btn:hover {
-  color: #6e6b7b; }
+  color: #000; }
 
 .btn-check:focus + .btn, .btn:focus {
   outline: 0;
@@ -2936,7 +2936,7 @@ fieldset:disabled .btn {
   padding: 0.5rem 0;
   margin: 0;
   font-size: 1rem;
-  color: #6e6b7b;
+  color: #000;
   text-align: left;
   list-style: none;
   background-color: #fff;
@@ -3108,7 +3108,7 @@ fieldset:disabled .btn {
   padding: 0.65rem 1.28rem;
   clear: both;
   font-weight: 400;
-  color: #6e6b7b;
+  color: #000;
   text-align: inherit;
   white-space: nowrap;
   background-color: transparent;
@@ -3142,7 +3142,7 @@ fieldset:disabled .btn {
 .dropdown-item-text {
   display: block;
   padding: 0.65rem 1.28rem;
-  color: #6e6b7b; }
+  color: #000; }
 
 .dropdown-menu-dark {
   color: #dae1e7;
@@ -3906,7 +3906,7 @@ fieldset:disabled .btn {
   width: 100%;
   padding: 1rem 1rem;
   font-size: 1rem;
-  color: #6e6b7b;
+  color: #000;
   text-align: left;
   background-color: #fff;
   border: 0;
@@ -3919,7 +3919,7 @@ fieldset:disabled .btn {
     transition: none; } }
 
 .accordion-button:not(.collapsed) {
-  color: #6e6b7b;
+  color: #000;
   background-color: transparent;
   box-shadow: inset 0 0 0 rgba(34, 41, 47, 0.125); }
 
@@ -4017,11 +4017,11 @@ fieldset:disabled .btn {
 .breadcrumb-item + .breadcrumb-item::before {
   float: left;
   padding-right: 0.6rem;
-  color: #6e6b7b;
+  color: #000;
   content: var(--bs-breadcrumb-divider, "/"); }
 
 .breadcrumb-item.active {
-  color: #6e6b7b; }
+  color: #000; }
 
 .pagination {
   display: flex;
@@ -4031,7 +4031,7 @@ fieldset:disabled .btn {
 .page-link {
   position: relative;
   display: block;
-  color: #6e6b7b;
+  color: #000;
   background-color: #f3f2f7;
   border: 0 solid #dae1e7;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
@@ -4268,12 +4268,12 @@ fieldset:disabled .btn {
 
 .list-group-item-action {
   width: 100%;
-  color: #6e6b7b;
+  color: #000;
   text-align: inherit; }
 
 .list-group-item-action:hover, .list-group-item-action:focus {
   z-index: 1;
-  color: #6e6b7b;
+  color: #000;
   text-decoration: none;
   background-color: #f8f8f8; }
 
@@ -4285,7 +4285,7 @@ fieldset:disabled .btn {
   position: relative;
   display: block;
   padding: 0.75rem 1.25rem;
-  color: #6e6b7b;
+  color: #000;
   background-color: #fff;
   border: 1px solid rgba(34, 41, 47, 0.125); }
 
@@ -4573,7 +4573,7 @@ fieldset:disabled .btn {
   width: 380px;
   max-width: 100%;
   font-size: 0.857rem;
-  color: #6e6b7b;
+  color: #000;
   pointer-events: auto;
   background-color: rgba(255, 255, 255, 0.85);
   background-clip: padding-box;
@@ -4599,7 +4599,7 @@ fieldset:disabled .btn {
   display: flex;
   align-items: center;
   padding: 0.5rem 1.14rem;
-  color: #6e6b7b;
+  color: #000;
   background-color: #fff;
   background-clip: padding-box;
   border-bottom: 0 solid rgba(0, 0, 0, 0.05);
@@ -5066,7 +5066,7 @@ fieldset:disabled .btn {
 
 .popover-body {
   padding: 1rem 1rem;
-  color: #6e6b7b; }
+  color: #000; }
 
 .carousel {
   position: relative; }

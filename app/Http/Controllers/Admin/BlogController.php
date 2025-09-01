@@ -110,6 +110,7 @@ class BlogController extends Controller
             $rules = [
                 'category_id'  => 'required|exists:blog_categories,id',
                 'title'        => 'required|string|max:200',
+                'slug'         => 'required|string|max:200|unique:blogs,slug' . ($id ? ",$id" : ''),
                 'excerpt'      => 'nullable|string',
                 'content'      => 'nullable|string',
                 'read_time'    => 'nullable|string|max:50',
@@ -151,6 +152,7 @@ class BlogController extends Controller
             $data = [
                 'category_id'  => $request->category_id,
                 'title'        => $request->title,
+                'slug'        => $request->title,
                 'excerpt'      => $request->excerpt,
                 'content'      => $request->content,
                 'read_time'    => $request->read_time,
