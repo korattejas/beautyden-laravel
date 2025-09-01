@@ -7,6 +7,7 @@
                         {{-- <img src="{{ URL::asset('panel-assets/admin-logo/logo.png') }}" /> --}}
                     </span>
                     <h2 class="brand-text">BeautyDen</h2>
+                    {{-- <p>Trusted Beauty Services at Your Home</p> --}}
                 </a>
             </li>
         </ul>
@@ -118,7 +119,7 @@
                 </a>
             </li>
 
-              <li class="nav-item {{ Request::routeIs('admin.policies.index') ? 'active' : '' }}">
+            <li class="nav-item {{ Request::routeIs('admin.policies.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.policies.index') }}">
                     <i data-feather="users"></i>
                     <span class="menu-title text-truncate" data-i18n="Email">Policies</span>

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('service_category_id')->nullable()->comment('Reference to service categories table');
-            $table->unsignedBigInteger('service_id')->nullable()->comment('Reference to services table');
+            $table->string('service_id')->nullable()->comment('Reference to services table');
             $table->string('order_number', 50);
             $table->string('first_name', 50);
             $table->string('last_name', 50)->nullable();
