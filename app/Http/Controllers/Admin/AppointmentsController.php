@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
@@ -36,15 +37,22 @@ class AppointmentsController extends Controller
         try {
             if ($request->ajax()) {
                 $appointments = Appointment::query()
-                    ->leftJoin('services as s', 's.id', '=', 'appointments.service_id')
                     ->leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
                     ->select(
                         'appointments.*',
-                        's.name as service_name',
                         'sc.name as service_category_name'
                     );
 
                 return DataTables::of($appointments)
+                    ->addColumn('service_name', function ($appointment) {
+                        $serviceNames = [];
+                        if (!empty($appointment->service_id)) {
+                            $serviceIds = explode(',', $appointment->service_id);
+                            $services = Service::whereIn('id', $serviceIds)->pluck('name')->toArray();
+                            $serviceNames = $services;
+                        }
+                        return implode(', ', $serviceNames);
+                    })
                     ->addColumn('status', function ($appointment) {
                         $status_array = [
                             'is_simple_active' => 1,
@@ -65,7 +73,7 @@ class AppointmentsController extends Controller
                             'action_array' => $action_array
                         ])->render();
                     })
-                    ->rawColumns(['action', 'status'])
+                    ->rawColumns(['action', 'service_name', 'status'])
                     ->make(true);
             }
         } catch (\Exception $e) {

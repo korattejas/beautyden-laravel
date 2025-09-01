@@ -39,7 +39,7 @@ class AppointmentsController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'service_category_id' => 'nullable|integer',
-                'service_id'          => 'nullable|integer',
+                'service_id'          => 'required',
                 'first_name'          => 'required|string|max:50',
                 'last_name'           => 'nullable|string|max:50',
                 'email'               => 'nullable|email|max:100',
