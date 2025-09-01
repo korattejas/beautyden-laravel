@@ -65,6 +65,15 @@
                                             </div>
                                         </div>
 
+                                         <!-- Slug -->
+                                        <div class="col-12 mt-2">
+                                            <div class="form-group">
+                                                <label>Slug</label>
+                                                <input type="text" class="form-control" name="slug"
+                                                    value="{{ $blog->slug }}" placeholder="Slug Title" required>
+                                            </div>
+                                        </div>
+
                                         <!-- Excerpt -->
                                         <div class="col-12 mt-2">
                                             <div class="form-group">

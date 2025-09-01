@@ -70,6 +70,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('services', [ServiceController::class, 'getServices']);
         Route::get('blogCategory', [BlogController::class, 'getBlogCategory']);
         Route::post('blogs', [BlogController::class, 'getBlogs']);
+        Route::post('blogView', [BlogController::class, 'blogView']);
         Route::get('teamMember', [TeamMemberController::class, 'getTeamMembers']);
         Route::post('customerReview', [CustomerReviewController::class, 'getCustomerReviews']);
         Route::post('hiring', [HiringController::class, 'getHiring']);
@@ -91,6 +92,7 @@ Route::middleware([])->group(function () {
         Route::post('services', [ServiceController::class, 'getServices']);
         Route::get('blogCategory', [BlogController::class, 'getBlogCategory']);
         Route::post('blogs', [BlogController::class, 'getBlogs']);
+        Route::post('blogView', [BlogController::class, 'blogView']);
         Route::get('teamMember', [TeamMemberController::class, 'getTeamMembers']);
         Route::post('customerReview', [CustomerReviewController::class, 'getCustomerReviews']);
         Route::post('hiring', [HiringController::class, 'getHiring']);

@@ -105,6 +105,45 @@
                                                 </div>
                                             </div>
 
+                                             <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>State</label>
+                                                    <input type="text" class="form-control" name="state"
+                                                        value="{{ old('state', $team->state) }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>City</label>
+                                                    <input type="text" class="form-control" name="city"
+                                                        value="{{ old('city', $team->city) }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Taluko</label>
+                                                    <input type="text" class="form-control" name="taluko"
+                                                        value="{{ old('taluko', $team->taluko) }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Village</label>
+                                                    <input type="text" class="form-control" name="village"
+                                                        value="{{ old('village', $team->village) }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12 mt-2">
+                                                <div class="form-group">
+                                                    <label>Address</label>
+                                                    <textarea class="form-control" name="address" rows="2">{{ old('address', $team->address) }}</textarea>
+                                                </div>
+                                            </div>
+
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Popular</label>

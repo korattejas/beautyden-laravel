@@ -42,7 +42,7 @@
                                                 <th>Name</th>
                                                 <th>Role</th>
                                                 <th>Experience (Years)</th>
-                                                <th>Photo</th>
+                                                <th data-search="false">Photo</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-stuff="High Priority,Low Priority">Is Popular</th>
                                                 <th data-search="false">Action</th>

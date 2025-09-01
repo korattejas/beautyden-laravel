@@ -154,6 +154,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('getDataContactSubmissions', [ContactSubmissionsController::class, 'getDataContactSubmissions'])->name('getDataContactSubmissions');
     Route::get('contact-submissions/status/{id}/{status}', [ContactSubmissionsController::class, 'changeStatus']);
     Route::delete('contact-submissions/{id}', [ContactSubmissionsController::class, 'destroy']);
+    Route::get('contact-submissions-view/{id}', [ContactSubmissionsController::class, 'view']);
 
     /* Appointments Route */
     Route::get('appointments', [AppointmentsController::class, 'index'])->name('admin.appointments.index');

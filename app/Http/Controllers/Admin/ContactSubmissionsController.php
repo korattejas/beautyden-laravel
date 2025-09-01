@@ -30,6 +30,21 @@ class ContactSubmissionsController extends Controller
         }
     }
 
+    public function view($id)
+    {
+        $function_name = 'view';
+        try {
+            $contact = ContactSubmission::leftJoin('services as sc', 'sc.id', '=', 'contact_submissions.service_id')
+            ->select('contact_submissions.*', 'sc.name as service_name')
+            ->findOrFail($id);
+
+        return response()->json(['data' => $contact], 200);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
     public function getDataContactSubmissions(Request $request)
     {
         $function_name = 'getDataContactSubmissions';
@@ -54,6 +69,8 @@ class ContactSubmissionsController extends Controller
                             'delete_id' => $contact->id,
                             'current_status' => $contact->status,
                             'hidden_id' => $contact->id,
+                            'view_id' => $contact->id,
+
                         ];
                         return view('admin.render-view.datable-action', [
                             'action_array' => $action_array

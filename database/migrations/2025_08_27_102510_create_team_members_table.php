@@ -17,6 +17,11 @@ return new class extends Migration
             $table->text('bio')->nullable();
             $table->string('icon', 255)->nullable(); 
             $table->json('certifications')->nullable();
+            $table->string('state', 150)->nullable();
+            $table->string('city', 150)->nullable();
+            $table->string('taluko', 150)->nullable();
+            $table->string('village', 150)->nullable();
+            $table->longText('address')->nullable();
             $table->tinyInteger('is_popular')->default(0)->comment('1 = Yes, 0 = No');
             $table->tinyInteger('status')->default(1)->comment('1 = Active, 0 = InActive');
             $table->timestamps();

@@ -17,6 +17,11 @@ class TeamMember extends Model
         'bio',
         'icon',
         'certifications',
+        'state',
+        'city',
+        'taluko',
+        'village',
+        'address',
         'is_popular',
         'status',
     ];
