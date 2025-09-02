@@ -1,100 +1,226 @@
 @extends('admin.layouts.app')
 
 @section('content')
-<div class="app-content content">
-    <div class="content-overlay"></div>
-    <div class="header-navbar-shadow"></div>
-    <div class="content-wrapper">
-        <div class="content-header row">
-            <div class="content-header-left col-md-9 col-12 mb-2">
-                <div class="row breadcrumbs-top">
-                    <div class="col-12">
-                        <h2 class="content-header-title float-start mb-0">Services</h2>
-                        <div class="breadcrumb-wrapper">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item">
-                                    <a href="{{ route('admin.dashboard') }}">Home</a>
-                                </li>
-                                <li class="breadcrumb-item active"><a href="#">Services</a></li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
-                <a href="{{ route('admin.service.create') }}" class="btn btn-primary">
-                    Add Service
-                </a>
-            </div>
-        </div>
-
-        <div class="content-body">
-            <!-- Column Search -->
-            <section id="column-search-datatable">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-datatable">
-                                <table class="dt-column-search table w-100 dataTable" id="table-1">
-                                    <thead>
-                                        <tr>
-                                            <th>Id</th>
-                                            <th>Category</th>
-                                            <th>Name</th>
-                                            <th>Price</th>
-                                            <th>Discount Price</th>
-                                            <th>Duration</th>
-                                            <th>Rating</th>
-                                            <th>Reviews</th>
-                                            <th data-stuff="Active,InActive">Status</th>
-                                            <th data-stuff="High Priority,Low Priority">Is Popular</th>
-                                            <th data-search="false">Action</th>
-                                        </tr>
-                                    </thead>
-                                </table>
+    <div class="app-content content">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper">
+            <div class="content-header row">
+                <div class="content-header-left col-md-9 col-12 mb-2">
+                    <div class="row breadcrumbs-top">
+                        <div class="col-12">
+                            <h2 class="content-header-title float-start mb-0">Services</h2>
+                            <div class="breadcrumb-wrapper">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ route('admin.dashboard') }}">Home</a>
+                                    </li>
+                                    <li class="breadcrumb-item active"><a href="#">Services</a></li>
+                                </ol>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
-            <!--/ Column Search -->
+                <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                    <a href="{{ route('admin.service.create') }}" class="btn btn-primary">
+                        Add Service
+                    </a>
+                </div>
+            </div>
+
+            <div class="content-body">
+                <!-- Column Search -->
+                <section id="column-search-datatable">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-datatable">
+                                    <table class="dt-column-search table w-100 dataTable" id="table-1">
+                                        <thead>
+                                            <tr>
+                                                <th>Id</th>
+                                                <th>Category</th>
+                                                <th>Name</th>
+                                                <th>Price</th>
+                                                <th>Discount Price</th>
+                                                <th data-stuff="Active,InActive">Status</th>
+                                                <th data-stuff="High Priority,Low Priority">Is Popular</th>
+                                                <th data-search="false">Action</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!--/ Column Search -->
+            </div>
         </div>
     </div>
-</div>
+
+    <div id="c-viewServiceModal" class="c-modal">
+        <div class="c-modal-dialog">
+            <div class="c-modal-content">
+                <!-- Header -->
+                <div class="c-modal-header">
+                    <h5 class="c-modal-title"><i class="bi bi-briefcase"></i> Service Details</h5>
+                    <button class="c-close-btn" data-c-close>&times;</button>
+                </div>
+                <!-- Body -->
+                <div class="c-modal-body" id="c-service-details">
+                    <div class="c-loader">
+                        <div class="c-spinner"></div>
+                        <span>Fetching details...</span>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="c-modal-footer">
+                    <small><i class="bi bi-clock"></i> Updated just now</small>
+                    <button class="c-btn" data-c-close>
+                        <i class="bi bi-x-circle"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('footer_script_content')
-<script>
-    const sweetalert_delete_title = "Delete Service?";
-    const sweetalert_change_status = "Change Status of Service";
-    const sweetalert_change_priority_status = "Change Popularity Status of Service";
+    <script>
+        const sweetalert_delete_title = "Delete Service?";
+        const sweetalert_change_status = "Change Status of Service";
+        const sweetalert_change_priority_status = "Change Popularity Status of Service";
 
-    // base form and data URLs
-    const form_url = '/service';
-    datatable_url = '/getDataService';
+        // base form and data URLs
+        const form_url = '/service';
+        datatable_url = '/getDataService';
 
-    $.extend(true, $.fn.dataTable.defaults, {
-        columns: [
-            {
-                data: null,
-                name: 'id',
-                render: function (data, type, row, meta) {
-                    return meta.row + 1;
+        $.extend(true, $.fn.dataTable.defaults, {
+            columns: [{
+                    data: null,
+                    name: 'id',
+                    render: function(data, type, row, meta) {
+                        return meta.row + 1;
+                    }
+                },
+                {
+                    data: 'category_name',
+                    name: 'category_name'
+                },
+                {
+                    data: 'name',
+                    name: 'name'
+                },
+                {
+                    data: 'price',
+                    name: 'price'
+                },
+                {
+                    data: 'discount_price',
+                    name: 'discount_price'
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
+                    data: 'is_popular',
+                    name: 'is_popular'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false
+                },
+            ],
+            order: [
+                [0, 'DESC']
+            ],
+        });
+
+        // Modal View
+        $(document).on('click', '.btn-view', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            const baseUrl = "{{ asset('uploads/service') }}/";
+
+            $("#c-viewServiceModal").addClass("show");
+            $("#c-service-details").html(`
+            <div class="c-loader">
+                <div class="c-spinner"></div>
+                <span>Loading...</span>
+            </div>
+        `);
+
+            $.ajax({
+                url: '/admin/service-view/' + id,
+                type: 'GET',
+                success: function(response) {
+                    let data = response.data;
+                    let html = `
+                        <div class="c-row">
+                            <div class="c-col-6"><div class="c-detail-card"><label>Category</label><p>${data.category_name ?? '-'}</p></div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Name</label><p>${data.name ?? '-'}</p></div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Price</label><p>${data.price ?? '-'}</p></div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Discount Price</label><p>${data.discount_price ?? '-'}</p></div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Duration</label><p>${data.duration ?? '-'}</p></div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Rating</label><p>${data.rating ?? '-'}</p></div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Reviews</label><p>${data.reviews ?? '-'}</p></div></div>
+                            <div class="c-col-12"><div class="c-detail-card"><label>Description</label><p>${data.description ?? '-'}</p></div></div>
+                            <div class="c-col-12"><div class="c-detail-card"><label>Includes</label><p>${
+                                data.includes 
+                                ? JSON.parse(data.includes).map(item => `<span class="c-include-badge">${item}</span>`).join(" ") 
+                                : '-'
+                            }</p></div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Status</label>
+                                <p>${data.status == 1 
+                                    ? '<span class="badge badge-glow bg-success">Active</span>' 
+                                    : '<span class="badge badge-glow bg-danger">InActive</span>'}
+                                </p>
+                            </div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Is Popular</label>
+                                <p>${data.is_popular == 1 
+                                    ? '<span class="badge badge-glow bg-primary">High Priority</span>' 
+                                    : '<span class="badge badge-glow bg-secondary">Low Priority</span>'}
+                                </p>
+                            </div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Created At</label><p>${data.created_at ? new Date(data.created_at).toLocaleString() : '-'}</p></div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Updated At</label><p>${data.updated_at ? new Date(data.updated_at).toLocaleString() : '-'}</p></div></div>
+
+                            <!-- Icon (Image Preview) -->
+                            <div class="c-col-12">
+                                <div class="c-detail-card text-center">
+                                    <label>Icon</label><br>
+                                    ${
+                                        data.icon 
+                                        ? `<img 
+                                            src="${baseUrl + data.icon}" 
+                                            alt="Service Icon" 
+                                            class="img-fluid service-icon" 
+                                            style="max-width:250px; cursor:pointer;" 
+                                            onclick="window.open('${baseUrl + data.icon}', '_blank')" 
+                                        >`
+                                        : '<p>-</p>'
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    $("#c-service-details").html(html);
+
+                },
+                error: function() {
+                    $("#c-service-details").html(
+                        `<div class="c-detail-card" style="color:red">Failed to load details.</div>`
+                    );
                 }
-            },
-            { data: 'category_name', name: 'category_name' },
-            { data: 'name', name: 'name' },
-            { data: 'price', name: 'price' },
-            { data: 'discount_price', name: 'discount_price' },
-            { data: 'duration', name: 'duration' },
-            { data: 'rating', name: 'rating' },
-            { data: 'reviews', name: 'reviews' },
-            { data: 'status', name: 'status' },
-            { data: 'is_popular', name: 'is_popular' },
-            { data: 'action', name: 'action', orderable: false },
-        ],
-        order: [[0, 'DESC']],
-    });
-</script>
-<script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{time()}}"></script>
+            });
+        });
+
+        $(document).on("click", "[data-c-close]", function() {
+            $("#c-viewServiceModal").removeClass("show");
+        });
+    </script>
+    <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
 @endsection

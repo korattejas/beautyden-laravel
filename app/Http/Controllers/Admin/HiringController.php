@@ -30,6 +30,23 @@ class HiringController extends Controller
         }
     }
 
+    public function view($id)
+    {
+        $function_name = 'view';
+        try {
+            $hiring = Hiring::findOrFail($id);
+
+            if (!$hiring) {
+                return response()->json(['error' => 'Hiring not found'], 404);
+            }
+
+            return response()->json(['data' => $hiring], 200);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
     public function create()
     {
         try {
@@ -81,6 +98,7 @@ class HiringController extends Controller
                             'current_status' => $h->status,
                             'current_is_popular_priority_status' => $h->is_popular,
                             'hidden_id' => $h->id,
+                            'view_id' => $h->id,
                         ];
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })

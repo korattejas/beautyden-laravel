@@ -41,11 +41,7 @@
                                                 <th>#</th>
                                                 <th>Title</th>
                                                 <th>City</th>
-                                                <th>Experience Level</th>
-                                                <th>Experience (Min - Max)</th>
-                                                <th>Salary Range</th>
-                                                <th data-stuff="Full-time,Part-time,Internship,Work from home">Hiring Type</th>
-                                                <th data-stuff="Female,Male,Any">Gender Preference</th>
+                                                <th data-stuff="Fresher,Experienced,Expert">Experience Level</th>
                                                 <th data-stuff="Active,Inactive">Status</th>
                                                 <th data-stuff="Yes,No">Is Popular</th>
                                                 <th data-search="false">Action</th>
@@ -61,6 +57,26 @@
             </div>
         </div>
     </div>
+    <div id="c-viewHiringModal" class="c-modal">
+        <div class="c-modal-dialog">
+            <div class="c-modal-content">
+                <div class="c-modal-header">
+                    <h5 class="c-modal-title"><i class="bi bi-briefcase"></i> Hiring Details</h5>
+                    <button class="c-close-btn" data-c-close>&times;</button>
+                </div>
+                <div class="c-modal-body" id="c-hiring-details">
+                    <div class="c-loader">
+                        <div class="c-spinner"></div>
+                        <span>Fetching details...</span>
+                    </div>
+                </div>
+                <div class="c-modal-footer">
+                    <small><i class="bi bi-clock"></i> Updated just now</small>
+                    <button class="c-btn" data-c-close><i class="bi bi-x-circle"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('footer_script_content')
@@ -73,32 +89,134 @@
         datatable_url = '/getDataHirings';
 
         $.extend(true, $.fn.dataTable.defaults, {
-            columns: [
-                {
+            columns: [{
                     data: null,
                     name: 'id',
                     render: function(data, type, row, meta) {
                         return meta.row + 1;
                     }
                 },
-                { data: 'title', name: 'title' },
-                { data: 'city', name: 'city' },
-                { data: 'experience_level', name: 'experience_level' },
                 {
-                    data: null,
-                    name: 'experience',
-                    render: function(data, type, row) {
-                        return (row.min_experience ?? '-') + ' - ' + (row.max_experience ?? '-');
+                    data: 'title',
+                    name: 'title'
+                },
+                {
+                    data: 'city',
+                    name: 'city'
+                },
+                {
+                    data: 'experience_level',
+                    name: 'experience_level',
+                    render: function(data) {
+                        switch (data) {
+                            case 1:
+                                return "Fresher";
+                            case 2:
+                                return "Experienced";
+                            case 3:
+                                return "Expert";
+                            default:
+                                return "-";
+                        }
                     }
                 },
-                { data: 'salary_range', name: 'salary_range' },
-                { data: 'hiring_type', name: 'hiring_type' },
-                { data: 'gender_preference', name: 'gender_preference' },
-                { data: 'status', name: 'status' },
-                { data: 'is_popular', name: 'is_popular' },
-                { data: 'action', name: 'action', orderable: false },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
+                    data: 'is_popular',
+                    name: 'is_popular'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false
+                },
             ],
-            order: [[0, 'DESC']],
+            order: [
+                [0, 'DESC']
+            ],
+        });
+
+        // Hiring View Modal
+        $(document).on('click', '.btn-view', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+
+            $("#c-viewHiringModal").addClass("show");
+            $("#c-hiring-details").html(
+                `<div class="c-loader"><div class="c-spinner"></div><span>Loading...</span></div>`);
+
+            $.ajax({
+                url: '/admin/hirings-view/' + id,
+                type: 'GET',
+                success: function(response) {
+                    let data = response.data;
+
+                    let experience_level = {
+                        1: "Fresher",
+                        2: "Experienced",
+                        3: "Expert"
+                    } [data.experience_level] ?? "-";
+
+                    let hiring_type = {
+                        1: "Full-time",
+                        2: "Part-time",
+                        3: "Internship",
+                        4: "Work from home"
+                    } [data.hiring_type] ?? "-";
+
+                    let gender_pref = {
+                        1: "Female",
+                        2: "Male",
+                        3: "Any"
+                    } [data.gender_preference] ?? "-";
+
+                    let html = `
+                    <div class="c-row">
+                        <div class="c-col-6"><div class="c-detail-card"><label>Title</label><p>${data.title ?? '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>City</label><p>${data.city ?? '-'}</p></div></div>
+                        <div class="c-col-12"><div class="c-detail-card"><label>Description</label><p>${data.description ?? '-'}</p></div></div>
+                        
+                        <div class="c-col-6"><div class="c-detail-card"><label>Min Experience</label><p>${data.min_experience ?? '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Max Experience</label><p>${data.max_experience ?? '-'}</p></div></div>
+                        
+                        <div class="c-col-6"><div class="c-detail-card"><label>Experience Level</label><p>${experience_level}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Hiring Type</label><p>${hiring_type}</p></div></div>
+                        
+                        <div class="c-col-6"><div class="c-detail-card"><label>Gender Preference</label><p>${gender_pref}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Salary Range</label><p>${data.salary_range ?? '-'}</p></div></div>
+                        
+                        <div class="c-col-12"><div class="c-detail-card"><label>Required Skills</label><p>${
+                            data.required_skills ? JSON.parse(data.required_skills).map(skill => `<span class="c-include-badge">${skill}</span>`).join(" ") : '-'
+                        }</p></div></div>
+                        
+                        <div class="c-col-6"><div class="c-detail-card"><label>Popular</label>
+                            <p>${data.is_popular == 1 ? '<span class="badge badge-glow bg-primary">Yes</span>' : '<span class="badge badge-glow bg-secondary">No</span>'}</p>
+                        </div></div>
+                        
+                        <div class="c-col-6"><div class="c-detail-card"><label>Status</label>
+                            <p>${data.status == 1 ? '<span class="badge badge-glow bg-success">Active</span>' : '<span class="badge badge-glow bg-danger">InActive</span>'}</p>
+                        </div></div>
+                        
+                        <div class="c-col-6"><div class="c-detail-card"><label>Created At</label><p>${data.created_at ? new Date(data.created_at).toLocaleString() : '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Updated At</label><p>${data.updated_at ? new Date(data.updated_at).toLocaleString() : '-'}</p></div></div>
+                    </div>
+                `;
+
+                    $("#c-hiring-details").html(html);
+                },
+                error: function() {
+                    $("#c-hiring-details").html(
+                        `<div class="c-detail-card" style="color:red">Failed to load details.</div>`
+                    );
+                }
+            });
+        });
+
+        $(document).on("click", "[data-c-close]", function() {
+            $("#c-viewHiringModal").removeClass("show");
         });
     </script>
     <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>

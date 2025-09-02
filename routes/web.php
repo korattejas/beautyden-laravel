@@ -69,6 +69,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('getDataService', [ServiceController::class, 'getDataService'])->name('getDataService');
     Route::get('service/status/{id}/{status}', [ServiceController::class, 'changeStatus']);
     Route::get('service/priority-status/{id}/{status}', [ServiceController::class, 'changePriorityStatus']);
+    Route::get('service-view/{id}', [ServiceController::class, 'view']);
 
     // Team Members
     Route::get('team', [TeamMemberController::class, 'index'])->name('admin.team.index');
@@ -79,6 +80,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('getDataTeamMembers', [TeamMemberController::class, 'getDataTeamMembers'])->name('getDataTeamMembers');
     Route::get('team/status/{id}/{status}', [TeamMemberController::class, 'changeStatus'])->name('admin.team.changeStatus');
     Route::get('team/priority-status/{id}/{status}', [TeamMemberController::class, 'changePriorityStatus'])->name('admin.team.changePriorityStatus');
+    Route::get('team-view/{id}', [TeamMemberController::class, 'view']);
 
     // Customer Reviews
     Route::get('reviews', [CustomerReviewController::class, 'index'])->name('admin.reviews.index');
@@ -89,6 +91,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('getDataReviews', [CustomerReviewController::class, 'getDataReviews'])->name('getDataReviews');
     Route::get('reviews/status/{id}/{status}', [CustomerReviewController::class, 'changeStatus'])->name('admin.reviews.changeStatus');
     Route::get('reviews/priority-status/{id}/{status}', [CustomerReviewController::class, 'changePopularStatus'])->name('admin.reviews.changePopularStatus');
+    Route::get('reviews-view/{id}', [CustomerReviewController::class, 'view']);
 
     // Blogs
     Route::get('blogs', [BlogController::class, 'index'])->name('admin.blogs.index');
@@ -99,6 +102,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::delete('blogs/{id}', [BlogController::class, 'destroy'])->name('admin.blogs.destroy');
     Route::get('blogs/status/{id}/{status}', [BlogController::class, 'changeStatus'])->name('admin.blogs.changeStatus');
     Route::get('blogs/priority-status/{id}/{status}', [BlogController::class, 'changeFeaturedStatus'])->name('admin.blogs.changeFeaturedStatus');
+    Route::get('blogs-view/{id}', [BlogController::class, 'view']);
 
     // Hirings
     Route::get('hirings', [HiringController::class, 'index'])->name('admin.hirings.index');
@@ -109,6 +113,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('getDataHirings', [HiringController::class, 'getDataHirings'])->name('getDataHirings');
     Route::get('hirings/status/{id}/{status}', [HiringController::class, 'changeStatus'])->name('admin.hirings.changeStatus');
     Route::get('hirings/priority-status/{id}/{status}', [HiringController::class, 'changePopularStatus'])->name('admin.hirings.changePopularStatus');
+    Route::get('hirings-view/{id}', [HiringController::class, 'view']);
 
     /* Home Counters Routes */
     Route::get('home-counters', [HomeCounterController::class, 'index'])->name('admin.home-counters.index');

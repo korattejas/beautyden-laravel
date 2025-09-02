@@ -6,7 +6,7 @@
                     <span class="brand-logo">
                         {{-- <img src="{{ URL::asset('panel-assets/admin-logo/logo.png') }}" /> --}}
                     </span>
-                    <h2 class="brand-text">BeautyDen</h2>
+                    <h2 class="brand-text">Test</h2>
                     {{-- <p>Trusted Beauty Services at Your Home</p> --}}
                 </a>
             </li>

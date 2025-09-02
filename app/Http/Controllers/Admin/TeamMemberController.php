@@ -34,6 +34,21 @@ class TeamMemberController extends Controller
         }
     }
 
+    public function view($id)
+    {
+        $function_name = 'view';
+        try {
+            $team = TeamMember::find($id);
+            if (!$team) {
+                return response()->json(['error' => 'Team not found'], 404);
+            }
+            return response()->json(['data' => $team], 200);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
     public function create()
     {
         $function_name = 'create';
@@ -91,6 +106,7 @@ class TeamMemberController extends Controller
                             'current_status' => $members->status,
                             'current_is_popular_priority_status' => $members->is_popular,
                             'hidden_id' => $members->id,
+                            'view_id' => $members->id,
                         ];
                         return view('admin.render-view.datable-action', [
                             'action_array' => $action_array

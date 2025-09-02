@@ -58,6 +58,31 @@
             </div>
         </div>
     </div>
+    <div id="c-viewTeamModal" class="c-modal">
+        <div class="c-modal-dialog">
+            <div class="c-modal-content">
+                <!-- Header -->
+                <div class="c-modal-header">
+                    <h5 class="c-modal-title"><i class="bi bi-person-badge"></i> Team Member Details</h5>
+                    <button class="c-close-btn" data-c-close>&times;</button>
+                </div>
+                <!-- Body -->
+                <div class="c-modal-body" id="c-team-details">
+                    <div class="c-loader">
+                        <div class="c-spinner"></div>
+                        <span>Fetching details...</span>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="c-modal-footer">
+                    <small><i class="bi bi-clock"></i> Updated just now</small>
+                    <button class="c-btn" data-c-close>
+                        <i class="bi bi-x-circle"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('footer_script_content')
@@ -112,6 +137,94 @@
             order: [
                 [0, 'DESC']
             ],
+        });
+
+        // Modal View
+        $(document).on('click', '.btn-view', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            const baseUrl = "{{ asset('uploads/team-member') }}/";
+
+            $("#c-viewTeamModal").addClass("show");
+            $("#c-team-details").html(`
+            <div class="c-loader">
+                <div class="c-spinner"></div>
+                <span>Loading...</span>
+            </div>
+        `);
+
+            $.ajax({
+                url: '/admin/team-view/' + id,
+                type: 'GET',
+                success: function(response) {
+                    let data = response.data;
+                    let html = `
+                    <div class="c-row">
+                        <div class="c-col-6"><div class="c-detail-card"><label>Name</label><p>${data.name ?? '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Role</label><p>${data.role ?? '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Experience (Years)</label><p>${data.experience_years ?? '-'}</p></div></div>
+                        <div class="c-col-12"><div class="c-detail-card"><label>Bio</label><p>${data.bio ?? '-'}</p></div></div>
+                        <div class="c-col-12"><div class="c-detail-card"><label>Specialties</label><p>${
+                            data.specialties 
+                            ? JSON.parse(data.specialties).map(item => `<span class="c-include-badge">${item}</span>`).join(" ") 
+                            : '-'
+                        }</p></div></div>
+                        <div class="c-col-12"><div class="c-detail-card"><label>Certifications</label><p>${
+                            data.certifications 
+                            ? JSON.parse(data.certifications).map(item => `<span class="c-include-badge">${item}</span>`).join(" ") 
+                            : '-'
+                        }</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Address</label><p>${data.address ?? '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>City</label><p>${data.city ?? '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Taluko</label><p>${data.taluko ?? '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Village</label><p>${data.village ?? '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>State</label><p>${data.state ?? '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Status</label>
+                            <p>${data.status == 1 
+                                ? '<span class="badge badge-glow bg-success">Active</span>' 
+                                : '<span class="badge badge-glow bg-danger">InActive</span>'}
+                            </p>
+                        </div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Is Popular</label>
+                            <p>${data.is_popular == 1 
+                                ? '<span class="badge badge-glow bg-primary">Yes</span>' 
+                                : '<span class="badge badge-glow bg-secondary">No</span>'}
+                            </p>
+                        </div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Created At</label><p>${data.created_at ? new Date(data.created_at).toLocaleString() : '-'}</p></div></div>
+                        <div class="c-col-6"><div class="c-detail-card"><label>Updated At</label><p>${data.updated_at ? new Date(data.updated_at).toLocaleString() : '-'}</p></div></div>
+
+                        <!-- Icon (Image Preview) -->
+                        <div class="c-col-12">
+                            <div class="c-detail-card text-center">
+                                <label>Icon</label><br>
+                                ${
+                                    data.icon 
+                                    ? `<img 
+                                                src="${baseUrl + data.icon}" 
+                                                alt="Team Icon" 
+                                                class="img-fluid service-icon" 
+                                                style="max-width:250px; cursor:pointer;" 
+                                                onclick="window.open('${baseUrl + data.icon}', '_blank')" 
+                                            >`
+                                    : '<p>-</p>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+                    $("#c-team-details").html(html);
+                },
+                error: function() {
+                    $("#c-team-details").html(
+                        `<div class="c-detail-card" style="color:red">Failed to load details.</div>`
+                    );
+                }
+            });
+        });
+
+        $(document).on("click", "[data-c-close]", function() {
+            $("#c-viewTeamModal").removeClass("show");
         });
     </script>
     <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
