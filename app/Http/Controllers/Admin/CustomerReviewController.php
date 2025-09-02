@@ -33,6 +33,28 @@ class CustomerReviewController extends Controller
         }
     }
 
+    public function view($id)
+    {
+        $function_name = 'view';
+        try {
+            $review = CustomerReview::query()
+                ->leftJoin('services as s', 's.id', '=', 'customer_reviews.service_id')
+                ->select('customer_reviews.*', 's.name as service_name')
+                ->where('customer_reviews.id', $id)
+                ->first();
+
+            if (!$review) {
+                return response()->json(['error' => 'Review not found'], 404);
+            }
+
+            return response()->json(['data' => $review], 200);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
+
     public function create()
     {
         try {
@@ -89,29 +111,11 @@ class CustomerReviewController extends Controller
                             'current_status' => $r->status,
                             'current_is_popular_priority_status' => $r->is_popular,
                             'hidden_id' => $r->id,
+                            'view_id' => $r->id,
                         ];
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })
-                    ->addColumn('photos', function ($r) {
-                        $photos = json_decode($r->photos, true);
-                        $html = '';
-                        if (!empty($photos)) {
-                            foreach ($photos as $photo) {
-                                $html .= '<img src="' . asset("uploads/review/photos/" . $photo) . '" style="max-width:100px;  margin-right:5px;" alt="Review Photo" />';
-                            }
-                        }
-                        return $html;
-                    })
-                    ->addColumn('video', function ($r) {
-                        if ($r->video) {
-                            return '<video width="120" controls>
-                                        <source src="' . asset("uploads/review/videos/" . $r->video) . '" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>';
-                        }
-                        return '-';
-                    })
-                    ->rawColumns(['action', 'photos', 'video', 'status', 'is_popular'])
+                    ->rawColumns(['action', 'status', 'is_popular'])
                     ->make(true);
             }
         } catch (\Exception $e) {

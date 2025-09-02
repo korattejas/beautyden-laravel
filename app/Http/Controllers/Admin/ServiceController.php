@@ -35,6 +35,25 @@ class ServiceController extends Controller
         }
     }
 
+    public function view($id)
+    {
+        $function_name = 'view';
+        try {
+            $service = Service::leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
+                ->select('services.*', 'sc.name as category_name')
+                ->where('services.id', $id)
+                ->first();
+
+            if (!$service) {
+                return response()->json(['error' => 'Service not found'], 404);
+            }
+            return response()->json(['data' => $service], 200);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
     public function create()
     {
         $function_name = 'create';
@@ -67,8 +86,8 @@ class ServiceController extends Controller
         try {
             if ($request->ajax()) {
                 $services = Service::query()
-                ->leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
-                ->select('services.*', 'sc.name as category_name');
+                    ->leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
+                    ->select('services.*', 'sc.name as category_name');
 
                 return DataTables::of($services)
                     ->addColumn('status', function ($s) {
@@ -94,6 +113,7 @@ class ServiceController extends Controller
                             'current_status' => $s->status,
                             'current_is_popular_priority_status' => $s->is_popular,
                             'hidden_id' => $s->id,
+                            'view_id' => $s->id,
                         ];
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })
@@ -136,7 +156,7 @@ class ServiceController extends Controller
 
             $icon = null;
             if ($request->hasFile('icon')) {
-                $service = Service::where('id',$id)->first();
+                $service = Service::where('id', $id)->first();
                 if ($service) {
                     $filePath = public_path('uploads/service/' . $service->icon);
                     if (File::exists($filePath)) {
@@ -155,7 +175,7 @@ class ServiceController extends Controller
 
                 $array = array_filter($array, fn($val) => $val !== '');
 
-                $includes = json_encode(array_values($array)); 
+                $includes = json_encode(array_values($array));
             }
 
             $data = [
@@ -164,6 +184,8 @@ class ServiceController extends Controller
                 'price'       => $request->price,
                 'discount_price' => $request->discount_price,
                 'duration'    => $request->duration,
+                'rating'    => $request->rating,
+                'reviews'    => $request->reviews,
                 'description' => $request->description,
                 'includes'    => $includes,
                 'icon'        => $icon,

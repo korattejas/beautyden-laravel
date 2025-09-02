@@ -33,6 +33,28 @@ class BlogController extends Controller
         }
     }
 
+    public function view($id)
+    {
+        $function_name = 'view';
+        try {
+            $blog = Blog::query()
+                ->leftJoin('blog_categories as bc', 'bc.id', '=', 'blogs.category_id')
+                ->select('blogs.*', 'bc.name as category')
+                ->where('blogs.id', $id)
+                ->first();
+
+            if (!$blog) {
+                return response()->json(['error' => 'Blog not found'], 404);
+            }
+
+            return response()->json(['data' => $blog], 200);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
+
     public function create()
     {
         try {
@@ -85,6 +107,7 @@ class BlogController extends Controller
                             'current_status' => $b->status,
                             'current_is_popular_priority_status' => $b->featured,
                             'hidden_id' => $b->id,
+                            'view_id' => $b->id,
                         ];
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })
@@ -129,7 +152,7 @@ class BlogController extends Controller
 
             $icon = null;
             if ($request->hasFile('icon')) {
-                $blog = Blog::where('id',$id)->first();
+                $blog = Blog::where('id', $id)->first();
                 if ($blog) {
                     $filePath = public_path('uploads/blogs/' . $blog->icon);
                     if (File::exists($filePath)) {

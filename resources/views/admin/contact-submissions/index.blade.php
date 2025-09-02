@@ -38,8 +38,6 @@
                                                 <th>Last Name</th>
                                                 <th>Email</th>
                                                 <th>Phone</th>
-                                                <th>Service Name</th>
-                                                <th>Subject</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-search="false">Action</th>
 
@@ -56,7 +54,6 @@
         </div>
     </div>
 
-    <!-- Modal -->
     <!-- Modal -->
     <div id="c-viewContactModal" class="c-modal">
         <div class="c-modal-dialog">
@@ -119,14 +116,6 @@
                 {
                     data: 'phone',
                     name: 'phone'
-                },
-                {
-                    data: 'service_name',
-                    name: 'service_name'
-                },
-                {
-                    data: 'subject',
-                    name: 'subject'
                 },
                 {
                     data: 'status',
