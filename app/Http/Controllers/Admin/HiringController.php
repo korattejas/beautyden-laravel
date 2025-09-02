@@ -74,6 +74,30 @@ class HiringController extends Controller
             if ($request->ajax()) {
                 $hirings = Hiring::query();
 
+                if ($request->status !== null && $request->status !== '') {
+                    $hirings->where('hirings.status', $request->status);
+                }
+
+                if ($request->popular !== null && $request->popular !== '') {
+                    $hirings->where('hirings.is_popular', $request->popular);
+                }
+
+                if ($request->min_experience !== null && $request->min_experience !== '') {
+                    $hirings->where('hirings.min_experience', '>=', $request->min_experience);
+                }
+
+                if ($request->max_experience !== null && $request->max_experience !== '') {
+                    $hirings->where('hirings.max_experience', '<=', $request->max_experience);
+                }
+
+                if ($request->salary_range !== null && $request->salary_range !== '') {
+                    $hirings->where('hirings.salary_range', 'like', '%' . $request->salary_range . '%');
+                }
+
+                if ($request->created_date) {
+                    $hirings->whereDate('hirings.created_at', $request->created_date);
+                }
+
                 return DataTables::of($hirings)
                     ->addColumn('status', function ($h) {
                         $status_array = [

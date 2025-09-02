@@ -68,6 +68,17 @@ class BlogCategoryController extends Controller
         try {
             if ($request->ajax()) {
                 $categories = DB::table('blog_categories')->select('blog_categories.*');
+                if ($request->status !== null && $request->status !== '') {
+                    $categories->where('blog_categories.status', $request->status);
+                }
+
+                if ($request->popular !== null && $request->popular !== '') {
+                    $categories->where('blog_categories.is_popular', $request->popular);
+                }
+
+                if ($request->created_date) {
+                    $categories->whereDate('blog_categories.created_at', $request->created_date);
+                }
                 return DataTables::of($categories)
                     ->addColumn('status', function ($categories) {
                         $status_array = [
@@ -102,11 +113,11 @@ class BlogCategoryController extends Controller
                         ])->render();
                     })
                     ->addColumn('icon', function ($categories) {
-                       if ($categories->icon && file_exists(public_path('uploads/blog-category/' . $categories->icon))) {
+                        if ($categories->icon && file_exists(public_path('uploads/blog-category/' . $categories->icon))) {
                             $imageUrl = asset('uploads/blog-category/' . $categories->icon);
                             return '<img src="' . $imageUrl . '" style="max-width:100px;" alt="Category Icon" />';
                         }
-                        return ''; 
+                        return '';
                     })
                     ->rawColumns(['action', 'icon', 'status', 'is_popular'])
                     ->make(true);

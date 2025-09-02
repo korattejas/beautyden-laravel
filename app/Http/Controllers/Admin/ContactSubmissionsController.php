@@ -35,10 +35,10 @@ class ContactSubmissionsController extends Controller
         $function_name = 'view';
         try {
             $contact = ContactSubmission::leftJoin('services as sc', 'sc.id', '=', 'contact_submissions.service_id')
-            ->select('contact_submissions.*', 'sc.name as service_name')
-            ->findOrFail($id);
+                ->select('contact_submissions.*', 'sc.name as service_name')
+                ->findOrFail($id);
 
-        return response()->json(['data' => $contact], 200);
+            return response()->json(['data' => $contact], 200);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -53,6 +53,15 @@ class ContactSubmissionsController extends Controller
                 $contact = ContactSubmission::query()
                     ->leftJoin('services as sc', 'sc.id', '=', 'contact_submissions.service_id')
                     ->select('contact_submissions.*', 'sc.name as service_name');
+
+                if ($request->status !== null && $request->status !== '') {
+                    $contact->where('contact_submissions.status', $request->status);
+                }
+
+                if ($request->created_date) {
+                    $contact->whereDate('contact_submissions.created_at', $request->created_date);
+                }
+
                 return DataTables::of($contact)
                     ->addColumn('status', function ($contact) {
                         $status_array = [

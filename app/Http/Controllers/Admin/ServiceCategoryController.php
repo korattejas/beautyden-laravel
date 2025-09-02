@@ -68,6 +68,19 @@ class ServiceCategoryController extends Controller
         try {
             if ($request->ajax()) {
                 $categories = DB::table('service_categories')->select('service_categories.*');
+
+                if ($request->status !== null && $request->status !== '') {
+                    $categories->where('service_categories.status', $request->status);
+                }
+
+                if ($request->popular !== null && $request->popular !== '') {
+                    $categories->where('service_categories.is_popular', $request->popular);
+                }
+
+                if ($request->created_date) {
+                    $categories->whereDate('service_categories.created_at', $request->created_date);
+                }
+
                 return DataTables::of($categories)
                     ->addColumn('status', function ($categories) {
                         $status_array = [
@@ -101,12 +114,12 @@ class ServiceCategoryController extends Controller
                             'action_array' => $action_array
                         ])->render();
                     })
-                   ->addColumn('icon', function ($categories) {
+                    ->addColumn('icon', function ($categories) {
                         if ($categories->icon && file_exists(public_path('uploads/service-category/' . $categories->icon))) {
                             $imageUrl = asset('uploads/service-category/' . $categories->icon);
                             return '<img src="' . $imageUrl . '" style="max-width:100px;" alt="Category Icon" />';
                         }
-                        return ''; 
+                        return '';
                     })
 
                     ->rawColumns(['action', 'icon', 'status', 'is_popular'])

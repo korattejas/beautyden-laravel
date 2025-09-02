@@ -25,6 +25,57 @@
                     <a href="{{ route('admin.team.create') }}" class="btn btn-primary">
                         Add Team Member
                     </a>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-2" style="min-width: 300px;">
+                            <div class="mb-2">
+                                <label class="form-label">Status</label>
+                                <select id="filter-status" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Is Popular</label>
+                                <select id="filter-popular" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="1">High Priority</option>
+                                    <option value="0">Low Priority</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Experience (Years)</label>
+                                <select id="filter-year-of-experience" class="form-select">
+                                    <option value="">All</option>
+                                    @for ($i = 0; $i <= 10; $i++)
+                                        @if ($i < 10)
+                                            <option value="{{ $i }}">{{ $i }}
+                                                year{{ $i > 1 ? 's' : '' }}</option>
+                                        @else
+                                            <option value="10+">10+ years</option>
+                                        @endif
+                                    @endfor
+                                </select>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label">Created Date</label>
+                                <input type="date" id="filter-created-date" class="form-control">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button id="btn-apply-filters" class="btn btn-sm btn-primary">
+                                    Apply
+                                </button>
+                                <button id="btn-reset-filters" class="btn btn-sm btn-secondary">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -201,12 +252,12 @@
                                 ${
                                     data.icon 
                                     ? `<img 
-                                                src="${baseUrl + data.icon}" 
-                                                alt="Team Icon" 
-                                                class="img-fluid service-icon" 
-                                                style="max-width:250px; cursor:pointer;" 
-                                                onclick="window.open('${baseUrl + data.icon}', '_blank')" 
-                                            >`
+                                                                src="${baseUrl + data.icon}" 
+                                                                alt="Team Icon" 
+                                                                class="img-fluid service-icon" 
+                                                                style="max-width:250px; cursor:pointer;" 
+                                                                onclick="window.open('${baseUrl + data.icon}', '_blank')" 
+                                                            >`
                                     : '<p>-</p>'
                                 }
                             </div>
