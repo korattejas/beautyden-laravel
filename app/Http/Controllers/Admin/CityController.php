@@ -58,7 +58,21 @@ class CityController extends Controller
         try {
             if ($request->ajax()) {
                 $cities = City::query();
+                if ($request->status !== null && $request->status !== '') {
+                    $cities->where('cities.status', $request->status);
+                }
 
+                if ($request->popular !== null && $request->popular !== '') {
+                    $cities->where('cities.is_popular', $request->popular);
+                }
+
+                if ($request->launch_quarter !== null && $request->launch_quarter !== '') {
+                    $cities->where('cities.launch_quarter', $request->launch_quarter);
+                }
+
+                if ($request->created_date) {
+                    $cities->whereDate('cities.created_at', $request->created_date);
+                }
                 return DataTables::of($cities)
                     ->addColumn('status', function ($c) {
                         $status_array = [

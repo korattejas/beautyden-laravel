@@ -25,6 +25,42 @@
                 <a href="{{ route('admin.blog-category.create') }}" class="btn btn-primary">
                     Add Blog Category
                 </a>
+                <div class="btn-group">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-2" style="min-width: 300px;">
+                            <div class="mb-2">
+                                <label class="form-label">Status</label>
+                                <select id="filter-status" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Is Popular</label>
+                                <select id="filter-popular" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="1">High Priority</option>
+                                    <option value="0">Low Priority</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Created Date</label>
+                                <input type="date" id="filter-created-date" class="form-control">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button id="btn-apply-filters" class="btn btn-sm btn-primary">
+                                    Apply
+                                </button>
+                                <button id="btn-reset-filters" class="btn btn-sm btn-secondary">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
         <div class="content-body">

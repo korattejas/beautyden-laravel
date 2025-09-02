@@ -25,6 +25,46 @@
                     <a href="{{ route('admin.blogs.create') }}" class="btn btn-primary">
                         Add Blog
                     </a>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-2" style="min-width: 300px;">
+                            <div class="mb-2">
+                                <label class="form-label">Status</label>
+                                <select id="filter-status" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Is Featured</label>
+                                <select id="filter-featured" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="1">Featured</option>
+                                    <option value="0">Normal</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Publish Date</label>
+                                <input type="date" id="filter-publish-date" class="form-control">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Created Date</label>
+                                <input type="date" id="filter-created-date" class="form-control">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button id="btn-apply-filters" class="btn btn-sm btn-primary">
+                                    Apply
+                                </button>
+                                <button id="btn-reset-filters" class="btn btn-sm btn-secondary">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

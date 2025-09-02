@@ -89,6 +89,18 @@ class ServiceController extends Controller
                     ->leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
                     ->select('services.*', 'sc.name as category_name');
 
+                if ($request->status !== null && $request->status !== '') {
+                    $services->where('services.status', $request->status);
+                }
+
+                if ($request->popular !== null && $request->popular !== '') {
+                    $services->where('services.is_popular', $request->popular);
+                }
+
+                if ($request->created_date) {
+                    $services->whereDate('services.created_at', $request->created_date);
+                }
+
                 return DataTables::of($services)
                     ->addColumn('status', function ($s) {
                         $status_array = [

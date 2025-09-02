@@ -83,6 +83,25 @@ class BlogController extends Controller
                 $blogs = Blog::query()
                     ->leftJoin('blog_categories as bc', 'bc.id', '=', 'blogs.category_id')
                     ->select('blogs.*', 'bc.name as category');
+                if ($request->status !== null && $request->status !== '') {
+                    $blogs->where('blogs.status', $request->status);
+                }
+
+                if ($request->popular !== null && $request->popular !== '') {
+                    $blogs->where('blogs.is_popular', $request->popular);
+                }
+
+                if ($request->featured !== null && $request->featured !== '') {
+                    $blogs->where('blogs.featured', $request->featured);
+                }
+
+                if ($request->publish_date) {
+                    $blogs->whereDate('blogs.publish_date', $request->publish_date);
+                }
+
+                if ($request->created_date) {
+                    $blogs->whereDate('blogs.created_at', $request->created_date);
+                }
                 return DataTables::of($blogs)
                     ->addColumn('status', function ($b) {
                         $status_array = [

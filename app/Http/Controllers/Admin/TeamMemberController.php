@@ -78,6 +78,27 @@ class TeamMemberController extends Controller
         try {
             if ($request->ajax()) {
                 $members = DB::table('team_members')->select('team_members.*');
+
+                if ($request->status !== null && $request->status !== '') {
+                    $members->where('team_members.status', $request->status);
+                }
+
+                if ($request->popular !== null && $request->popular !== '') {
+                    $members->where('team_members.is_popular', $request->popular);
+                }
+
+                if ($request->year_of_experience !== null && $request->year_of_experience !== '') {
+                    if ($request->year_of_experience === '10+') {
+                        $members->where('team_members.experience_years', '>', 10);
+                    } else {
+                        $members->where('team_members.experience_years', $request->year_of_experience);
+                    }
+                }
+
+                if ($request->created_date) {
+                    $members->whereDate('team_members.created_at', $request->created_date);
+                }
+
                 return DataTables::of($members)
                     ->addColumn('status', function ($members) {
                         $status_array = [

@@ -87,6 +87,22 @@ class CustomerReviewController extends Controller
                     ->leftJoin('services as s', 's.id', '=', 'customer_reviews.service_id')
                     ->select('customer_reviews.*', 's.name as service_name');
 
+                if ($request->status !== null && $request->status !== '') {
+                    $reviews->where('customer_reviews.status', $request->status);
+                }
+
+                if ($request->popular !== null && $request->popular !== '') {
+                    $reviews->where('customer_reviews.is_popular', $request->popular);
+                }
+
+                if ($request->review_date) {
+                    $reviews->whereDate('customer_reviews.review_date', $request->review_date);
+                }
+
+                if ($request->created_date) {
+                    $reviews->whereDate('customer_reviews.created_at', $request->created_date);
+                }
+
                 return DataTables::of($reviews)
                     ->addColumn('status', function ($r) {
                         $status_array = [
