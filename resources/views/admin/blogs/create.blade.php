@@ -157,7 +157,7 @@
 
                                             <!-- Submit -->
                                             <div class="col-12">
-                                                <div class="form-group mb-0 mt-3 justify-content-end">
+                                                <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">
                                                     <button type="submit" class="btn btn-primary">Submit</button>
                                                     <a href="{{ route('admin.blogs.index') }}"
                                                         class="btn btn-secondary">Cancel</a>

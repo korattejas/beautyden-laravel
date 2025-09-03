@@ -82,7 +82,7 @@
                                             </div>
 
                                             <div class="col-12">
-                                                <div class="form-group mb-0 mt-3 justify-content-end">
+                                                <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">
                                                     <div>
                                                         <button type="submit"
                                                             class="btn btn-primary">{{ trans('admin_string.submit') }}</button>
