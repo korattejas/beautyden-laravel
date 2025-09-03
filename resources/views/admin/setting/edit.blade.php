@@ -59,9 +59,7 @@
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label>{{trans('admin_string.value')}}</label>
-                                                    <input type="text" class="form-control" name="value"
-                                                        value="{{$setting->value}}"
-                                                        placeholder="{{trans('admin_string.value')}}" required>
+                                                        <textarea class="form-control" name="value" rows="3" placeholder="Write a value" required>{{$setting->value}}</textarea>
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
