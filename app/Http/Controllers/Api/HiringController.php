@@ -44,6 +44,8 @@ class HiringController extends Controller
                     'h.gender_preference',
                     DB::raw('JSON_EXTRACT(h.required_skills, "$") as required_skills'),
                     'h.is_popular',
+                    'h.created_at',
+                    'h.updated_at',
                 )
                 ->where('h.status', 1);
 
