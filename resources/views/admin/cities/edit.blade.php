@@ -128,7 +128,7 @@
 
                                             <!-- Submit -->
                                             <div class="col-12">
-                                                <div class="form-group mb-0 mt-3 justify-content-end">
+                                                <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">
                                                     <button type="submit"
                                                         class="btn btn-primary">{{ trans('admin_string.submit') }}</button>
                                                     <a href="{{ route('admin.city.index') }}"

@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('screen_name', 100)->nullable();
             $table->string('key', 155)->unique();
-            $table->string('value');
+            $table->longText('value');
             $table->tinyInteger('status')->default(1)->comment('1 = Active, 0 = InActive');
             $table->timestamps();
         });

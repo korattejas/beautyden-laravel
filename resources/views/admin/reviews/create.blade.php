@@ -128,7 +128,7 @@
                                             </div>
 
                                             <!-- Submit -->
-                                            <div class="col-12 mt-3">
+                                            <div class="col-12 mt-3" style="text-align: right;">
                                                 <button type="submit" class="btn btn-primary">Submit</button>
                                                 <a href="{{ route('admin.reviews.index') }}"
                                                     class="btn btn-secondary">Cancel</a>

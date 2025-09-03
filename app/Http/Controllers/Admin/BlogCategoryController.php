@@ -192,7 +192,7 @@ class BlogCategoryController extends Controller
                     'name' => $request->name,
                     'description' => $request->description,
                     'icon' => $icon,
-                    'is_popular' => (int) $request->is_main,
+                    'is_popular' => (int) $request->is_popular,
                     'status' => (int) $request->status,
                 ]);
                 return response()->json([
