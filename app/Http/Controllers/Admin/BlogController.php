@@ -194,7 +194,7 @@ class BlogController extends Controller
             $data = [
                 'category_id'  => $request->category_id,
                 'title'        => $request->title,
-                'slug'        => $request->title,
+                'slug'        => $request->slug,
                 'excerpt'      => $request->excerpt,
                 'content'      => $request->content,
                 'read_time'    => $request->read_time,

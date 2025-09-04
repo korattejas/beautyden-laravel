@@ -167,20 +167,10 @@ class BlogController extends Controller
                 });
             }
 
+            $blogs = $query->orderByDesc('b.featured')->first();
 
-            if ($request->has('category_id') && !empty($request->category_id)) {
-                $query->where('b.category_id', $request->category_id);
-            }
-
-            $blogs = $query->orderByDesc('b.featured')
-                ->get()
-                ->map(function ($blog) {
-                    $blog->tags = $blog->tags ? json_decode($blog->tags, true) : [];
-                    return $blog;
-                });
-
-            if ($blogs->isEmpty()) {
-                return $this->sendError('No blog found.', $this->backend_error_status);
+            if ($blogs) {
+                $blogs->tags = $blogs->tags ? json_decode($blogs->tags, true) : [];
             }
 
             return $this->sendResponse(

@@ -59,8 +59,10 @@ class AppointmentsController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
+            $orderNumber = '#BEAUTYDEN' . Str::upper(Str::random(8));
+
             $appointment = Appointment::create([
-                'order_number'        => '#BEAUTYDEN' . Str::upper(Str::random(8)),
+                'order_number'        => $orderNumber,
                 'first_name'          => $request->first_name,
                 'last_name'           => $request->last_name,
                 'email'               => $request->email,
@@ -77,9 +79,39 @@ class AppointmentsController extends Controller
                 'status'              => '0',
             ]);
 
+            $message = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                            <p>Thank you for booking with <strong>BeautyDen</strong>! 💖</p>
+
+                            <p><strong>📋 Your Order Number:</strong> <span style="color:#d63384;">' . $orderNumber . '</span></p>
+
+                            <p>Your appointment request has been received successfully.</p>
+
+                            <p>⏳ Our team will shortly review your booking details and check:</p>
+                            <ul>
+                                <li>Service availability</li>
+                                <li>Provider schedule</li>
+                                <li>Your location &amp; timing</li>
+                            </ul>
+
+                            <p>📌 Once everything is verified, we’ll confirm your appointment and share the final details with you.</p>
+
+                            <p>✨ Sit back &amp; relax — you’re in safe hands with <strong>BeautyDen</strong>!</p>
+
+                            <p>📞 If you don’t hear back from us soon, please feel free to reach us at:</p>
+                            <ul>
+                                <li><strong>WhatsApp:</strong> +91 95747 58282</li>
+                                <li><strong>Email:</strong> contact@beautyden.com</li>
+                                <li><strong>Phone:</strong> +91 95747 58282</li>
+                            </ul>
+                        </div>
+                    ';
+
             return $this->sendResponse(
-                $appointment,
-                'Appointment booked successfully.',
+                [
+                    'appointment'  => $appointment,
+                    'order_number' => $orderNumber,
+                ],
+                $message,
                 $this->success_status
             );
         } catch (Exception $e) {
