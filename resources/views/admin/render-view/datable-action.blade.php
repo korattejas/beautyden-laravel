@@ -68,5 +68,14 @@
                 <i class="bx bx-bullseye font-size-16 align-middle"></i>
             </button>
         @endif
+
+        @if (isset($action_array['assign_id']))
+            <button data-id="{{ $action_array['assign_id'] }}" data-new-old-priority-status-change="0"
+                class="assign-member btn btn-warning btn-icon" data-effect="effect-fall" data-toggle="tooltip"
+                data-placement="top" title="Assign team member">
+                <i class="bx bx-user-plus font-size-16 align-middle"></i>
+            </button>
+        @endif
+
     </div>
 @endif

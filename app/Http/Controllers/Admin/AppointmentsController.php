@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
+use App\Models\TeamMember;
 
 class AppointmentsController extends Controller
 {
@@ -24,7 +25,8 @@ class AppointmentsController extends Controller
     {
         $function_name = 'index';
         try {
-            return view('admin.appointments.index');
+            $teamMembers = TeamMember::all();
+            return view('admin.appointments.index', compact('teamMembers'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -68,6 +70,7 @@ class AppointmentsController extends Controller
                             'delete_id' => $appointment->id,
                             'current_status' => $appointment->status,
                             'hidden_id' => $appointment->id,
+                            'assign_id' => $appointment->id
                         ];
                         return view('admin.render-view.datable-action', [
                             'action_array' => $action_array
@@ -109,6 +112,23 @@ class AppointmentsController extends Controller
                 logger()->error("$function_name: Failed to delete appointment not found.");
                 return response()->json(['error' => 'Failed to delete appointment not found.'], 500);
             }
+        } catch (\Exception $e) {
+            logger()->error("$function_name: " . $e->getMessage());
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
+    public function AssignMember(Request $request)
+    {
+        $function_name = 'AssignMember';
+        try {
+            $memberString = implode(',', $request->members);
+            Appointment::where('id', $request->value_id)->update([
+                'assigned_to' => $memberString,
+                'assigned_by' => 'Admin',
+                'status' => 2
+            ]);
+            return response()->json(['message' => 'Team member assign successfully']);
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());
             return response()->json(['error' => $this->error_message], $this->exception_error_code);

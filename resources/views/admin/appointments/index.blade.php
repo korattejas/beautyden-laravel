@@ -58,6 +58,46 @@
             </div>
         </div>
     </div>
+    <!-- Assign Team Members Modal -->
+    <div id="c-assignModal" class="c-modal">
+        <div class="c-modal-dialog">
+            <div class="c-modal-content">
+
+                <!-- Header -->
+                <div class="c-modal-header">
+                    <h5 class="c-modal-title"><i class="bi bi-people-fill"></i> Assign Team Members</h5>
+                    <button class="c-close-btn" data-c-close>&times;</button>
+                </div>
+
+                <!-- Body -->
+                <div class="c-modal-body">
+                    <form id="assignForm">
+                        <input type="hidden" id="value_id" name="value_id">
+
+                        <div class="mb-3">
+                            <label for="team_members" class="form-label">Select Members</label>
+                            <select id="team_members" name="team_members[]" class="form-control" multiple>
+                                @foreach ($teamMembers as $member)
+                                    <option value="{{ $member->id }}">{{ $member->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer -->
+                <div class="c-modal-footer">
+                    <button class="c-btn c-btn-secondary" data-c-close>
+                        <i class="bi bi-x-circle"></i> Close
+                    </button>
+                    <button type="button" id="saveMembers" class="c-btn c-btn-primary">
+                        <i class="bi bi-check-circle"></i> Save
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('footer_script_content')
@@ -66,32 +106,90 @@
         const sweetalert_change_status = "Change Status of Appointment";
         const form_url = '/appointments';
         datatable_url = '/getDataAppointments';
+        $('#team_members').select2({
+            dropdownParent: $('#c-assignModal')
+        });
 
         $.extend(true, $.fn.dataTable.defaults, {
-            columns: [
-                {
+            columns: [{
                     data: null,
                     name: 'id',
                     render: function(data, type, row, meta) {
-                        return meta.row + 1; 
+                        return meta.row + 1;
                     }
                 },
-                { data: 'service_category_name', name: 'service_category_name' },
-                { data: 'service_name', name: 'service_name' },
-                { data: 'order_number', name: 'order_number' },
-                { data: 'first_name', name: 'first_name' },
-                { data: 'last_name', name: 'last_name' },
-                { data: 'phone', name: 'phone' },
+                {
+                    data: 'service_category_name',
+                    name: 'service_category_name'
+                },
+                {
+                    data: 'service_name',
+                    name: 'service_name'
+                },
+                {
+                    data: 'order_number',
+                    name: 'order_number'
+                },
+                {
+                    data: 'first_name',
+                    name: 'first_name'
+                },
+                {
+                    data: 'last_name',
+                    name: 'last_name'
+                },
+                {
+                    data: 'phone',
+                    name: 'phone'
+                },
                 // { data: 'quantity', name: 'quantity' },
                 // { data: 'price', name: 'price' },
                 // { data: 'discount_price', name: 'discount_price' },
                 // { data: 'service_address', name: 'service_address' },
-                { data: 'appointment_date', name: 'appointment_date' },
-                { data: 'appointment_time', name: 'appointment_time' },
-                { data: 'status', name: 'status' },
-                { data: 'action', name: 'action', orderable: false },
+                {
+                    data: 'appointment_date',
+                    name: 'appointment_date'
+                },
+                {
+                    data: 'appointment_time',
+                    name: 'appointment_time'
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false
+                },
             ],
-            order: [[0, 'DESC']],
+            order: [
+                [0, 'DESC']
+            ],
+        });
+
+        $(document).on('click', '#saveMembers', function() {
+            let selected = $('#team_members').val();
+            let value_id = $('#value_id').val();
+
+            $.ajax({
+                url: 'appointments/assign_member',
+                method: 'POST',
+                data: {
+                    value_id: value_id,
+                    members: selected
+                },
+                success: function(res) {
+                    loaderHide();
+                    $('#c-assignModal').removeClass("show");
+                }
+            });
+        });
+
+        $(document).on("click", "[data-c-close]", function() {
+            loaderHide();
+            $("#c-assignModal").removeClass("show");
         });
     </script>
     <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>

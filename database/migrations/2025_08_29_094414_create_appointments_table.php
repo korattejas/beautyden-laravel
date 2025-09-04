@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('service_category_id')->nullable()->comment('Reference to service categories table');
             $table->string('service_id')->nullable()->comment('Reference to services table');
+            $table->string('assigned_to', 100)->nullable()->comment('Multiple team ids comma separated');
+            $table->string('assigned_by', 100)->nullable()->comment('Admin who assigned appointment');
             $table->string('order_number', 50);
             $table->string('first_name', 50);
             $table->string('last_name', 50)->nullable();
@@ -27,7 +29,7 @@ return new class extends Migration
             $table->date('appointment_date')->nullable();
             $table->time('appointment_time')->nullable();
             $table->text('special_notes')->nullable();
-            $table->tinyInteger('status')->default(0)->comment('1 = Active/Approve, 0 = Inactive/Rejected/Pending');
+            $table->tinyInteger('status')->default(1)->comment('1 = Pending, 2 = Assigned, 3 = Completed, 4 = Rejected')->change();
             $table->timestamps();
         });
     }

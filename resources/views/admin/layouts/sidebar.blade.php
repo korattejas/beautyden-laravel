@@ -41,7 +41,7 @@
                     <span class="menu-title text-truncate">Customer Contact</span>
                 </a>
             </li>
-            
+
             <li class="nav-item {{ Request::routeIs('admin.service-category.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.service-category.index') }}">
                     <i data-feather="layers"></i>
@@ -95,6 +95,13 @@
                 <a class="d-flex align-items-center" href="{{ route('admin.home-counters.index') }}">
                     <i data-feather="bar-chart-2"></i>
                     <span class="menu-title text-truncate">Home Counter</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.product-brand.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.product-brand.index') }}">
+                    <i data-feather="tag"></i>
+                    <span class="menu-title text-truncate">Product Brand</span>
                 </a>
             </li>
 
