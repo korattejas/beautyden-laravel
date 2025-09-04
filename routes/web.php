@@ -173,13 +173,21 @@ Route::group(['prefix' => 'admin'], function () {
 
     /* Appointments Route */
     Route::get('appointments', [AppointmentsController::class, 'index'])->name('admin.appointments.index');
+    Route::get('appointments/create', [AppointmentsController::class, 'create'])->name('admin.appointments.create');
+    Route::post('appointments/store', [AppointmentsController::class, 'store']);
+    Route::get('appointments/edit/{id}', [AppointmentsController::class, 'edit'])->name('admin.appointments.edit');
     Route::get('getDataAppointments', [AppointmentsController::class, 'getDataAppointments'])->name('getDataAppointments');
     Route::get('appointments/status/{id}/{status}', [AppointmentsController::class, 'changeStatus']);
     Route::delete('appointments/{id}', [AppointmentsController::class, 'destroy']);
     Route::post('appointments/assign_member', [AppointmentsController::class, 'AssignMember'])->name('assign.members');
+    Route::get('appointments-view/{id}', [AppointmentsController::class, 'view']);
     
     /* Policies Route */
     Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');
     Route::post('policies/store', [PoliciesController::class, 'store']);
   });
 });
+
+
+
+

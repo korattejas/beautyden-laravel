@@ -20,6 +20,49 @@
                         </div>
                     </div>
                 </div>
+                <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                    <a href="{{ route('admin.appointments.create') }}" class="btn btn-primary">
+                        Add Appointments
+                    </a>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-funnel"></i> Filter
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-2" style="min-width: 300px;">
+                            <div class="mb-2">
+                                <label class="form-label">Status</label>
+                                <select id="filter-status" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="1">Pending</option>
+                                    <option value="2">Assigned</option>
+                                    <option value="3">Completed</option>
+                                    <option value="4">Rejected</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Appointment Date</label>
+                                <input type="date" id="filter-appointment-date" class="form-control">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Appointment Time</label>
+                                <input type="time" id="filter-appointment-time" class="form-control">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Created Date</label>
+                                <input type="date" id="filter-created-date" class="form-control">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button id="btn-apply-filters" class="btn btn-sm btn-primary">
+                                    Apply
+                                </button>
+                                <button id="btn-reset-filters" class="btn btn-sm btn-secondary">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="content-body">
                 <!-- Column Search -->
@@ -32,11 +75,11 @@
                                         <thead>
                                             <tr>
                                                 <th>Id</th>
-                                                <th>Service Category</th>
-                                                <th>Service</th>
+                                                {{-- <th>Service Category</th> --}}
+                                                {{-- <th>Service</th> --}}
                                                 <th>Order Number</th>
                                                 <th>First Name</th>
-                                                <th>Last Name</th>
+                                                {{-- <th>Last Name</th> --}}
                                                 <th>Phone</th>
                                                 {{-- <th>Quantity</th> --}}
                                                 {{-- <th>Price</th> --}}
@@ -44,7 +87,7 @@
                                                 {{-- <th>Service Address</th> --}}
                                                 <th>Appointment Date</th>
                                                 <th>Appointment Time</th>
-                                                <th data-stuff="Active,Inactive">Status</th>
+                                                <th data-stuff="Pending,Assigned,Completed,Rejected">Status</th>
                                                 <th data-search="false">Action</th>
                                             </tr>
                                         </thead>
@@ -98,6 +141,27 @@
             </div>
         </div>
     </div>
+
+    <div id="c-viewAppointmentModal" class="c-modal">
+        <div class="c-modal-dialog">
+            <div class="c-modal-content">
+                <div class="c-modal-header">
+                    <h5 class="c-modal-title"><i class="bi bi-journal-text"></i> Appoinment Details</h5>
+                    <button class="c-close-btn" data-c-close>&times;</button>
+                </div>
+                <div class="c-modal-body" id="c-appointment-details">
+                    <div class="c-loader">
+                        <div class="c-spinner"></div>
+                        <span>Fetching details...</span>
+                    </div>
+                </div>
+                <div class="c-modal-footer">
+                    <small><i class="bi bi-clock"></i> Updated just now</small>
+                    <button class="c-btn" data-c-close><i class="bi bi-x-circle"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('footer_script_content')
@@ -118,14 +182,14 @@
                         return meta.row + 1;
                     }
                 },
-                {
-                    data: 'service_category_name',
-                    name: 'service_category_name'
-                },
-                {
-                    data: 'service_name',
-                    name: 'service_name'
-                },
+                // {
+                //     data: 'service_category_name',
+                //     name: 'service_category_name'
+                // },
+                // {
+                //     data: 'service_name',
+                //     name: 'service_name'
+                // },
                 {
                     data: 'order_number',
                     name: 'order_number'
@@ -134,10 +198,10 @@
                     data: 'first_name',
                     name: 'first_name'
                 },
-                {
-                    data: 'last_name',
-                    name: 'last_name'
-                },
+                // {
+                //     data: 'last_name',
+                //     name: 'last_name'
+                // },
                 {
                     data: 'phone',
                     name: 'phone'
@@ -181,15 +245,101 @@
                     members: selected
                 },
                 success: function(res) {
-                    loaderHide();
+                    location.reload();
                     $('#c-assignModal').removeClass("show");
                 }
             });
         });
 
         $(document).on("click", "[data-c-close]", function() {
-            loaderHide();
             $("#c-assignModal").removeClass("show");
+        });
+
+        $(document).on('click', '.btn-view', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+
+            $("#c-viewAppointmentModal").addClass("show");
+            $("#c-appointment-details").html(
+                `<div class="c-loader"><div class="c-spinner"></div><span>Loading...</span></div>`
+            );
+
+            $.ajax({
+                url: '/admin/appointments-view/' + id, // 👈 Laravel route
+                type: 'GET',
+                success: function(response) {
+                    let data = response.data;
+                    console.log('Appointment data:', data);
+
+                    // 🔹 Services
+                    let servicesHtml = '-';
+                    if (data.services && Array.isArray(data.services) && data.services.length > 0) {
+                        servicesHtml = data.services.map(s =>
+                            `<span class="c-include-badge">${s}</span>`).join(" ");
+                    }
+
+                    // 🔹 Team Members
+                    let teamHtml = '-';
+                    if (data.team_members && Array.isArray(data.team_members) && data.team_members
+                        .length > 0) {
+                        teamHtml = data.team_members.map(m =>
+                            `<span class="c-include-badge">${m}</span>`).join(" ");
+                    }
+
+                    let html = `
+                <div class="c-row">
+                    <div class="c-col-6"><div class="c-detail-card"><label>Category</label><p>${data.service_category ?? '-'}</p></div></div>
+                    <div class="c-col-6"><div class="c-detail-card"><label>Services</label><p>${servicesHtml}</p></div></div>
+
+                    <div class="c-col-6"><div class="c-detail-card"><label>Order #</label><p>${data.order_number ?? '-'}</p></div></div>
+                    <div class="c-col-6"><div class="c-detail-card"><label>Quantity</label><p>${data.quantity ?? '-'}</p></div></div>
+
+                    <div class="c-col-6"><div class="c-detail-card"><label>First Name</label><p>${data.first_name ?? '-'}</p></div></div>
+                    <div class="c-col-6"><div class="c-detail-card"><label>Last Name</label><p>${data.last_name ?? '-'}</p></div></div>
+
+                    <div class="c-col-6"><div class="c-detail-card"><label>Email</label><p>${data.email ?? '-'}</p></div></div>
+                    <div class="c-col-6"><div class="c-detail-card"><label>Phone</label><p>${data.phone ?? '-'}</p></div></div>
+
+                    <div class="c-col-6"><div class="c-detail-card"><label>Price</label><p>${data.price ?? '-'}</p></div></div>
+                    <div class="c-col-6"><div class="c-detail-card"><label>Discount Price</label><p>${data.discount_price ?? '-'}</p></div></div>
+
+                    <div class="c-col-6"><div class="c-detail-card"><label>Appointment Date</label><p>${data.appointment_date ?? '-'}</p></div></div>
+                    <div class="c-col-6"><div class="c-detail-card"><label>Appointment Time</label><p>${data.appointment_time ?? '-'}</p></div></div>
+
+                    <div class="c-col-12"><div class="c-detail-card"><label>Service Address</label><p>${data.service_address ?? '-'}</p></div></div>
+
+                    <div class="c-col-12"><div class="c-detail-card"><label>Special Notes</label><p>${data.special_notes ?? '-'}</p></div></div>
+
+                    <div class="c-col-6"><div class="c-detail-card"><label>Status</label>
+                        <p>${
+                            data.status == 1 ? '<span class="badge bg-warning">Pending</span>' :
+                            data.status == 2 ? '<span class="badge bg-info">Assigned</span>' :
+                            data.status == 3 ? '<span class="badge bg-success">Completed</span>' :
+                            data.status == 4 ? '<span class="badge bg-danger">Rejected</span>' : '-'
+                        }</p>
+                    </div></div>
+
+                    <div class="c-col-6"><div class="c-detail-card"><label>Team Members</label><p>${teamHtml}</p></div></div>
+
+                    <div class="c-col-6"><div class="c-detail-card"><label>Assigned By</label><p>${data.assigned_by ?? '-'}</p></div></div>
+
+                    <div class="c-col-6"><div class="c-detail-card"><label>Created At</label><p>${data.created_at ? new Date(data.created_at).toLocaleString() : '-'}</p></div></div>
+                    <div class="c-col-6"><div class="c-detail-card"><label>Updated At</label><p>${data.updated_at ? new Date(data.updated_at).toLocaleString() : '-'}</p></div></div>
+                </div>
+            `;
+
+                    $("#c-appointment-details").html(html);
+                },
+                error: function() {
+                    $("#c-appointment-details").html(
+                        `<div class="c-detail-card" style="color:red">Failed to load details.</div>`
+                    );
+                }
+            });
+        });
+
+        $(document).on("click", "[data-c-close]", function() {
+            $("#c-viewAppointmentModal").removeClass("show");
         });
     </script>
     <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
