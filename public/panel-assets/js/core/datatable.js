@@ -165,6 +165,14 @@ $(function () {
         });
 
     });
+    $(document).on('click', '.assign-member', function () {
+        const value_id = $(this).data('id');
+        const status = $(this).data('change-status');
+        loaderView();
+        $('#value_id').val(value_id);
+        $("#c-assignModal").addClass("show");
+
+    });
 
     const changeStatus = (value_id, status) => {
         loaderView();

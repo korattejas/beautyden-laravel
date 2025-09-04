@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AppointmentsController;
 use App\Http\Controllers\Admin\ContactSubmissionsController;
 use App\Http\Controllers\Admin\PoliciesController;
 use Rap2hpoutre\LaravelLogViewer\LogViewerController;
+use App\Http\Controllers\Admin\ProductBrandController;
 use App\Http\Middleware\AdminCheck;
 
 
@@ -49,6 +50,15 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('getDataServiceCategory', [ServiceCategoryController::class, 'getDataServiceCategory'])->name('getDataServiceCategory');
     Route::get('service-category/status/{id}/{status}', [ServiceCategoryController::class, 'changeStatus']);
     Route::get('service-category/priority-status/{id}/{status}', [ServiceCategoryController::class, 'changePriorityStatus']);
+
+    /* product brand */
+    Route::get('product-brand', [ProductBrandController::class, 'index'])->name('admin.product-brand.index');
+    Route::get('product-brand/create', [ProductBrandController::class, 'create'])->name('admin.product-brand.create');
+    Route::post('product-brand/store', [ProductBrandController::class, 'store']);
+    Route::delete('product-brand/{id}', [ProductBrandController::class, 'destroy']);
+    Route::get('product-brand/edit/{id}', [ProductBrandController::class, 'edit'])->name('admin.product-brand.edit');
+    Route::get('getDataProductBrand', [ProductBrandController::class, 'getDataProductBrand'])->name('getDataProductBrand');
+    Route::get('product-brand/status/{id}/{status}', [ProductBrandController::class, 'changeStatus']);
 
     /* Blog Category Route */
     Route::get('blog-category', [BlogCategoryController::class, 'index'])->name('admin.blog-category.index');
@@ -166,7 +176,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('getDataAppointments', [AppointmentsController::class, 'getDataAppointments'])->name('getDataAppointments');
     Route::get('appointments/status/{id}/{status}', [AppointmentsController::class, 'changeStatus']);
     Route::delete('appointments/{id}', [AppointmentsController::class, 'destroy']);
-
+    Route::post('appointments/assign_member', [AppointmentsController::class, 'AssignMember'])->name('assign.members');
+    
     /* Policies Route */
     Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');
     Route::post('policies/store', [PoliciesController::class, 'store']);

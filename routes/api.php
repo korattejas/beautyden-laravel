@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CustomerReviewController;
 use App\Http\Controllers\Api\HiringController;
 use App\Http\Controllers\Api\HomeCounterController;
 use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\ProductBrandController;
 use App\Http\Controllers\Api\FaqsController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\ContactSubmissionsController;
@@ -76,6 +77,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('hiring', [HiringController::class, 'getHiring']);
         Route::get('homeCounter', [HomeCounterController::class, 'getHomeCounter']);
         Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('productBrand', [ProductBrandController::class, 'getProductBrand']);
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
         Route::get('settings', [SettingController::class, 'getsettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
@@ -98,6 +100,7 @@ Route::middleware([])->group(function () {
         Route::post('hiring', [HiringController::class, 'getHiring']);
         Route::get('homeCounter', [HomeCounterController::class, 'getHomeCounter']);
         Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('productBrand', [ProductBrandController::class, 'getProductBrand']);
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
         Route::get('settings', [SettingController::class, 'getsettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
