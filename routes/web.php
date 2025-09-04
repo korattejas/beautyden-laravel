@@ -187,3 +187,5 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('policies/store', [PoliciesController::class, 'store']);
   });
 });
+
+
