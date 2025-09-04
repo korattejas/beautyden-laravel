@@ -13,6 +13,7 @@ use App\Models\TeamMember;
 use App\Models\CustomerReview;
 use App\Models\ContactSubmission;
 use App\Models\Hiring;
+use App\Models\ProductBrand;
 
 class DashboardController extends Controller
 {
@@ -34,8 +35,10 @@ class DashboardController extends Controller
         $function_name = 'index';
         try {
             $totalAppointments      = Appointment::count();
-            $totalAppoinmentSuccess = Appointment::where('status', 1)->count();
-            $totalAppoinmentPending = Appointment::where('status', 0)->count();
+            $totalAppointmentsPending   = Appointment::where('status', 1)->count(); 
+            $totalAppointmentsAssigned  = Appointment::where('status', 2)->count(); 
+            $totalAppointmentsCompleted = Appointment::where('status', 3)->count();
+            $totalAppointmentsRejected  = Appointment::where('status', 4)->count();
             $totalContacts = ContactSubmission::count();
             $totalServiceCategory = ServiceCategory::where('status', 1)->count();
             $totalServices = Service::where('status', 1)->count();
@@ -45,11 +48,14 @@ class DashboardController extends Controller
             $totalHirings = Hiring::where('status', 1)->count();
             $totalCustomerReviews = CustomerReview::where('status', 1)->count();
             $totalCity = City::where('status', 1)->count();
+            $totalProductBrand = ProductBrand::where('status', 1)->count();
 
             return view('admin.dashboard.index', [
                 'totalAppointments'      => $totalAppointments,
-                'totalAppoinmentSuccess' => $totalAppoinmentSuccess,
-                'totalAppoinmentPending' => $totalAppoinmentPending,
+                'totalAppointmentsPending' => $totalAppointmentsPending,
+                'totalAppointmentsAssigned' => $totalAppointmentsAssigned,
+                'totalAppointmentsCompleted' => $totalAppointmentsCompleted,
+                'totalAppointmentsRejected' => $totalAppointmentsRejected,
                 'totalContacts'          => $totalContacts,
                 'totalServiceCategory'   => $totalServiceCategory,
                 'totalServices'          => $totalServices,
@@ -59,6 +65,7 @@ class DashboardController extends Controller
                 'totalHirings'           => $totalHirings,
                 'totalCustomerReviews'   => $totalCustomerReviews,
                 'totalCity'              => $totalCity,
+                'totalProductBrand'      => $totalProductBrand,
             ]);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);

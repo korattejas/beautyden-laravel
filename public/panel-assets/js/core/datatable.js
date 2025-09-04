@@ -64,6 +64,8 @@ $(function () {
                     d.salary_range = $('#filter-salary').val();
                     d.year_of_experience = $('#filter-year-of-experience').val();
                     d.launch_quarter = $('#filter-launch-quarter').val();
+                    d.appointment_date = $('#filter-appointment-date').val();
+                    d.appointment_time = $('#filter-appointment-time').val();
                 }
             },
             orderCellsTop: true,
@@ -91,6 +93,8 @@ $(function () {
             $('#filter-max-exp').val('');
             $('#filter-salary').val('');
             $('#filter-launch-quarter').val('');
+            $('#filter-appointment-date').val('');
+            $('#filter-appointment-time').val('');
             dt_filter.ajax.reload();
         });
     }
@@ -168,7 +172,6 @@ $(function () {
     $(document).on('click', '.assign-member', function () {
         const value_id = $(this).data('id');
         const status = $(this).data('change-status');
-        loaderView();
         $('#value_id').val(value_id);
         $("#c-assignModal").addClass("show");
 
