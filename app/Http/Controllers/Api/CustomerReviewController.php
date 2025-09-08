@@ -79,9 +79,12 @@ class CustomerReviewController extends Controller
                 $query->where('r.rating', '>=', $request->rating);
             }
 
+            $perPage = $request->per_page ?? 9;
+            $page = $request->page ?? 1;
+
             $reviews = $query->orderByDesc('r.is_popular')
-                ->get()
-                ->map(function ($review) {
+                ->paginate($perPage, ['*'], 'page', $page)
+                ->through(function ($review) {
                     $photos = $review->photos ? json_decode($review->photos, true) : [];
                     $review->photos = array_map(function ($photo) {
                         return asset('uploads/review/photos/' . $photo);
@@ -89,7 +92,7 @@ class CustomerReviewController extends Controller
                     return $review;
                 });
 
-            if ($reviews->isEmpty()) {
+            if ($reviews->total() === 0) {
                 return $this->sendError('No customer review found.', $this->backend_error_status);
             }
 

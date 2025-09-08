@@ -35,7 +35,7 @@
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Service</label>
-                                                    <select name="service_id" class="form-control" required>
+                                                    <select name="service_id" class="form-control select2">
                                                         <option value="">Select Service</option>
                                                         @foreach ($services as $service)
                                                             <option value="{{ $service->id }}">{{ $service->name }}
@@ -151,5 +151,11 @@
         var form_url = 'reviews/store';
         var redirect_url = 'reviews';
         var is_one_image_and_multiple_image_status = 'is_multiple_image';
+
+        $('.select2').select2({
+            placeholder: "Select an option",
+            allowClear: true,
+            width: '100%'
+        });
     </script>
 @endsection
