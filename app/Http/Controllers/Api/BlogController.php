@@ -94,15 +94,18 @@ class BlogController extends Controller
                 $query->where('b.category_id', $request->category_id);
             }
 
+            $perPage = $request->per_page ?? 9;
+            $page = $request->page ?? 1;
+
             $blogs = $query->orderByDesc('b.featured')
-                ->get()
-                ->map(function ($blog) {
+                ->paginate($perPage, ['*'], 'page', $page)
+                ->through(function ($blog) {
                     $blog->tags = $blog->tags ? json_decode($blog->tags, true) : [];
                     return $blog;
                 });
 
-            if ($blogs->isEmpty()) {
-                return $this->sendError('No blog found.', $this->backend_error_status);
+            if ($blogs->total() === 0) {
+                return $this->sendError('No service found.', $this->backend_error_status);
             }
 
             return $this->sendResponse(

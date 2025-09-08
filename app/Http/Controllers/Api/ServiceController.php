@@ -75,7 +75,7 @@ class ServiceController extends Controller
                 )
                 ->where('s.status', 1);
 
-            if ($request->has('search') && !empty($request->search)) {
+            if ($request->filled('search')) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('s.name', 'like', "%$search%")
@@ -90,17 +90,21 @@ class ServiceController extends Controller
                 });
             }
 
-            if ($request->has('category_id') && !empty($request->category_id)) {
+            if ($request->filled('category_id')) {
                 $query->where('s.category_id', $request->category_id);
             }
 
+            $perPage = $request->per_page ?? 8;
+            $page = $request->page ?? 1;
+
             $services = $query->orderByDesc('s.is_popular')
-                ->get()
-                ->map(function ($service) {
+                ->paginate($perPage, ['*'], 'page', $page)
+                ->through(function ($service) {
                     $service->includes = $service->includes ? json_decode($service->includes, true) : [];
                     return $service;
                 });
-            if ($services->isEmpty()) {
+
+            if ($services->total() === 0) {
                 return $this->sendError('No service found.', $this->backend_error_status);
             }
 
