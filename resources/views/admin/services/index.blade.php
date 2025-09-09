@@ -78,7 +78,9 @@
                                                 <th>Category</th>
                                                 <th>Name</th>
                                                 <th>Price</th>
-                                                <th>Discount Price</th>
+                                                <th>DP</th>
+                                                <th>TP</th>
+                                                <th>PP</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-stuff="High Priority,Low Priority">Is Popular</th>
                                                 <th data-search="false">Action</th>
@@ -157,6 +159,36 @@
                     name: 'discount_price'
                 },
                 {
+                    data: null,
+                    name: 'total_price',
+                    render: function(data, type, row) {
+                        let price = parseFloat(row.price) || 0;
+                        let discount = parseFloat(row.discount_price) || 0;
+                        let total = price - discount;
+
+                        // Color: green if discount applied, else black
+                        let color = discount > 0 ? 'green' : 'black';
+                        return `<span style="color:${color}; font-weight:bold;">${total.toFixed(2)}</span>`;
+                    }
+                },
+                {
+                    data: null,
+                    name: 'discount_percent',
+                    render: function(data, type, row) {
+                        let price = parseFloat(row.price) || 0;
+                        let discount = parseFloat(row.discount_price) || 0;
+                        let percent = 0;
+
+                        if (price > 0 && discount > 0) {
+                            percent = (discount / price) * 100;
+                        }
+
+                        // Color: green if discount applied, else black
+                        let color = discount > 0 ? 'green' : 'black';
+                        return `<span style="color:${color}; font-weight:bold;">${percent.toFixed(2)}%</span>`;
+                    }
+                },
+                {
                     data: 'status',
                     name: 'status'
                 },
@@ -231,12 +263,12 @@
                                     ${
                                         data.icon 
                                         ? `<img 
-                                                src="${baseUrl + data.icon}" 
-                                                alt="Service Icon" 
-                                                class="img-fluid service-icon" 
-                                                style="max-width:250px; cursor:pointer;" 
-                                                onclick="window.open('${baseUrl + data.icon}', '_blank')" 
-                                            >`
+                                                                    src="${baseUrl + data.icon}" 
+                                                                    alt="Service Icon" 
+                                                                    class="img-fluid service-icon" 
+                                                                    style="max-width:250px; cursor:pointer;" 
+                                                                    onclick="window.open('${baseUrl + data.icon}', '_blank')" 
+                                                                >`
                                         : '<p>-</p>'
                                     }
                                 </div>
