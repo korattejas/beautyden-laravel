@@ -80,6 +80,9 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('service/status/{id}/{status}', [ServiceController::class, 'changeStatus']);
     Route::get('service/priority-status/{id}/{status}', [ServiceController::class, 'changePriorityStatus']);
     Route::get('service-view/{id}', [ServiceController::class, 'view']);
+    Route::get('service/export-pdf', [ServiceController::class, 'exportPdf'])->name('admin.service.export.pdf');
+    Route::get('service/export-excel', [ServiceController::class, 'exportExcel'])->name('admin.service.export.excel');
+
 
     // Team Members
     Route::get('team', [TeamMemberController::class, 'index'])->name('admin.team.index');

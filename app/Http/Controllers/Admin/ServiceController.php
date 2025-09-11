@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 use App\Helpers\ImageUploadHelper;
 use Illuminate\Support\Facades\File;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ServicesExport;
+
 
 class ServiceController extends Controller
 {
@@ -253,6 +257,31 @@ class ServiceController extends Controller
             return response()->json(['error' => 'Service not found.'], 404);
         } catch (\Exception $e) {
             return response()->json(['error' => $this->error_message], 500);
+        }
+    }
+
+    public function exportPdf()
+    {
+        try {
+            $services = Service::leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
+                ->select('services.*', 'sc.name as category_name')
+                ->get();
+
+            $pdf = Pdf::loadView('admin.services.export-pdf', compact('services'))
+                ->setPaper('a4', 'landscape');
+
+            return $pdf->download('services_list.pdf');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to export PDF');
+        }
+    }
+
+    public function exportExcel()
+    {
+        try {
+            return Excel::download(new ServicesExport, 'services_list.xlsx');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to export Excel');
         }
     }
 }
