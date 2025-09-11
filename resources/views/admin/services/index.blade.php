@@ -21,7 +21,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                <div class="content-header-right text-md-end d-md-block d-none"
+                    style="display: flex !important;gap: 12px;width: 100%;justify-content: end;padding-bottom: 10px;">
+                    <a href="{{ route('admin.service.export.pdf') }}" class="btn btn-primary">
+                        Export PDF Format
+                    </a>
+                    <a href="{{ route('admin.service.export.excel') }}" class="btn btn-primary">
+                        Export Excel Format
+                    </a>
                     <a href="{{ route('admin.service.create') }}" class="btn btn-primary">
                         Add Service
                     </a>
@@ -263,12 +270,12 @@
                                     ${
                                         data.icon 
                                         ? `<img 
-                                                                    src="${baseUrl + data.icon}" 
-                                                                    alt="Service Icon" 
-                                                                    class="img-fluid service-icon" 
-                                                                    style="max-width:250px; cursor:pointer;" 
-                                                                    onclick="window.open('${baseUrl + data.icon}', '_blank')" 
-                                                                >`
+                                                                                src="${baseUrl + data.icon}" 
+                                                                                alt="Service Icon" 
+                                                                                class="img-fluid service-icon" 
+                                                                                style="max-width:250px; cursor:pointer;" 
+                                                                                onclick="window.open('${baseUrl + data.icon}', '_blank')" 
+                                                                            >`
                                         : '<p>-</p>'
                                     }
                                 </div>
