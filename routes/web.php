@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\ServiceCityPriceController;
 use App\Http\Controllers\Admin\TeamMemberController;
 use App\Http\Controllers\Admin\CustomerReviewController;
 use App\Http\Controllers\Admin\HiringController;
@@ -82,6 +83,23 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('service-view/{id}', [ServiceController::class, 'view']);
     Route::get('service/export-pdf', [ServiceController::class, 'exportPdf'])->name('admin.service.export.pdf');
     Route::get('service/export-excel', [ServiceController::class, 'exportExcel'])->name('admin.service.export.excel');
+
+
+    /* Services City Price Route */
+    Route::get('service-city-price', [ServiceCityPriceController::class, 'index'])->name('admin.service-city-price.index');
+    Route::get('service-city-price/create', [ServiceCityPriceController::class, 'create'])->name('admin.service-city-price.create');
+    Route::post('service-city-price/store', [ServiceCityPriceController::class, 'store']);
+    Route::delete('service-city-price/{id}', [ServiceCityPriceController::class, 'destroy']);
+    Route::get('service-city-price/edit/{id}', [ServiceCityPriceController::class, 'edit'])->name('admin.service-city-price.edit');
+    Route::get('getDataServiceCityPrice', [ServiceCityPriceController::class, 'getDataServiceCityPrice'])->name('getDataServiceCityPrice');
+    Route::get('service-city-price/status/{id}/{status}', [ServiceCityPriceController::class, 'changeStatus']);
+    Route::get('service-city-price/priority-status/{id}/{status}', [ServiceCityPriceController::class, 'changePriorityStatus']);
+    Route::get('service-city-price-view/{id}', [ServiceCityPriceController::class, 'view']);
+    Route::get('services-by-category', [ServiceCityPriceController::class, 'getServicesByCategory'])
+    ->name('admin.services.by-category');
+
+    Route::get('service-city-price/export-pdf', [ServiceCityPriceController::class, 'exportPdf'])->name('admin.service-city-price.export.pdf');
+    Route::get('service-city-price/export-excel', [ServiceCityPriceController::class, 'exportExcel'])->name('admin.service-city-price.export.excel');
 
 
     // Team Members
@@ -184,13 +202,9 @@ Route::group(['prefix' => 'admin'], function () {
     Route::delete('appointments/{id}', [AppointmentsController::class, 'destroy']);
     Route::post('appointments/assign_member', [AppointmentsController::class, 'AssignMember'])->name('assign.members');
     Route::get('appointments-view/{id}', [AppointmentsController::class, 'view']);
-    
+
     /* Policies Route */
     Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');
     Route::post('policies/store', [PoliciesController::class, 'store']);
   });
 });
-
-
-
-

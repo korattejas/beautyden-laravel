@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -29,7 +30,8 @@ class AppointmentsController extends Controller
         $function_name = 'index';
         try {
             $teamMembers = TeamMember::where('status', 1)->get();
-            return view('admin.appointments.index', compact('teamMembers'));
+            $cities = City::select('id', 'name')->get();
+            return view('admin.appointments.index', compact('teamMembers', 'cities'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -42,8 +44,9 @@ class AppointmentsController extends Controller
             $teamMembers = TeamMember::all();
             $categories = ServiceCategory::where('status', 1)->get();
             $services = Service::where('status', 1)->get();
+            $cities = City::select('id', 'name')->get();
 
-            return view('admin.appointments.create', compact('teamMembers', 'categories', 'services'));
+            return view('admin.appointments.create', compact('teamMembers', 'categories', 'services', 'cities'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, 'create');
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -58,8 +61,9 @@ class AppointmentsController extends Controller
             $services = Service::where('status', 1)->get();
             $appointment = Appointment::findOrFail(decryptId($id));
             $appointment->service_ids = $appointment->service_id ? explode(',', $appointment->service_id) : [];
+            $cities = City::select('id', 'name')->get();
 
-            return view('admin.appointments.edit', compact('teamMembers', 'categories', 'services', 'appointment'));
+            return view('admin.appointments.edit', compact('teamMembers', 'categories', 'services', 'appointment', 'cities'));
         } catch (\Exception $e) {
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
         }
@@ -70,9 +74,11 @@ class AppointmentsController extends Controller
         $function_name = 'view';
         try {
             $appointment = Appointment::leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
+                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
                 ->select(
                     'appointments.*',
-                    'sc.name as service_category_name'
+                    'sc.name as service_category_name',
+                    'ct.name as city_name',
                 )
                 ->where('appointments.id', $id)
                 ->firstOrFail();
@@ -110,6 +116,7 @@ class AppointmentsController extends Controller
                     'updated_at'          => $appointment->updated_at,
 
                     'service_category'    => $appointment->service_category_name,
+                    'city_name'           => $appointment->city_name,
                     'services'            => $services,
                     'team_members'        => $teamMembers,
                 ]
@@ -128,6 +135,7 @@ class AppointmentsController extends Controller
             if ($request->ajax()) {
                 $appointments = Appointment::query()
                     ->leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
+                    ->leftJoin('cities as c', 'appointments.city_id', '=', 'c.id')
                     ->select(
                         'appointments.*',
                         'sc.name as service_category_name'
@@ -147,6 +155,10 @@ class AppointmentsController extends Controller
 
                 if ($request->created_date) {
                     $appointments->whereDate('appointments.created_at', $request->created_date);
+                }
+
+                 if ($request->city_id) {
+                    $appointments->where('appointments.city_id', $request->city_id);
                 }
 
                 return DataTables::of($appointments)
@@ -202,6 +214,7 @@ class AppointmentsController extends Controller
 
         try {
             $rules = [
+                'city_id'             => 'required|integer|exists:cities,id',
                 'service_category_id' => 'nullable|integer|exists:service_categories,id',
                 'service_id'          => 'required|array',
                 'service_id.*'        => 'integer|exists:services,id',
@@ -232,6 +245,7 @@ class AppointmentsController extends Controller
             $orderNumber = '#BEAUTYDEN' . Str::upper(Str::random(8));
 
             $data = [
+                'city_id' => $request->city_id,
                 'service_category_id' => $request->service_category_id,
                 'service_id'          => $serviceIdsString,
                 'order_number'        => $orderNumber,

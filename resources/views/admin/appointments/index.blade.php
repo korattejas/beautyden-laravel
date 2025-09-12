@@ -52,6 +52,15 @@
                                 <label class="form-label">Created Date</label>
                                 <input type="date" id="filter-created-date" class="form-control">
                             </div>
+                            <div class="mb-2">
+                                <label class="form-label">City</label>
+                                <select id="filter-city" class="form-select">
+                                    <option value="">All Cities</option>
+                                    @foreach ($cities as $city)
+                                        <option value="{{ $city->id }}">{{ $city->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="d-flex justify-content-between">
                                 <button id="btn-apply-filters" class="btn btn-sm btn-primary">
                                     Apply
@@ -288,6 +297,7 @@
 
                     let html = `
                 <div class="c-row">
+                    <div class="c-col-6"><div class="c-detail-card"><label>City</label><p>${data.city_name ?? '-'}</p></div></div>
                     <div class="c-col-6"><div class="c-detail-card"><label>Category</label><p>${data.service_category ?? '-'}</p></div></div>
                     <div class="c-col-6"><div class="c-detail-card"><label>Services</label><p>${servicesHtml}</p></div></div>
 

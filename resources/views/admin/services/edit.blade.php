@@ -62,7 +62,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-6 mt-2">
+                                        {{-- <div class="col-6 mt-2">
                                             <div class="form-group">
                                                 <label>Price</label>
                                                 <input type="number" step="0.01" class="form-control" name="price"
@@ -76,7 +76,7 @@
                                                 <input type="number" step="0.01" class="form-control" name="discount_price"
                                                     value="{{ $service->discount_price }}" placeholder="Discount Price">
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                         <div class="col-6 mt-2">
                                             <div class="form-group">
@@ -86,7 +86,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-6 mt-2">
+                                        <div class="col-3 mt-2">
                                             <div class="form-group">
                                                 <label>Rating</label>
                                                 <input type="number" step="0.1" class="form-control" name="rating"
@@ -94,7 +94,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-6 mt-2">
+                                        <div class="col-3 mt-2">
                                             <div class="form-group">
                                                 <label>Reviews</label>
                                                 <input type="number" class="form-control" name="reviews"
