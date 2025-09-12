@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('city_id')->nullable()->comment('Reference to city table');
             $table->unsignedBigInteger('service_category_id')->nullable()->comment('Reference to service categories table');
             $table->string('service_id')->nullable()->comment('Reference to services table');
             $table->string('assigned_to', 100)->nullable()->comment('Multiple team ids comma separated');

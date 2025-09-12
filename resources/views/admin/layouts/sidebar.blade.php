@@ -56,6 +56,20 @@
                 </a>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.service-city-price.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.service-city-price.index') }}">
+                    <i data-feather="map-pin"></i>
+                    <span class="menu-title text-truncate">Service City Price</span>
+                </a>
+            </li>
+
+             <li class="nav-item {{ Request::routeIs('admin.city.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.city.index') }}">
+                    <i data-feather="map-pin"></i>
+                    <span class="menu-title text-truncate">City</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ Request::routeIs('admin.team.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.team.index') }}">
                     <i data-feather="users"></i>
@@ -102,13 +116,6 @@
                 <a class="d-flex align-items-center" href="{{ route('admin.product-brand.index') }}">
                     <i data-feather="tag"></i>
                     <span class="menu-title text-truncate">Product Brand</span>
-                </a>
-            </li>
-
-            <li class="nav-item {{ Request::routeIs('admin.city.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.city.index') }}">
-                    <i data-feather="map-pin"></i>
-                    <span class="menu-title text-truncate">City</span>
                 </a>
             </li>
 

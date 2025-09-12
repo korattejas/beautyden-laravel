@@ -14,7 +14,7 @@ return new class extends Migration
                 ->constrained('service_categories')
                 ->onDelete('cascade');
             $table->string('name', 150);
-            $table->decimal('price', 8, 2);
+            $table->decimal('price', 8, 2)->nullable();
             $table->decimal('discount_price', 8, 2)->nullable();
             $table->string('duration', 50);
             $table->decimal('rating', 3, 1)->nullable();

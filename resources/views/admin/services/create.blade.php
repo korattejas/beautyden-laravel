@@ -62,7 +62,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Price -->
+                                        {{-- <!-- Price -->
                                         <div class="col-6 mt-2">
                                             <div class="form-group">
                                                 <label>Price</label>
@@ -76,7 +76,7 @@
                                                 <label>Discount Price</label>
                                                 <input type="number" step="0.01" class="form-control" name="discount_price" placeholder="Discount Price">
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                         <!-- Duration -->
                                         <div class="col-6 mt-2">

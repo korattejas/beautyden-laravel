@@ -152,8 +152,8 @@ class ServiceController extends Controller
             $validateArray = [
                 'category_id' => 'required|exists:service_categories,id',
                 'name'        => 'required',
-                'price'       => 'required|numeric|min:0',
-                'discount_price' => 'nullable|numeric|min:0',
+                // 'price'       => 'required|numeric|min:0',
+                // 'discount_price' => 'nullable|numeric|min:0',
                 'duration'    => 'required|string|max:50',
                 'description' => 'required|string',
                 'rating'      => 'nullable|numeric|min:0|max:5',

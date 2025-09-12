@@ -31,6 +31,19 @@
                                         <input type="hidden" id="form-method" value="add">
                                         <div class="row">
 
+                                            <!-- City Dropdown -->
+                                            <div class="col-12 mt-2">
+                                                <div class="form-group">
+                                                    <label for="city_id">City</label>
+                                                    <select name="city_id" id="city_id" class="form-control select2">
+                                                        <option value="">Select City</option>
+                                                        @foreach ($cities as $city)
+                                                            <option value="{{ $city->id }}">{{ $city->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
                                             <!-- Service Category -->
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">

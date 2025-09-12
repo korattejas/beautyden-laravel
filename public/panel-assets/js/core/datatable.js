@@ -66,6 +66,7 @@ $(function () {
                     d.launch_quarter = $('#filter-launch-quarter').val();
                     d.appointment_date = $('#filter-appointment-date').val();
                     d.appointment_time = $('#filter-appointment-time').val();
+                    d.city_id = $('#filter-city').val();
                 }
             },
             orderCellsTop: true,
@@ -95,6 +96,7 @@ $(function () {
             $('#filter-launch-quarter').val('');
             $('#filter-appointment-date').val('');
             $('#filter-appointment-time').val('');
+            $('#filter-city').val('');
             dt_filter.ajax.reload();
         });
     }
