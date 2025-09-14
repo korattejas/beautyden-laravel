@@ -14,6 +14,7 @@ use Yajra\DataTables\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ServiceCityPriceController extends Controller
 {
@@ -137,9 +138,18 @@ class ServiceCityPriceController extends Controller
             $validateArray = [
                 'city_id'    => 'required|exists:cities,id',
                 'category_id' => 'required|exists:service_categories,id',
-                'service_id' => 'required|exists:services,id',
-                'price'      => 'required',
-                'discount_price' => 'nullable',
+                'service_id' => [
+                    'required',
+                    'exists:services,id',
+                    Rule::unique('service_city_prices')
+                        ->where(function ($query) use ($request) {
+                            return $query->where('city_id', $request->city_id)
+                                ->where('category_id', $request->category_id);
+                        })
+                        ->ignore($id),
+                ],
+                'price'      => 'required|numeric',
+                'discount_price' => 'nullable|numeric',
             ];
 
             $validator = Validator::make($request_all, $validateArray);

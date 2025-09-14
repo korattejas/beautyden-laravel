@@ -41,7 +41,7 @@ class CityController extends Controller
                     'c.launch_quarter',
                     'c.is_popular',
                 )
-                ->where('c.status', 1)
+                // ->where('c.status', 1)
                 ->orderByDesc('c.is_popular')
                 ->orderBy('c.name', 'ASC')
                 ->get();
