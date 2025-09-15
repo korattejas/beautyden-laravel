@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\City;
 use App\Exports\ServiceCityPricesExport;
 use App\Models\ServiceCategory;
+use App\Models\ServiceSubcategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
@@ -148,8 +149,8 @@ class ServiceCityPriceController extends Controller
                         })
                         ->ignore($id),
                 ],
-                'price'      => 'required|numeric',
-                'discount_price' => 'nullable|numeric',
+                'price'      => 'required',
+                'discount_price' => 'nullable',
             ];
 
             $validator = Validator::make($request_all, $validateArray);
@@ -161,6 +162,7 @@ class ServiceCityPriceController extends Controller
             $data = [
                 'city_id'        => $request->city_id,
                 'category_id'     => $request->category_id,
+                'sub_category_id'     => $request->sub_category_id,
                 'service_id'     => $request->service_id,
                 'price'          => $request->price,
                 'discount_price' => $request->discount_price,
@@ -245,13 +247,25 @@ class ServiceCityPriceController extends Controller
         }
     }
 
-
     public function exportExcel()
     {
         try {
             return Excel::download(new ServiceCityPricesExport, 'service_city_prices_list.xlsx');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to export Excel');
+        }
+    }
+
+    public function getSubcategories($categoryId)
+    {
+        try {
+            $subcategories = ServiceSubcategory::where('service_category_id', $categoryId)
+                ->where('status', 1)
+                ->get();
+
+            return response()->json($subcategories);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to sub category data');
         }
     }
 }

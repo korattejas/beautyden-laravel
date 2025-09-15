@@ -13,6 +13,7 @@ class Appointment extends Model
         'order_number',
         'city_id',
         'service_category_id',
+        'service_sub_category_id',
         'service_id',
         'first_name',
         'last_name',

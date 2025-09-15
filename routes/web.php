@@ -89,6 +89,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('service-view/{id}', [ServiceController::class, 'view']);
         Route::get('service/export-pdf', [ServiceController::class, 'exportPdf'])->name('admin.service.export.pdf');
         Route::get('service/export-excel', [ServiceController::class, 'exportExcel'])->name('admin.service.export.excel');
+        Route::get('service/get-subcategories/{categoryId}', [ServiceController::class, 'getSubcategories']);
+
 
         /* Services City Price Route */
         Route::get('service-city-price', [ServiceCityPriceController::class, 'index'])->name('admin.service-city-price.index');
@@ -102,9 +104,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('service-city-price-view/{id}', [ServiceCityPriceController::class, 'view']);
         Route::get('services-by-category', [ServiceCityPriceController::class, 'getServicesByCategory'])
             ->name('admin.services.by-category');
-
         Route::get('service-city-price/export-pdf', [ServiceCityPriceController::class, 'exportPdf'])->name('admin.service-city-price.export.pdf');
         Route::get('service-city-price/export-excel', [ServiceCityPriceController::class, 'exportExcel'])->name('admin.service-city-price.export.excel');
+        Route::get('service-city-price/get-serviceCityPriceSubCategories/{categoryId}', [ServiceCityPriceController::class, 'getSubcategories']);
 
         // Team Members
         Route::get('team', [TeamMemberController::class, 'index'])->name('admin.team.index');
@@ -206,6 +208,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('appointments/{id}', [AppointmentsController::class, 'destroy']);
         Route::post('appointments/assign_member', [AppointmentsController::class, 'AssignMember'])->name('assign.members');
         Route::get('appointments-view/{id}', [AppointmentsController::class, 'view']);
+        Route::get('appointments/get-appoinmentSubcategories/{categoryId}', [AppointmentsController::class, 'getSubcategories']);
 
         /* Policies Route */
         Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');

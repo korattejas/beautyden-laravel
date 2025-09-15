@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\ServiceSubcategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +45,8 @@ class ServiceController extends Controller
         $function_name = 'view';
         try {
             $service = Service::leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
-                ->select('services.*', 'sc.name as category_name')
+                ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'services.sub_category_id')
+                ->select('services.*', 'sc.name as category_name','ssc.name as sub_category_name')
                 ->where('services.id', $id)
                 ->first();
 
@@ -62,8 +64,9 @@ class ServiceController extends Controller
     {
         $function_name = 'create';
         try {
+            $subcategories = ServiceSubcategory::where('status', 1)->select('name', 'id')->get();
             $categories = ServiceCategory::where('status', 1)->select('name', 'id')->get();
-            return view('admin.services.create', compact('categories'));
+            return view('admin.services.create', compact('categories', 'subcategories'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -91,7 +94,8 @@ class ServiceController extends Controller
             if ($request->ajax()) {
                 $services = Service::query()
                     ->leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
-                    ->select('services.*', 'sc.name as category_name');
+                    ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'services.sub_category_id')
+                    ->select('services.*', 'sc.name as category_name', 'ssc.name as sub_category_name');
 
                 if ($request->status !== null && $request->status !== '') {
                     $services->where('services.status', $request->status);
@@ -151,6 +155,7 @@ class ServiceController extends Controller
 
             $validateArray = [
                 'category_id' => 'required|exists:service_categories,id',
+                'sub_category_id' => 'nullable|exists:service_subcategories,id',
                 'name'        => 'required',
                 // 'price'       => 'required|numeric|min:0',
                 // 'discount_price' => 'nullable|numeric|min:0',
@@ -193,6 +198,7 @@ class ServiceController extends Controller
 
             $data = [
                 'category_id' => $request->category_id,
+                'sub_category_id' => $request->sub_category_id,
                 'name'        => $request->name,
                 'price'       => $request->price,
                 'discount_price' => $request->discount_price,
@@ -282,6 +288,19 @@ class ServiceController extends Controller
             return Excel::download(new ServicesExport, 'services_list.xlsx');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to export Excel');
+        }
+    }
+
+    public function getSubcategories($categoryId)
+    {
+        try {
+            $subcategories = ServiceSubcategory::where('service_category_id', $categoryId)
+                ->where('status', 1)
+                ->get();
+
+            return response()->json($subcategories);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to sub category data');
         }
     }
 }

@@ -54,11 +54,12 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Category Dropdown -->
+                                            <!-- Category -->
                                             <div class="col-6 mt-2">
                                                 <div class="form-group">
-                                                    <label for="category_id">Category</label>
-                                                    <select name="category_id" id="category_id" class="form-control select2">
+                                                    <label>Category</label>
+                                                    <select name="category_id" class="form-control select2"
+                                                        id="category_id">
                                                         <option value="">Select Category</option>
                                                         @foreach ($categories as $category)
                                                             <option value="{{ $category->id }}">{{ $category->name }}
@@ -68,8 +69,19 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Service Dropdown -->
+                                            <!-- Sub Category -->
                                             <div class="col-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Sub Category</label>
+                                                    <select name="sub_category_id" class="form-control select2"
+                                                        id="sub_category_id">
+                                                        <option value="">Select Sub Category</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Service Dropdown -->
+                                            <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label for="service_id">Service</label>
                                                     <select name="service_id" id="service_id" class="form-control select2">
@@ -137,6 +149,27 @@
             placeholder: "Select an option",
             allowClear: true,
             width: '100%'
+        });
+
+        $('#category_id').on('change', function() {
+            var categoryId = $(this).val();
+
+            $('#sub_category_id').empty().append('<option value="">Select Sub Category</option>');
+
+            if (categoryId) {
+                $.ajax({
+                    url: 'get-serviceCityPriceSubCategories/' + categoryId,
+                    type: 'GET',
+                    success: function(data) {
+                        $.each(data, function(key, subCategory) {
+                            $('#sub_category_id').append('<option value="' + subCategory.id +
+                                '">' + subCategory.name + '</option>');
+                        });
+
+                        $('#sub_category_id').trigger('change');
+                    }
+                });
+            }
         });
 
         $('#category_id').on('change', function() {

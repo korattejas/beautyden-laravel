@@ -40,16 +40,28 @@
                                         <input type="hidden" id="form-method" value="add">
 
                                         <div class="row row-sm">
-
                                             <!-- Category -->
-                                            <div class="col-12 mt-2">
+                                            <div class="col-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Category</label>
-                                                    <select name="category_id" class="form-control select2">
+                                                    <select name="category_id" class="form-control select2"
+                                                        id="category_id">
                                                         <option value="">Select Category</option>
-                                                        @foreach($categories as $category)
-                                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                        @foreach ($categories as $category)
+                                                            <option value="{{ $category->id }}">{{ $category->name }}
+                                                            </option>
                                                         @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Sub Category -->
+                                            <div class="col-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Sub Category</label>
+                                                    <select name="sub_category_id" class="form-control select2"
+                                                        id="sub_category_id">
+                                                        <option value="">Select Sub Category</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -112,8 +124,7 @@
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Description</label>
-                                                    <textarea class="form-control" name="description" rows="4"
-                                                        placeholder="Service Description" required></textarea>
+                                                    <textarea class="form-control" name="description" rows="4" placeholder="Service Description" required></textarea>
                                                 </div>
                                             </div>
 
@@ -121,8 +132,7 @@
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Includes (comma separated)</label>
-                                                    <textarea class="form-control" name="includes" rows="3"
-                                                        placeholder="e.g. Haircut, Coloring, Styling"></textarea>
+                                                    <textarea class="form-control" name="includes" rows="3" placeholder="e.g. Haircut, Coloring, Styling"></textarea>
                                                 </div>
                                             </div>
 
@@ -191,5 +201,25 @@
             width: '100%'
         });
 
+        $('#category_id').on('change', function() {
+            var categoryId = $(this).val();
+
+            $('#sub_category_id').empty().append('<option value="">Select Sub Category</option>');
+
+            if (categoryId) {
+                $.ajax({
+                    url: 'get-subcategories/' + categoryId,
+                    type: 'GET',
+                    success: function(data) {
+                        $.each(data, function(key, subCategory) {
+                            $('#sub_category_id').append('<option value="' + subCategory.id +
+                                '">' + subCategory.name + '</option>');
+                        });
+
+                        $('#sub_category_id').trigger('change');
+                    }
+                });
+            }
+        });
     </script>
 @endsection

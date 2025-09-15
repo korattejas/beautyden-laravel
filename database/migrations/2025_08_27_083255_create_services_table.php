@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('category_id')
                 ->constrained('service_categories')
                 ->onDelete('cascade');
+            $table->unsignedBigInteger('sub_category_id')->nullable();
             $table->string('name', 150);
             $table->decimal('price', 8, 2)->nullable();
             $table->decimal('discount_price', 8, 2)->nullable();
