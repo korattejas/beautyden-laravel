@@ -39,6 +39,7 @@ class AppointmentsController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'service_category_id' => 'nullable|integer',
+                'service_sub_category_id' => 'nullable|integer',
                 'service_id'          => 'required',
                 'first_name'          => 'required|string|max:50',
                 'last_name'           => 'nullable|string|max:50',
@@ -69,6 +70,7 @@ class AppointmentsController extends Controller
                 'phone'               => $request->phone,
                 'service_id'          => $request->service_id,
                 'service_category_id' => $request->service_category_id,
+                'service_sub_category_id' => $request->service_sub_category_id,
                 'quantity'            => $request->quantity,
                 'price'               => $request->price,
                 'discount_price'      => $request->discount_price,
@@ -76,7 +78,7 @@ class AppointmentsController extends Controller
                 'appointment_date'    => $request->appointment_date,
                 'appointment_time'    => $request->appointment_time,
                 'notes'               => $request->notes,
-                'status'              => '0',
+                'status'              => '1',
             ]);
 
             $message = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
