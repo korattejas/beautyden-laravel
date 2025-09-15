@@ -75,7 +75,7 @@
                                             <div class="col-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Price</label>
-                                                    <input type="number" step="0.01" class="form-control" name="price"
+                                                    <input type="text" class="form-control" name="price"
                                                         value="{{ $service->price }}" placeholder="Price" required>
                                                 </div>
                                             </div>
@@ -83,7 +83,7 @@
                                             <div class="col-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Discount Price</label>
-                                                    <input type="number" step="0.01" class="form-control"
+                                                    <input type="text" class="form-control"
                                                         name="discount_price" value="{{ $service->discount_price }}"
                                                         placeholder="Discount Price">
                                                 </div>
