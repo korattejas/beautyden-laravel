@@ -29,27 +29,46 @@ class ServiceController extends Controller
     {
         $function_name = 'getServiceCategory';
         try {
-            $categories = DB::table('service_categories')->select(
-                'id',
-                'name',
-                DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'),
-                'description',
-                'is_popular'
-            )
-                ->where('status', 1)
-                ->orderBy('is_popular', 'desc')
+            $categories = DB::table('service_categories as c')
+                ->select(
+                    'c.id',
+                    'c.name',
+                    DB::raw('CONCAT("' . asset('uploads/service-category') . '/", c.icon) AS icon'),
+                    'c.description',
+                    'c.is_popular'
+                )
+                ->where('c.status', 1)
+                ->orderBy('c.is_popular', 'desc')
                 ->get();
 
             if ($categories->isEmpty()) {
                 return $this->sendError('No category found.', $this->backend_error_status);
             }
 
-            return $this->sendResponse($categories, 'Categories retrieved successfully', $this->success_status);
+            $subCategories = DB::table('service_subcategories as sc')
+                ->select(
+                    'sc.id',
+                    'sc.service_category_id',
+                    'sc.name',
+                    DB::raw('CONCAT("' . asset('uploads/service-subcategory') . '/", sc.icon) AS icon'),
+                    'sc.description',
+                    'sc.is_popular'
+                )
+                ->where('sc.status', 1)
+                ->get();
+
+            $categories->transform(function ($category) use ($subCategories) {
+                $category->subcategories = $subCategories->where('service_category_id', $category->id)->values();
+                return $category;
+            });
+
+            return $this->sendResponse($categories, 'Categories with subcategories retrieved successfully', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
+
 
     public function getServices(Request $request): JsonResponse
     {
@@ -62,11 +81,14 @@ class ServiceController extends Controller
                 $query = DB::table('service_city_prices as scp')
                     ->join('services as s', 'scp.service_id', '=', 's.id')
                     ->join('service_categories as c', 'scp.category_id', '=', 'c.id')
+                    ->leftJoin('service_subcategories as csc', 'scp.sub_category_id', '=', 'csc.id')
                     ->where('scp.city_id', $cityId)
                     ->select(
                         's.id',
                         'scp.category_id',
+                        's.sub_category_id',
                         'c.name as category_name',
+                        'csc.name as sub_category_name',
                         's.name',
                         'scp.price',
                         'scp.discount_price',
@@ -82,10 +104,13 @@ class ServiceController extends Controller
             } else {
                 $query = DB::table('services as s')
                     ->join('service_categories as c', 's.category_id', '=', 'c.id')
+                    ->leftJoin('service_subcategories as csc', 's.sub_category_id', '=', 'csc.id')
                     ->select(
                         's.id',
                         's.category_id',
+                        's.sub_category_id',
                         'c.name as category_name',
+                        'csc.name as sub_category_name',
                         's.name',
                         's.price',
                         's.discount_price',
@@ -117,6 +142,10 @@ class ServiceController extends Controller
 
             if ($request->filled('category_id')) {
                 $query->where('s.category_id', $request->category_id);
+            }
+
+            if ($request->filled('sub_category_id')) {
+                $query->where('s.sub_category_id', $request->sub_category_id);
             }
 
             $perPage = $request->per_page ?? 8;
