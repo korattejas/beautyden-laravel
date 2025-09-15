@@ -8,12 +8,14 @@ use App\Models\Service;
 use App\Models\City;
 use App\Exports\ServiceCityPricesExport;
 use App\Models\ServiceCategory;
+use App\Models\ServiceSubcategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ServiceCityPriceController extends Controller
 {
@@ -48,6 +50,7 @@ class ServiceCityPriceController extends Controller
                     ->leftJoin('services as s', 'scp.service_id', '=', 's.id')
                     ->leftJoin('cities as c', 'scp.city_id', '=', 'c.id')
                     ->leftJoin('service_categories as sc', 'sc.id', '=', 's.category_id')
+                    ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'scp.sub_category_id')
                     ->select(
                         'scp.id',
                         'scp.city_id',
@@ -58,6 +61,7 @@ class ServiceCityPriceController extends Controller
                         'scp.updated_at',
                         's.name as service_name',
                         'sc.name as service_category_name',
+                        'ssc.name as service_sub_category_name',
                         'c.name as city_name'
                     );
 
@@ -137,7 +141,16 @@ class ServiceCityPriceController extends Controller
             $validateArray = [
                 'city_id'    => 'required|exists:cities,id',
                 'category_id' => 'required|exists:service_categories,id',
-                'service_id' => 'required|exists:services,id',
+                'service_id' => [
+                    'required',
+                    'exists:services,id',
+                    Rule::unique('service_city_prices')
+                        ->where(function ($query) use ($request) {
+                            return $query->where('city_id', $request->city_id)
+                                ->where('category_id', $request->category_id);
+                        })
+                        ->ignore($id),
+                ],
                 'price'      => 'required',
                 'discount_price' => 'nullable',
             ];
@@ -151,6 +164,7 @@ class ServiceCityPriceController extends Controller
             $data = [
                 'city_id'        => $request->city_id,
                 'category_id'     => $request->category_id,
+                'sub_category_id'     => $request->sub_category_id,
                 'service_id'     => $request->service_id,
                 'price'          => $request->price,
                 'discount_price' => $request->discount_price,
@@ -235,13 +249,25 @@ class ServiceCityPriceController extends Controller
         }
     }
 
-
     public function exportExcel()
     {
         try {
             return Excel::download(new ServiceCityPricesExport, 'service_city_prices_list.xlsx');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to export Excel');
+        }
+    }
+
+    public function getSubcategories($categoryId)
+    {
+        try {
+            $subcategories = ServiceSubcategory::where('service_category_id', $categoryId)
+                ->where('status', 1)
+                ->get();
+
+            return response()->json($subcategories);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to sub category data');
         }
     }
 }

@@ -83,6 +83,7 @@
                                             <tr>
                                                 <th>Id</th>
                                                 <th>Category</th>
+                                                <th>Sub Category</th>
                                                 <th>Name</th>
                                                 <th>Price</th>
                                                 <th>DP</th>
@@ -152,6 +153,10 @@
                 {
                     data: 'category_name',
                     name: 'category_name'
+                },
+                {
+                    data: 'sub_category_name',
+                    name: 'sub_category_name'
                 },
                 {
                     data: 'name',
@@ -236,6 +241,7 @@
                     let html = `
                         <div class="c-row">
                             <div class="c-col-6"><div class="c-detail-card"><label>Category</label><p>${data.category_name ?? '-'}</p></div></div>
+                            <div class="c-col-6"><div class="c-detail-card"><label>Sub Category</label><p>${data.sub_category_name ?? '-'}</p></div></div>
                             <div class="c-col-6"><div class="c-detail-card"><label>Name</label><p>${data.name ?? '-'}</p></div></div>
                             <div class="c-col-6"><div class="c-detail-card"><label>Price</label><p>${data.price ?? '-'}</p></div></div>
                             <div class="c-col-6"><div class="c-detail-card"><label>Discount Price</label><p>${data.discount_price ?? '-'}</p></div></div>

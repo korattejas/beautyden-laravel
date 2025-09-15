@@ -45,10 +45,11 @@
                                             </div>
 
                                             <!-- Service Category -->
-                                            <div class="col-md-6 mt-2">
+                                            <div class="col-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Service Category</label>
-                                                    <select name="service_category_id" class="form-control select2">
+                                                    <select name="service_category_id" class="form-control select2"
+                                                        id="category_id">
                                                         <option value="">Select Category</option>
                                                         @foreach ($categories as $category)
                                                             <option value="{{ $category->id }}">{{ $category->name }}
@@ -58,8 +59,19 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Service Sub Category -->
+                                            <div class="col-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Service Sub Category</label>
+                                                    <select name="service_sub_category_id" class="form-control select2"
+                                                        id="sub_category_id">
+                                                        <option value="">Select Sub Category</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
                                             <!-- Services (Multiple Select) -->
-                                            <div class="col-md-6 mt-2">
+                                            <div class="col-md-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Services</label>
                                                     <select name="service_id[]" id="service_id" class="form-control select2"
@@ -211,6 +223,27 @@
             placeholder: "Select an option",
             allowClear: true,
             width: '100%'
+        });
+
+        $('#category_id').on('change', function() {
+            var categoryId = $(this).val();
+
+            $('#sub_category_id').empty().append('<option value="">Select Sub Category</option>');
+
+            if (categoryId) {
+                $.ajax({
+                    url: 'get-appoinmentSubcategories/' + categoryId,
+                    type: 'GET',
+                    success: function(data) {
+                        $.each(data, function(key, subCategory) {
+                            $('#sub_category_id').append('<option value="' + subCategory.id +
+                                '">' + subCategory.name + '</option>');
+                        });
+
+                        $('#sub_category_id').trigger('change');
+                    }
+                });
+            }
         });
     </script>
 @endsection

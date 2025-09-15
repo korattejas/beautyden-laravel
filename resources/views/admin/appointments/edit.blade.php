@@ -50,15 +50,15 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Service Category -->
-                                            <div class="col-md-6 mt-2">
+                                            <div class="col-6 mt-2">
                                                 <div class="form-group">
-                                                    <label>Service Category</label>
-                                                    <select name="service_category_id" class="form-control select2">
+                                                    <label>Category</label>
+                                                    <select name="service_category_id" class="form-control select2"
+                                                        id="category_id" required>
                                                         <option value="">Select Category</option>
                                                         @foreach ($categories as $category)
                                                             <option value="{{ $category->id }}"
-                                                                {{ isset($appointment) && $appointment->service_category_id == $category->id ? 'selected' : '' }}>
+                                                                @if ($appointment->service_category_id == $category->id) selected @endif>
                                                                 {{ $category->name }}
                                                             </option>
                                                         @endforeach
@@ -66,8 +66,18 @@
                                                 </div>
                                             </div>
 
+                                            <div class="col-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Sub Category</label>
+                                                    <select name="service_sub_category_id" class="form-control select2"
+                                                        id="sub_category_id">
+                                                        <option value="">Select Sub Category</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
                                             <!-- Services (Multiple Select) -->
-                                            <div class="col-md-6 mt-2">
+                                            <div class="col-md-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Services</label>
                                                     <select name="service_id[]" id="service_id" class="form-control select2"
@@ -233,5 +243,37 @@
             allowClear: true,
             width: '100%'
         });
+
+        let selectedCategory = $('#category_id').val();
+        let selectedSubCategory = "{{ $appointment->service_sub_category_id ?? '' }}";
+
+        function loadSubcategories(categoryId, selectedSubCategory = null) {
+            $('#sub_category_id').empty().append('<option value="">Select Sub Category</option>');
+
+            if (categoryId) {
+                $.ajax({
+                    url: '/admin/appointments/get-appoinmentSubcategories/' + categoryId,
+                    type: 'GET',
+                    success: function(data) {
+                        $.each(data, function(key, subCategory) {
+                            let selected = (selectedSubCategory == subCategory.id) ? 'selected' : '';
+                            $('#sub_category_id').append('<option value="' + subCategory.id + '" ' +
+                                selected + '>' + subCategory.name + '</option>');
+                        });
+
+                        $('#sub_category_id').trigger('change');
+                    }
+                });
+            }
+        }
+
+        $('#category_id').on('change', function() {
+            let categoryId = $(this).val();
+            loadSubcategories(categoryId);
+        });
+
+        if (selectedCategory) {
+            loadSubcategories(selectedCategory, selectedSubCategory);
+        }
     </script>
 @endsection

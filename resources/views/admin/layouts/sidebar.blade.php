@@ -49,6 +49,13 @@
                 </a>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.service-subcategory.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.service-subcategory.index') }}">
+                    <i data-feather="layers"></i>
+                    <span class="menu-title text-truncate">Service Sub Category</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ Request::routeIs('admin.service.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.service.index') }}">
                     <i data-feather="briefcase"></i>

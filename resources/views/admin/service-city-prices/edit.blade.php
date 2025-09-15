@@ -58,15 +58,15 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Category Dropdown -->
                                             <div class="col-6 mt-2">
                                                 <div class="form-group">
-                                                    <label for="category_id">Category</label>
-                                                    <select name="category_id" id="category_id" class="form-control select2">
+                                                    <label>Category</label>
+                                                    <select name="category_id" class="form-control select2" id="category_id"
+                                                        required>
                                                         <option value="">Select Category</option>
                                                         @foreach ($categories as $category)
                                                             <option value="{{ $category->id }}"
-                                                                {{ $category->id == $serviceCityPrice->category_id ? 'selected' : '' }}>
+                                                                @if ($serviceCityPrice->category_id == $category->id) selected @endif>
                                                                 {{ $category->name }}
                                                             </option>
                                                         @endforeach
@@ -74,8 +74,18 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Service Dropdown -->
                                             <div class="col-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Sub Category</label>
+                                                    <select name="sub_category_id" class="form-control select2"
+                                                        id="sub_category_id">
+                                                        <option value="">Select Sub Category</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Service Dropdown -->
+                                            <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label for="service_id">Service</label>
                                                     <select name="service_id" id="service_id" class="form-control select2">
@@ -99,8 +109,7 @@
                                                 <div class="form-group">
                                                     <label for="discount_price">Discount Price</label>
                                                     <input type="text" name="discount_price" id="discount_price"
-                                                        class="form-control"
-                                                        value="{{ $serviceCityPrice->discount_price }}"
+                                                        class="form-control" value="{{ $serviceCityPrice->discount_price }}"
                                                         placeholder="Enter Discount Price">
                                                 </div>
                                             </div>
@@ -150,6 +159,38 @@
         $('.select2').select2({
             width: '100%'
         });
+
+        let selectedCategory = $('#category_id').val();
+        let selectedSubCategory = "{{ $serviceCityPrice->sub_category_id ?? '' }}";
+
+        function loadSubcategories(categoryId, selectedSubCategory = null) {
+            $('#sub_category_id').empty().append('<option value="">Select Sub Category</option>');
+
+            if (categoryId) {
+                $.ajax({
+                    url: '/admin/service-city-price/get-serviceCityPriceSubCategories/' + categoryId,
+                    type: 'GET',
+                    success: function(data) {
+                        $.each(data, function(key, subCategory) {
+                            let selected = (selectedSubCategory == subCategory.id) ? 'selected' : '';
+                            $('#sub_category_id').append('<option value="' + subCategory.id + '" ' +
+                                selected + '>' + subCategory.name + '</option>');
+                        });
+
+                        $('#sub_category_id').trigger('change');
+                    }
+                });
+            }
+        }
+
+        $('#category_id').on('change', function() {
+            let categoryId = $(this).val();
+            loadSubcategories(categoryId);
+        });
+
+        if (selectedCategory) {
+            loadSubcategories(selectedCategory, selectedSubCategory);
+        }
 
         function loadServices(categoryId, selectedServiceId = null) {
             var $serviceSelect = $('#service_id');

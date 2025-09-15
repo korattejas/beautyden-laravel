@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('city_id');
             $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('sub_category_id')->nullable();
             $table->unsignedBigInteger('service_id');
             $table->string('price',150);
             $table->string('discount_price',150)->nullable();

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('city_id')->nullable()->comment('Reference to city table');
             $table->unsignedBigInteger('service_category_id')->nullable()->comment('Reference to service categories table');
+            $table->unsignedBigInteger('service_sub_category_id')->nullable();
             $table->string('service_id')->nullable()->comment('Reference to services table');
             $table->string('assigned_to', 100)->nullable()->comment('Multiple team ids comma separated');
             $table->string('assigned_by', 100)->nullable()->comment('Admin who assigned appointment');

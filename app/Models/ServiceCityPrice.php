@@ -12,6 +12,7 @@ class ServiceCityPrice extends Model
     protected $fillable = [
         'city_id',
         'category_id',
+        'sub_category_id',
         'service_id',
         'price',
         'discount_price',

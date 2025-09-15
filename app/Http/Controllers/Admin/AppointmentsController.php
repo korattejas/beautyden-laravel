@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\ServiceSubcategory;
 use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -74,10 +75,12 @@ class AppointmentsController extends Controller
         $function_name = 'view';
         try {
             $appointment = Appointment::leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
+                ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'appointments.service_sub_category_id')
                 ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
                 ->select(
                     'appointments.*',
                     'sc.name as service_category_name',
+                    'ssc.name as service_sub_category_name',
                     'ct.name as city_name',
                 )
                 ->where('appointments.id', $id)
@@ -116,6 +119,7 @@ class AppointmentsController extends Controller
                     'updated_at'          => $appointment->updated_at,
 
                     'service_category'    => $appointment->service_category_name,
+                    'service_sub_category'    => $appointment->service_sub_category_name,
                     'city_name'           => $appointment->city_name,
                     'services'            => $services,
                     'team_members'        => $teamMembers,
@@ -157,7 +161,7 @@ class AppointmentsController extends Controller
                     $appointments->whereDate('appointments.created_at', $request->created_date);
                 }
 
-                 if ($request->city_id) {
+                if ($request->city_id) {
                     $appointments->where('appointments.city_id', $request->city_id);
                 }
 
@@ -247,6 +251,7 @@ class AppointmentsController extends Controller
             $data = [
                 'city_id' => $request->city_id,
                 'service_category_id' => $request->service_category_id,
+                'service_sub_category_id' => $request->service_sub_category_id,
                 'service_id'          => $serviceIdsString,
                 'order_number'        => $orderNumber,
                 'first_name'          => $request->first_name,
@@ -326,6 +331,19 @@ class AppointmentsController extends Controller
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
+    public function getSubcategories($categoryId)
+    {
+        try {
+            $subcategories = ServiceSubcategory::where('service_category_id', $categoryId)
+                ->where('status', 1)
+                ->get();
+
+            return response()->json($subcategories);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to sub category data');
         }
     }
 }

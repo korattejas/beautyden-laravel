@@ -56,24 +56,49 @@ class ServiceController extends Controller
         $function_name = 'getServices';
 
         try {
-            $query = DB::table('services as s')
-                ->join('service_categories as c', 's.category_id', '=', 'c.id')
-                ->select(
-                    's.id',
-                    's.category_id',
-                    'c.name as category_name',
-                    's.name',
-                    's.price',
-                    's.discount_price',
-                    's.duration',
-                    's.rating',
-                    's.reviews',
-                    's.description',
-                    's.includes',
-                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
-                    's.is_popular'
-                )
-                ->where('s.status', 1);
+            $cityId = $request->city_id ?? null;
+
+            if ($cityId) {
+                $query = DB::table('service_city_prices as scp')
+                    ->join('services as s', 'scp.service_id', '=', 's.id')
+                    ->join('service_categories as c', 'scp.category_id', '=', 'c.id')
+                    ->where('scp.city_id', $cityId)
+                    ->select(
+                        's.id',
+                        'scp.category_id',
+                        'c.name as category_name',
+                        's.name',
+                        'scp.price',
+                        'scp.discount_price',
+                        's.duration',
+                        's.rating',
+                        's.reviews',
+                        's.description',
+                        's.includes',
+                        DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
+                        's.is_popular'
+                    )
+                    ->where('scp.status', 1);
+            } else {
+                $query = DB::table('services as s')
+                    ->join('service_categories as c', 's.category_id', '=', 'c.id')
+                    ->select(
+                        's.id',
+                        's.category_id',
+                        'c.name as category_name',
+                        's.name',
+                        's.price',
+                        's.discount_price',
+                        's.duration',
+                        's.rating',
+                        's.reviews',
+                        's.description',
+                        's.includes',
+                        DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
+                        's.is_popular'
+                    )
+                    ->where('s.status', 1);
+            }
 
             if ($request->filled('search')) {
                 $search = $request->search;

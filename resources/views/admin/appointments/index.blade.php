@@ -299,6 +299,7 @@
                 <div class="c-row">
                     <div class="c-col-6"><div class="c-detail-card"><label>City</label><p>${data.city_name ?? '-'}</p></div></div>
                     <div class="c-col-6"><div class="c-detail-card"><label>Category</label><p>${data.service_category ?? '-'}</p></div></div>
+                    <div class="c-col-6"><div class="c-detail-card"><label>Sub Category</label><p>${data.service_sub_category ?? '-'}</p></div></div>
                     <div class="c-col-6"><div class="c-detail-card"><label>Services</label><p>${servicesHtml}</p></div></div>
 
                     <div class="c-col-6"><div class="c-detail-card"><label>Order #</label><p>${data.order_number ?? '-'}</p></div></div>

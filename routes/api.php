@@ -46,16 +46,6 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
 Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/user')->group(function () {
         Route::get('logout', [AuthenticationController::class, 'logout']);
-        Route::get('settingData', [PoseImagesController::class, 'settingData']);
-        Route::get('filterData', [PoseImagesController::class, 'filterData']);
-        Route::get('flashScreenImage', [PoseImagesController::class, 'flashScreenImage']);
-        Route::get('getHomePageCategory', [CategoryController::class, 'getHomePageCategory']);
-        Route::post('categoryWiseSubCategoryGet', [SubCategoryController::class, 'categoryWiseSubCategoryGet']);
-        Route::get('getCategory', [CategoryController::class, 'getCategory']);
-        Route::get('getSubCategory', [SubCategoryController::class, 'getSubCategory']);
-        Route::get('getAllPoseImage', [PoseImagesController::class, 'getAllPoseImage']);
-        Route::post('getPoseImage', [PoseImagesController::class, 'getPoseImage']);
-        Route::post('viewPoseImage', [PoseImagesController::class, 'viewPoseImage']);
     });
 });
 
