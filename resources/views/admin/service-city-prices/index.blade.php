@@ -85,6 +85,7 @@
                                                 <th>#</th>
                                                 <th>City</th>
                                                 <th>Category</th>
+                                                <th>Sub Category</th>
                                                 <th>Service</th>
                                                 <th>Price</th>
                                                 <th>Discount Price</th>
@@ -154,6 +155,10 @@
                 {
                     data: 'service_category_name',
                     name: 'service_category_name'
+                },
+                {
+                    data: 'service_sub_category_name',
+                    name: 'service_sub_category_name'
                 },
                 {
                     data: 'service_name',

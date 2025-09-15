@@ -50,6 +50,7 @@ class ServiceCityPriceController extends Controller
                     ->leftJoin('services as s', 'scp.service_id', '=', 's.id')
                     ->leftJoin('cities as c', 'scp.city_id', '=', 'c.id')
                     ->leftJoin('service_categories as sc', 'sc.id', '=', 's.category_id')
+                    ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'scp.sub_category_id')
                     ->select(
                         'scp.id',
                         'scp.city_id',
@@ -60,6 +61,7 @@ class ServiceCityPriceController extends Controller
                         'scp.updated_at',
                         's.name as service_name',
                         'sc.name as service_category_name',
+                        'ssc.name as service_sub_category_name',
                         'c.name as city_name'
                     );
 
