@@ -46,7 +46,7 @@ class ServiceController extends Controller
         try {
             $service = Service::leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
                 ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'services.sub_category_id')
-                ->select('services.*', 'sc.name as category_name','ssc.name as sub_category_name')
+                ->select('services.*', 'sc.name as category_name', 'ssc.name as sub_category_name')
                 ->where('services.id', $id)
                 ->first();
 
@@ -270,7 +270,8 @@ class ServiceController extends Controller
     {
         try {
             $services = Service::leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
-                ->select('services.*', 'sc.name as category_name')
+                ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'services.sub_category_id')
+                ->select('services.*', 'sc.name as category_name', 'ssc.name as sub_category_name')
                 ->get();
 
             $pdf = Pdf::loadView('admin.services.export-pdf', compact('services'))

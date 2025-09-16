@@ -55,11 +55,12 @@
             <tr>
                 <th>Id</th>
                 <th>Category</th>
+                <th>Sub Category</th>
                 <th>Name</th>
                 <th>Price</th>
                 <th>Discount Price</th>
-                <th>Total Price</th>
-                <th>Discount %</th>
+                {{-- <th>Total Price</th> --}}
+                {{-- <th>Discount %</th> --}}
                 <th>Duration</th>
                 <th>Rating</th>
                 <th>Reviews</th>
@@ -76,19 +77,20 @@
             @endphp
             @foreach ($services as $s)
                 @php
-                    $price = $s->price ?? 0;
-                    $discount = $s->discount_price ?? 0;
-                    $totalPrice = $price - $discount;
-                    $discountPercent = $price > 0 ? ($discount / $price) * 100 : 0;
+                    // $price = $s->price ?? 0;
+                    // $discount = $s->discount_price ?? 0;
+                    // $totalPrice = $price - $discount;
+                    // $discountPercent = $price > 0 ? ($discount / $price) * 100 : 0;
                 @endphp
                 <tr>
                     <td>{{ $s->id }}</td>
                     <td>{{ $s->category_name ?? '-' }}</td>
+                    <td>{{ $s->sub_category_name ?? '-' }}</td>
                     <td>{{ $s->name }}</td>
-                    <td>{{ number_format($price, 2) }}</td>
-                    <td>{{ $discount > 0 ? number_format($discount, 2) : '-' }}</td>
-                    <td>{{ number_format($totalPrice, 2) }}</td>
-                    <td>{{ number_format($discountPercent, 2) }}%</td>
+                    <td>{{ $s->price ?? 0 }}</td>
+                    <td>{{ $s->discount_price ?? 0 }}</td>
+                    {{-- <td>{{ number_format($totalPrice, 2) }}</td>
+                    <td>{{ number_format($discountPercent, 2) }}%</td> --}}
                     <td>{{ $s->duration }}</td>
                     <td>{{ $s->rating ?? '-' }}</td>
                     <td>{{ $s->reviews ?? '-' }}</td>
