@@ -86,9 +86,9 @@
                                                 <th>Sub Category</th>
                                                 <th>Name</th>
                                                 <th>Price</th>
-                                                <th>DP</th>
-                                                <th>TP</th>
-                                                <th>PP</th>
+                                                <th>Discount Price</th>
+                                                {{-- <th>TP</th> --}}
+                                                {{-- <th>PP</th> --}}
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-stuff="High Priority,Low Priority">Is Popular</th>
                                                 <th data-search="false">Action</th>
@@ -170,36 +170,36 @@
                     data: 'discount_price',
                     name: 'discount_price'
                 },
-                {
-                    data: null,
-                    name: 'total_price',
-                    render: function(data, type, row) {
-                        let price = parseFloat(row.price) || 0;
-                        let discount = parseFloat(row.discount_price) || 0;
-                        let total = price - discount;
+                // {
+                //     data: null,
+                //     name: 'total_price',
+                //     render: function(data, type, row) {
+                //         let price = parseFloat(row.price) || 0;
+                //         let discount = parseFloat(row.discount_price) || 0;
+                //         let total = price - discount;
 
-                        // Color: green if discount applied, else black
-                        let color = discount > 0 ? 'green' : 'black';
-                        return `<span style="color:${color}; font-weight:bold;">${total.toFixed(2)}</span>`;
-                    }
-                },
-                {
-                    data: null,
-                    name: 'discount_percent',
-                    render: function(data, type, row) {
-                        let price = parseFloat(row.price) || 0;
-                        let discount = parseFloat(row.discount_price) || 0;
-                        let percent = 0;
+                //         // Color: green if discount applied, else black
+                //         let color = discount > 0 ? 'green' : 'black';
+                //         return `<span style="color:${color}; font-weight:bold;">${total.toFixed(2)}</span>`;
+                //     }
+                // },
+                // {
+                //     data: null,
+                //     name: 'discount_percent',
+                //     render: function(data, type, row) {
+                //         let price = parseFloat(row.price) || 0;
+                //         let discount = parseFloat(row.discount_price) || 0;
+                //         let percent = 0;
 
-                        if (price > 0 && discount > 0) {
-                            percent = (discount / price) * 100;
-                        }
+                //         if (price > 0 && discount > 0) {
+                //             percent = (discount / price) * 100;
+                //         }
 
-                        // Color: green if discount applied, else black
-                        let color = discount > 0 ? 'green' : 'black';
-                        return `<span style="color:${color}; font-weight:bold;">${percent.toFixed(2)}%</span>`;
-                    }
-                },
+                //         // Color: green if discount applied, else black
+                //         let color = discount > 0 ? 'green' : 'black';
+                //         return `<span style="color:${color}; font-weight:bold;">${percent.toFixed(2)}%</span>`;
+                //     }
+                // },
                 {
                     data: 'status',
                     name: 'status'
