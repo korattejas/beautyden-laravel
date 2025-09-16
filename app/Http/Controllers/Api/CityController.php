@@ -39,6 +39,7 @@ class CityController extends Controller
                     'c.slug',
                     DB::raw('CONCAT("' . asset('uploads/city') . '/", c.icon) AS icon'),
                     'c.launch_quarter',
+                    'c.status',
                     'c.is_popular',
                 )
                 // ->where('c.status', 1)
