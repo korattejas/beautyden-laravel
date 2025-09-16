@@ -148,11 +148,11 @@ class CustomerReviewController extends Controller
             $rules = [
                 'service_id'    => 'required|exists:services,id',
                 'customer_name' => 'required|string|max:100',
-                'customer_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+                'customer_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
                 'rating'        => 'nullable|numeric|min:0|max:5',
                 'review'        => 'nullable|string',
                 'review_date'   => 'nullable|date',
-                'photos.*'      => 'nullable|image|mimes:jpeg,png,jpg,gif',
+                'photos.*'      => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
                 'video'         => 'nullable',
             ];
 

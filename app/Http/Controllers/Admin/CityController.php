@@ -125,7 +125,7 @@ class CityController extends Controller
             'state'  => 'required|string|max:50',
             'area'   => 'nullable|string|max:50',
             'slug'   => $id == 0 ? 'nullable|unique:cities,slug' : 'nullable|unique:cities,slug,' . $id,
-            'icon'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            'icon'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
         ];
 
         $validator = Validator::make($request->all(), $validateArray);

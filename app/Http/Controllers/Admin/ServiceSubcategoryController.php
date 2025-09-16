@@ -147,7 +147,7 @@ class ServiceSubcategoryController extends Controller
                     'required',
                     $id == 0 ? 'unique:service_subcategories,name' : 'unique:service_subcategories,name,' . $id . ',id',
                 ],
-                'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+                'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
             ];
 
             $validateMessage = [
@@ -156,7 +156,7 @@ class ServiceSubcategoryController extends Controller
                 'name.required' => 'The subcategory name is required.',
                 'name.unique' => 'The subcategory name has already been taken.',
                 'icon.image' => 'The file must be an image.',
-                'icon.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg.',
+                'icon.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
             ];
 
             $validator = Validator::make($request_all, $validateArray, $validateMessage);
