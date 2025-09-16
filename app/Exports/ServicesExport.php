@@ -14,9 +14,11 @@ class ServicesExport implements FromCollection, WithHeadings, WithStyles, Should
     public function collection()
     {
         return Service::leftJoin('service_categories as sc', 'sc.id', '=', 'services.category_id')
+            ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'services.sub_category_id')
             ->select(
                 'services.id',
                 'sc.name as category_name',
+                'ssc.name as sub_category_name',
                 'services.name',
                 'services.price',
                 'services.discount_price',
@@ -30,19 +32,20 @@ class ServicesExport implements FromCollection, WithHeadings, WithStyles, Should
             )
             ->get()
             ->map(function ($row) {
-                $price = (float) $row->price;
-                $discount = (float) $row->discount_price;
-                $total = $discount > 0 ? $price - $discount : $price;
-                $percent = ($price > 0 && $discount > 0) ? round(($discount / $price) * 100, 2) : 0;
+                // $price = (float) $row->price;
+                // $discount = (float) $row->discount_price;
+                // $total = $discount > 0 ? $price - $discount : $price;
+                // $percent = ($price > 0 && $discount > 0) ? round(($discount / $price) * 100, 2) : 0;
 
                 return [
                     'ID'            => $row->id,
                     'Category'      => $row->category_name,
+                    'Sub Category'      => $row->sub_category_name,
                     'Name'          => $row->name,
-                    'Price'         => number_format($price, 2),
-                    'Discount Price' => $discount > 0 ? number_format($discount, 2) : '-',
-                    'Total Price'   => number_format($total, 2),
-                    'Discount %'    => $percent . '%',
+                    'Price'         => $row->price ?? 0,
+                    'Discount Price' => $row->discount_price ?? 0,
+                    // 'Total Price'   => number_format($total, 2),
+                    // 'Discount %'    => $percent . '%',
                     'Duration'      => $row->duration,
                     'Rating'        => $row->rating,
                     'Reviews'       => $row->reviews,
@@ -59,11 +62,12 @@ class ServicesExport implements FromCollection, WithHeadings, WithStyles, Should
         return [
             'ID',
             'Category',
+            'Sub Category',
             'Name',
             'Price',
             'Discount Price',
-            'Total Price',
-            'Discount %',
+            // 'Total Price',
+            // 'Discount %',
             'Duration',
             'Rating',
             'Reviews',
