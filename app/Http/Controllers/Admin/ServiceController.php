@@ -163,7 +163,7 @@ class ServiceController extends Controller
                 'description' => 'required|string',
                 'rating'      => 'nullable|numeric|min:0|max:5',
                 'reviews'     => 'nullable|integer|min:0',
-                'icon' => $id == 0 ? 'image|mimes:jpeg,png,jpg,gif,svg' : 'image|mimes:jpeg,png,jpg,gif,svg',
+                'icon' => $id == 0 ? 'image|mimes:jpeg,png,jpg,gif,svg,webp' : 'image|mimes:jpeg,png,jpg,gif,svg,webp',
             ];
 
             $validator = Validator::make($request_all, $validateArray);
