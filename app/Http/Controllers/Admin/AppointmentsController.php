@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use App\Models\TeamMember;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AppointmentsController extends Controller
 {
@@ -198,6 +199,7 @@ class AppointmentsController extends Controller
                             'hidden_id' => $appointment->id,
                             'assign_id' => $appointment->id,
                             'view_id' => $appointment->id,
+                            'pdf_id' => $appointment->id,
                         ];
                         return view('admin.render-view.datable-action', [
                             'action_array' => $action_array
@@ -342,6 +344,44 @@ class AppointmentsController extends Controller
                 ->get();
 
             return response()->json($subcategories);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to sub category data');
+        }
+    }
+
+    public function downloadPdf($id)
+    {
+        try {
+            $appointment = Appointment::leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
+                ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'appointments.service_sub_category_id')
+                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select(
+                    'appointments.*',
+                    'sc.name as service_category_name',
+                    'ssc.name as service_sub_category_name',
+                    'ct.name as city_name',
+                )
+                ->where('appointments.id', $id)
+                ->firstOrFail();
+
+            $serviceIds = $appointment->service_id ? explode(',', $appointment->service_id) : [];
+            $serviceIds = array_map('intval', $serviceIds);
+            $services = Service::whereIn('id', $serviceIds)->pluck('name')->toArray();
+
+            $memberIds = $appointment->assigned_to ? explode(',', $appointment->assigned_to) : [];
+            $memberIds = array_map('intval', $memberIds);
+            $teamMembers = TeamMember::whereIn('id', $memberIds)->pluck('name')->toArray();
+
+            $data = [
+                'appointment'   => $appointment,
+                'services'      => $services,
+                'team_members'  => $teamMembers,
+            ];
+
+            $pdf = PDF::loadView('admin.appointments.pdf', $data)->setPaper('a4', 'portrait');
+
+            $fileName = 'appointment_' . $appointment->order_number . '.pdf';
+            return $pdf->download($fileName);
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to sub category data');
         }

@@ -209,6 +209,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('appointments/assign_member', [AppointmentsController::class, 'AssignMember'])->name('assign.members');
         Route::get('appointments-view/{id}', [AppointmentsController::class, 'view']);
         Route::get('appointments/get-appoinmentSubcategories/{categoryId}', [AppointmentsController::class, 'getSubcategories']);
+        Route::get('appointments/{id}/pdf', [AppointmentsController::class, 'downloadPdf'])
+            ->name('admin.appointments.pdf');
+
 
         /* Policies Route */
         Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');

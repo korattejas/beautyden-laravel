@@ -69,6 +69,17 @@
             </button>
         @endif
 
+        @if (isset($action_array['pdf_id']))
+        {{-- <button type="button" class="btn btn-dark btn-icon btn-view" data-id="{{ $action_array['view_id'] }}"
+        data-toggle="tooltip" data-placement="top" title="VIEW">
+        <i class="bx bx-bullseye font-size-16 align-middle"></i>
+    </button> --}}
+            <a type="button" href="{{ route('admin.appointments.pdf', $action_array['pdf_id']) }}" class="btn btn-dark btn-icon btn-pdf"
+                title="Download PDF">
+                <i class="bx bx-file"></i>
+            </a>
+        @endif
+
         @if (isset($action_array['assign_id']))
             <button data-id="{{ $action_array['assign_id'] }}" data-new-old-priority-status-change="0"
                 class="assign-member btn btn-warning btn-icon" data-effect="effect-fall" data-toggle="tooltip"
