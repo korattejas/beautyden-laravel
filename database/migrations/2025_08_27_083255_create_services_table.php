@@ -15,8 +15,8 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->unsignedBigInteger('sub_category_id')->nullable();
             $table->string('name', 150);
-            $table->decimal('price', 8, 2)->nullable();
-            $table->decimal('discount_price', 8, 2)->nullable();
+            $table->string('price', 150);
+            $table->string('discount_price', 150)->nullable();
             $table->string('duration', 50);
             $table->decimal('rating', 3, 1)->nullable();
             $table->integer('reviews')->nullable();

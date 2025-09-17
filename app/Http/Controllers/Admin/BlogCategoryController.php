@@ -140,14 +140,14 @@ class BlogCategoryController extends Controller
                     'required',
                     $id == 0 ? 'unique:blog_categories,name' : 'unique:blog_categories,name,' . $id . ',id',
                 ],
-                'icon' => $id == 0 ? 'image|mimes:jpeg,png,jpg,gif,svg' : 'image|mimes:jpeg,png,jpg,gif,svg',
+                'icon' => $id == 0 ? 'image|mimes:jpeg,png,jpg,gif,svg,webp' : 'image|mimes:jpeg,png,jpg,gif,svg,webp',
             ];
 
             $validateMessage = [
                 'name.required' => 'The category name is required.',
                 'name.unique' => 'The category name has already been taken.',
                 'icon.image' => 'The file must be an image.',
-                'icon.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg.',
+                'icon.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
             ];
 
 

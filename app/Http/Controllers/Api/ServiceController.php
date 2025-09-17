@@ -25,75 +25,75 @@ class ServiceController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
-    // public function getServiceCategory(): JsonResponse
-    // {
-    //     $function_name = 'getServiceCategory';
-    //     try {
-    //         $categories = DB::table('service_categories as c')
-    //             ->select(
-    //                 'c.id',
-    //                 'c.name',
-    //                 DB::raw('CONCAT("' . asset('uploads/service-category') . '/", c.icon) AS icon'),
-    //                 'c.description',
-    //                 'c.is_popular'
-    //             )
-    //             ->where('c.status', 1)
-    //             ->orderBy('c.is_popular', 'desc')
-    //             ->get();
-
-    //         if ($categories->isEmpty()) {
-    //             return $this->sendError('No category found.', $this->backend_error_status);
-    //         }
-
-    //         $subCategories = DB::table('service_subcategories as sc')
-    //             ->select(
-    //                 'sc.id',
-    //                 'sc.service_category_id',
-    //                 'sc.name',
-    //                 DB::raw('CONCAT("' . asset('uploads/service-subcategory') . '/", sc.icon) AS icon'),
-    //                 'sc.description',
-    //                 'sc.is_popular'
-    //             )
-    //             ->where('sc.status', 1)
-    //             ->get();
-
-    //         $categories->transform(function ($category) use ($subCategories) {
-    //             $category->subcategories = $subCategories->where('service_category_id', $category->id)->values();
-    //             return $category;
-    //         });
-
-    //         return $this->sendResponse($categories, 'Categories with subcategories retrieved successfully', $this->success_status);
-    //     } catch (Exception $e) {
-    //         logCatchException($e, $this->controller_name, $function_name);
-    //         return $this->sendError($this->common_error_message, $this->exception_status);
-    //     }
-    // }
-
     public function getServiceCategory(): JsonResponse
     {
         $function_name = 'getServiceCategory';
         try {
-            $categories = DB::table('service_categories')->select(
-                'id',
-                'name',
-                DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'),
-                'description',
-                'is_popular'
-            )
-                ->where('status', 1)
-                ->orderBy('is_popular', 'desc')
+            $categories = DB::table('service_categories as c')
+                ->select(
+                    'c.id',
+                    'c.name',
+                    DB::raw('CONCAT("' . asset('uploads/service-category') . '/", c.icon) AS icon'),
+                    'c.description',
+                    'c.is_popular'
+                )
+                ->where('c.status', 1)
+                ->orderBy('c.is_popular', 'desc')
                 ->get();
 
             if ($categories->isEmpty()) {
                 return $this->sendError('No category found.', $this->backend_error_status);
             }
 
-            return $this->sendResponse($categories, 'Categories retrieved successfully', $this->success_status);
+            $subCategories = DB::table('service_subcategories as sc')
+                ->select(
+                    'sc.id',
+                    'sc.service_category_id',
+                    'sc.name',
+                    DB::raw('CONCAT("' . asset('uploads/service-subcategory') . '/", sc.icon) AS icon'),
+                    'sc.description',
+                    'sc.is_popular'
+                )
+                ->where('sc.status', 1)
+                ->get();
+
+            $categories->transform(function ($category) use ($subCategories) {
+                $category->subcategories = $subCategories->where('service_category_id', $category->id)->values();
+                return $category;
+            });
+
+            return $this->sendResponse($categories, 'Categories with subcategories retrieved successfully', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
+
+    // public function getServiceCategory(): JsonResponse
+    // {
+    //     $function_name = 'getServiceCategory';
+    //     try {
+    //         $categories = DB::table('service_categories')->select(
+    //             'id',
+    //             'name',
+    //             DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'),
+    //             'description',
+    //             'is_popular'
+    //         )
+    //             ->where('status', 1)
+    //             ->orderBy('is_popular', 'desc')
+    //             ->get();
+
+    //         if ($categories->isEmpty()) {
+    //             return $this->sendError('No category found.', $this->backend_error_status);
+    //         }
+
+    //         return $this->sendResponse($categories, 'Categories retrieved successfully', $this->success_status);
+    //     } catch (Exception $e) {
+    //         logCatchException($e, $this->controller_name, $function_name);
+    //         return $this->sendError($this->common_error_message, $this->exception_status);
+    //     }
+    // }
 
 
     public function getServices(Request $request): JsonResponse
