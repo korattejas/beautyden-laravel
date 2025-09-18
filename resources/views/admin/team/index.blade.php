@@ -147,6 +147,11 @@
         datatable_url = '/getDataTeamMembers';
 
         $.extend(true, $.fn.dataTable.defaults, {
+            pageLength: 100,
+            lengthMenu: [
+                [10, 25, 50, 100, 200, -1],
+                [10, 25, 50, 100, 200, "All"]
+            ],
             columns: [{
                     data: null,
                     name: 'id',
@@ -252,12 +257,12 @@
                                 ${
                                     data.icon 
                                     ? `<img 
-                                                                src="${baseUrl + data.icon}" 
-                                                                alt="Team Icon" 
-                                                                class="img-fluid service-icon" 
-                                                                style="max-width:250px; cursor:pointer;" 
-                                                                onclick="window.open('${baseUrl + data.icon}', '_blank')" 
-                                                            >`
+                                                                    src="${baseUrl + data.icon}" 
+                                                                    alt="Team Icon" 
+                                                                    class="img-fluid service-icon" 
+                                                                    style="max-width:250px; cursor:pointer;" 
+                                                                    onclick="window.open('${baseUrl + data.icon}', '_blank')" 
+                                                                >`
                                     : '<p>-</p>'
                                 }
                             </div>

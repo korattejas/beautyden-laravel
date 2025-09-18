@@ -143,10 +143,7 @@ class ServiceSubcategoryController extends Controller
             $id = $request->input('edit_value');
             $validateArray = [
                 'service_category_id' => 'required|exists:service_categories,id',
-                'name' => [
-                    'required',
-                    $id == 0 ? 'unique:service_subcategories,name' : 'unique:service_subcategories,name,' . $id . ',id',
-                ],
+                'name' => 'required',
                 'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
             ];
 
@@ -154,7 +151,6 @@ class ServiceSubcategoryController extends Controller
                 'service_category_id.required' => 'The parent category is required.',
                 'service_category_id.exists' => 'The selected category is invalid.',
                 'name.required' => 'The subcategory name is required.',
-                'name.unique' => 'The subcategory name has already been taken.',
                 'icon.image' => 'The file must be an image.',
                 'icon.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
             ];
