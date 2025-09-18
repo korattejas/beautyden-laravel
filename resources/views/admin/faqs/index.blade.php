@@ -65,6 +65,11 @@
         datatable_url = '/getDataFaqs';
 
         $.extend(true, $.fn.dataTable.defaults, {
+            pageLength: 100,
+            lengthMenu: [
+                [10, 25, 50, 100, 200, -1],
+                [10, 25, 50, 100, 200, "All"]
+            ],
             columns: [{
                     data: null,
                     name: 'id',

@@ -47,7 +47,7 @@
                                     <option value="0">Low Priority</option>
                                 </select>
                             </div>
-                           <div class="mb-2">
+                            <div class="mb-2">
                                 <label class="form-label">Review Date</label>
                                 <input type="date" id="filter-review-date" class="form-control">
                             </div>
@@ -128,6 +128,11 @@
         datatable_url = '/getDataReviews';
 
         $.extend(true, $.fn.dataTable.defaults, {
+            pageLength: 100,
+            lengthMenu: [
+                [10, 25, 50, 100, 200, -1],
+                [10, 25, 50, 100, 200, "All"]
+            ],
             columns: [{
                     data: null,
                     name: 'id',
@@ -239,11 +244,11 @@
                                    ${
                                         data.video 
                                         ? `<a href="${baseUrlCustomerVideo + data.video}" target="_blank">
-                                                    <video controls style="max-width:300px; cursor:pointer;">
-                                                        <source src="${baseUrlCustomerVideo + data.video}" type="video/mp4">
-                                                        Your browser does not support video.
-                                                    </video>
-                                            </a>` 
+                                                        <video controls style="max-width:300px; cursor:pointer;">
+                                                            <source src="${baseUrlCustomerVideo + data.video}" type="video/mp4">
+                                                            Your browser does not support video.
+                                                        </video>
+                                                </a>` 
                                         : '<p>-</p>'
                                     }
 
