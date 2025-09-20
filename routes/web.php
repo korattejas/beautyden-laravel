@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\ServiceCityPriceController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TeamMemberController;
+use App\Http\Controllers\ContractController;
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
 use Rap2hpoutre\LaravelLogViewer\LogViewerController;
@@ -28,6 +29,15 @@ Route::get('logs/BeautyDen@admin.com/8998', [LogViewerController::class, 'index'
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/beautician-contracts', [ContractController::class, 'showAgreements']);
+Route::post('/contracts/verify', [ContractController::class, 'verifyProvider'])->name('contracts.verify');
+Route::get('/contracts/sign', function () {
+    return view('contracts.sign');
+})->name('contracts.sign');
+Route::post('/contracts/save', [ContractController::class, 'saveSignature'])->name('contracts.save');
+Route::get('/contracts/success', [ContractController::class, 'success'])->name('contracts.success');
+
 
 /* Admin Route */
 Route::group(['prefix' => 'admin'], function () {
