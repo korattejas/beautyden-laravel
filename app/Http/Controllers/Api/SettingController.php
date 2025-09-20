@@ -64,15 +64,14 @@ class SettingController extends Controller
                 ],
             ];
 
-            return $this->sendResponse(
-                [
-                    'settings' => $settings,
-                    'homePageSlides' => $heroSlides,
-                    'homePageSlidesContent' => $heroContent
-                ],
-                'Settings and Hero content retrieved successfully',
-                $this->success_status
-            );
+            return response()->json([
+                'code' => 200,
+                'status' => true,
+                'message' => 'Settings retrieved successfully',
+                'data' => $settings,
+                'homePageSlides' => $heroSlides,
+                'homePageSlidesContent' => $heroContent
+            ]);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
 
