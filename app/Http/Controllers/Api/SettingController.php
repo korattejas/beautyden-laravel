@@ -30,27 +30,50 @@ class SettingController extends Controller
         $function_name = 'getsettings';
 
         try {
-            $faqs = DB::table('settings as s')
-                ->select(
-                    's.id',
-                    's.screen_name',
-                    's.key',
-                    's.value',
-                )
+            $settings = DB::table('settings as s')
+                ->select('s.id', 's.screen_name', 's.key', 's.value')
                 ->where('s.status', 1)
                 ->orderBy('s.id', 'ASC')
                 ->get();
 
-            if ($faqs->isEmpty()) {
+            if ($settings->isEmpty()) {
                 return $this->sendError('No Setting found.', $this->backend_error_status);
             }
 
+            $heroSlides = [
+                [
+                    'image' => asset('uploads/home-page-slider/slider1.webp')
+                ],
+                [
+                    'image' => asset('uploads/home-page-slider/slider2.webp')
+                ],
+                [
+                    'image' => asset('uploads/home-page-slider/slider2.webp')
+                ],
+            ];
+
+            $heroContent = [
+                'title' => "Trusted Beauty Service at Your Doorstep",
+                'description' => "Experience premium beauty treatments from head to toe — hair, skin, nails, waxing, facials, spa therapies, and more, all delivered by expert professionals at your doorstep.",
+                'badges' => [
+                    "Home",
+                    "Events",
+                    "Functions",
+                    "Marriages",
+                    "Special Occasions",
+                ],
+            ];
+
             return $this->sendResponse(
-                $faqs,
-                'Settings retrieved successfully',
+                [
+                    'settings' => $settings,
+                    'homePageSlides' => $heroSlides,
+                    'homePageSlidesContent' => $heroContent
+                ],
+                'Settings and Hero content retrieved successfully',
                 $this->success_status
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
 
             return $this->sendError(
