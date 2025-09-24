@@ -67,6 +67,7 @@ $(function () {
                     d.appointment_date = $('#filter-appointment-date').val();
                     d.appointment_time = $('#filter-appointment-time').val();
                     d.city_id = $('#filter-city').val();
+                    d.signed_date = $('#filter-signed-date').val();
                 }
             },
             orderCellsTop: true,
@@ -97,6 +98,7 @@ $(function () {
             $('#filter-appointment-date').val('');
             $('#filter-appointment-time').val('');
             $('#filter-city').val('');
+            $('#filter-signed-date').val('');
             dt_filter.ajax.reload();
         });
     }
