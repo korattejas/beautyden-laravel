@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\ServiceCityPriceController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TeamMemberController;
+use App\Http\Controllers\Admin\ContractSignedController;
 use App\Http\Controllers\ContractController;
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,13 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['middleware' => [AdminCheck::class]], function () {
         Route::get('logout', [LoginController::class, 'logout'])->name('admin.logout');
         Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+        /* Contract Signed Route */
+        Route::get('contract-signed', [ContractSignedController::class, 'index'])->name('admin.contract-signed.index');
+        Route::get('getDataContracts', [ContractSignedController::class, 'getDataContracts'])->name('getDataContracts');
+        Route::delete('contract-signed/{id}', [ContractSignedController::class, 'destroy']);
+        Route::get('contract-signed/status/{id}/{status}', [ContractSignedController::class, 'changeStatus']);
+
 
         /* Services Category Route */
         Route::get('service-category', [ServiceCategoryController::class, 'index'])->name('admin.service-category.index');

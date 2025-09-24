@@ -28,6 +28,13 @@
                 <i data-feather="more-horizontal"></i>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.contract-signed.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.contract-signed.index') }}">
+                    <i data-feather="file-text"></i>
+                    <span class="menu-title text-truncate">Contract Signed</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ Request::routeIs('admin.appointments.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.appointments.index') }}">
                     <i data-feather="calendar"></i>
@@ -70,7 +77,7 @@
                 </a>
             </li>
 
-             <li class="nav-item {{ Request::routeIs('admin.city.index') ? 'active' : '' }}">
+            <li class="nav-item {{ Request::routeIs('admin.city.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.city.index') }}">
                     <i data-feather="map-pin"></i>
                     <span class="menu-title text-truncate">City</span>
