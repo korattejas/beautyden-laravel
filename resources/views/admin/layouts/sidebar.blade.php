@@ -4,9 +4,8 @@
             <li class="nav-item me-auto">
                 <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
                     <span class="brand-logo">
-                        {{-- <img src="{{ URL::asset('panel-assets/admin-logo/logo.png') }}" /> --}}
+                        <img src="{{ URL::asset('panel-assets/admin-logo/sidebar-Logo.png') }}" />
                     </span>
-                    <h2 class="brand-text">Test</h2>
                 </a>
             </li>
         </ul>

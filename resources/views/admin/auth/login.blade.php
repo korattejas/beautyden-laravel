@@ -102,7 +102,7 @@
 
         * {
             margin: 0;
-            padding: 0;
+            /* padding: 0; */
             box-sizing: border-box;
         }
 
@@ -279,9 +279,9 @@
         }
 
         .premium-logo {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
+            width: 75%;
+            height: 100%;
+            /* border-radius: 50%;
             object-fit: cover;
             border: 4px solid rgba(255, 255, 255, 0.3);
             box-shadow:
@@ -289,7 +289,7 @@
                 0 20px 40px rgba(0, 0, 0, 0.2);
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            z-index: 2;
+            z-index: 2; */
         }
 
         .logo-glow {
@@ -306,7 +306,7 @@
             z-index: 1;
         }
 
-        .premium-logo:hover+.logo-glow {
+        /* .premium-logo:hover+.logo-glow {
             opacity: 0.6;
         }
 
@@ -315,7 +315,7 @@
             box-shadow:
                 0 0 0 8px rgba(255, 255, 255, 0.2),
                 0 30px 60px rgba(0, 0, 0, 0.3);
-        }
+        } */
 
         .brand-identity {
             margin-bottom: var(--spacing-2xl);
@@ -1339,9 +1339,9 @@
         }
 
         /* Luxury Details */
-        .premium-logo {
+        /* .premium-logo {
             filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
-        }
+        } */
 
         .login-card {
             background-image:
@@ -1415,19 +1415,12 @@
             <div class="showcase-overlay">
                 <div class="showcase-content">
                     <!-- Brand Header -->
-                    <div class="brand-header">
-                        <div class="brand-logo-container">
-                            <div class="logo-wrapper">
-                                {{-- <img src="{{ URL::asset('panel-assets/admin-logo/logo.png') }}" alt="BeautyDen Logo"
-                                    class="premium-logo" /> --}}
-                                <div class="logo-glow"></div>
+                    <div class="brand-headerk">
+                        <div class="brand-logo-containerk">
+                            <div class="logo-wrapperk">
+                                <img src="{{ URL::asset('panel-assets/admin-logo/logo.png') }}" alt="BeautyDen Logo"
+                                    class="premium-logo" />
                             </div>
-                        </div>
-                        <div class="brand-identity">
-                            <h1 class="brand-name">
-                                <span class="beauty-script">Beauty</span><span class="den-text">Den</span>
-                            </h1>
-                            <p class="brand-tagline">Premium Home Beauty Services</p>
                         </div>
                     </div>
 
@@ -1435,7 +1428,7 @@
                     <div class="hero-content">
                         <h2 class="hero-title">
                             <span class="hero-line-1">Transform Your Beauty</span>
-                            <span class="hero-line-2">In the Comfort of Home</span>
+                            <span class="hero-line-2">In the Comfort of Doorstep</span>
                         </h2>
                         <p class="hero-description">
                             Experience luxury beauty treatments with our certified professionals who bring the salon
@@ -1480,22 +1473,6 @@
                                 <h4>Nail Artistry</h4>
                                 <p>Manicures, pedicures & nail art</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Trust Indicators -->
-                    <div class="trust-indicators">
-                        <div class="trust-item">
-                            <div class="trust-number">500+</div>
-                            <div class="trust-label">Happy Clients</div>
-                        </div>
-                        <div class="trust-item">
-                            <div class="trust-number">50+</div>
-                            <div class="trust-label">Expert Artists</div>
-                        </div>
-                        <div class="trust-item">
-                            <div class="trust-number">5★</div>
-                            <div class="trust-label">Average Rating</div>
                         </div>
                     </div>
                 </div>
