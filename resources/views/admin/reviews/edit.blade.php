@@ -36,7 +36,7 @@
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Category</label>
-                                                    <select name="service_id" class="form-control select2">
+                                                    <select name="category_id" class="form-control select2">
                                                         <option value="">Select Category</option>
                                                         @foreach ($categories as $category)
                                                             <option value="{{ $category->id }}"
@@ -90,7 +90,7 @@
                                             </div>
 
                                             <!-- Rating -->
-                                            <div class="col-md-6 mt-2">
+                                            <div class="col-md-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Rating (0-5)</label>
                                                     <input type="number" class="form-control" name="rating" min="0"
