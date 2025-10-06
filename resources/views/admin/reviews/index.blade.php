@@ -79,6 +79,7 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
+                                                <th>Category</th>
                                                 <th>Service</th>
                                                 <th>Customer Name</th>
                                                 <th data-stuff="Active,InActive">Status</th>
@@ -139,6 +140,10 @@
                     render: function(data, type, row, meta) {
                         return meta.row + 1;
                     }
+                },
+                {
+                    data: 'service_category_name',
+                    name: 'service_category_name'
                 },
                 {
                     data: 'service_name',

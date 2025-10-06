@@ -88,7 +88,8 @@ class CustomerReviewController extends Controller
             if ($request->ajax()) {
                 $reviews = CustomerReview::query()
                     ->leftJoin('services as s', 's.id', '=', 'customer_reviews.service_id')
-                    ->select('customer_reviews.*', 's.name as service_name');
+                    ->leftJoin('service_categories as sc', 'sc.id', '=', 'customer_reviews.category_id')
+                    ->select('customer_reviews.*', 's.name as service_name', 'sc.name as service_category_name');
 
                 if ($request->status !== null && $request->status !== '') {
                     $reviews->where('customer_reviews.status', $request->status);
