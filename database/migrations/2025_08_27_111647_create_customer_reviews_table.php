@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('customer_reviews', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('service_id');
             $table->string('customer_name', 100);
             $table->string('customer_photo', 255)->nullable();
