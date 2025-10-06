@@ -78,7 +78,7 @@
                                             </div>
 
                                             <!-- Rating -->
-                                            <div class="col-md-6 mt-2">
+                                            <div class="col-md-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Rating (0-5)</label>
                                                     <input type="number" class="form-control" name="rating" min="0"
