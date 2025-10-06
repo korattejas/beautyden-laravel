@@ -10,6 +10,7 @@ class CustomerReview extends Model
     use HasFactory;
 
     protected $fillable = [
+        'category_id',
         'service_id',
         'customer_name',
         'customer_photo',

@@ -33,6 +33,7 @@ class CustomerReviewController extends Controller
                 ->leftJoin('services as s', 'r.service_id', '=', 's.id')
                 ->select(
                     'r.id',
+                    'r.category_id',
                     'r.service_id',
                     's.name as service_name',
                     'r.customer_name',
@@ -62,7 +63,7 @@ class CustomerReviewController extends Controller
             }
 
             if ($request->has('service_id') && !empty($request->service_id)) {
-                $query->where('r.service_id', $request->service_id);
+                $query->where('r.category_id', $request->service_id);
             }
 
             if ($request->has('with_photos') && $request->with_photos) {

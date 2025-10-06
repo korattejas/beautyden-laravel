@@ -32,6 +32,23 @@
 
                                         <div class="row">
 
+                                            <!-- Category -->
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Category</label>
+                                                    <select name="service_id" class="form-control select2">
+                                                        <option value="">Select Category</option>
+                                                        @foreach ($categories as $category)
+                                                            <option value="{{ $category->id }}"
+                                                                @if ($review->category_id == $category->id) selected @endif>
+                                                                {{ $category->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
                                             <!-- Service -->
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">

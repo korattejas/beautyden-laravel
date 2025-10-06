@@ -31,6 +31,20 @@
                                         <input type="hidden" id="form-method" value="add">
                                         <div class="row">
 
+                                            <!-- Category -->
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Category</label>
+                                                    <select name="category_id" class="form-control select2">
+                                                        <option value="">Select Category</option>
+                                                        @foreach ($categories as $category)
+                                                            <option value="{{ $category->id }}">{{ $category->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
                                             <!-- Service -->
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">

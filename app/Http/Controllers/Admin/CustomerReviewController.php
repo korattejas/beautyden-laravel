@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 use App\Helpers\ImageUploadHelper;
+use App\Models\ServiceCategory;
 use Illuminate\Support\Facades\File;
 
 class CustomerReviewController extends Controller
@@ -59,7 +60,8 @@ class CustomerReviewController extends Controller
     {
         try {
             $services = Service::where('status', 1)->select('id', 'name')->get();
-            return view('admin.reviews.create', compact('services'));
+            $categories = ServiceCategory::where('status', 1)->select('id', 'name')->get();
+            return view('admin.reviews.create', compact('services','categories'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, 'create');
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -71,8 +73,9 @@ class CustomerReviewController extends Controller
         try {
             $review = CustomerReview::findOrFail(decryptId($id));
             $services = Service::where('status', 1)->select('id', 'name')->get();
+            $categories = ServiceCategory::where('status', 1)->select('id', 'name')->get();
 
-            return view('admin.reviews.edit', compact('review', 'services'));
+            return view('admin.reviews.edit', compact('review', 'services', 'categories'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, 'edit');
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -146,6 +149,7 @@ class CustomerReviewController extends Controller
 
         try {
             $rules = [
+                'category_id'    => 'required|exists:service_categories,id',
                 'service_id'    => 'required|exists:services,id',
                 'customer_name' => 'required|string|max:100',
                 'customer_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
@@ -207,6 +211,7 @@ class CustomerReviewController extends Controller
             }
 
             $data = [
+                'category_id'     => $request->category_id,
                 'service_id'     => $request->service_id,
                 'customer_name'  => $request->customer_name,
                 'customer_photo' => $photo,
