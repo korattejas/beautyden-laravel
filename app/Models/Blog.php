@@ -21,6 +21,8 @@ class Blog extends Model
         'tags',
         'icon',
         'featured',
+        'meta_keywords',
+        'meta_description',
         'status',
     ];
 }

@@ -19,6 +19,8 @@ return new class extends Migration
             $table->date('publish_date')->nullable();           
             $table->json('tags')->nullable();       
             $table->string('icon')->nullable();
+            $table->longText('meta_keywords')->nullable();
+            $table->longText('meta_description')->nullable();
             $table->tinyInteger('featured')->default(0)->comment('1 = Featured, 0 = Normal');
             $table->tinyInteger('status')->default(1)->comment('1 = Active, 0 = InActive');
             $table->timestamps();

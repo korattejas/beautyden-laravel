@@ -202,6 +202,8 @@ class BlogController extends Controller
                 'publish_date' => $request->publish_date ?? today(),
                 'tags'         => $tags ?? null,
                 'icon'         => $icon,
+                'meta_keywords'    => $request->meta_keywords,
+                'meta_description'    => $request->meta_description,
                 'featured'     => (int) $request->input('featured', 0),
                 'status'       => (int) $request->input('status', 1),
             ];
