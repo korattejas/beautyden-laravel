@@ -147,6 +147,22 @@
                                             </div>
                                         </div>
 
+                                        <!-- Meta Keywords -->
+                                        <div class="col-12 mt-2">
+                                            <div class="form-group">
+                                                <label>Meta Keywords</label>
+                                                <textarea class="form-control" name="meta_keywords" rows="6" placeholder="Meta Keywords">{{ $blog->meta_keywords }}</textarea>
+                                            </div>
+                                        </div>
+
+                                         <!-- Meta Description -->
+                                         <div class="col-12 mt-2">
+                                            <div class="form-group">
+                                                <label>Meta Description</label>
+                                                <textarea class="form-control" name="meta_description" rows="6" placeholder="Meta Description">{{ $blog->meta_description }}</textarea>
+                                            </div>
+                                        </div>
+
                                         <!-- Featured -->
                                         <div class="col-6 mt-2">
                                             <div class="form-group">
