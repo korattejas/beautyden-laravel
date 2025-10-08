@@ -48,7 +48,7 @@ class SettingController extends Controller
                     'image' => asset('uploads/home-page-slider/slider2.webp')
                 ],
                 [
-                    'image' => asset('uploads/home-page-slider/slider2.webp')
+                    'image' => asset('uploads/home-page-slider/slider3.webp')
                 ],
             ];
 
