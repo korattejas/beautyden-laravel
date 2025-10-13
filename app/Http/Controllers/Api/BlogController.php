@@ -72,6 +72,8 @@ class BlogController extends Controller
                     'b.tags',
                     DB::raw('CONCAT("' . asset('uploads/blogs') . '/", b.icon) AS icon'),
                     'b.featured',
+                    'b.meta_keywords',
+                    'b.meta_description',
                 )
                 ->where('b.status', 1);
 
@@ -153,6 +155,8 @@ class BlogController extends Controller
                     'b.tags',
                     DB::raw('CONCAT("' . asset('uploads/blogs') . '/", b.icon) AS icon'),
                     'b.featured',
+                    'b.meta_keywords',
+                    'b.meta_description',
                 )
                 ->where('b.slug', $request->slug)->where('b.status', 1);
 
