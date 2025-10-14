@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use Twilio\Rest\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class AppointmentsController extends Controller
@@ -81,6 +83,10 @@ class AppointmentsController extends Controller
                 'status'              => '1',
             ]);
 
+            // if (!empty($request->phone)) {
+            //     $this->sendWhatsAppBooking($request->phone, $request->first_name, $orderNumber);
+            // }
+
             $message = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                             <p>Thank you for booking with <strong>BeautyDen</strong>! 💖</p>
 
@@ -123,6 +129,40 @@ class AppointmentsController extends Controller
                 $this->common_error_message,
                 $this->exception_status
             );
+        }
+    }
+
+    protected function sendWhatsAppBooking($phone, $orderDate, $appointmentTime)
+    {
+        try {
+            $sid    = env('TWILIO_ACCOUNT_SID');
+            $token  = env('TWILIO_AUTH_TOKEN');
+            $from   = env('TWILIO_WHATSAPP_FROM'); // Twilio sandbox / business WhatsApp number
+
+            $client = new Client($sid, $token);
+
+            // Ensure number formatting
+            $to = 'whatsapp:+91' . preg_replace('/\D/', '', $phone);
+
+            // Example message template SID from your Twilio console
+            $contentSid = "HXb5b62575e6e4ff6129ad7c8efe1f983e";
+
+            // Variables to replace in your template
+            $contentVariables = json_encode([
+                "1" => $orderDate,
+                "2" => $appointmentTime
+            ]);
+
+            $message = $client->messages->create($to, [
+                "from" => $from,
+                "contentSid" => $contentSid,
+                "contentVariables" => $contentVariables,
+                "body" => "Your appointment booking details"
+            ]);
+
+            Log::info("WhatsApp message sent, SID: " . $message->sid);
+        } catch (\Exception $e) {
+            Log::error("WhatsApp send failed: " . $e->getMessage());
         }
     }
 }
