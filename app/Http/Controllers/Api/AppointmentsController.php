@@ -46,7 +46,7 @@ class AppointmentsController extends Controller
                 'first_name'          => 'required|string|max:50',
                 'last_name'           => 'nullable|string|max:50',
                 'email'               => 'nullable|email|max:100',
-                'phone'               => 'nullable|string|max:20',
+                'phone'               => 'required|string|max:20',
                 'quantity'            => 'nullable|integer|min:1',
                 'price'               => 'nullable|numeric',
                 'discount_price'      => 'nullable|numeric',
@@ -83,9 +83,9 @@ class AppointmentsController extends Controller
                 'status'              => '1',
             ]);
 
-            // if (!empty($request->phone)) {
-            //     $this->sendWhatsAppBooking($request->phone, $request->first_name, $orderNumber);
-            // }
+            if (!empty($request->phone)) {
+                $this->sendWhatsAppBooking($request->phone, $request->first_name, $orderNumber, $request->appointment_date, $request->appointment_time);
+            }
 
             $message = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                             <p>Thank you for booking with <strong>BeautyDen</strong>! 💖</p>
@@ -132,32 +132,29 @@ class AppointmentsController extends Controller
         }
     }
 
-    protected function sendWhatsAppBooking($phone, $orderDate, $appointmentTime)
+    protected function sendWhatsAppBooking($phone, $customerName, $orderNumber, $appointmentDate = null, $appointmentTime = null)
     {
         try {
             $sid    = env('TWILIO_ACCOUNT_SID');
             $token  = env('TWILIO_AUTH_TOKEN');
-            $from   = env('TWILIO_WHATSAPP_FROM'); // Twilio sandbox / business WhatsApp number
+            $from   = env('TWILIO_WHATSAPP_FROM');
 
             $client = new Client($sid, $token);
-
-            // Ensure number formatting
             $to = 'whatsapp:+91' . preg_replace('/\D/', '', $phone);
 
-            // Example message template SID from your Twilio console
-            $contentSid = "HXb5b62575e6e4ff6129ad7c8efe1f983e";
+            $contentSid = "HXa15c4ea636e067b11dfa1e7441b1ef89"; // Your approved Twilio template SID
 
-            // Variables to replace in your template
             $contentVariables = json_encode([
-                "1" => $orderDate,
-                "2" => $appointmentTime
+                "1" => $customerName,
+                "2" => $orderNumber,
+                "3" => $appointmentDate ?? 'N/A',
+                "4" => $appointmentTime ?? 'N/A'
             ]);
 
             $message = $client->messages->create($to, [
                 "from" => $from,
                 "contentSid" => $contentSid,
-                "contentVariables" => $contentVariables,
-                "body" => "Your appointment booking details"
+                "contentVariables" => $contentVariables
             ]);
 
             Log::info("WhatsApp message sent, SID: " . $message->sid);
