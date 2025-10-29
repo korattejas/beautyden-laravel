@@ -12,11 +12,12 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50);
+            $table->string('name', 50)->nullable();
             $table->string('mobile_number', 15)->nullable();
             $table->string('email')->unique()->nullable();
+            $table->longText('address')->nullable();
             $table->string('otp', 6)->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->tinyInteger('role')->default(1)->comment('1 = Application, 2 = Website');
             $table->boolean('status')->default(true)->comment('0 = Inactive, 1 = Active');
             $table->timestamp('otp_expiration_at')->nullable();

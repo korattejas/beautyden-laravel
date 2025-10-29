@@ -13,17 +13,13 @@ use App\Http\Controllers\Api\ProductBrandController;
 use App\Http\Controllers\Api\FaqsController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\ContactSubmissionsController;
-use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\AppointmentsController;
-use App\Http\Controllers\Api\SubCategoryController;
-use App\Http\Controllers\Api\PoseImagesController;
 use App\Http\Controllers\Api\User\AuthenticationController;
 use App\Http\Controllers\Api\PoliciesController;
 use App\Http\Middleware\RequestModifier;
 use App\Http\Middleware\ResponseModifier;
 use App\Http\Middleware\SanitizeInput;
 use App\Http\Middleware\JWTTokenMiddleware;
-use App\Http\Middleware\JWTTokenPhotographer;
 
 
 Route::get('/user', function (Request $request) {
@@ -32,28 +28,25 @@ Route::get('/user', function (Request $request) {
 
 
 
-/*======================================================== User API ==============================================*/
+/*======================================================== Customer API ==============================================*/
 
 Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
-    Route::prefix('V1/user')->group(function () {
-        Route::post('signUp', [AuthenticationController::class, 'registrations']);
-        Route::post('signIn', [AuthenticationController::class, 'login']);
-        Route::post('sendOtp', [AuthenticationController::class, 'sendResendMobileOrForgotPasswordOtp']);
-        Route::post('verifyMobileOtpRegister', [AuthenticationController::class, 'verifyMobileOtpRegister']);
+    Route::prefix('V1/customer')->group(function () {
+        Route::post('sendOtpOnMobileNumber', [AuthenticationController::class, 'sendOtpOnMobileNumber']);
+        Route::post('verifyOtpOnMobileNumber', [AuthenticationController::class, 'verifyOtpOnMobileNumber']);
     });
 });
 
+
 Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
-    Route::prefix('V1/user')->group(function () {
+    Route::prefix('V1/customer')->group(function () {
+        Route::post('profileUpdate', [AuthenticationController::class, 'profileUpdate']);
+        Route::post('getProfile', [AuthenticationController::class, 'getProfile']);
+        Route::post('getTotalBookService', [AuthenticationController::class, 'getTotalBookService']);
+        Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
         Route::get('logout', [AuthenticationController::class, 'logout']);
     });
 });
-
-/*======================================================== Photographer API ==============================================*/
-
-
-
-
 
 Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/')->group(function () {
@@ -77,6 +70,23 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
 });
 
 /*======================================================== Debug API ==============================================*/
+
+Route::middleware([])->group(function () {
+    Route::prefix('Test/V1/customer')->group(function () {
+        Route::post('sendOtpOnMobileNumber', [AuthenticationController::class, 'sendOtpOnMobileNumber']);
+        Route::post('verifyOtpOnMobileNumber', [AuthenticationController::class, 'verifyOtpOnMobileNumber']);
+    });
+});
+
+Route::middleware([JWTTokenMiddleware::class])->group(function () {
+    Route::prefix('Test/V1/customer')->group(function () {
+        Route::post('profileUpdate', [AuthenticationController::class, 'profileUpdate']);
+        Route::post('getProfile', [AuthenticationController::class, 'getProfile']);
+        Route::post('getTotalBookService', [AuthenticationController::class, 'getTotalBookService']);
+        Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
+        Route::get('logout', [AuthenticationController::class, 'logout']);
+    });
+});
 
 Route::middleware([])->group(function () {
     Route::prefix('Test/V1/')->group(function () {

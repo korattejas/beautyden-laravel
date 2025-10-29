@@ -10,7 +10,13 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Twilio\Rest\Client;
 use Exception;
+use App\Models\Service;
+use App\Models\Appointment;
+use App\Models\ServiceCategory;
+use App\Models\ServiceSubcategory;
+use App\Models\City;
 
 class AuthenticationController extends Controller
 {
@@ -29,65 +35,23 @@ class AuthenticationController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
-    public function registrations(Request $request): JsonResponse
+    public function sendOtpOnMobileNumber(Request $request): JsonResponse
     {
-        $function_name = 'registrations';
+        $function_name = 'sendOtpOnMobileNumber';
         try {
             $mobile_number = $request->mobile_number;
-            $email = $request->email;
-
-
-            if ($mobile_number) {
-                $checkMobile = User::where('mobile_number', $mobile_number)->whereNull('mobile_verified_at')->first();
-                if ($checkMobile) {
-                    User::where('mobile_number', $mobile_number)->delete();
-                    $checkMobile->delete();
-                }
-            } else {
-                $checkEmail = User::where('email', $email)->whereNull('email_verified_at')->first();
-                if ($checkEmail) {
-                    User::where('email', $email)->delete();
-                    $checkEmail->delete();
-                }
-            }
-
-            $mobileExists = User::where('mobile_number', $mobile_number)->whereNull('mobile_verified_at')->exists();
-            $emailExists = User::where('email', $email)->whereNull('email_verified_at')->exists();
 
             $validateArray = [
-                'name' => 'required',
                 'mobile_number' => [
-                    'required_without:email',
-                    'regex:/^\+?[1-9]\d{1,14}$/',
-                    $mobileExists ? '' : 'unique:users,mobile_number',
-                ],
-                'email' => [
-                    'required_without:mobile_number',
-                    'email',
-                    new ValidateEmail(),
-                    $emailExists ? '' : 'unique:users,email',
-                ],
-                'password' => [
                     'required',
-                    'min:8',
-                    'regex:~^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*#?&:,_./\s)(])[A-Za-z\d@$!%*#?&:,_./\s)(]{8,}$~',
-                ],
-                'confirm_password' => 'required|same:password',
+                    'regex:/^\+?[1-9]\d{1,14}$/'
+                ]
             ];
 
             $validateMessage = [
-                'name.required' => 'Name is required.',
-                'mobile_number.required_without' => 'Mobile number is required if no email is provided.',
+                'mobile_number.required' => 'Mobile number is required.',
                 'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
                 'mobile_number.unique' => 'Mobile number already exists!',
-                'email.required_without' => 'Email is required if no mobile number is provided.',
-                'email.email' => 'Enter a valid email address.',
-                'email.unique' => 'Email already exists!',
-                'password.required' => 'Password is required.',
-                'password.regex' => 'Enter a password with at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.',
-                'password.min' => 'Password must be at least 8 characters long.',
-                'confirm_password.required' => 'Confirm password is required.',
-                'confirm_password.same' => 'Passwords do not match.',
             ];
 
             $validator = Validator::make($request->all(), $validateArray, $validateMessage);
@@ -97,50 +61,38 @@ class AuthenticationController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
-            $insertData = [
-                'name' => $request->name,
-                'email' => $email,
-                'mobile_number' => $mobile_number,
-                'ip_address' => $request->ip(),
-                'role' => 1,
-                'password' => bcrypt($request->password),
+            $otp = rand(100000, 999999);
+            $otpExpirationTime = (int) config('custom.otp_expiration_time');
+            $expiry = now()->addSeconds($otpExpirationTime);
+
+            $user = User::where('mobile_number', $mobile_number)->first();
+
+            if ($user) {
+                $user->update([
+                    'otp' => $otp,
+                    'otp_expiration_at' => $expiry,
+                    'ip_address' => $request->ip(),
+                    'mobile_verified_at' => null,
+                ]);
+            } else {
+                $user = User::create([
+                    'mobile_number' => $mobile_number,
+                    'otp' => $otp,
+                    'otp_expiration_at' => $expiry,
+                    'ip_address' => $request->ip(),
+                    'role' => 2,
+                ]);
+            }
+
+            // $this->sendWhatsAppOtp($mobile_number, $otp);
+            $user = User::where('mobile_number', $mobile_number)->first();
+            $success = [
+                'customer' => $user,
+                'otp_expiration_time' => $otpExpirationTime,
+                'resend_otp_time' => config('custom.resend_otp_time'),
+                'resend_otp_max_limit' => config('custom.resend_otp_max_limit'),
             ];
 
-            if ($mobile_number) {
-                $mobileOtp = generateOTP($function_name);
-                $insertData['otp'] = generateOTP($function_name);
-                $otpExpirationTime = (int) config('custom.otp_expiration_time');
-                $insertData['otp_expiration_at'] = now()->addSeconds($otpExpirationTime);
-
-
-                $insertUser = User::create($insertData);
-                // $this->sendMobileOtp(config('custom.whatsapp_otp_template'), $insertUser->mobile_number, $insertUser->name, $mobileOtp);
-
-                $success = [
-                    'user' => $insertData,
-                    'mobile_number' => $mobile_number,
-                    'otp_expiration_time' => config('custom.otp_expiration_time'),
-                    'resend_otp_time' => config('custom.resend_otp_time'),
-                    'resend_otp_max_limit' => config('custom.resend_otp_max_limit'),
-                ];
-            } else {
-                $emailOtp = generateOTP($function_name);
-                $insertData['otp'] = generateOTP($function_name);
-                $otpExpirationTime = (int) config('custom.otp_expiration_time');
-                $insertData['otp_expiration_at'] = now()->addSeconds($otpExpirationTime);
-
-                $insertUser = User::create($insertData);
-                // $this->sendEmailOtp($email, 'mail.candidate_update_profile_email_otp', config('custom.email_otp_title'), config('custom.email_otp_subject'), $request->name, $emailOtp);
-
-                $success = [
-                    'user' => $insertData,
-                    'email' => $email,
-                    'email_otp' => $emailOtp,
-                    'otp_expiration_time' => config('custom.otp_expiration_time'),
-                    'resend_otp_time' => config('custom.resend_otp_time'),
-                    'resend_otp_max_limit' => config('custom.resend_otp_max_limit'),
-                ];
-            }
 
             return $this->sendResponse($success, 'User register successfully.', $this->success_status);
         } catch (Exception $e) {
@@ -149,24 +101,39 @@ class AuthenticationController extends Controller
         }
     }
 
-    public function verifyMobileOtpRegister(Request $request): JsonResponse
+    protected function sendWhatsAppOtp($phone, $otp)
     {
-        $function_name = 'verifyMobileOtpRegister';
+        try {
+            $sid    = env('TWILIO_ACCOUNT_SID');
+            $token  = env('TWILIO_AUTH_TOKEN');
+            $from   = env('TWILIO_WHATSAPP_FROM');
+            $templateSid = 'HX3e6d0aac83cf42ed0c9269971562d295';
+
+            $client = new Client($sid, $token);
+            $cleanedNumber = preg_replace('/\D/', '', $phone);
+            $to = 'whatsapp:+91' . $cleanedNumber;
+
+            $contentVariables = json_encode(['1' => (string) $otp], JSON_UNESCAPED_UNICODE);
+
+            $message = $client->messages->create($to, [
+                'from' => $from,
+                'contentSid' => $templateSid,
+                'contentVariables' => $contentVariables
+            ]);
+
+            logger()->error("✅ WhatsApp OTP sent successfully. SID: " . $message->sid);
+        } catch (\Exception $e) {
+            logger()->error("❌ WhatsApp OTP send failed: " . $e->getMessage());
+        }
+    }
+
+    public function verifyOtpOnMobileNumber(Request $request): JsonResponse
+    {
+        $function_name = 'verifyOtpOnMobileNumber';
         try {
             $validator = Validator::make($request->all(), [
                 'otp' => 'required|numeric|digits:6',
                 'mobile_number' => 'required|numeric|exists:users,mobile_number',
-                'password' => [
-                    'required',
-                    'min:8',
-                ],
-            ], [
-                'otp.required' => 'OTP is required.',
-                'otp.numeric' => 'OTP number must be numeric.',
-                'mobile_number.required' => 'Mobile number is required.',
-                'mobile_number.numeric' => 'Mobile number must be numeric.',
-                'password.required' => 'Password is required.',
-                'password.min' => 'Password must be at least 8 characters long.',
             ]);
 
             if ($validator->fails()) {
@@ -174,55 +141,294 @@ class AuthenticationController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
-            $mobile_otp = $request->otp;
-            $mobile_number = $request->mobile_number;
-            $password = $request->password;
+            $mobile_number = preg_replace('/\D/', '', $request->mobile_number);
+            $otp = $request->otp;
 
-            $mobileOtpRecordCheck = User::where('mobile_number', $mobile_number)
-                ->select('id', 'otp_expiration_at', 'otp', 'mobile_verified_at', 'email', 'mobile_number', 'password','name')
-                ->first();
+            $user = User::where('mobile_number', $mobile_number)->first();
 
-            if (!$mobileOtpRecordCheck) {
-                logError($this->controller_name, $function_name, 'OTP store not properly.');
-                return $this->sendError('Something went wrong.', $this->backend_error_status);
+            if (!$user) {
+                return $this->sendError('User not found.', $this->backend_error_status);
             }
 
-            if ($mobileOtpRecordCheck->otp_expiration_at < now()) {
-                return $this->sendError('Mobile OTP Expired.', $this->backend_error_status);
+            if ($user->otp_expiration_at < now()) {
+                return $this->sendError('OTP expired.', $this->backend_error_status);
             }
 
-            if ("$mobileOtpRecordCheck->otp" !== $mobile_otp) {
-                return $this->sendError('Mobile OTP Invalid.', $this->backend_error_status);
+            if ($user->otp != $otp) {
+                return $this->sendError('Invalid OTP.', $this->backend_error_status);
             }
 
-            if (is_null($mobileOtpRecordCheck->mobile_verified_at)) {
+            if (is_null($user->mobile_verified_at)) {
+                $user->update(['mobile_verified_at' => now()]);
 
-                $mobileOtpRecordCheck->update(['mobile_verified_at' => now()]);
-
-                $token = auth()->guard('user')->attempt([
-                    'mobile_number' => $mobile_number,
-                    'password' => $password,
-                    'status' => "1",
-                ]);
-
-                if (!$token) {
-                    return $this->sendError('Invalid credentials.', $this->backend_error_status);
-                }
+                $token = JWTAuth::fromUser($user);
 
                 $success = [
-                    'id' => $mobileOtpRecordCheck->id,
-                    'name' => $mobileOtpRecordCheck->name,
+                    'id' => $user->id,
                     'mobile_no' => $mobile_number,
                     'token' => $token,
-                    'otp_expiration_time' => config('custom.otp_expiration_time'),
-                    'resend_otp_time' => config('custom.resend_otp_time'),
-                    'resend_otp_max_limit' => config('custom.resend_otp_max_limit'),
                 ];
 
-                return $this->sendResponse($success, 'Mobile number verified successfully.', $this->success_status);
+                return $this->sendResponse($success, 'Mobile verified successfully.', $this->success_status);
             } else {
-                return $this->sendError('Your mobile number is already verified.', $this->backend_error_status);
+                return $this->sendError('Mobile number already verified.', $this->backend_error_status);
             }
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function profileUpdate(Request $request): JsonResponse
+    {
+        $function_name = 'profileUpdate';
+
+        try {
+            $validateArray = [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'address' => 'required|string|max:500',
+                'mobile_number' => [
+                    'required',
+                    'regex:/^\+?[1-9]\d{1,14}$/',
+                ],
+            ];
+
+            $validateMessage = [
+                'mobile_number.required' => 'Mobile number is required.',
+                'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
+                'email.email' => 'Enter a valid email address.',
+            ];
+
+            $validator = Validator::make($request->all(), $validateArray, $validateMessage);
+
+            if ($validator->fails()) {
+                logValidationException($this->controller_name, $function_name, $validator);
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $authUser = User::where('mobile_number', $request->mobile_number)
+                ->whereNotNull('mobile_verified_at')
+                ->first();
+
+            if (!$authUser) {
+                return $this->sendError('User not found or not verified.', 404);
+            }
+
+            if ($request->filled('email') && $request->email !== $authUser->email) {
+                $emailExists = User::where('email', $request->email)
+                    ->where('id', '!=', $authUser->id)
+                    ->exists();
+
+                if ($emailExists) {
+                    return $this->sendError('This email is already in use by another account.', 409);
+                }
+
+                $authUser->email = $request->email;
+            }
+
+            $authUser->name = $request->name ?? $authUser->name;
+            $authUser->address = $request->address ?? $authUser->address;
+            $authUser->save();
+
+            $success = [
+                'customer' => $authUser->fresh(),
+            ];
+
+            return $this->sendResponse($success, 'Profile updated successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+
+    public function getProfile(Request $request): JsonResponse
+    {
+        $function_name = 'getProfile';
+
+        try {
+            $mobile_number = $request->mobile_number;
+
+            $validator = Validator::make($request->all(), [
+                'mobile_number' => [
+                    'required',
+                    'regex:/^\+?[1-9]\d{1,14}$/',
+                ],
+            ], [
+                'mobile_number.required' => 'Mobile number is required.',
+                'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
+            ]);
+
+            if ($validator->fails()) {
+                logValidationException($this->controller_name, $function_name, $validator);
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $authUser = User::where('mobile_number', $mobile_number)
+                ->whereNotNull('mobile_verified_at')
+                ->first();
+
+            if (!$authUser) {
+                return $this->sendError('User not found or not verified.', 404);
+            }
+
+            $success = [
+                'customer' => [
+                    'name' => $authUser->name,
+                    'email' => $authUser->email,
+                    'address' => $authUser->address,
+                    'mobile_number' => $authUser->mobile_number,
+                    'mobile_verified_at' => $authUser->mobile_verified_at,
+                ],
+            ];
+
+            return $this->sendResponse($success, 'Profile fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function getTotalBookService(Request $request): JsonResponse
+    {
+        $function_name = 'getTotalBookService';
+
+        try {
+            $validator = Validator::make($request->all(), [
+                'mobile_number' => [
+                    'required',
+                    'regex:/^\+?[1-9]\d{1,14}$/',
+                ],
+            ], [
+                'mobile_number.required' => 'Mobile number is required.',
+                'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
+            ]);
+
+            if ($validator->fails()) {
+                logValidationException($this->controller_name, $function_name, $validator);
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $mobile_number = $request->mobile_number;
+
+            $authUser = User::where('mobile_number', $mobile_number)
+                ->whereNotNull('mobile_verified_at')
+                ->first();
+
+            if (!$authUser) {
+                return $this->sendError('User not found or not verified.', 404);
+            }
+
+            $appointments = Appointment::leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select(
+                    'appointments.id',
+                    'appointments.order_number',
+                    'appointments.appointment_date',
+                    'appointments.appointment_time',
+                    'appointments.service_id',
+                    'ct.name as city_name'
+                )
+                ->where('appointments.phone', $mobile_number)
+                ->orderByDesc('appointments.id')
+                ->get();
+
+            if ($appointments->isEmpty()) {
+                return $this->sendError('No bookings found for this user.', 404);
+            }
+
+            $data = $appointments->map(function ($appointment) {
+                $serviceIds = $appointment->service_id ? explode(',', $appointment->service_id) : [];
+                $totalServices = count(array_filter($serviceIds));
+
+                return [
+                    'id'                => $appointment->id,
+                    'order_number'      => $appointment->order_number,
+                    'appointment_date'  => $appointment->appointment_date,
+                    'appointment_time'  => $appointment->appointment_time,
+                    'city_name'         => $appointment->city_name,
+                    'total_services'    => $totalServices,
+                ];
+            });
+
+            return $this->sendResponse($data, 'All booking details fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+
+    public function getBookServiceDetails(Request $request): JsonResponse
+    {
+        $function_name = 'getBookServiceDetails';
+
+        try {
+            $validator = Validator::make($request->all(), [
+                'mobile_number' => [
+                    'required',
+                    'regex:/^\+?[1-9]\d{1,14}$/',
+                ],
+                'appointment_id' => 'required|integer',
+            ], [
+                'mobile_number.required' => 'Mobile number is required.',
+                'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
+                'appointment_id.required' => 'Appointment ID is required.',
+            ]);
+
+            if ($validator->fails()) {
+                logValidationException($this->controller_name, $function_name, $validator);
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $mobile_number = $request->mobile_number;
+            $appointmentId = $request->appointment_id;
+
+            $authUser = User::where('mobile_number', $mobile_number)
+                ->whereNotNull('mobile_verified_at')
+                ->first();
+
+            if (!$authUser) {
+                return $this->sendError('User not found or not verified.', 404);
+            }
+
+            $appointment = Appointment::leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
+                ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'appointments.service_sub_category_id')
+                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select(
+                    'appointments.*',
+                    'sc.name as service_category_name',
+                    'ssc.name as service_sub_category_name',
+                    'ct.name as city_name',
+                )
+                ->where('appointments.id', $appointmentId)
+                ->first();
+
+            if (!$appointment) {
+                return $this->sendError('Appointment not found.', 404);
+            }
+
+            $serviceIds = $appointment->service_id ? explode(',', $appointment->service_id) : [];
+            $serviceIds = array_map('intval', $serviceIds);
+            $services = Service::whereIn('id', $serviceIds)->pluck('name')->toArray();
+
+            $data = [
+                'id'                     => $appointment->id,
+                'order_number'           => $appointment->order_number,
+                'price'                  => $appointment->price,
+                'discount_price'         => $appointment->discount_price,
+                'service_address'        => $appointment->service_address,
+                'appointment_date'       => $appointment->appointment_date,
+                'appointment_time'       => $appointment->appointment_time,
+                'special_notes'          => $appointment->special_notes,
+                'status'                 => $appointment->status,
+                'created_at'             => $appointment->created_at,
+                'updated_at'             => $appointment->updated_at,
+                'city_name'              => $appointment->city_name,
+                'services'               => $services,
+            ];
+
+            return $this->sendResponse($data, 'Booking details fetched successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
@@ -465,6 +671,4 @@ class AuthenticationController extends Controller
 
         sendEmail($email_data);
     }
-
-
 }
