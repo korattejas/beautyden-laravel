@@ -97,6 +97,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('getDataPortfolio', [PortfolioController::class, 'getDataPortfolio'])->name('getDataPortfolio');
         Route::get('portfolio/status/{id}/{status}', [PortfolioController::class, 'changeStatus'])->name('admin.portfolio.changeStatus');
 
+    
+
         /* Blog Category Route */
         Route::get('blog-category', [BlogCategoryController::class, 'index'])->name('admin.blog-category.index');
         Route::get('blog-category/create', [BlogCategoryController::class, 'create'])->name('admin.blog-category.create');
