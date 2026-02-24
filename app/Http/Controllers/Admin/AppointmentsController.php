@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\ServiceSubcategory;
+use App\Models\ServiceCityPrice;
 use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -43,95 +44,152 @@ class AppointmentsController extends Controller
     public function create()
     {
         try {
-            $teamMembers = TeamMember::all();
-            $categories = ServiceCategory::where('status', 1)->get();
-            $services = Service::where('status', 1)->get();
+
             $cities = City::select('id', 'name')->get();
 
-            return view('admin.appointments.create', compact('teamMembers', 'categories', 'services', 'cities'));
+            return view('admin.appointments.create', compact('cities'));
         } catch (\Exception $e) {
-            logCatchException($e, $this->controller_name, 'create');
-            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+            dd($e->getMessage());
         }
     }
+
+    public function getCityServices($cityId)
+    {
+        $records = ServiceCityPrice::where('city_id', $cityId)
+            ->where('status', 1)
+            ->get();
+
+        if ($records->isEmpty()) {
+            return response()->json([]);
+        }
+
+        $categories = ServiceCategory::whereIn('id', $records->pluck('category_id'))->get();
+        $subCategories = ServiceSubCategory::whereIn('id', $records->pluck('sub_category_id')->filter())->get();
+        $services = Service::whereIn('id', $records->pluck('service_id'))->get();
+
+        $data = [];
+
+        foreach ($categories as $category) {
+
+            $data[$category->id] = [
+                'id' => $category->id,
+                'name' => $category->name,
+                'services' => [],
+                'subcategories' => []
+            ];
+        }
+
+        foreach ($records as $record) {
+
+            $service = $services->where('id', $record->service_id)->first();
+            if (!$service) continue;
+
+            if (!$record->sub_category_id) {
+
+                $data[$record->category_id]['services'][] = [
+                    'id' => $service->id,
+                    'name' => $service->name,
+                    'price' => $record->price,
+                    'discount_price' => $record->discount_price
+                ];
+            } else {
+
+                if (!isset($data[$record->category_id]['subcategories'][$record->sub_category_id])) {
+
+                    $sub = $subCategories->where('id', $record->sub_category_id)->first();
+                    if (!$sub) continue;
+
+                    $data[$record->category_id]['subcategories'][$record->sub_category_id] = [
+                        'id' => $sub->id,
+                        'name' => $sub->name,
+                        'services' => []
+                    ];
+                }
+
+                $data[$record->category_id]['subcategories'][$record->sub_category_id]['services'][] = [
+                    'id' => $service->id,
+                    'name' => $service->name,
+                    'price' => $record->price,
+                    'discount_price' => $record->discount_price
+                ];
+            }
+        }
+
+        return response()->json($data);
+    }
+
 
     public function edit($id)
     {
         try {
-            $teamMembers = TeamMember::all();
-            $categories = ServiceCategory::where('status', 1)->get();
-            $services = Service::where('status', 1)->get();
+
             $appointment = Appointment::findOrFail(decryptId($id));
-            $appointment->service_ids = $appointment->service_id ? explode(',', $appointment->service_id) : [];
             $cities = City::select('id', 'name')->get();
 
-            return view('admin.appointments.edit', compact('teamMembers', 'categories', 'services', 'appointment', 'cities'));
+            return view('admin.appointments.edit', compact(
+                'appointment',
+                'cities'
+            ));
         } catch (\Exception $e) {
-            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+            dd($e->getMessage());
         }
     }
 
     public function view($id)
     {
-        $function_name = 'view';
         try {
-            $appointment = Appointment::leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
-                ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'appointments.service_sub_category_id')
-                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
-                ->select(
-                    'appointments.*',
-                    'sc.name as service_category_name',
-                    'ssc.name as service_sub_category_name',
-                    'ct.name as city_name',
-                )
+
+            $appointment = Appointment::leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select('appointments.*', 'ct.name as city_name')
                 ->where('appointments.id', $id)
                 ->firstOrFail();
 
-            $serviceIds = $appointment->service_id;
-            $serviceIds = $serviceIds ? explode(',', $serviceIds) : [];
-            $serviceIds = array_map('intval', $serviceIds);
-            $services = Service::whereIn('id', $serviceIds)->pluck('name')->toArray();
+            $servicesJson = $appointment->services_data ?? [];
 
-            $memberIds = $appointment->assigned_to;
-            $memberIds = $memberIds ? explode(',', $memberIds) : [];
+            $client      = $servicesJson['client'] ?? [];
+            $appData     = $servicesJson['appointment'] ?? [];
+            $services    = $servicesJson['services'] ?? [];
+            $summary     = $servicesJson['summary'] ?? [];
+
+            $memberIds = $appointment->assigned_to
+                ? explode(',', $appointment->assigned_to)
+                : [];
+
             $memberIds = array_map('intval', $memberIds);
-            $teamMembers = TeamMember::whereIn('id', $memberIds)->pluck('name')->toArray();
 
+            $teamMembers = TeamMember::whereIn('id', $memberIds)
+                ->pluck('name')
+                ->toArray();
 
             return response()->json([
                 'data' => [
-                    'id'                  => $appointment->id,
-                    'order_number'        => $appointment->order_number,
-                    'first_name'          => $appointment->first_name,
-                    'last_name'           => $appointment->last_name,
-                    'email'               => $appointment->email,
-                    'phone'               => $appointment->phone,
-                    'quantity'            => $appointment->quantity,
-                    'price'               => $appointment->price,
-                    'discount_price'      => $appointment->discount_price,
-                    'service_address'     => $appointment->service_address,
+                    'id'              => $appointment->id,
+                    'order_number'    => $appointment->order_number,
+                    'first_name'    => $appointment->first_name,
+                    'last_name'    => $appointment->last_name,
+                    'phone'    => $appointment->phone,
+                    'email'    => $appointment->email,
                     'appointment_date'    => $appointment->appointment_date,
                     'appointment_time'    => $appointment->appointment_time,
-                    'special_notes'       => $appointment->special_notes,
-                    'status'              => $appointment->status,
-                    'assigned_by'         => $appointment->assigned_by,
-                    'assigned_to'         => $appointment->assigned_to,
-                    'created_at'          => $appointment->created_at,
-                    'updated_at'          => $appointment->updated_at,
+                    'service_address'    => $appointment->service_address,
+                    'special_notes'    => $appointment->special_notes,
+                    'status'          => $appointment->status,
+                    'city_name'       => $appointment->city_name,
+                    'created_at'      => $appointment->created_at,
+                    'updated_at'      => $appointment->updated_at,
 
-                    'service_category'    => $appointment->service_category_name,
-                    'service_sub_category'    => $appointment->service_sub_category_name,
-                    'city_name'           => $appointment->city_name,
-                    'services'            => $services,
-                    'team_members'        => $teamMembers,
+                    'client'          => $client,
+                    'appointment'     => $appData,
+                    'services'        => $services,
+                    'summary'         => $summary,
+
+                    'team_members'    => $teamMembers,
                 ]
             ], 200);
         } catch (\Exception $e) {
-            logCatchException($e, $this->controller_name, $function_name);
-            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
 
     public function getDataAppointments(Request $request)
     {
@@ -222,8 +280,8 @@ class AppointmentsController extends Controller
             $rules = [
                 'city_id'             => 'required|integer|exists:cities,id',
                 'service_category_id' => 'nullable|integer|exists:service_categories,id',
-                'service_id'          => 'required|array',
-                'service_id.*'        => 'integer|exists:services,id',
+                // 'service_id'          => 'required|array',
+                // 'service_id.*'        => 'integer|exists:services,id',
                 'first_name'          => 'required|string|max:50',
                 'last_name'           => 'nullable|string|max:50',
                 'email'               => 'nullable|email|max:100',
@@ -248,7 +306,8 @@ class AppointmentsController extends Controller
             $serviceIds = $request->input('service_id', []);
             $serviceIdsString = implode(',', $serviceIds);
 
-            $orderNumber = '#BEAUTYDEN' . Str::upper(Str::random(8));
+            $orderNumber = '#BD' . Str::upper(Str::random(8));
+            $servicesJson = json_decode($request->services_json, true);
 
             $data = [
                 'city_id' => $request->city_id,
@@ -260,16 +319,17 @@ class AppointmentsController extends Controller
                 'last_name'           => $request->last_name,
                 'email'               => $request->email,
                 'phone'               => $request->phone,
-                'quantity'            => $request->quantity,
+                'quantity'            => $request->quantity ?? 1,
                 'price'               => $request->price,
                 'discount_price'      => $request->discount_price,
                 'service_address'     => $request->service_address,
                 'appointment_date'    => $request->appointment_date,
                 'appointment_time'    => $request->appointment_time,
                 'special_notes'       => $request->special_notes,
+                'services_data'      => $servicesJson,
                 'status'              => $request->status,
-                'assigned_to'         => $request->assigned_to,
-                'assigned_by'         => $request->assigned_by,
+                //'assigned_to'         => $request->assigned_to,
+                //'assigned_by'         => $request->assigned_by,
             ];
 
             if ($id == 0) {
@@ -352,38 +412,41 @@ class AppointmentsController extends Controller
     public function downloadPdf($id)
     {
         try {
-            $appointment = Appointment::leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
-                ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'appointments.service_sub_category_id')
-                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
-                ->select(
-                    'appointments.*',
-                    'sc.name as service_category_name',
-                    'ssc.name as service_sub_category_name',
-                    'ct.name as city_name',
-                )
+            $appointment = Appointment::leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select('appointments.*', 'ct.name as city_name')
                 ->where('appointments.id', $id)
                 ->firstOrFail();
 
-            $serviceIds = $appointment->service_id ? explode(',', $appointment->service_id) : [];
-            $serviceIds = array_map('intval', $serviceIds);
-            $services = Service::whereIn('id', $serviceIds)->pluck('name')->toArray();
+            $servicesData = $appointment->services_data;
+            if (is_string($servicesData)) {
+                $servicesData = json_decode($servicesData, true);
+            }
+
+            $services = isset($servicesData['services']) ? $servicesData['services'] : [];
+            $summary = isset($servicesData['summary']) ? $servicesData['summary'] : null;
 
             $memberIds = $appointment->assigned_to ? explode(',', $appointment->assigned_to) : [];
-            $memberIds = array_map('intval', $memberIds);
             $teamMembers = TeamMember::whereIn('id', $memberIds)->pluck('name')->toArray();
 
             $data = [
                 'appointment'   => $appointment,
                 'services'      => $services,
+                'summary'       => $summary,
                 'team_members'  => $teamMembers,
             ];
 
             $pdf = PDF::loadView('admin.appointments.pdf', $data)->setPaper('a4', 'portrait');
 
-            $fileName = 'appointment_' . $appointment->order_number . '.pdf';
+            $fileName = 'Invoice_'
+                . ($appointment->order_number ?? 'APT')
+                . '_'
+                . (!empty($appointment->appointment_date)
+                    ? \Carbon\Carbon::parse($appointment->appointment_date)->format('d-m-Y')
+                    : date('d-m-Y'))
+                . '.pdf';
             return $pdf->download($fileName);
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to sub category data');
+            return back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
     }
 }

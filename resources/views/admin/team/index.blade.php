@@ -93,6 +93,9 @@
                                                 <th>Name</th>
                                                 <th>Role</th>
                                                 <th>Experience (Years)</th>
+                                                <th>Phone</th>
+                                                <th>Address</th>
+                                                <th>Bio</th>
                                                 <th data-search="false">Photo</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-stuff="High Priority,Low Priority">Is Popular</th>
@@ -170,6 +173,18 @@
                 {
                     data: 'experience_years',
                     name: 'experience_years'
+                },
+                {
+                    data: 'phone',
+                    name: 'phone'
+                },
+                {
+                    data: 'address',
+                    name: 'address'
+                },
+                {
+                    data: 'bio',
+                    name: 'bio'
                 },
                 {
                     data: 'icon',

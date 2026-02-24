@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\TeamMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 use Exception;
 
 class TeamMemberController extends Controller
@@ -36,6 +38,7 @@ class TeamMemberController extends Controller
                     't.role',
                     't.experience_years',
                     't.bio',
+                    't.address',
                     DB::raw('CONCAT("' . asset('uploads/team-member') . '/", t.icon) AS photo'),
                     't.is_popular',
                     't.specialties',
@@ -59,6 +62,49 @@ class TeamMemberController extends Controller
                 'Team members retrieved successfully',
                 $this->success_status
             );
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
+
+    public function beauticianInquiryFormSubmit(Request $request): JsonResponse
+    {
+        $function_name = 'beauticianInquiryFormSubmit';
+
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:50',
+                'phone'      => 'required|string|max:20',
+                'experience_years' => 'required',
+                'address'    => 'nullable|string',
+                'bio'    => 'nullable|string',
+            ]);
+
+            if ($validator->fails()) {
+                logValidationException($this->controller_name, $function_name, $validator);
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $contact = TeamMember::create([
+                'name' => $request->name,
+                'phone'      => $request->phone,
+                'experience_years' => $request->experience_years,
+                'address'    => $request->address,
+                'bio'    => $request->bio,
+                'status' => 0,
+            ]);
+
+            return $this->sendResponse(
+                $contact,
+                'Beautician inquiry form submitted successfully.',
+                $this->success_status
+            );
+
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
 

@@ -125,7 +125,7 @@
             @csrf
             <input type="text" name="provider_name" placeholder="Full Name" required>
             <input type="number" name="provider_mobile" placeholder="Mobile No" required>
-            <textarea name="provider_address" placeholder="Address" required></textarea>
+            <textarea name="provider_address" placeholder="Full Address" required></textarea>
             <button type="submit" id="continueBtn" disabled>Continue</button>
         </form>
     </div>

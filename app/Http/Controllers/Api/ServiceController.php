@@ -174,7 +174,7 @@ class ServiceController extends Controller
                 $query->where('s.sub_category_id', $request->sub_category_id);
             }
 
-            $perPage = $request->per_page ?? 8;
+            $perPage = $request->per_page ?? 24;
             $page = $request->page ?? 1;
 
             $services = $query->orderByDesc('s.is_popular')

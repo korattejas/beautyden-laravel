@@ -214,6 +214,7 @@ class TeamMemberController extends Controller
                 'name' => $request->name,
                 'role' => $request->role,
                 'experience_years' => $request->experience_years,
+                'phone' => $request->phone,
                 'specialties' => $specialties,
                 'bio' => $request->bio,
                 'icon' => $photoFilename,

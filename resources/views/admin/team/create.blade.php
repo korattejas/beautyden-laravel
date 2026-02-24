@@ -60,8 +60,16 @@
                                                     <textarea class="form-control" name="specialties" rows="2" placeholder="e.g. Haircut, Coloring, Styling"></textarea>
                                                 </div>
                                             </div>
+                                            
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Phone</label>
+                                                    <input type="number" class="form-control" name="phone"
+                                                        placeholder="9999999999" required>
+                                                </div>
+                                            </div>
 
-                                            <div class="col-md-12 mt-2">
+                                            <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Bio</label>
                                                     <textarea class="form-control" name="bio" rows="3" placeholder="Write a short bio"></textarea>

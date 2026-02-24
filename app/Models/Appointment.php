@@ -26,6 +26,13 @@ class Appointment extends Model
         'appointment_date',
         'appointment_time',
         'special_notes',
+        'assigned_to',
+        'assigned_by',
+        'services_data',
         'status',
+    ];
+
+    protected $casts = [
+        'services_data' => 'array',
     ];
 }

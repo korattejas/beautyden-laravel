@@ -67,7 +67,7 @@
     <div class="provider-info">
         <p><strong>Provider Name:</strong> {{ $provider['provider_name'] }}</p>
         <p><strong>Mobile:</strong> {{ $provider['provider_mobile'] }}</p>
-        <p><strong>Address:</strong> {{ $provider['provider_address'] }}</p>
+        <p><strong>Full Address:</strong> {{ $provider['provider_address'] }}</p>
         <p><strong>Date:</strong> {{ now()->format('d-m-Y') }}</p>
     </div>
 

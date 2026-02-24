@@ -90,6 +90,13 @@
                 </a>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.portfolio.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.portfolio.index') }}">
+                    <i data-feather="image"></i>
+                    <span class="menu-title text-truncate">Portfolio</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ Request::routeIs('admin.reviews.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.reviews.index') }}">
                     <i data-feather="star"></i>

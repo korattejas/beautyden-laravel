@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\ContactSubmissionsController;
 use App\Http\Controllers\Api\AppointmentsController;
 use App\Http\Controllers\Api\User\AuthenticationController;
 use App\Http\Controllers\Api\PoliciesController;
+use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Middleware\RequestModifier;
 use App\Http\Middleware\ResponseModifier;
 use App\Http\Middleware\SanitizeInput;
@@ -56,6 +57,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('blogs', [BlogController::class, 'getBlogs']);
         Route::post('blogView', [BlogController::class, 'blogView']);
         Route::get('teamMember', [TeamMemberController::class, 'getTeamMembers']);
+        Route::post('beauticianInquiryFormSubmit', [TeamMemberController::class, 'beauticianInquiryFormSubmit']);
         Route::post('customerReview', [CustomerReviewController::class, 'getCustomerReviews']);
         Route::post('hiring', [HiringController::class, 'getHiring']);
         Route::get('homeCounter', [HomeCounterController::class, 'getHomeCounter']);
@@ -66,6 +68,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
+        Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
     });
 });
 
@@ -96,6 +99,7 @@ Route::middleware([])->group(function () {
         Route::post('blogs', [BlogController::class, 'getBlogs']);
         Route::post('blogView', [BlogController::class, 'blogView']);
         Route::get('teamMember', [TeamMemberController::class, 'getTeamMembers']);
+        Route::post('beauticianInquiryFormSubmit', [TeamMemberController::class, 'beauticianInquiryFormSubmit']);
         Route::post('customerReview', [CustomerReviewController::class, 'getCustomerReviews']);
         Route::post('hiring', [HiringController::class, 'getHiring']);
         Route::get('homeCounter', [HomeCounterController::class, 'getHomeCounter']);
@@ -106,5 +110,6 @@ Route::middleware([])->group(function () {
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
+        Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
     });
 });

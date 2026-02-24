@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\Service;
 use Twilio\Rest\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -53,7 +54,7 @@ class AppointmentsController extends Controller
                 'service_address'     => 'nullable|string',
                 'appointment_date'    => 'nullable|date',
                 'appointment_time'    => 'nullable',
-                'special_notes'       => 'nullable|string',
+                'notes'       => 'nullable|string',
                 'status'              => 'nullable|in:0,1',
             ]);
 
@@ -62,10 +63,63 @@ class AppointmentsController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
-            $orderNumber = '#BEAUTYDEN' . Str::upper(Str::random(8));
+            $orderNumber = '#BD' . Str::upper(Str::random(8));
+
+            $quantity = 1;
+            $price    = $request->price ?? 0;
+
+            $subTotal = $price * $quantity;
+            $discountAmount = $request->discount_price ?? 0;
+            $travelCharges = 0;
+
+            $grandTotal = ($subTotal + $travelCharges) - $discountAmount;
+
+            $serviceIds = explode(',', $request->service_id);
+
+            $services = [];
+
+            foreach ($serviceIds as $id) {
+
+                $service = Service::find($id);
+
+                if ($service) {
+                    $services[] = [
+                        'type'  => 'service',
+                        'name'  => $service->name,
+                        'price' => $service->price ?? $price,
+                        'qty'   => $quantity,
+                        'total' => ($service->price ?? $price) * $quantity,
+                    ];
+                }
+            }
+
+            $servicesData = [
+                'client' => [
+                    'first_name' => $request->first_name,
+                    'last_name'  => $request->last_name,
+                    'email'      => $request->email,
+                    'phone'      => $request->phone,
+                ],
+                'appointment' => [
+                    'date'    => $request->appointment_date,
+                    'time'    => $request->appointment_time,
+                    'address' => $request->service_address,
+                    'notes'   => $request->notes,
+                ],
+                'services' => $services,
+                'summary' => [
+                    'sub_total'        => number_format($subTotal, 2, '.', ''),
+                    'travel_charges'   => number_format($travelCharges, 2, '.', ''),
+                    'discount_percent' => $request->discount_percent ?? 0,
+                    'discount_amount'  => number_format($discountAmount, 2, '.', ''),
+                    'grand_total'      => number_format($grandTotal, 2, '.', ''),
+                ],
+            ];
+
 
             $appointment = Appointment::create([
                 'order_number'        => $orderNumber,
+                'city_id'             => $request->city_id,
                 'first_name'          => $request->first_name,
                 'last_name'           => $request->last_name,
                 'email'               => $request->email,
@@ -79,7 +133,8 @@ class AppointmentsController extends Controller
                 'service_address'     => $request->service_address,
                 'appointment_date'    => $request->appointment_date,
                 'appointment_time'    => $request->appointment_time,
-                'notes'               => $request->notes,
+                'special_notes'               => $request->notes,
+                'services_data'    => $servicesData,
                 'status'              => '1',
             ]);
 
@@ -138,11 +193,12 @@ class AppointmentsController extends Controller
             $sid    = env('TWILIO_ACCOUNT_SID');
             $token  = env('TWILIO_AUTH_TOKEN');
             $from   = env('TWILIO_WHATSAPP_FROM');
+            $phone  = '6352755075';
 
             $client = new Client($sid, $token);
             $to = 'whatsapp:+91' . preg_replace('/\D/', '', $phone);
 
-            $contentSid = "HXa15c4ea636e067b11dfa1e7441b1ef89"; // Your approved Twilio template SID
+            $contentSid = "HXea04cd2b522a5bf3754464c4cbd5298d"; // Your approved Twilio template SID
 
             $contentVariables = json_encode([
                 "1" => $customerName,

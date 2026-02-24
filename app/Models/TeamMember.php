@@ -11,6 +11,7 @@ class TeamMember extends Model
 
     protected $fillable = [
         'name',
+        'phone',
         'role',
         'experience_years',
         'specialties',

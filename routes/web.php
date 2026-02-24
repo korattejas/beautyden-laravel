@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\HomeCounterController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\PoliciesController;
 use App\Http\Controllers\Admin\ProductBrandController;
+use App\Http\Controllers\Admin\PortfolioController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceSubcategoryController;
 use App\Http\Controllers\Admin\ServiceCityPriceController;
@@ -86,6 +87,15 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('product-brand/edit/{id}', [ProductBrandController::class, 'edit'])->name('admin.product-brand.edit');
         Route::get('getDataProductBrand', [ProductBrandController::class, 'getDataProductBrand'])->name('getDataProductBrand');
         Route::get('product-brand/status/{id}/{status}', [ProductBrandController::class, 'changeStatus']);
+
+         /* Portfoio */
+        Route::get('portfolio', [PortfolioController::class, 'index'])->name('admin.portfolio.index');
+        Route::get('portfolio/create', [PortfolioController::class, 'create'])->name('admin.portfolio.create');
+        Route::post('portfolio/store', [PortfolioController::class, 'store'])->name('admin.portfolio.store');
+        Route::get('portfolio/edit/{id}', [PortfolioController::class, 'edit'])->name('admin.portfolio.edit');
+        Route::delete('portfolio/{id}', [PortfolioController::class, 'destroy'])->name('admin.portfolio.destroy');
+        Route::get('getDataPortfolio', [PortfolioController::class, 'getDataPortfolio'])->name('getDataPortfolio');
+        Route::get('portfolio/status/{id}/{status}', [PortfolioController::class, 'changeStatus'])->name('admin.portfolio.changeStatus');
 
         /* Blog Category Route */
         Route::get('blog-category', [BlogCategoryController::class, 'index'])->name('admin.blog-category.index');
@@ -231,6 +241,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('appointments/get-appoinmentSubcategories/{categoryId}', [AppointmentsController::class, 'getSubcategories']);
         Route::get('appointments/{id}/pdf', [AppointmentsController::class, 'downloadPdf'])
             ->name('admin.appointments.pdf');
+        Route::get('get-city-services/{cityId}', [AppointmentsController::class, 'getCityServices']);
+
 
 
         /* Policies Route */

@@ -1,403 +1,272 @@
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>Appointment - {{ $appointment->order_number ?? '-' }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Invoice - {{ $appointment->order_number ?? '-' }} - {{ !empty($appointment->appointment_date) ? \Carbon\Carbon::parse($appointment->appointment_date)->format('d-M-Y') : '' }}</title>
+
     <style>
+        @page {
+            margin: 15px;
+            /* Margin ghataadi jethi badhu ek page ma aave */
+        }
+
         body {
-            font-family: 'Segoe UI', 'DejaVu Sans', Arial, sans-serif;
-            font-size: 11px;
-            color: #2e2e2e;
-            background: #fff;
-            line-height: 1.5;
+            font-family: 'DejaVu Sans', sans-serif;
+            font-size: 12px;
+            color: #333;
+            line-height: 1.4;
+            margin: 0;
+            padding: 10px;
         }
 
-        .page {
+        /* ================= HEADER ================= */
+        .header-table {
             width: 100%;
-            padding: 15px;
-        }
-
-        /* ---------- HEADER ---------- */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #c59d5f;
+            margin-bottom: 20px;
+            border-bottom: 4px solid #000;
+            /* Blue Accent */
             padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .logo {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #c59d5f, #e1c699);
-            border-radius: 8px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            /* Logo size haji vadhari - Extra Large */
+            height: 190px;
+            width: auto;
+        }
+
+        .invoice-title {
+            font-size: 48px;
             font-weight: bold;
-            font-size: 18px;
-        }
-
-        .brand-text h1 {
-            margin: 0;
-            font-size: 18px;
-            color: #2e2e2e;
-            font-weight: 700;
-        }
-
-        .brand-text p {
-            margin: 0;
-            font-size: 10px;
-            color: #6b5b73;
-        }
-
-        .header-right {
+            color: #000;
             text-align: right;
+            margin-bottom: 0;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            color: #fff;
-            font-weight: 600;
+        .invoice-meta {
+            font-size: 13px;
+            text-align: right;
+            color: #444;
+        }
+
+        /* ================= ADDRESS SECTION ================= */
+        .address-table {
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #fcfcfc;
+        }
+
+        .address-col {
+            width: 50%;
+            vertical-align: top;
+            padding: 10px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 14px;
+            color: #2d5a27;
+            /* Green Theme */
+            text-transform: uppercase;
             margin-bottom: 5px;
+            border-bottom: 1px solid #ddd;
         }
 
-        .badge-pending {
-            background: #f59e0b;
+        .name {
+            font-weight: bold;
+            font-size: 15px;
+            color: #111;
         }
 
-        .badge-assigned {
-            background: #3b82f6;
-        }
-
-        .badge-completed {
-            background: #10b981;
-        }
-
-        .badge-rejected {
-            background: #ef4444;
-        }
-
-        .date-time {
-            font-size: 10px;
-            padding: 3px 8px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            background: #fafafa;
-            display: inline-block;
-        }
-
-        /* ---------- GRID CONTENT ---------- */
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        /* ================= ITEMS TABLE ================= */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-bottom: 15px;
         }
 
-        .card {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+        .items-table th {
+            background-color: #000;
+            /* Blue Header */
+            color: #ffffff;
             padding: 10px;
-            background: #fafafa;
-        }
-
-        .card-title {
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 4px;
-            color: #c59d5f;
-        }
-
-        .info-row {
-            display: flex;
-            margin-bottom: 6px;
-        }
-
-        .info-label {
-            width: 65px;
-            font-size: 9px;
-            color: #666;
-            font-weight: 600;
+            text-align: left;
             text-transform: uppercase;
         }
 
-        .info-value {
-            flex: 1;
+        .items-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Zebra striping for readability */
+        .items-table tr:nth-child(even) {
+            background-color: #f2f7f2;
+            /* Very light green */
+        }
+
+        /* ================= SUMMARY ================= */
+        .summary-wrapper {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .summary-table {
+            width: 280px;
+            float: right;
+            border-collapse: collapse;
+        }
+
+        .summary-table td {
+            padding: 5px 8px;
+            font-size: 13px;
+        }
+
+        .grand-total-row {
+            background-color: #2d5a27;
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* ================= TERMS & FOOTER ================= */
+        .bottom-section {
+            clear: both;
+            margin-top: 30px;
+        }
+
+        .terms {
             font-size: 11px;
-            font-weight: 500;
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .detail-item {
-            border: 1px solid #eee;
-            border-radius: 6px;
-            padding: 6px;
-            text-align: center;
-            background: #fff;
-        }
-
-        .detail-label {
-            font-size: 8px;
-            color: #888;
-            text-transform: uppercase;
-        }
-
-        .detail-value {
-            font-size: 11px;
-            font-weight: 700;
-            color: #2e2e2e;
-        }
-
-        .chip-section {
-            margin-top: 8px;
-        }
-
-        .section-label {
-            font-size: 9px;
-            text-transform: uppercase;
             color: #555;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-
-        .chip {
-            background: #f1eadf;
-            color: #5b4636;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 9px;
-            font-weight: 600;
-        }
-
-        /* ---------- NOTES ---------- */
-        .notes {
-            border-left: 3px solid #c59d5f;
+            background: #f9f9f9;
             padding: 10px;
-            margin-bottom: 15px;
-            background: #fdfaf5;
-            border-radius: 6px;
+            border-radius: 5px;
+            border-left: 5px solid #2d5a27;
         }
 
-        .notes-title {
-            font-size: 10px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            color: #5b4636;
-        }
-
-        .notes-content {
-            font-size: 10px;
-            color: #333;
-        }
-
-        /* ---------- FOOTER ---------- */
         .footer {
-            border-top: 1px solid #e5e7eb;
-            padding-top: 10px;
-        }
-
-        .footer-top {
-            display: flex;
-            justify-content: space-between;
-            font-size: 9px;
-            margin-bottom: 8px;
-        }
-
-        .company-info {
+            margin-top: 20px;
             text-align: center;
-            background: #fafafa;
-            padding: 6px;
-            border-radius: 6px;
-            font-size: 9px;
-            line-height: 1.4;
-            color: #555;
-        }
-
-        .company-name {
-            font-size: 11px;
-            font-weight: 700;
-            color: #2e2e2e;
-        }
-
-        @page {
-            size: A4;
-            margin: 10mm;
+            font-size: 12px;
+            color: #000;
+            font-weight: bold;
+            border-top: 1px solid #000;
+            padding-top: 10px;
         }
     </style>
 </head>
 
 <body>
-    <div class="page">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="brand">
-                <div class="logo">B</div>
-                <div class="brand-text">
-                    <h1>BeautyDen</h1>
-                    <p>Trusted Beauty Service at Your Doorstep
-                    </p>
+
+    <table class="header-table">
+        <tr>
+            <td width="50%" style="vertical-align: middle;">
+                <img src="{{ public_path('uploads/logo/logo-new.png') }}"
+                    style="height:80px; width:auto;">
+            </td>
+            <td style="vertical-align: bottom;">
+                <div class="invoice-title">INVOICE</div>
+                <div class="invoice-meta">
+                    <strong>Order:</strong> {{ $appointment->order_number ?? '' }}<br>
+                    <strong>Date:</strong> {{ !empty($appointment->appointment_date) ? \Carbon\Carbon::parse($appointment->appointment_date)->format('d-M-Y') : '' }}<br>
+                    <strong>Time:</strong> {{ !empty($appointment->appointment_time) ? \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') : '' }}
                 </div>
-            </div>
-            <div class="header-right">
-                @php $s=$appointment->status; @endphp
-                @if ($s == 1)
-                    <div class="badge badge-pending">Pending</div>
-                @elseif($s == 2)
-                    <div class="badge badge-assigned">Assigned</div>
-                @elseif($s == 3)
-                    <div class="badge badge-completed">Completed</div>
-                @elseif($s == 4)
-                    <div class="badge badge-rejected">Rejected</div>
-                @else
-                    <div class="badge" style="background:#a0895c">Unknown</div>
-                @endif
-                @if ($appointment->appointment_date || $appointment->appointment_time)
-                    <div class="date-time">
-                        @if ($appointment->appointment_date)
-                            {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('d M, Y') }}
-                        @endif
-                        @if ($appointment->appointment_time)
-                            <br>{{ $appointment->appointment_time }}
-                        @endif
-                    </div>
-                @endif
-            </div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="address-table">
+        <tr>
+            <td class="address-col">
+                <div class="section-title">Customer Details</div>
+                <div class="name">{{ $appointment->first_name ?? '' }} {{ $appointment->last_name ?? '' }}</div>
+                Phone: {{ $appointment->phone ?? '' }}<br>
+                Email: {{ $appointment->email ?? 'N/A' }}<br>
+                Address: {{ $appointment->service_address ?? '' }}
+            </td>
+            <td class="address-col" style="text-align: right;">
+                <div class="section-title">Service Provider</div>
+                <div class="name">BeautyDen Services</div>
+                +91 95747 58282<br>
+                contact@beautyden.com<br>
+                www.beautyden.in
+            </td>
+        </tr>
+    </table>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 40px; text-align: center;">#</th>
+                <th>Service Name</th>
+                <th style="width: 80px; text-align: right;">Price</th>
+                <th style="width: 50px; text-align: center;">Qty</th>
+                <th style="width: 100px; text-align: right;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($services as $key => $s)
+            <tr>
+                <td align="center">{{ $key+1 }}</td>
+                <td style="font-weight: bold;">{{ $s['name'] }}</td>
+                <td align="right">₹{{ number_format($s['price'], 2) }}</td>
+                <td align="center">{{ $s['qty'] }}</td>
+                <td align="right">₹{{ number_format($s['total'], 2) }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <div class="summary-wrapper">
+        <table class="summary-table">
+            <tr>
+                <td>Subtotal</td>
+                <td align="right">
+                    ₹{{ number_format($summary['sub_total'] ?? 0, 2) }}
+                </td>
+            </tr>
+
+            {{-- ✅ Show Discount Only If > 0 --}}
+            @if(!empty($summary['discount_amount']) && $summary['discount_amount'] > 0)
+            <tr>
+                <td style="color: #d9534f;">Discount</td>
+                <td align="right" style="color: #d9534f;">
+                    - ₹{{ number_format($summary['discount_amount'], 2) }}
+                </td>
+            </tr>
+            @endif
+
+            <tr>
+                <td>Travel Fee</td>
+                <td align="right">
+                    ₹{{ number_format($summary['travel_charges'] ?? 0, 2) }}
+                </td>
+            </tr>
+
+            <tr class="grand-total-row">
+                <td>GRAND TOTAL</td>
+                <td align="right">
+                    ₹{{ number_format($summary['grand_total'] ?? 0, 2) }}
+                </td>
+            </tr>
+        </table>
+        <div style="clear: both;"></div>
+    </div>
+
+    <div class="bottom-section">
+        <div class="terms">
+            <strong>Terms & Conditions:</strong><br>
+            • Services once rendered are non-refundable.<br>
+            • For cancellations, please notify us 12 hours in advance.<br>
+            • This is an electronically generated invoice.
         </div>
 
-        <!-- GRID CONTENT -->
-        <div class="grid">
-            <div class="card">
-                <div class="card-title">Customer Information</div>
-                @if ($appointment->first_name || $appointment->last_name)
-                    <div class="info-row">
-                        <div class="info-label">Name</div>
-                        <div class="info-value">{{ $appointment->first_name }} {{ $appointment->last_name }}</div>
-                    </div>
-                @endif
-                @if ($appointment->phone)
-                    <div class="info-row">
-                        <div class="info-label">Phone</div>
-                        <div class="info-value">{{ $appointment->phone }}</div>
-                    </div>
-                @endif
-                @if ($appointment->email)
-                    <div class="info-row">
-                        <div class="info-label">Email</div>
-                        <div class="info-value">{{ $appointment->email }}</div>
-                    </div>
-                @endif
-                @if ($appointment->service_address)
-                    <div class="info-row">
-                        <div class="info-label">Address</div>
-                        <div class="info-value">{{ $appointment->service_address }}</div>
-                    </div>
-                @endif
-                @if ($appointment->order_number)
-                    <div class="info-row">
-                        <div class="info-label">Order #</div>
-                        <div class="info-value"><strong>{{ $appointment->order_number }}</strong></div>
-                    </div>
-                @endif
-            </div>
-
-            <div class="card">
-                <div class="card-title">Order Details</div>
-                <div class="detail-grid">
-                    @if ($appointment->city_name)
-                        <div class="detail-item">
-                            <div class="detail-label">City</div>
-                            <div class="detail-value">{{ $appointment->city_name }}</div>
-                        </div>
-                    @endif
-                    @if ($appointment->price)
-                        <div class="detail-item">
-                            <div class="detail-label">Price</div>
-                            <div class="detail-value">₹{{ number_format($appointment->price, 2) }}</div>
-                        </div>
-                    @endif
-                    @if ($appointment->discount_price)
-                        <div class="detail-item" style="grid-column:1/-1">
-                            <div class="detail-label">Discount</div>
-                            <div class="detail-value">₹{{ number_format($appointment->discount_price, 2) }}</div>
-                        </div>
-                    @endif
-                </div>
-                @if (!empty($services))
-                    <div class="chip-section">
-                        <div class="section-label">Services</div>
-                        <div class="chips">
-                            @foreach ($services as $s)
-                                <div class="chip">{{ $s }}</div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-                @if (!empty($team_members))
-                    <div class="chip-section">
-                        <div class="section-label">Team</div>
-                        <div class="chips">
-                            @foreach ($team_members as $m)
-                                <div class="chip">{{ $m }}</div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- NOTES -->
-        @if ($appointment->special_notes)
-            <div class="notes">
-                <div class="notes-title">Special Notes</div>
-                <div class="notes-content">{{ $appointment->special_notes }}</div>
-            </div>
-        @endif
-
-        <!-- FOOTER -->
         <div class="footer">
-            <div class="footer-top">
-                @if ($appointment->assigned_by)
-                    <div>Assigned by: <strong>{{ $appointment->assigned_by }}</strong></div>
-                @endif
-                @if ($appointment->created_at)
-                    <div>Created:
-                        <strong>{{ \Carbon\Carbon::parse($appointment->created_at)->format('d M, Y H:i') }}</strong>
-                    </div>
-                @endif
-            </div>
-            <div class="company-info">
-                <div class="company-name">BeautyDen Professional Services</div>
-                +91 95747 58282 | contact@beautyden.com | www.beautyden.in
-            </div>
+            Thank You for choosing BeautyDen! | www.beautyden.in | +91 95747 58282
         </div>
     </div>
+
 </body>
 
 </html>
