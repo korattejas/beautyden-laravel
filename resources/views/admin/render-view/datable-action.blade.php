@@ -81,7 +81,8 @@
         @endif
 
         @if (isset($action_array['assign_id']))
-            <button data-id="{{ $action_array['assign_id'] }}" data-new-old-priority-status-change="0"
+            <button data-id="{{ $action_array['assign_id'] }}" 
+                data-members="{{ $action_array['current_members'] ?? '' }}"
                 class="assign-member btn btn-warning btn-icon" data-effect="effect-fall" data-toggle="tooltip"
                 data-placement="top" title="Assign team member">
                 <i class="bx bx-user-plus font-size-16 align-middle"></i>

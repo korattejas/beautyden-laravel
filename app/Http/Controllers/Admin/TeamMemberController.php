@@ -23,11 +23,112 @@ class TeamMemberController extends Controller
         $this->controller_name = "Admin/TeamMemberController";
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $function_name = 'index';
         try {
-            return view('admin.team.index');
+            $query = TeamMember::query();
+
+            // Search by Name or Address
+            if ($request->filled('search')) {
+                $query->where(function($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%')
+                      ->orWhere('address', 'like', '%' . $request->search . '%');
+                });
+            }
+
+            // Other filters
+            if ($request->filled('status')) {
+                $query->where('status', (int)$request->status);
+            }
+            if ($request->filled('popular')) {
+                $query->where('is_popular', (int)$request->popular);
+            }
+            if ($request->filled('year_of_experience')) {
+                if ($request->year_of_experience === '10+') {
+                    $query->where('experience_years', '>', 10);
+                } else {
+                    $query->where('experience_years', (int)$request->year_of_experience);
+                }
+            }
+            if ($request->filled('created_date')) {
+                $query->whereDate('created_at', $request->created_date);
+            }
+
+            $allMembers = $query->get();
+            
+            // Summary Stats (Total global counts)
+            $active_count = TeamMember::where('status', 1)->count();
+            $inactive_count = TeamMember::where('status', 0)->count();
+
+            $allStats = [];
+            $selected_month = $request->month;
+            $selected_year = $request->year;
+
+            foreach ($allMembers as $member) {
+                // Fetch completed appointments for this member with date filtering
+                $appQuery = DB::table('appointments')
+                    ->whereRaw("FIND_IN_SET(?, assigned_to)", [$member->id])
+                    ->where('status', 3); // Completed
+
+                if ($selected_month) {
+                    $appQuery->whereMonth('appointment_date', $selected_month);
+                }
+                if ($selected_year) {
+                    $appQuery->whereYear('appointment_date', $selected_year);
+                }
+
+                $appointments = $appQuery->get();
+
+                $totalRevenue = 0;
+                foreach ($appointments as $app) {
+                    $servicesData = json_decode($app->services_data, true);
+                    $totalRevenue += (float)($servicesData['summary']['grand_total'] ?? 0);
+                }
+
+                $allStats[] = [
+                    'member' => $member,
+                    'total_appointments' => $appointments->count(),
+                    'total_revenue' => $totalRevenue,
+                    'status_order' => $member->status == 1 ? 0 : 1 // Active first
+                ];
+            }
+
+            // Global Sort: Active first (by Revenue), then Inactive (by Experience)
+            usort($allStats, function ($a, $b) {
+                // 1. Sort by Status (Active first)
+                if ($a['status_order'] !== $b['status_order']) {
+                    return $a['status_order'] <=> $b['status_order'];
+                }
+                
+                // 2. If both are Active (status 1), sort by Revenue (High to Low)
+                if ($a['member']->status == 1) {
+                    return $b['total_revenue'] <=> $a['total_revenue'];
+                }
+                
+                // 3. If both are Inactive (status 0), sort by Experience (High to Low)
+                $expA = (int)($a['member']->experience_years ?? 0);
+                $expB = (int)($b['member']->experience_years ?? 0);
+                return $expB <=> $expA;
+            });
+
+            // Manual Pagination after global sorting
+            $perPage = 50;
+            $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
+            $currentItems = array_slice($allStats, ($currentPage - 1) * $perPage, $perPage);
+            
+            $members = new \Illuminate\Pagination\LengthAwarePaginator(
+                $currentItems,
+                count($allStats),
+                $perPage,
+                $currentPage,
+                ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'query' => $request->query()]
+            );
+
+            // Re-map the stats to match the paginated slice
+            $stats = $currentItems;
+
+            return view('admin.team.index', compact('stats', 'members', 'active_count', 'inactive_count'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -281,6 +382,37 @@ class TeamMemberController extends Controller
         } catch (\Exception $e) {
             logger()->error("destroy: " . $e->getMessage());
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
+    public function getAppointmentsReport(Request $request, $id)
+    {
+        try {
+            $appointments = DB::table('appointments')
+                ->whereRaw("FIND_IN_SET(?, assigned_to)", [$id])
+                ->where('status', 3) // Completed
+                ->orderBy('appointment_date', 'DESC')
+                ->orderBy('appointment_time', 'DESC')
+                ->paginate(20);
+
+            $data = [];
+            foreach ($appointments as $app) {
+                $servicesData = json_decode($app->services_data, true);
+                $data[] = [
+                    'order_number' => $app->order_number,
+                    'date' => $app->appointment_date,
+                    'time' => $app->appointment_time,
+                    'total' => '₹' . number_format((float)($servicesData['summary']['grand_total'] ?? 0), 0),
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'pagination' => (string) $appointments->links('pagination::bootstrap-5')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

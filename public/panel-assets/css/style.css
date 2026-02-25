@@ -185,3 +185,38 @@
         opacity: 1;
     }
 }
+
+/* Sidebar Logo Size */
+.main-menu .navbar-header {
+    height: 120px !important;
+    /* Increased height */
+    padding: 15px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.main-menu .navbar-header .navbar-brand {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.main-menu .brand-logo {
+    margin: 0 !important;
+}
+
+.sidebar-main-logo {
+    width: 220px !important;
+    /* Larger width */
+    /* Slightly smaller to ensure no horizontal crop */
+    max-height: 100px !important;
+    /* Larger max-height */
+    /* Prevent vertical crop */
+    height: auto !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+}

@@ -1,4 +1,281 @@
 @extends('admin.layouts.app')
+
+@section('header_style_content')
+<style>
+    /* Premium Member Grid */
+    .member-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 10px;
+        margin-top: 15px;
+    }
+
+    .member-card {
+        border: 2px solid transparent;
+        border-radius: 12px;
+        padding: 15px 10px;
+        text-align: center;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .member-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        background: #fff;
+    }
+
+    .member-card.selected {
+        border-color: #1a4a7a;
+        background: #eff6ff;
+        box-shadow: 0 4px 12px rgba(26, 74, 122, 0.12);
+    }
+
+    .member-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e2e8f0;
+        font-weight: bold;
+        color: #64748b;
+        font-size: 1.2rem;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .member-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #1e293b;
+        margin-bottom: 2px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .member-role {
+        font-size: 0.75rem;
+        color: #64748b;
+        display: block;
+    }
+
+    .selection-indicator {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 22px;
+        height: 22px;
+        background: #1a4a7a;
+        color: #fff;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .member-card.selected .selection-indicator {
+        display: flex;
+    }
+
+    /* Modal Styling */
+    #c-assignModal .c-modal-dialog {
+        max-width: 650px;
+    }
+
+    .member-search-wrap {
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .member-search-wrap i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .member-search-wrap input#memberSearch {
+        padding-left: 35px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background: #f8fafc;
+    }
+
+    .member-search-wrap input#memberSearch:focus {
+        background: #fff;
+        border-color: #1a4a7a;
+        box-shadow: 0 0 0 3px rgba(26, 74, 122, 0.1);
+    }
+
+    /* Premium Detail Modal Enhancements */
+    #c-viewAppointmentModal .c-modal-content {
+        border: none;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+
+    #c-viewAppointmentModal .c-modal-header {
+        background: linear-gradient(135deg, #102365 0%, #1a4a7a 100%);
+        padding: 20px 24px;
+    }
+
+    .detail-section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7367f0;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .detail-info-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px;
+        height: 100%;
+        border: 1px solid #edf2f7;
+        transition: all 0.3s ease;
+    }
+
+    .detail-info-card:hover {
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-color: #7367f0;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-icon {
+        width: 32px;
+        height: 32px;
+        background: rgba(115, 103, 240, 0.1);
+        color: #7367f0;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .info-content label {
+        display: block;
+        font-size: 0.72rem;
+        color: #82868b;
+        font-weight: 700;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-content p {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.2;
+    }
+
+    .premium-table-container {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #edf2f7;
+        margin-top: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .premium-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .premium-table thead th {
+        background: #f8f9fa;
+        color: #475569;
+        font-weight: 800;
+        font-size: 0.8rem;
+        padding: 14px 16px;
+        text-transform: uppercase;
+        text-align: left;
+        letter-spacing: 0.8px;
+    }
+
+    .premium-table tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #edf2f7;
+        font-size: 0.9rem;
+        color: #1e293b;
+    }
+
+    .premium-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .summary-box {
+        background: #fdfdfd;
+        border: 1px solid #edf2f7;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 350px;
+        margin-left: auto;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #475569;
+    }
+
+    .summary-line:last-child {
+        margin-bottom: 0;
+    }
+
+    .summary-total {
+        border-top: 2px dashed #dbdade;
+        margin-top: 15px;
+        padding-top: 15px;
+        font-weight: 800;
+        font-size: 1.4rem;
+        color: #7367f0;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="app-content content">
     <div class="content-overlay"></div>
@@ -74,6 +351,75 @@
             </div>
         </div>
         <div class="content-body">
+            <!-- Summary Boxes -->
+            <div class="row g-1 mb-2">
+                <div class="col">
+                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #f3e8ff !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-calendar-check" style="font-size: 1.2rem; color: #7c3aed;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $totalAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Total</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #ecfdf5 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-currency-rupee" style="font-size: 1.2rem; color: #059669;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">₹{{ number_format($totalRevenue, 2) }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Revenue</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fff7ed !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-clock-history" style="font-size: 1.2rem; color: #ea580c;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $pendingAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Pending</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #e0f2fe !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-person-check" style="font-size: 1.2rem; color: #0284c7;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $assignedAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Assigned</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #dcfce7 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-check2-circle" style="font-size: 1.2rem; color: #16a34a;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $completedAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Column Search -->
             <section id="column-search-datatable">
                 <div class="row">
@@ -125,15 +471,35 @@
             <div class="c-modal-body">
                 <form id="assignForm">
                     <input type="hidden" id="value_id" name="value_id">
-
-                    <div class="mb-3">
-                        <label for="team_members" class="form-label">Select Members</label>
-                        <select id="team_members" name="team_members[]" class="form-control" multiple>
-                            @foreach ($teamMembers as $member)
-                            <option value="{{ $member->id }}">{{ $member->name }}</option>
-                            @endforeach
-                        </select>
+                    
+                    <div class="member-search-wrap">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="memberSearch" class="form-control shadow-none" placeholder="Search team members...">
                     </div>
+
+                    <div class="member-grid" id="memberGrid">
+                        @foreach ($teamMembers as $member)
+                        <div class="member-card" data-id="{{ $member->id }}" data-name="{{ strtolower($member->name) }}">
+                            <div class="selection-indicator"><i class="bi bi-check"></i></div>
+                            <div class="member-avatar" 
+                                style="{{ $member->icon && file_exists(public_path('uploads/team-member/' . $member->icon)) 
+                                    ? 'background-image: url(' . asset('uploads/team-member/' . $member->icon) . ')' 
+                                    : '' }}">
+                                @if(!($member->icon && file_exists(public_path('uploads/team-member/' . $member->icon))))
+                                    {{ strtoupper(substr($member->name, 0, 1)) }}
+                                @endif
+                            </div>
+                            <span class="member-name">{{ $member->name }}</span>
+                            <span class="member-role">{{ $member->role ?? 'Professional' }}</span>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <select id="team_members" name="team_members[]" class="d-none" multiple>
+                        @foreach ($teamMembers as $member)
+                        <option value="{{ $member->id }}">{{ $member->name }}</option>
+                        @endforeach
+                    </select>
                 </form>
             </div>
 
@@ -152,59 +518,65 @@
 </div>
 
 <div id="c-viewAppointmentModal" class="c-modal">
-    <div class="c-modal-dialog">
+    <div class="c-modal-dialog" style="max-width: 850px;">
         <div class="c-modal-content">
 
             <!-- Header -->
-            <div class="c-modal-header"
-                style="display:flex; justify-content:space-between; align-items:center;">
-
+            <div class="c-modal-header">
                 <h5 class="c-modal-title" style="margin:0;">
-                    <i class="bi bi-journal-text"></i> Appointment Details
+                    <i class="bi bi-stars"></i> Appointment Insights
                 </h5>
 
-                <div style="display:flex; align-items:center; gap:10px;">
+                <div style="display:flex; align-items:center; gap:12px;">
 
                     <!-- 🔥 Copy Button -->
                     <button id="copyAppointmentData"
                         style="
-                            background:#1a4a7a;
+                            background: rgba(255,255,255,0.15);
                             color:#fff;
-                            border:none;
-                            padding:6px 14px;
-                            border-radius:6px;
+                            border: 1px solid rgba(255,255,255,0.3);
+                            padding:8px 16px;
+                            border-radius:8px;
                             font-size:13px;
+                            font-weight: 600;
                             cursor:pointer;
                             display:flex;
                             align-items:center;
-                            gap:6px;
-                            transition:all 0.2s ease;
+                            gap:8px;
+                            transition:all 0.3s ease;
+                            backdrop-filter: blur(5px);
                         "
-                        onmouseover="this.style.background='#163c63'"
-                        onmouseout="this.style.background='#1a4a7a'">
+                        onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.15)'">
 
-                        <i class="bi bi-clipboard"></i> Copy
+                        <i class="bi bi-clipboard2-check"></i> <span>Copy Details</span>
                     </button>
 
                     <!-- Close Button -->
-                    <button class="c-close-btn" data-c-close>&times;</button>
+                    <button class="c-close-btn" data-c-close 
+                        style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 50%; font-size: 20px; transition: all 0.3s;">
+                        &times;
+                    </button>
 
                 </div>
             </div>
 
             <!-- Body -->
-            <div class="c-modal-body" id="c-appointment-details">
+            <div class="c-modal-body" id="c-appointment-details" style="background: #fff; padding: 24px;">
                 <div class="c-loader">
                     <div class="c-spinner"></div>
-                    <span>Fetching details...</span>
+                    <span>Revealing information...</span>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="c-modal-footer">
-                <small><i class="bi bi-clock"></i> Updated just now</small>
-                <button class="c-btn" data-c-close>
-                    <i class="bi bi-x-circle"></i> Close
+            <div class="c-modal-footer" style="background: #f8f9fa; border-top: 1px solid #edf2f7; padding: 16px 24px;">
+                <div style="display: flex; align-items: center; gap: 8px; color: #82868b; font-size: 0.85rem;">
+                    <i class="bi bi-shield-check text-success"></i>
+                    <span>Verified Appointment Record</span>
+                </div>
+                <button class="c-btn" data-c-close style="background: #444050; border-radius: 8px; padding: 10px 20px;">
+                    <i class="bi bi-x-lg me-1"></i> Close View
                 </button>
             </div>
 
@@ -220,8 +592,57 @@
     const sweetalert_change_status = "Change Status of Appointment";
     const form_url = '/appointments';
     datatable_url = '/getDataAppointments';
-    $('#team_members').select2({
-        dropdownParent: $('#c-assignModal')
+    
+    // Member Selection Logic
+    $(document).on('click', '.member-card', function() {
+        let card = $(this);
+        let id = card.data('id');
+        let select = $('#team_members');
+        
+        card.toggleClass('selected');
+        
+        // Sync with hidden select
+        let option = select.find(`option[value="${id}"]`);
+        if (card.hasClass('selected')) {
+            option.prop('selected', true);
+        } else {
+            option.prop('selected', false);
+        }
+    });
+
+    // Search Filtering
+    $(document).on('keyup', '#memberSearch', function() {
+        let value = $(this).val().toLowerCase();
+        $('.member-card').each(function() {
+            let name = $(this).data('name');
+            if (name.includes(value)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+
+    $(document).on('click', '.assign-member', function() {
+        // Reset selections when opening modal
+        $('.member-card').removeClass('selected');
+        $('#team_members').val([]);
+        $('#memberSearch').val('');
+        $('.member-card').show();
+        
+        const value_id = $(this).data('id');
+        const currentMembers = $(this).data('members'); // Comma-separated IDs
+
+        if (currentMembers) {
+            const memberIds = currentMembers.toString().split(',');
+            memberIds.forEach(id => {
+                $(`.member-card[data-id="${id}"]`).addClass('selected');
+                $(`#team_members option[value="${id}"]`).prop('selected', true);
+            });
+        }
+
+        $('#value_id').val(value_id);
+        $("#c-assignModal").addClass("show");
     });
 
     $.extend(true, $.fn.dataTable.defaults, {
@@ -284,7 +705,7 @@
             },
         ],
         order: [
-            [0, 'DESC']
+            [4, 'DESC']
         ],
     });
 
@@ -334,190 +755,177 @@
                 let services = data.services || [];
                 let summary = data.summary || {};
 
-                let servicesHtml = '-';
+                let servicesHtml = '';
 
                 if (services.length > 0) {
-
                     servicesHtml = `
-        <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:13px;">
-            <thead>
-                <tr style="background:#1a4a7a; color:#fff;">
-                    <th style="padding:8px; border:1px solid #ddd;">#</th>
-                    <th style="padding:8px; border:1px solid #ddd;">Type</th>
-                    <th style="padding:8px; border:1px solid #ddd; text-align:left;">Service</th>
-                    <th style="padding:8px; border:1px solid #ddd; text-align:right;">Price</th>
-                    <th style="padding:8px; border:1px solid #ddd; text-align:center;">Qty</th>
-                    <th style="padding:8px; border:1px solid #ddd; text-align:right;">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+                        <div class="detail-section-label mt-4">
+                            <i class="bi bi-layers-half"></i> Service Inventory
+                        </div>
+                        <div class="premium-table-container">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">#</th>
+                                        <th>Name</th>
+                                        <th style="text-align: right;">Price</th>
+                                        <th style="text-align: center;">Qty</th>
+                                        <th style="text-align: right;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
 
                     services.forEach((s, index) => {
                         servicesHtml += `
-            <tr style="background:${index % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
-                <td style="padding:8px; border:1px solid #eee; text-align:center;">${index + 1}</td>
-                <td style="padding:8px; border:1px solid #eee; text-transform:capitalize;">${s.type ?? '-'}</td>
-                <td style="padding:8px; border:1px solid #eee;">${s.name ?? '-'}</td>
-                <td style="padding:8px; border:1px solid #eee; text-align:right;">₹${parseFloat(s.price).toFixed(2)}</td>
-                <td style="padding:8px; border:1px solid #eee; text-align:center;">${s.qty}</td>
-                <td style="padding:8px; border:1px solid #eee; text-align:right; font-weight:500;">
-                    ₹${parseFloat(s.total).toFixed(2)}
-                </td>
-            </tr>
-        `;
+                            <tr>
+                                <td style="text-align: center; color: #82868b;">${index + 1}</td>
+                                <td style="font-weight: 700; color: #1e293b;">
+                                    ${s.name ?? '-'}
+                                    <div style="font-size: 0.75rem; color: #82868b; text-transform: capitalize; font-weight: 500;">${s.type ?? 'Standard'}</div>
+                                </td>
+                                <td style="text-align: right; font-weight: 600;">₹${parseFloat(s.price).toFixed(2)}</td>
+                                <td style="text-align: center; font-weight: 600;">${s.qty}</td>
+                                <td style="text-align: right; font-weight: 800; color: #7367f0; font-size: 1rem;">
+                                    ₹${parseFloat(s.total).toFixed(2)}
+                                </td>
+                            </tr>
+                        `;
                     });
-
-                    servicesHtml += `</tbody></table>`;
-
-                    servicesHtml += `
-        <div style="
-            margin-top:15px;
-            padding:15px;
-            border:1px solid #ddd;
-            background:#fdfdfd;
-            border-radius:6px;
-            max-width:350px;
-            float:right;
-            font-size:14px;
-        ">
-
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                <span>Subtotal</span>
-                <span>₹${parseFloat(summary.sub_total || 0).toFixed(2)}</span>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                <span>Travel Charges</span>
-                <span>₹${parseFloat(summary.travel_charges || 0).toFixed(2)}</span>
-            </div>
-
-            ${
-                parseFloat(summary.discount_amount || 0) > 0
-                ? `
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px; color:#d9534f;">
-                    <span>Discount (${summary.discount_percent || 0}%)</span>
-                    <span>- ₹${parseFloat(summary.discount_amount).toFixed(2)}</span>
-                </div>
-                `
-                : ''
-            }
-
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                margin-top:10px;
-                padding-top:8px;
-                border-top:2px solid #1a4a7a;
-                font-weight:bold;
-                font-size:16px;
-                color:#1a4a7a;
-            ">
-                <span>Grand Total</span>
-                <span> ₹${parseFloat(summary.grand_total || 0).toFixed(2)}</span>
-            </div>
-
-        </div>
-        <div style="clear:both;"></div>
-    `;
+                    servicesHtml += `</tbody></table></div>`;
                 }
 
-
-                let html = `
-                        <div class="c-row">
-
-                            <div class="c-col-6"><div class="c-detail-card"><label>Order #</label><p>${data.order_number ?? '-'}</p></div></div>
-                            <div class="c-col-6"><div class="c-detail-card"><label>City</label><p>${data.city_name ?? '-'}</p></div></div>
-
-                            <div class="c-col-6"><div class="c-detail-card"><label>Customer</label>
-                                <p>${data.first_name ?? ''} ${data.last_name ?? ''}</p>
-                            </div></div>
-
-                            <div class="c-col-6"><div class="c-detail-card"><label>Phone</label>
-                                <p>${data.phone ?? '-'}</p>
-                            </div></div>
-
-                            <div class="c-col-6"><div class="c-detail-card"><label>Email</label>
-                                <p>${data.email ?? '-'}</p>
-                            </div></div>
-
-                            <div class="c-col-6"><div class="c-detail-card"><label>Appointment Date</label>
-                                <p>${data.appointment_date ?? '-'}</p>
-                            </div></div>
-
-                            <div class="c-col-6"><div class="c-detail-card"><label>Appointment Time</label>
-                                <p>${data.appointment_time ?? '-'}</p>
-                            </div></div>
-
-                            <div class="c-col-12"><div class="c-detail-card"><label>Address</label>
-                                <p>${data.service_address ?? '-'}</p>
-                            </div></div>
-
-                            <div class="c-col-12"><div class="c-detail-card"><label>Team Assign Name</label>
-                                <p>${data.team_members ?? '-'}</p>
-                            </div></div>
-
-                            <div class="c-col-12"><div class="c-detail-card"><label>Special Notes</label>
-                                <p>${data.special_notes ?? '-'}</p>
-                            </div></div>
-
-                            <div class="c-col-12">
-                                <div class="c-detail-card">
-                                    <label>Services Details</label>
-                                    ${servicesHtml}
+                $("#c-appointment-details").html(`
+                    <div class="row">
+                        <!-- Client Contact Card -->
+                        <div class="col-md-6 mb-3">
+                            <div class="detail-section-label">
+                                <i class="bi bi-person-circle"></i> Client Information
+                            </div>
+                            <div class="detail-info-card">
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-person"></i></div>
+                                    <div class="info-content">
+                                        <label>Full Name</label>
+                                        <p>${client.first_name ?? '-'} ${client.last_name ?? ''}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-envelope"></i></div>
+                                    <div class="info-content">
+                                        <label>Email Address</label>
+                                        <p>${client.email ?? 'Not provided'}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-telephone"></i></div>
+                                    <div class="info-content">
+                                        <label>Phone Number</label>
+                                        <p>${client.phone ?? 'Not provided'}</p>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
-                    `;
 
-                $("#c-appointment-details").html(html);
+                        <!-- Schedule & Location Card -->
+                        <div class="col-md-6 mb-3">
+                            <div class="detail-section-label">
+                                <i class="bi bi-geo-alt-fill"></i> Schedule & Logistics
+                            </div>
+                            <div class="detail-info-card" style="border-left: 4px solid #7367f0;">
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(115, 103, 240, 0.2);"><i class="bi bi-calendar-check"></i></div>
+                                    <div class="info-content">
+                                        <label>Appointment Date</label>
+                                        <p>${appointment.date ?? '-'}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(115, 103, 240, 0.2);"><i class="bi bi-clock-history"></i></div>
+                                    <div class="info-content">
+                                        <label>Reserved Time</label>
+                                        <p>${appointment.time ?? '-'}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(115, 103, 240, 0.2);"><i class="bi bi-geo"></i></div>
+                                    <div class="info-content">
+                                        <label>Service Location</label>
+                                        <p>${appointment.address ?? 'On-site'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${servicesHtml}
+
+                    <div class="summary-box">
+                        <div class="summary-line">
+                            <span>Subtotal</span>
+                            <span style="font-weight: 700; color: #1e293b;">₹${parseFloat(summary.sub_total || 0).toFixed(2)}</span>
+                        </div>
+                        <div class="summary-line">
+                            <span>Traveling Charges</span>
+                            <span style="font-weight: 700; color: #1e293b;">+ ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}</span>
+                        </div>
+                        <div class="summary-line text-danger">
+                            <span style="font-weight: 600;">Discount (${summary.discount_percent || 0}%)</span>
+                            <span style="font-weight: 700;">- ₹${parseFloat(summary.discount_amount || 0).toFixed(2)}</span>
+                        </div>
+                        <div class="summary-line summary-total">
+                            <span>Grand Total</span>
+                            <span>₹${parseFloat(summary.grand_total || 0).toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3" style="background: #fff8eb; border-radius: 12px; border: 1px solid #ffe5b4; box-shadow: 0 4px 12px rgba(255, 159, 67, 0.08);">
+                        <div class="detail-section-label" style="color: #ff9f43; margin-bottom: 8px;">
+                            <i class="bi bi-sticky"></i> Special Instructions
+                        </div>
+                        <p style="margin:0; font-size: 0.95rem; color: #1e293b; font-weight: 600; font-style: italic; line-height: 1.5;">
+                            "${appointment.special_notes ?? 'No special instructions provided for this appointment.'}"
+                        </p>
+                    </div>
+                `);
+
+                // Update copy button text
+                $("#copyAppointmentData").html('<i class="bi bi-clipboard2-check"></i> <span>Copy Details</span>');
             },
             error: function() {
                 $("#c-appointment-details").html(
-                    `<div style="color:red;">Failed to load details.</div>`
+                    `<div class="text-center py-5 text-danger"><i class="bi bi-exclamation-triangle fs-1"></i><p>Failed to load data</p></div>`
                 );
             }
         });
     });
 
     $(document).on('click', '#copyAppointmentData', function() {
-
         if (!currentAppointmentData) return;
 
-        let data = currentAppointmentData;
-        let services = data.services || [];
-        let summary = data.summary || {};
+        let d = currentAppointmentData;
+        let client = d.client || {};
+        let appointment = d.appointment || {};
+        let summary = d.summary || {};
+        let services = d.services || [];
 
-        let fullName = `${data.first_name || ''} ${data.last_name || ''}`.trim();
+        let text = `🌟 APPOINTMENT DETAILS 🌟\n\n`;
+        text += `👤 CLIENT INFORMATION\n`;
+        text += `Name: ${client.first_name} ${client.last_name}\n`;
+        text += `Phone: ${client.phone}\n`;
+        text += `Email: ${client.email}\n\n`;
 
-        let text = `Hello ${data.first_name || 'Customer'}! 👋\n\n`;
-        text += `Your appointment with BeautyDen has been successfully booked. 💖\n\n`;
+        text += `📅 SCHEDULE & LOCATION\n`;
+        text += `Date: ${appointment.date}\n`;
+        text += `Time: ${appointment.time}\n`;
+        text += `Address: ${appointment.address}\n\n`;
 
-        text += `📋 Appointment Details\n`;
-        text += `---------------------------------\n`;
-        text += `Order: ${data.order_number}\n`;
-        text += `Customer: ${fullName}\n`;
-        text += `Phone: ${data.phone}\n`;
-        text += `City: ${data.city_name}\n`;
-        text += `Date: ${data.appointment_date}\n`;
-        text += `Time: ${data.appointment_time}\n`;
-        text += `Address: ${data.service_address}\n\n`;
-
-        text += `🛍 Services:\n`;
-        text += `---------------------------------\n`;
-
-        services.forEach(s => {
-            text += `${s.name} (${s.qty} x ₹${s.price}) = ₹${s.total}\n`;
+        text += `🛠️ SERVICES\n`;
+        services.forEach((s, idx) => {
+            text += `${idx + 1}. ${s.name} (x${s.qty}) - ₹${s.total}\n`;
         });
-
-        text += `---------------------------------\n`;
+        text += `\n💰 FINANCIAL SUMMARY\n`;
         text += `Subtotal: ₹${summary.sub_total}\n`;
-
-        if (parseFloat(summary.discount_amount) > 0) {
-            text += `Discount: - ₹${summary.discount_amount}\n`;
-        }
-
         text += `Travel Charges: ₹${summary.travel_charges}\n`;
 
         text += `Grand Total: ₹${summary.grand_total}\n\n`;

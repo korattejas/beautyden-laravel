@@ -180,21 +180,25 @@ class PortfolioController extends Controller
                     })
 
                     ->addColumn('photos', function ($portfolio) {
-
-                        $html = '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+                        if (empty($portfolio->photos)) return '<span class="text-muted">No Photos</span>';
+                        
+                        $html = '<div class="photo-stack">';
+                        $limit = 4;
+                        $count = 0;
+                        $total = count($portfolio->photos);
 
                         foreach ($portfolio->photos as $img) {
-                            $path = public_path('uploads/portfolio/' . $img);
-
-                            if (file_exists($path)) {
-                                $url = asset('uploads/portfolio/' . $img);
-                                $html .= '<img src="' . $url . '"
-                                style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;" />';
-                            }
+                            if ($count >= $limit) break;
+                            $url = asset('uploads/portfolio/' . $img);
+                            $html .= '<img src="' . $url . '" class="photo-stack-item" title="Portfolio Image" />';
+                            $count++;
                         }
 
+                        if ($total > $limit) {
+                            $html .= '<div class="photo-count-badge">+' . ($total - $limit) . '</div>';
+                        }
+                        
                         $html .= '</div>';
-
                         return $html;
                     })
 
@@ -260,6 +264,40 @@ class PortfolioController extends Controller
             return response()->json([
                 'error' => $this->error_message
             ], $this->exception_error_code);
+        }
+    }
+    public function removeImage(Request $request)
+    {
+        try {
+            $id = $request->id;
+            $imageName = $request->image;
+
+            $portfolio = Portfolio::find($id);
+            if ($portfolio && is_array($portfolio->photos)) {
+                $photos = $portfolio->photos;
+
+                // Remove the image name from the array
+                if (($key = array_search($imageName, $photos)) !== false) {
+                    unset($photos[$key]);
+
+                    // Reset array keys to avoid index issues
+                    $photos = array_values($photos);
+
+                    // Update the portfolio
+                    $portfolio->update(['photos' => $photos]);
+
+                    // Delete the physical file
+                    $path = public_path('uploads/portfolio/' . $imageName);
+                    if (File::exists($path)) {
+                        File::delete($path);
+                    }
+
+                    return response()->json(['success' => true, 'message' => 'Image removed successfully']);
+                }
+            }
+            return response()->json(['success' => false, 'message' => 'Image not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 }

@@ -96,6 +96,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('portfolio/{id}', [PortfolioController::class, 'destroy'])->name('admin.portfolio.destroy');
         Route::get('getDataPortfolio', [PortfolioController::class, 'getDataPortfolio'])->name('getDataPortfolio');
         Route::get('portfolio/status/{id}/{status}', [PortfolioController::class, 'changeStatus'])->name('admin.portfolio.changeStatus');
+        Route::post('portfolio/remove-image', [PortfolioController::class, 'removeImage'])->name('admin.portfolio.removeImage');
 
     
 
@@ -150,6 +151,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('team/status/{id}/{status}', [TeamMemberController::class, 'changeStatus'])->name('admin.team.changeStatus');
         Route::get('team/priority-status/{id}/{status}', [TeamMemberController::class, 'changePriorityStatus'])->name('admin.team.changePriorityStatus');
         Route::get('team-view/{id}', [TeamMemberController::class, 'view']);
+        Route::get('team/appointments-report/{id}', [TeamMemberController::class, 'getAppointmentsReport'])->name('admin.team.appointmentsReport');
 
         // Customer Reviews
         Route::get('reviews', [CustomerReviewController::class, 'index'])->name('admin.reviews.index');

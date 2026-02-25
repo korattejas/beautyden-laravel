@@ -4,7 +4,7 @@
             <li class="nav-item me-auto">
                 <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
                     <span class="brand-logo">
-                        <img src="{{ URL::asset('panel-assets/admin-logo/sidebar-Logo.png') }}" />
+                        <img src="{{ URL::asset('panel-assets/admin-logo/sidebar-Logo.png') }}" class="sidebar-main-logo" />
                     </span>
                 </a>
             </li>

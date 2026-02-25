@@ -50,6 +50,16 @@ class DashboardController extends Controller
             $totalCity = City::where('status', 1)->count();
             $totalProductBrand = ProductBrand::where('status', 1)->count();
 
+            // Total Revenue from Completed Appointments
+            $completedAppointments = Appointment::where('status', 3)->get();
+            $totalRevenue = 0;
+            foreach ($completedAppointments as $app) {
+                $servicesData = $app->services_data;
+                $totalRevenue += (float)($servicesData['summary']['grand_total'] ?? 0);
+            }
+
+            $todayAppointments = Appointment::whereDate('appointment_date', date('Y-m-d'))->count();
+
             return view('admin.dashboard.index', [
                 'totalAppointments'      => $totalAppointments,
                 'totalAppointmentsPending' => $totalAppointmentsPending,
@@ -66,6 +76,8 @@ class DashboardController extends Controller
                 'totalCustomerReviews'   => $totalCustomerReviews,
                 'totalCity'              => $totalCity,
                 'totalProductBrand'      => $totalProductBrand,
+                'totalRevenue'           => $totalRevenue,
+                'todayAppointments'      => $todayAppointments,
             ]);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);

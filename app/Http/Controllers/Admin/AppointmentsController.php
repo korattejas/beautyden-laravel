@@ -34,7 +34,27 @@ class AppointmentsController extends Controller
         try {
             $teamMembers = TeamMember::where('status', 1)->get();
             $cities = City::select('id', 'name')->get();
-            return view('admin.appointments.index', compact('teamMembers', 'cities'));
+
+            // Calculate statistics
+            $totalAppointments = Appointment::count();
+            $pendingAppointments = Appointment::where('status', 1)->count();
+            $assignedAppointments = Appointment::where('status', 2)->count();
+            $completedAppointments = Appointment::where('status', 3)->count();
+
+            // Calculate total revenue from JSON services_data->summary->grand_total for completed appointments only
+            $totalRevenue = Appointment::where('status', 3)->get()->sum(function ($appointment) {
+                return (float) ($appointment->services_data['summary']['grand_total'] ?? 0);
+            });
+
+            return view('admin.appointments.index', compact(
+                'teamMembers',
+                'cities',
+                'totalAppointments',
+                'pendingAppointments',
+                'assignedAppointments',
+                'completedAppointments',
+                'totalRevenue'
+            ));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -224,6 +244,10 @@ class AppointmentsController extends Controller
                     $appointments->where('appointments.city_id', $request->city_id);
                 }
 
+                if ($request->team_member_id) {
+                    $appointments->whereRaw("FIND_IN_SET(?, appointments.assigned_to)", [$request->team_member_id]);
+                }
+
                 return DataTables::of($appointments)
                     ->addColumn('service_name', function ($appointment) {
                         $serviceNames = [];
@@ -235,18 +259,49 @@ class AppointmentsController extends Controller
                         return implode(', ', $serviceNames);
                     })
                     ->addColumn('status', function ($appointment) {
+                        $statusBadge = '';
                         switch ($appointment->status) {
                             case '1':
-                                return '<span class="badge badge-glow bg-warning text-dark">Pending</span>';
+                                $statusBadge = '<span class="badge badge-glow bg-warning text-dark">Pending</span>';
+                                break;
                             case '2':
-                                return '<span class="badge badge-glow bg-info text-dark">Assigned</span>';
+                                $statusBadge = '<span class="badge badge-glow bg-info text-dark">Assigned</span>';
+                                break;
                             case '3':
-                                return '<span class="badge badge-glow bg-success">Completed</span>';
+                                $statusBadge = '<span class="badge badge-glow bg-success">Completed</span>';
+                                break;
                             case '4':
-                                return '<span class="badge badge-glow bg-danger">Rejected</span>';
+                                $statusBadge = '<span class="badge badge-glow bg-danger">Rejected</span>';
+                                break;
                             default:
-                                return '<span class="badge badge-glow bg-secondary">Unknown</span>';
+                                $statusBadge = '<span class="badge badge-glow bg-secondary">Unknown</span>';
                         }
+
+                        $dropdown = '<div class="dropdown">
+                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown" aria-expanded="false">
+                                ' . $statusBadge . '
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item status-change" href="javascript:void(0);" data-id="' . $appointment->id . '" data-change-status="1">
+                                    <i class="bi bi-clock-history me-50 text-warning"></i>
+                                    <span>Pending</span>
+                                </a>
+                                <a class="dropdown-item status-change" href="javascript:void(0);" data-id="' . $appointment->id . '" data-change-status="2">
+                                    <i class="bi bi-person-check me-50 text-info"></i>
+                                    <span>Assigned</span>
+                                </a>
+                                <a class="dropdown-item status-change" href="javascript:void(0);" data-id="' . $appointment->id . '" data-change-status="3">
+                                    <i class="bi bi-check2-circle me-50 text-success"></i>
+                                    <span>Completed</span>
+                                </a>
+                                <a class="dropdown-item status-change" href="javascript:void(0);" data-id="' . $appointment->id . '" data-change-status="4">
+                                    <i class="bi bi-x-circle me-50 text-danger"></i>
+                                    <span>Rejected</span>
+                                </a>
+                            </div>
+                        </div>';
+
+                        return $dropdown;
                     })
                     ->addColumn('action', function ($appointment) {
                         $action_array = [
@@ -258,6 +313,7 @@ class AppointmentsController extends Controller
                             'assign_id' => $appointment->id,
                             'view_id' => $appointment->id,
                             'pdf_id' => $appointment->id,
+                            'current_members' => $appointment->assigned_to,
                         ];
                         return view('admin.render-view.datable-action', [
                             'action_array' => $action_array
