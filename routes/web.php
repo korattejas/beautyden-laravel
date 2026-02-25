@@ -33,7 +33,6 @@ Route::get('/', function () {
 });
 
 
-
 Route::get('/beautician-contracts', [ContractController::class, 'showAgreements']);
 Route::post('/contracts/verify', [ContractController::class, 'verifyProvider'])->name('contracts.verify');
 Route::get('/contracts/sign', function () {
