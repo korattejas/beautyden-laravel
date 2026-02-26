@@ -30,6 +30,7 @@ class CityController extends Controller
         $function_name = 'getCities';
 
         try {
+
             $cities = DB::table('cities as c')
                 ->select(
                     'c.id',
@@ -40,13 +41,17 @@ class CityController extends Controller
                     DB::raw('CONCAT("' . asset('uploads/city') . '/", c.icon) AS icon'),
                     'c.launch_quarter',
                     'c.status',
-                    DB::raw('CAST(sc.is_popular AS SIGNED) as is_popular')
-
+                    'c.is_popular'
                 )
                 // ->where('c.status', 1)
                 ->orderByDesc('c.is_popular')
                 ->orderBy('c.name', 'ASC')
-                ->get();
+                ->get()
+                ->map(function ($city) {
+                    $city->is_popular = (int) $city->is_popular; // ✅ Force integer
+                    $city->status = (int) $city->status;         // optional but recommended
+                    return $city;
+                });
 
             if ($cities->isEmpty()) {
                 return $this->sendError('No cities found.', $this->backend_error_status);
@@ -57,7 +62,9 @@ class CityController extends Controller
                 'Cities retrieved successfully',
                 $this->success_status
             );
+
         } catch (Exception $e) {
+
             logCatchException($e, $this->controller_name, $function_name);
 
             return $this->sendError(
