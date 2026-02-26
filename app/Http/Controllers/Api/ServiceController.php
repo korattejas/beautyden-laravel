@@ -52,7 +52,8 @@ class ServiceController extends Controller
                     'sc.name',
                     DB::raw('CONCAT("' . asset('uploads/service-subcategory') . '/", sc.icon) AS icon'),
                     'sc.description',
-                    'sc.is_popular'
+                    DB::raw('CAST(sc.is_popular AS SIGNED) as is_popular')
+
                 )
                 ->where('sc.status', 1)
                 ->get();
