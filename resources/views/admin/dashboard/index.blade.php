@@ -184,11 +184,33 @@
         letter-spacing: 0.5px;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .dashboard-welcome h1 { font-size: 1.6rem; }
-        .primary-stats-grid { grid-template-columns: 1fr 1fr; }
-        .module-grid { grid-template-columns: 1fr 1fr; }
+    /* Chart Section */
+    .chart-container {
+        background: #fff;
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        margin-bottom: 2.5rem;
+    }
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .chart-header h4 {
+        margin: 0;
+        font-weight: 700;
+        color: var(--mst-indigo);
+    }
+    .chart-badge {
+        background: var(--mst-indigo-light);
+        color: var(--mst-indigo);
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
     }
 
 </style>
@@ -243,6 +265,44 @@
                         <div class="stat-value">{{ $totalTeamMember }}</div>
                         <div class="stat-label">Expert Professionals</div>
                     </a>
+                </div>
+
+                <!-- Performance Analytics -->
+                <div class="dashboard-section">
+                    <div class="section-title">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        <h4>Appointment Analytics</h4>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Date-wise Chart -->
+                        <div class="col-lg-8">
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <div>
+                                        <h4>Daily Completions</h4>
+                                        <span class="text-muted small">Completed appointments for the current month</span>
+                                    </div>
+                                    <span class="chart-badge">Current Month</span>
+                                </div>
+                                <div id="completed-appointments-chart"></div>
+                            </div>
+                        </div>
+
+                        <!-- Time-wise Chart -->
+                        <div class="col-lg-4">
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <div>
+                                        <h4>Hourly Load</h4>
+                                        <span class="text-muted small">Completions by hour today</span>
+                                    </div>
+                                    <span class="chart-badge" style="background: #ecfdf5; color: #059669;">Today</span>
+                                </div>
+                                <div id="hourly-completions-chart"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Content Management Group -->
@@ -335,4 +395,136 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('footer_script_content')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Daily Chart (Date-wise)
+        const chartLabels = @json($chartLabels);
+        const chartData = @json($chartData);
+
+        const dailyOptions = {
+            series: [{
+                name: 'Completed Appointments',
+                data: chartData
+            }],
+            chart: {
+                type: 'area',
+                height: 350,
+                toolbar: { show: false },
+                zoom: { enabled: false },
+                fontFamily: 'Montserrat, sans-serif'
+            },
+            dataLabels: { enabled: false },
+            stroke: { curve: 'smooth', width: 3, colors: ['#102365'] },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.4,
+                    opacityTo: 0.05,
+                    stops: [0, 90, 100],
+                    colorStops: [
+                        { offset: 0, color: "#102365", opacity: 0.4 },
+                        { offset: 100, color: "#102365", opacity: 0.05 }
+                    ]
+                }
+            },
+            xaxis: {
+                categories: chartLabels,
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                labels: { style: { colors: '#64748b', fontSize: '11px' } }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: '#64748b', fontSize: '11px' },
+                    formatter: function (val) { return val.toFixed(0); }
+                }
+            },
+            grid: {
+                borderColor: '#f1f5f9',
+                strokeDashArray: 4,
+                padding: { left: 10, right: 10 }
+            },
+            colors: ['#102365'],
+            tooltip: {
+                theme: 'light',
+                y: { formatter: function (val) { return val + " Appointments"; } }
+            },
+            markers: {
+                size: 4,
+                colors: ['#fff'],
+                strokeColors: '#102365',
+                strokeWidth: 2,
+                hover: { size: 6 }
+            }
+        };
+
+        if(document.querySelector("#completed-appointments-chart")) {
+            const dailyChart = new ApexCharts(document.querySelector("#completed-appointments-chart"), dailyOptions);
+            dailyChart.render();
+        }
+
+        // Hourly Chart (Time-wise)
+        const hourlyData = @json($todayHourlyData);
+        const hourlyLabels = Array.from({length: 24}, (_, i) => `${i}:00`);
+
+        const hourlyOptions = {
+            series: [{
+                name: 'Completions',
+                data: hourlyData
+            }],
+            chart: {
+                type: 'bar',
+                height: 350,
+                toolbar: { show: false },
+                fontFamily: 'Montserrat, sans-serif'
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 6,
+                    columnWidth: '60%',
+                    distributed: true
+                }
+            },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            colors: ['#102365', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'],
+            xaxis: {
+                categories: hourlyLabels,
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                labels: {
+                    show: true,
+                    rotate: -45,
+                    style: { colors: '#64748b', fontSize: '10px' },
+                    formatter: function(val, index) {
+                        return index % 3 === 0 ? val : '';
+                    }
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: '#64748b', fontSize: '11px' },
+                    formatter: function (val) { return val.toFixed(0); }
+                }
+            },
+            grid: {
+                borderColor: '#f1f5f9',
+                strokeDashArray: 4
+            },
+            tooltip: {
+                theme: 'light',
+                y: { formatter: function (val) { return val + " Appointments"; } }
+            }
+        };
+
+        if(document.querySelector("#hourly-completions-chart")) {
+            const hourlyChart = new ApexCharts(document.querySelector("#hourly-completions-chart"), hourlyOptions);
+            hourlyChart.render();
+        }
+    });
+</script>
 @endsection

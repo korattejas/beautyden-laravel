@@ -60,6 +60,30 @@ class DashboardController extends Controller
 
             $todayAppointments = Appointment::whereDate('appointment_date', date('Y-m-d'))->count();
 
+            // Completed Appointments Chart Data (Current Month Only)
+            $startDate = now()->startOfMonth();
+            $endDate = now()->endOfMonth();
+            $totalDays = $startDate->daysInMonth;
+
+            $completedAppointmentData = Appointment::where('status', 3)
+                ->whereBetween('appointment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+                ->selectRaw('appointment_date, count(*) as total')
+                ->groupBy('appointment_date')
+                ->orderBy('appointment_date', 'ASC')
+                ->get();
+
+            $chartLabels = [];
+            $chartData = [];
+            
+            // Fill all dates of the current month
+            for ($i = 0; $i < $totalDays; $i++) {
+                $currentDate = $startDate->copy()->addDays($i);
+                $dateString = $currentDate->format('Y-m-d');
+                $chartLabels[] = $currentDate->format('d M');
+                $found = $completedAppointmentData->firstWhere('appointment_date', $dateString);
+                $chartData[] = $found ? $found->total : 0;
+            }
+
             return view('admin.dashboard.index', [
                 'totalAppointments'      => $totalAppointments,
                 'totalAppointmentsPending' => $totalAppointmentsPending,
@@ -78,10 +102,30 @@ class DashboardController extends Controller
                 'totalProductBrand'      => $totalProductBrand,
                 'totalRevenue'           => $totalRevenue,
                 'todayAppointments'      => $todayAppointments,
+                'chartLabels'            => $chartLabels,
+                'chartData'              => $chartData,
+                'todayHourlyData'        => $this->getTodayHourlyData(),
             ]);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
         }
+    }
+
+    private function getTodayHourlyData()
+    {
+        $todayCompletions = Appointment::where('status', 3)
+            ->whereDate('appointment_date', date('Y-m-d'))
+            ->get();
+
+        $hourlyData = array_fill(0, 24, 0);
+        foreach ($todayCompletions as $app) {
+            if ($app->appointment_time) {
+                $hour = (int)date('H', strtotime($app->appointment_time));
+                $hourlyData[$hour]++;
+            }
+        }
+
+        return $hourlyData;
     }
 }

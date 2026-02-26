@@ -273,6 +273,160 @@
         font-size: 1.4rem;
         color: #7367f0;
     }
+
+    /* Premium Table Layout Optimization */
+    .card-datatable {
+        padding: 0.5rem;
+        overflow-x: auto;
+    }
+    #table-appointments {
+        width: 100% !important;
+        border-spacing: 0 10px !important;
+        border-collapse: separate !important;
+    }
+    #table-appointments thead th {
+        border-bottom: 2px solid #ebe9f1 !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.82rem;
+        padding: 12px 10px !important;
+        color: #5e5873;
+        background-color: #f8f8f8;
+    }
+    #table-appointments tbody tr {
+        transition: all 0.25s ease;
+        cursor: pointer;
+    }
+    #table-appointments tbody tr:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(115,103,240,0.1);
+        background-color: #fcfaff !important;
+    }
+    #table-appointments td {
+        padding: 10px !important;
+        vertical-align: middle !important;
+        border-top: none !important;
+    }
+    /* Premium Table Layout Optimization */
+    .card-datatable {
+        padding: 0.5rem;
+    }
+    #table-appointments {
+        width: 100% !important;
+        border-collapse: separate !important;
+        border-spacing: 0 5px !important;
+    }
+    #table-appointments thead th {
+        border-bottom: 2px solid #ebe9f1 !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.82rem;
+        padding: 12px 10px !important;
+        color: #5e5873;
+        background-color: #f8f8f8;
+    }
+    #table-appointments tbody tr {
+        transition: all 0.25s ease;
+    }
+    #table-appointments tbody tr:hover {
+        background-color: #fcfaff !important;
+    }
+    #table-appointments td {
+        padding: 12px 10px !important;
+        vertical-align: middle !important;
+        border-top: 1px solid #ebe9f1 !important;
+    }
+    
+    /* Ensure dropdowns are not cut off */
+    .dataTables_wrapper .table-responsive {
+        overflow: visible !important;
+    }
+    .card-datatable {
+        overflow: visible !important;
+    }
+    
+    /* Z-index Fix for Dropdowns vs Badges */
+    .dropdown-menu.show {
+        z-index: 9999 !important;
+        position: fixed !important; /* Force to top-level stacking context if possible */
+    }
+    
+    .badge {
+        z-index: 1 !important;
+        position: relative;
+    }
+    
+    .badge-glow {
+        box-shadow: none !important; /* Remove glow if it causes rendering issues */
+        z-index: 1 !important;
+    }
+
+    #table-appointments tbody tr {
+        position: relative;
+    }
+    
+    /* Make sure the row with the open dropdown is on top */
+    #table-appointments tbody tr:has(.dropdown-menu.show) {
+        z-index: 1000 !important;
+    }
+    /* Stat Filter Cards */
+    .stat-filter-card {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        border: 2px solid transparent !important;
+    }
+    .stat-filter-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+        border-color: rgba(115,103,240,0.3) !important;
+    }
+    .stat-filter-card.active-stat {
+        background-color: #f0edff !important;
+        border-color: #7367f0 !important;
+        box-shadow: 0 4px 15px rgba(115,103,240,0.15) !important;
+    }
+    .stat-filter-card.active-stat h4 {
+        color: #7367f0 !important;
+    }
+
+    /* Premium Period Filter Styling */
+    .period-filter-card {
+        background: #ffffff !important;
+        border: none !important;
+        border-radius: 20px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+        overflow: hidden;
+    }
+    .period-filter-header {
+        background: #f8f9fa;
+        padding: 8px 15px;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .custom-pill-select {
+        appearance: none;
+        background-color: #f3f4f6 !important;
+        border: 2px solid transparent !important;
+        border-radius: 50px !important;
+        padding: 8px 40px 8px 20px !important;
+        font-weight: 600 !important;
+        color: #4b5563 !important;
+        cursor: pointer;
+        transition: all 0.3s ease !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 15px center !important;
+        background-size: 18px !important;
+    }
+    .custom-pill-select:hover {
+        background-color: #e5e7eb !important;
+        transform: translateY(-1px);
+    }
+    .custom-pill-select:focus {
+        border-color: #7367f0 !important;
+        background-color: #ffffff !important;
+        box-shadow: 0 0 0 4px rgba(115,103,240,0.1) !important;
+        outline: none;
+    }
 </style>
 @endsection
 
@@ -352,68 +506,145 @@
         </div>
         <div class="content-body">
             <!-- Summary Boxes -->
+            <!-- Premium Revenue Stats & Time Filter -->
+            <div class="row g-2 mb-2">
+                <div class="col-md-4">
+                    <div class="card h-100 mb-0" style="background: linear-gradient(135deg, #7367f0 0%, #ce9ffc 100%); border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(115,103,240,0.25);">
+                        <div class="card-body p-2 d-flex align-items-center">
+                            <div class="avatar p-1 m-0 me-2" style="background: rgba(255,255,255,0.2); border-radius: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-wallet2 text-white" style="font-size: 1.6rem;"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-white fw-bolder mb-0" style="font-size: 1.6rem;">₹{{ number_format($totalRevenue, 2) }}</h2>
+                                <p class="text-white mb-0" style="opacity: 0.9; font-weight: 600; font-size: 0.9rem; letter-spacing: 0.5px;">TOTAL REVENUE</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 mb-0" style="background: linear-gradient(135deg, #28c76f 0%, #81fbb8 100%); border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(40,199,111,0.25);">
+                        <div class="card-body p-2 d-flex align-items-center">
+                            <div class="avatar p-1 m-0 me-2" style="background: rgba(255,255,255,0.2); border-radius: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-bank2 text-white" style="font-size: 1.6rem;"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-white fw-bolder mb-0" style="font-size: 1.6rem;">₹{{ number_format($companyRevenue, 2) }}</h2>
+                                <p class="text-white mb-0" style="opacity: 0.9; font-weight: 600; font-size: 0.9rem; letter-spacing: 0.5px;">COMPANY REVENUE</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 mb-0 period-filter-card">
+                        <div class="period-filter-header d-flex align-items-center justify-content-center">
+                            <i class="bi bi-calendar3 me-1 text-primary"></i>
+                            <span class="fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 1px; color: #6e6b7b;">Select Period</span>
+                        </div>
+                        <div class="card-body p-2 d-flex align-items-center justify-content-center">
+                            <div class="row g-1 w-100">
+                                <div class="col-6">
+                                    <select id="global-month-filter" class="form-select custom-pill-select w-100">
+                                        <option value="all" {{ $month == 'all' ? 'selected' : '' }}>All Months</option>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ sprintf('%02d', $m) }}" {{ $month == sprintf('%02d', $m) ? 'selected' : '' }}>
+                                                {{ date('F', mktime(0, 0, 0, $m, 1)) }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <select id="global-year-filter" class="form-select custom-pill-select w-100">
+                                        <option value="all" {{ $year == 'all' ? 'selected' : '' }}>All Years</option>
+                                        @php
+                                            $currentYear = date('Y');
+                                        @endphp
+                                        @for ($y = $currentYear - 2; $y <= $currentYear + 1; $y++)
+                                            <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Stats Row - Quick Filters -->
             <div class="row g-1 mb-2">
-                <div class="col">
-                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                <div class="col-md-2 col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card active-stat" data-type="total">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #f3e8ff !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-calendar-check" style="font-size: 1.2rem; color: #7c3aed;"></i>
                             </div>
                             <div class="ms-1">
                                 <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $totalAppointments }}</h4>
-                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Total</p>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Total</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                <div class="col-md-2 col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="today">
                         <div class="card-body d-flex align-items-center p-1">
-                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #ecfdf5 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-currency-rupee" style="font-size: 1.2rem; color: #059669;"></i>
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fff1f2 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-calendar-day" style="font-size: 1.2rem; color: #e11d48;"></i>
                             </div>
                             <div class="ms-1">
-                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">₹{{ number_format($totalRevenue, 2) }}</h4>
-                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Revenue</p>
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $todayAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Today</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                <div class="col-md-2 col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="pending">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fff7ed !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-clock-history" style="font-size: 1.2rem; color: #ea580c;"></i>
                             </div>
                             <div class="ms-1">
                                 <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $pendingAppointments }}</h4>
-                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Pending</p>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Pending</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                <div class="col-md-2 col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="2" data-is-status="true">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #e0f2fe !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-person-check" style="font-size: 1.2rem; color: #0284c7;"></i>
                             </div>
                             <div class="ms-1">
                                 <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $assignedAppointments }}</h4>
-                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Assigned</p>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Assigned</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card h-100 mb-0" style="border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                <div class="col-md-2 col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="3" data-is-status="true">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #dcfce7 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-check2-circle" style="font-size: 1.2rem; color: #16a34a;"></i>
                             </div>
                             <div class="ms-1">
                                 <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $completedAppointments }}</h4>
-                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 1rem;">Completed</p>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="4" data-is-status="true">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fee2e2 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-x-circle" style="font-size: 1.2rem; color: #dc2626;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $rejectedAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Rejected</p>
                             </div>
                         </div>
                     </div>
@@ -433,16 +664,13 @@
                                             {{-- <th>Service Category</th> --}}
                                             {{-- <th>Service</th> --}}
                                             <th>Order Number</th>
-                                            <th>First Name</th>
-                                            {{-- <th>Last Name</th> --}}
+                                            <th>Client</th>
                                             <th>Phone</th>
-                                            {{-- <th>Quantity</th> --}}
-                                            {{-- <th>Price</th> --}}
-                                            {{-- <th>Discount Price</th> --}}
-                                            {{-- <th>Service Address</th> --}}
-                                            <th>Appointment Date</th>
-                                            <th>Appointment Time</th>
-                                            <th data-stuff="Pending,Assigned,Completed,Rejected">Status</th>
+                                            <th>Schedule</th>
+                                            <th>Assigned To</th>
+                                            <th>Grand Total</th>
+                                            <th>Company Amount</th>
+                                            <th data-search="false">Status</th>
                                             <th data-search="false">Action</th>
                                         </tr>
                                     </thead>
@@ -591,6 +819,31 @@
     const sweetalert_delete_title = "Delete Appointment?";
     const sweetalert_change_status = "Change Status of Appointment";
     const form_url = '/appointments';
+    $(document).on('change', '#global-month-filter, #global-year-filter', function() {
+        let month = $('#global-month-filter').val();
+        let year = $('#global-year-filter').val();
+        let url = new URL(window.location.href);
+        url.searchParams.set('month', month);
+        url.searchParams.set('year', year);
+        window.location.href = url.toString();
+    });
+
+    window.currentFilterType = 'total';
+    $(document).on('click', '.stat-filter-card', function() {
+        $('.stat-filter-card').removeClass('active-stat');
+        $(this).addClass('active-stat');
+        window.currentFilterType = $(this).data('type');
+        
+        // Show/hide status filter based on whether we are using status-specific filter
+        if ($(this).data('is-status')) {
+            $('#filter-status').val($(this).data('type'));
+        } else if (window.currentFilterType !== 'total') {
+            $('#filter-status').val(''); // Reset status if using other filter
+        }
+        
+        $('.dt-column-search').DataTable().ajax.reload();
+    });
+
     datatable_url = '/getDataAppointments';
     
     // Member Selection Logic
@@ -682,17 +935,21 @@
                 data: 'phone',
                 name: 'phone'
             },
-            // { data: 'quantity', name: 'quantity' },
-            // { data: 'price', name: 'price' },
-            // { data: 'discount_price', name: 'discount_price' },
-            // { data: 'service_address', name: 'service_address' },
             {
-                data: 'appointment_date',
+                data: 'schedule',
                 name: 'appointment_date'
             },
             {
-                data: 'appointment_time',
-                name: 'appointment_time'
+                data: 'assigned_to_name',
+                name: 'assigned_to_name'
+            },
+            {
+                data: 'grand_total',
+                name: 'grand_total'
+            },
+            {
+                data: 'company_amount',
+                name: 'company_amount'
             },
             {
                 data: 'status',
@@ -703,9 +960,6 @@
                 name: 'action',
                 orderable: false
             },
-        ],
-        order: [
-            [4, 'DESC']
         ],
     });
 
@@ -869,6 +1123,10 @@
                             <span>Traveling Charges</span>
                             <span style="font-weight: 700; color: #1e293b;">+ ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}</span>
                         </div>
+                        <div class="summary-line" style="background: #f0edff; margin: 0 -10px 10px; padding: 10px; border-radius: 8px;">
+                            <span style="font-weight: 700;">Company Amount</span>
+                            <span style="font-weight: 800; color: #7367f0;">₹${parseFloat(data.company_amount || 0).toFixed(2)}</span>
+                        </div>
                         <div class="summary-line text-danger">
                             <span style="font-weight: 600;">Discount (${summary.discount_percent || 0}%)</span>
                             <span style="font-weight: 700;">- ₹${parseFloat(summary.discount_amount || 0).toFixed(2)}</span>
@@ -909,44 +1167,45 @@
         let summary = d.summary || {};
         let services = d.services || [];
 
-        let text = `🌟 APPOINTMENT DETAILS 🌟\n\n`;
-        text += `👤 CLIENT INFORMATION\n`;
-        text += `Name: ${client.first_name} ${client.last_name}\n`;
+        let text = `Hello ${client.first_name}! 👋\n\n`;
+        text += `Your appointment with BeautyDen has been successfully booked. 💖\n\n`;
+        
+        text += `📋 Appointment Details\n`;
+        text += `---------------------------------\n`;
+        text += `Order: ${d.order_number}\n`;
+        text += `Customer: ${client.first_name} ${client.last_name || ''}\n`;
         text += `Phone: ${client.phone}\n`;
-        text += `Email: ${client.email}\n\n`;
-
-        text += `📅 SCHEDULE & LOCATION\n`;
+        text += `City: ${d.city_name || 'Ahmedabad'}\n`;
         text += `Date: ${appointment.date}\n`;
         text += `Time: ${appointment.time}\n`;
         text += `Address: ${appointment.address}\n\n`;
 
-        text += `🛠️ SERVICES\n`;
-        services.forEach((s, idx) => {
-            text += `${idx + 1}. ${s.name} (x${s.qty}) - ₹${s.total}\n`;
+        text += `🛍 Services:\n`;
+        text += `---------------------------------\n`;
+        services.forEach((s) => {
+            text += `${s.name} (${s.qty} x ₹${parseFloat(s.price).toFixed(0)}) = ₹${parseFloat(s.total).toFixed(0)}\n`;
         });
-        text += `\n💰 FINANCIAL SUMMARY\n`;
-        text += `Subtotal: ₹${summary.sub_total}\n`;
-        text += `Travel Charges: ₹${summary.travel_charges}\n`;
-
-        text += `Grand Total: ₹${summary.grand_total}\n\n`;
+        text += `---------------------------------\n`;
+        
+        text += `Subtotal: ₹${parseFloat(summary.sub_total || 0).toFixed(2)}\n`;
+        text += `Discount: - ₹${parseFloat(summary.discount_amount || 0).toFixed(2)}\n`;
+        text += `Travel Charges: + ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}\n`;
+        text += `Grand Total: ₹${parseFloat(summary.grand_total || 0).toFixed(2)}\n\n`;
 
         text += `We’ll review your booking and confirm shortly.\n`;
         text += `Thank you for choosing BeautyDen 💖\n\n`;
         text += `📞 Support: +91 95747 58282`;
 
         navigator.clipboard.writeText(text).then(() => {
-
             let btn = $('#copyAppointmentData');
             btn.html('<i class="bi bi-check-circle"></i> Copied');
             btn.css('background', '#28a745');
 
             setTimeout(() => {
-                btn.html('<i class="bi bi-clipboard"></i> Copy');
-                btn.css('background', '#1a4a7a');
+                btn.html('<i class="bi bi-clipboard2-check"></i> <span>Copy Details</span>');
+                btn.css('background', 'rgba(255,255,255,0.15)');
             }, 2000);
-
         });
-
     });
 
 
@@ -955,6 +1214,90 @@
     $(document).on("click", "[data-c-close]", function() {
         $("#c-viewAppointmentModal").removeClass("show");
     });
+
+    // Inline edit for Company Amount
+    $(document).on('click', '.amount-display', function() {
+        let wrapper = $(this).closest('.editable-amount-wrapper');
+        $(this).addClass('d-none');
+        wrapper.find('.amount-input').removeClass('d-none').focus();
+    });
+
+    $(document).on('blur', '.amount-input', function() {
+        saveInlineAmount($(this));
+    });
+
+    $(document).on('keypress', '.amount-input', function(e) {
+        if (e.which == 13) {
+            $(this).blur();
+        }
+    });
+
+    function saveInlineAmount(input) {
+        let wrapper = input.closest('.editable-amount-wrapper');
+        let id = wrapper.data('id');
+        let amount = input.val();
+        let display = wrapper.find('.amount-display');
+
+        if (input.hasClass('updating')) return;
+        input.addClass('updating');
+
+        $.ajax({
+            url: '{{ route("admin.appointments.updateAmount") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: id,
+                amount: amount
+            },
+            success: function(response) {
+                if (response.success) {
+                    display.text(response.formatted_amount);
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+                input.addClass('d-none').removeClass('updating');
+                display.removeClass('d-none');
+            },
+            error: function(xhr) {
+                toastr.error('Failed to update amount');
+                input.addClass('d-none').removeClass('updating');
+                display.removeClass('d-none');
+            }
+        });
+    }
+
+    // Row click to open view modal
+    $('#table-appointments tbody').on('click', 'tr', function (e) {
+        // Don't trigger if clicking on action items or inputs
+        if ($(e.target).closest('.dropdown, .amount-input, .amount-display, button, a').length) {
+            return;
+        }
+        
+        // Find the view button in this row and trigger it
+        let viewBtn = $(this).find('.btn-view');
+        if (viewBtn.length) {
+            viewBtn.click();
+        } else {
+            // Fallback for DataTables data-driven access
+            let data = $('#table-appointments').DataTable().row(this).data();
+            if (data && data.id) {
+                // If it's a manual click without the btn-view in DOM (rare in DT)
+                viewAppointment(data.id);
+            }
+        }
+    });
+
+    function viewAppointment(id) {
+        $.ajax({
+            url: "{{ url('admin/appointments-view') }}/" + id,
+            method: 'GET',
+            success: function(response) {
+                renderAppointmentDetail(response.data);
+                $("#c-viewAppointmentModal").addClass("show");
+            }
+        });
+    }
 </script>
 <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
 @endsection

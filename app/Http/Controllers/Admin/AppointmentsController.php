@@ -28,23 +28,39 @@ class AppointmentsController extends Controller
         $this->controller_name = "Admin/AppointmentsController";
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $function_name = 'index';
         try {
             $teamMembers = TeamMember::where('status', 1)->get();
             $cities = City::select('id', 'name')->get();
 
-            // Calculate statistics
-            $totalAppointments = Appointment::count();
-            $pendingAppointments = Appointment::where('status', 1)->count();
-            $assignedAppointments = Appointment::where('status', 2)->count();
-            $completedAppointments = Appointment::where('status', 3)->count();
+            $month = $request->month ?? 'all';
+            $year = $request->year ?? 'all';
 
-            // Calculate total revenue from JSON services_data->summary->grand_total for completed appointments only
-            $totalRevenue = Appointment::where('status', 3)->get()->sum(function ($appointment) {
+            $query = Appointment::query();
+            if ($month != 'all') {
+                $query->whereMonth('appointment_date', $month);
+            }
+            if ($year != 'all') {
+                $query->whereYear('appointment_date', $year);
+            }
+
+            // Statistics based on filtered query
+            $totalAppointments = (clone $query)->count();
+            $pendingAppointments = (clone $query)->where('status', 1)->count();
+            $assignedAppointments = (clone $query)->where('status', 2)->count();
+            $completedAppointments = (clone $query)->where('status', 3)->count();
+            $todayAppointments = (clone $query)->whereDate('appointment_date', today())->count();
+            $rejectedAppointments = (clone $query)->where('status', 4)->count();
+
+            // Calculate total revenue for filtered completed appointments
+            $totalRevenue = (clone $query)->where('status', 3)->get()->sum(function ($appointment) {
                 return (float) ($appointment->services_data['summary']['grand_total'] ?? 0);
             });
+
+            // Calculate company revenue for filtered completed appointments
+            $companyRevenue = (clone $query)->where('status', 3)->sum('company_amount');
 
             return view('admin.appointments.index', compact(
                 'teamMembers',
@@ -53,7 +69,12 @@ class AppointmentsController extends Controller
                 'pendingAppointments',
                 'assignedAppointments',
                 'completedAppointments',
-                'totalRevenue'
+                'totalRevenue',
+                'companyRevenue',
+                'todayAppointments',
+                'rejectedAppointments',
+                'month',
+                'year'
             ));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
@@ -194,6 +215,7 @@ class AppointmentsController extends Controller
                     'service_address'    => $appointment->service_address,
                     'special_notes'    => $appointment->special_notes,
                     'status'          => $appointment->status,
+                    'company_amount'  => $appointment->company_amount,
                     'city_name'       => $appointment->city_name,
                     'created_at'      => $appointment->created_at,
                     'updated_at'      => $appointment->updated_at,
@@ -222,7 +244,28 @@ class AppointmentsController extends Controller
                     ->select(
                         'appointments.*',
                         'sc.name as service_category_name'
-                    );
+                    )
+                    ->orderBy('appointments.appointment_date', 'DESC');
+
+                if ($request->month && $request->month != 'all') {
+                    $appointments->whereMonth('appointments.appointment_date', $request->month);
+                }
+
+                if ($request->year && $request->year != 'all') {
+                    $appointments->whereYear('appointments.appointment_date', $request->year);
+                }
+
+                if ($request->filter_type) {
+                    if ($request->filter_type == 'today') {
+                        $appointments->whereDate('appointments.appointment_date', today());
+                    } elseif ($request->filter_type == 'unassigned') {
+                        $appointments->where(function($q) {
+                            $q->whereNull('appointments.assigned_to')->orWhere('appointments.assigned_to', '');
+                        });
+                    } elseif ($request->filter_type == 'pending') {
+                        $appointments->where('appointments.status', 1);
+                    }
+                }
 
                 if ($request->status !== null && $request->status !== '') {
                     $appointments->where('appointments.status', $request->status);
@@ -258,6 +301,43 @@ class AppointmentsController extends Controller
                         }
                         return implode(', ', $serviceNames);
                     })
+                    ->addColumn('assigned_to_name', function ($appointment) {
+                        $memberNames = [];
+                        if (!empty($appointment->assigned_to)) {
+                            $memberIds = explode(',', $appointment->assigned_to);
+                            $members = TeamMember::whereIn('id', $memberIds)->pluck('name')->toArray();
+                            
+                            $html = '<div class="d-flex flex-wrap gap-25">';
+                            foreach($members as $name) {
+                                $html .= '<span class="badge rounded-pill bg-light-primary text-primary border-primary" style="padding: 0.6em 1.2em; font-weight: 700; font-size: 0.95rem;">
+                                            <i class="bi bi-person-fill me-50" style="font-size: 1.1rem;"></i> ' . $name . '
+                                         </span>';
+                            }
+                            $html .= '</div>';
+                            return $html;
+                        }
+                        return '<span class="badge rounded-pill bg-light-secondary text-secondary" style="padding: 0.6em 1.2em; font-size: 0.95rem;">
+                                    <i class="bi bi-person-x me-50" style="font-size: 1.1rem;"></i> Not Assigned
+                                </span>';
+                    })
+                    ->addColumn('schedule', function ($appointment) {
+                        $date = \Carbon\Carbon::parse($appointment->appointment_date)->format('d-m-Y');
+                        $time = !empty($appointment->appointment_time) ? \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') : '';
+                        return '<div style="line-height: 1.2;"><b>'.$date.'</b><br><span class="text-muted" style="font-size: 0.95rem; font-weight: 600;">'.$time.'</span></div>';
+                    })
+                    ->addColumn('grand_total', function ($appointment) {
+                        $grandTotal = 0;
+                        if (!empty($appointment->services_data) && isset($appointment->services_data['summary']['grand_total'])) {
+                            $grandTotal = $appointment->services_data['summary']['grand_total'];
+                        }
+                        return '<span class="fw-bolder">₹' . number_format($grandTotal, 2) . '</span>';
+                    })
+                    ->addColumn('company_amount', function ($appointment) {
+                        return '<div class="editable-amount-wrapper" data-id="'.$appointment->id.'">
+                                    <span class="amount-display fw-bolder text-primary" style="cursor: pointer; border-bottom: 1px dashed #7367f0;">₹' . number_format($appointment->company_amount ?? 0, 2) . '</span>
+                                    <input type="number" step="0.01" class="form-control form-control-sm amount-input d-none" value="'.($appointment->company_amount ?? 0).'" style="width: 100px; display: inline-block;">
+                                </div>';
+                    })
                     ->addColumn('status', function ($appointment) {
                         $statusBadge = '';
                         switch ($appointment->status) {
@@ -278,10 +358,10 @@ class AppointmentsController extends Controller
                         }
 
                         $dropdown = '<div class="dropdown">
-                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false">
                                 ' . $statusBadge . '
                             </button>
-                            <div class="dropdown-menu dropdown-menu-end">
+                            <div class="dropdown-menu dropdown-menu-end shadow" style="background-color: #ffffff !important; z-index: 9999;">
                                 <a class="dropdown-item status-change" href="javascript:void(0);" data-id="' . $appointment->id . '" data-change-status="1">
                                     <i class="bi bi-clock-history me-50 text-warning"></i>
                                     <span>Pending</span>
@@ -319,7 +399,7 @@ class AppointmentsController extends Controller
                             'action_array' => $action_array
                         ])->render();
                     })
-                    ->rawColumns(['action', 'service_name', 'status'])
+                    ->rawColumns(['action', 'service_name', 'status', 'assigned_to_name', 'company_amount', 'grand_total', 'schedule'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -351,6 +431,7 @@ class AppointmentsController extends Controller
                 'status'              => 'required|in:1,2,3,4', // 1=Pending, 2=Assigned, 3=Completed, 4=Rejected
                 'assigned_to'         => 'nullable|string|max:150',
                 'assigned_by'         => 'nullable|string|max:100',
+                'company_amount'      => 'nullable|numeric',
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -384,6 +465,7 @@ class AppointmentsController extends Controller
                 'special_notes'       => $request->special_notes,
                 'services_data'      => $servicesJson,
                 'status'              => $request->status,
+                'company_amount'      => $request->company_amount,
                 //'assigned_to'         => $request->assigned_to,
                 //'assigned_by'         => $request->assigned_by,
             ];
@@ -503,6 +585,27 @@ class AppointmentsController extends Controller
             return $pdf->download($fileName);
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
+        }
+    }
+
+    public function updateAmount(Request $request)
+    {
+        try {
+            $appointment = Appointment::findOrFail($request->id);
+            $appointment->update([
+                'company_amount' => $request->amount
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Amount updated successfully',
+                'formatted_amount' => '₹' . number_format($request->amount, 2)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update amount: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
