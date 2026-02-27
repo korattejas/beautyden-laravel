@@ -273,6 +273,7 @@
     /* Summary Boxes */
     .summary-stats-row {
         margin-bottom: 2rem;
+        margin-top: 1rem;
     }
 
     .summary-box {

@@ -57,10 +57,10 @@
     }
 
     .member-name {
-        font-weight: 600;
-        font-size: 0.9rem;
+        font-weight: 700;
+        font-size: 1.2rem;
         color: #1e293b;
-        margin-bottom: 2px;
+        margin-bottom: 6px;
         display: block;
         white-space: nowrap;
         overflow: hidden;
@@ -68,9 +68,39 @@
     }
 
     .member-role {
-        font-size: 0.75rem;
+        font-size: 1rem;
         color: #64748b;
         display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .member-experience {
+        font-size: 0.9rem;
+        color: #7367f0;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(115, 103, 240, 0.1);
+        padding: 5px 15px;
+        border-radius: 50px;
+        margin-bottom: 8px;
+    }
+
+    .member-address {
+        font-size: 0.9rem;
+        color: #64748b;
+        display: block;
+        margin-top: 4px;
+        line-height: 1.25;
+        font-weight: 500;
+        padding: 0 5px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .selection-indicator {
@@ -200,10 +230,10 @@
 
     .info-content p {
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 700;
         color: #1e293b;
-        line-height: 1.2;
+        line-height: 1.3;
     }
 
     .premium-table-container {
@@ -332,9 +362,10 @@
         background-color: #fcfaff !important;
     }
     #table-appointments td {
-        padding: 12px 10px !important;
+        padding: 15px 12px !important;
         vertical-align: middle !important;
         border-top: 1px solid #ebe9f1 !important;
+        /* font-size: 1.15rem !important; */
     }
     
     /* Ensure dropdowns are not cut off */
@@ -719,6 +750,13 @@
                             </div>
                             <span class="member-name">{{ $member->name }}</span>
                             <span class="member-role">{{ $member->role ?? 'Professional' }}</span>
+                            <div class="member-experience">
+                                <i class="bi bi-briefcase" style="font-size: 0.65rem;"></i> {{ $member->experience_years ?? 0 }} Years Exp.
+                            </div>
+                            <div class="member-address">
+                                <i class="bi bi-geo-alt-fill" style="font-size: 0.75rem; color: #ef4444;"></i> 
+                                {{ $member->address ? $member->address : ($member->city ? $member->city : 'Location N/A') }}
+                            </div>
                         </div>
                         @endforeach
                     </div>

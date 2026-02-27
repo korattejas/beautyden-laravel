@@ -11,7 +11,7 @@
     <meta name="keywords" content="POSE GALLERY">
     <meta name="author" content="POSE GALLERY">
 
-    <title>Test</title>
+    <title>BeautyDen</title>
 
     @include('admin.layouts.header-css')
     @yield('header_style_content')

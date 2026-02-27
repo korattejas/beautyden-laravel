@@ -199,7 +199,11 @@ class AppointmentsController extends Controller
             $memberIds = array_map('intval', $memberIds);
 
             $teamMembers = TeamMember::whereIn('id', $memberIds)
-                ->pluck('name')
+                ->select('name', 'experience_years')
+                ->get()
+                ->map(function($m) {
+                    return $m->name . ' (' . ($m->experience_years ?? 0) . ' Yr Exp)';
+                })
                 ->toArray();
 
             return response()->json([
