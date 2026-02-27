@@ -23,6 +23,8 @@ class TeamMember extends Model
         'taluko',
         'village',
         'address',
+        'latitude',
+        'longitude',
         'is_popular',
         'status',
     ];

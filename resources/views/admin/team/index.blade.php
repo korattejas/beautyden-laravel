@@ -31,7 +31,7 @@
     .team-member-card {
         background: var(--mst-card-bg);
         border-radius: var(--mst-radius);
-        padding: 1.5rem;
+        padding: 2rem 1.5rem; /* Increased vertical padding */
         box-shadow: var(--mst-shadow);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
@@ -88,10 +88,10 @@
     }
 
     .card-info h5 {
-        margin: 0;
+        margin-bottom: 8px; /* Added spacing */
         font-weight: 700;
         color: var(--mst-text-main);
-        font-size: 1.3rem; /* Increased font size */
+        font-size: 1.35rem; /* Slightly larger */
     }
 
     .card-info .role-label {
@@ -202,16 +202,41 @@
         font-size: 0.95rem;
         border-radius: 0 10px 10px 0 !important;
         box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .search-input-group .form-control:focus {
+        background-color: #fcfdfe;
+    }
+
+    .search-input-group:focus-within {
+        box-shadow: 0 4px 12px rgba(26, 35, 126, 0.1) !important;
     }
 
     .header-btn {
-        padding: 12px 24px !important; /* Larger buttons */
-        font-weight: 600 !important;
-        border-radius: 10px !important;
+        padding: 0 24px !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
         display: flex;
         align-items: center;
-        gap: 8px;
-        height: 48px; /* Fixed height for alignment */
+        gap: 10px;
+        height: 48px;
+        background: linear-gradient(135deg, #1a237e 0%, #311b92 100%) !important;
+        border: none !important;
+        color: #fff !important;
+        box-shadow: 0 4px 15px rgba(26, 35, 126, 0.25) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        white-space: nowrap;
+    }
+
+    .header-btn:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(26, 35, 126, 0.4) !important;
+        background: linear-gradient(135deg, #283593 0%, #4527a0 100%) !important;
+    }
+
+    .header-btn i {
+        font-size: 1.2rem;
     }
 
     /* Pagination Styling */
@@ -313,14 +338,14 @@
         padding: 15px 18px;
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.8rem;
+        font-size: 0.95rem; /* Increased from 0.8rem */
         color: var(--mst-text-muted);
         text-align: left;
         border-radius: 8px;
     }
     .report-table td {
         padding: 18px;
-        font-size: 1rem;
+        font-size: 1.15rem; /* Increased from 1rem */
         font-weight: 600;
         color: var(--mst-text-main);
         background: #fff;
@@ -333,14 +358,300 @@
     .report-table tr:hover td { background: #f8faff; }
     
     .report-total-text {
-        font-size: 1.15rem;
+        font-size: 1.3rem; /* Increased from 1.15rem */
         font-weight: 800;
         color: #059669;
     }
 
     .report-modal-header-title {
-        font-size: 1.25rem;
+        font-size: 1.4rem; /* Increased from 1.25rem */
         font-weight: 700;
+    }
+
+    /* Premium Location Alert - Glassmorphism Edit */
+    .location-banner {
+        background: rgba(14, 165, 233, 0.05);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(14, 165, 233, 0.2);
+        border-radius: 14px;
+        padding: 0.8rem 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 1.5rem;
+        max-width: fit-content; /* Make it fit content instead of full width */
+    }
+
+    .location-icon-box {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: #fff;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
+    }
+
+    .location-text span {
+        display: block;
+        font-size: 0.7rem;
+        color: #0284c7;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .location-text h6 {
+        margin: 0;
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.95rem;
+        line-height: 1.2;
+    }
+
+    .location-badge {
+        background: #0ea5e9;
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        margin-left: 10px;
+    }
+
+    /* Distance Badge Refinement */
+    .distance-pill {
+        background: #f0f9ff;
+        color: #0284c7;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-size: 0.9rem; /* Increased font size */
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1.5px solid #e0f2fe;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .distance-pill i {
+        font-size: 1rem;
+    }
+
+    .search-input-group {
+        width: 400px !important; /* Increased width */
+        max-width: 400px !important;
+        margin-right: 15px !important;
+    }
+
+    .role-label {
+        font-size: 0.9rem !important;
+        padding: 5px 15px !important;
+    }
+
+    /* Custom Premium Modal Styles */
+    .c-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(8px);
+        z-index: 1050;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .c-modal.show {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .c-modal-dialog {
+        width: 90%;
+        max-width: 650px;
+        position: relative;
+    }
+
+    .c-modal-content {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        overflow: hidden;
+    }
+
+    .c-modal-header {
+        padding: 1.25rem 1.5rem;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .c-modal-title {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .c-close-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: #fff;
+        font-size: 1.5rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .c-close-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .c-modal-body { padding: 1.5rem; max-height: 80vh; overflow-y: auto; }
+
+    .c-profile-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .c-profile-avatar {
+        width: 110px;
+        height: 110px;
+        border-radius: 24px;
+        object-fit: cover;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border: 4px solid #fff;
+    }
+
+    .c-profile-initials {
+        width: 110px;
+        height: 110px;
+        border-radius: 24px;
+        background: #f1f5f9;
+        color: var(--mst-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        font-weight: 700;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        border: 4px solid #fff;
+    }
+
+    .c-profile-info h4 { margin: 0; font-weight: 800; color: #1e293b; font-size: 1.8rem; }
+    .c-profile-info p { margin: 5px 0 0; color: #64748b; font-weight: 600; font-size: 1.15rem; }
+
+    .c-row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
+    .c-col-6 { width: 50%; padding: 0 10px; margin-bottom: 15px; }
+    .c-col-12 { width: 100%; padding: 0 10px; margin-bottom: 15px; }
+
+    .c-detail-card {
+        background: #f8fafc;
+        padding: 12px 16px;
+        border-radius: 12px;
+        height: 100%;
+        border: 1px solid #eff6ff;
+    }
+
+    .c-detail-card label {
+        display: block;
+        font-size: 0.85rem;
+        color: #0ea5e9;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .c-detail-card p {
+        margin: 0;
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 1.1rem;
+    }
+
+    .c-include-badge {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        padding: 4px 12px;
+        border-radius: 8px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .c-modal-footer {
+        padding: 1.25rem 1.5rem;
+        background: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .c-btn {
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        color: #1a237e;
+    }
+
+    .c-btn:hover { background: #f1f5f9; transform: translateY(-1px); }
+
+    .c-loader { text-align: center; padding: 40px 0; color: #64748b; font-weight: 600; }
+    .c-spinner {
+        width: 32px;
+        height: 32px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #1a237e;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Mobile Responsive Card Details */
+    @media (max-width: 576px) {
+        .c-col-6 { width: 100%; }
+        .c-profile-section { flex-direction: column; text-align: center; }
     }
 
 </style>
@@ -370,10 +681,14 @@
                 <div class="content-header-right text-md-end col-md-8 col-12 d-md-flex align-items-center justify-content-end d-none">
                     <div class="input-group search-input-group shadow-sm">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" id="search-member" class="form-control" placeholder="Search team members..." value="{{ request('search') }}">
+                        <input type="text" id="search-member" class="form-control" placeholder="Search name..." value="{{ request('search') }}">
                     </div>
-                    <a href="{{ route('admin.team.create') }}" class="btn btn-primary header-btn me-1">
-                        <i class="bi bi-plus-lg"></i> Add Team Member
+                    <div class="input-group search-input-group shadow-sm">
+                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                        <input type="text" id="search-address" class="form-control" placeholder="Search address (15km)..." value="{{ request('address_search') }}">
+                    </div>
+                    <a href="{{ route('admin.team.create') }}" class="btn btn-primary header-btn me-2 ms-1">
+                        <i class="bi bi-plus-lg"></i> Add Member
                     </a>
                     <div class="btn-group">
                         <button class="btn btn-outline-secondary dropdown-toggle header-btn" type="button" data-bs-toggle="dropdown"
@@ -449,6 +764,21 @@
             </div>
 
             <div class="content-body">
+                @if(request('address_search'))
+                    <div class="location-banner">
+                        <div class="location-icon-box">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <div class="location-text">
+                            <span>Searching Radius: 2000 k.m.</span>
+                            <h6>Proximity results for: {{ request('address_search') }}</h6>
+                        </div>
+                        <div class="location-badge">
+                            Active filter
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Summary Stats -->
                 <div class="row summary-stats-row">
                     <div class="col-md-3">
@@ -497,7 +827,15 @@
                                 
                                 <div class="card-info">
                                     <h5>{{ $stat['member']->name }}</h5>
-                                    <span class="role-label">{{ $stat['member']->role ?? 'Team Member' }}</span>
+                                    <div class="d-flex align-items-center justify-content-center flex-wrap gap-2 mt-2">
+                                        <span class="role-label">{{ $stat['member']->role ?? 'Team Member' }}</span>
+                                        @if(isset($stat['distance']))
+                                            <div class="distance-pill" title="Distance from searched location">
+                                                <i class="bi bi-cursor-fill"></i>
+                                                {{ $stat['distance'] }} km away
+                                            </div>
+                                        @endif
+                                    </div>
                                     <p class="member-address" title="{{ $stat['member']->address }}">
                                         <i class="bi bi-geo-alt"></i> {{ $stat['member']->address ?: 'No address provided' }}
                                     </p>
@@ -620,22 +958,24 @@
         // Card Filtering Logic
         $(document).on('click', '#btn-apply-card-filters', function() {
             let search = $('#search-member').val();
+            let address_search = $('#search-address').val();
             let status = $('#filter-status').val();
             let popular = $('#filter-popular').val();
             let exp = $('#filter-year-of-experience').val();
             let date = $('#filter-created-date').val();
             let month = $('#filter-month').val();
             let year = $('#filter-year').val();
-
+ 
             let url = new URL(window.location.href);
             if (search) url.searchParams.set('search', search); else url.searchParams.delete('search');
+            if (address_search) url.searchParams.set('address_search', address_search); else url.searchParams.delete('address_search');
             if (status !== "") url.searchParams.set('status', status); else url.searchParams.delete('status');
             if (popular !== "") url.searchParams.set('popular', popular); else url.searchParams.delete('popular');
             if (exp) url.searchParams.set('year_of_experience', exp); else url.searchParams.delete('year_of_experience');
             if (date) url.searchParams.set('created_date', date); else url.searchParams.delete('created_date');
             if (month) url.searchParams.set('month', month); else url.searchParams.delete('month');
             if (year) url.searchParams.set('year', year); else url.searchParams.delete('year');
-
+ 
             window.location.href = url.toString();
         });
 
@@ -644,7 +984,7 @@
         });
 
         // Search on Enter
-        $('#search-member').on('keypress', function(e) {
+        $('#search-member, #search-address').on('keypress', function(e) {
             if(e.which == 13) {
                 $('#btn-apply-card-filters').click();
             }
@@ -794,57 +1134,104 @@
                 type: 'GET',
                 success: function(response) {
                     let data = response.data;
-                    let html = `
-                    <div class="c-row">
-                        <div class="c-col-6"><div class="c-detail-card"><label>Name</label><p>${data.name ?? '-'}</p></div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>Role</label><p>${data.role ?? '-'}</p></div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>Experience (Years)</label><p>${data.experience_years ?? '-'}</p></div></div>
-                        <div class="c-col-12"><div class="c-detail-card"><label>Bio</label><p>${data.bio ?? '-'}</p></div></div>
-                        <div class="c-col-12"><div class="c-detail-card"><label>Specialties</label><p>${
-                            data.specialties 
-                            ? JSON.parse(data.specialties).map(item => `<span class="c-include-badge">${item}</span>`).join(" ") 
-                            : '-'
-                        }</p></div></div>
-                        <div class="c-col-12"><div class="c-detail-card"><label>Certifications</label><p>${
-                            data.certifications 
-                            ? JSON.parse(data.certifications).map(item => `<span class="c-include-badge">${item}</span>`).join(" ") 
-                            : '-'
-                        }</p></div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>Address</label><p>${data.address ?? '-'}</p></div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>City</label><p>${data.city ?? '-'}</p></div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>Taluko</label><p>${data.taluko ?? '-'}</p></div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>Village</label><p>${data.village ?? '-'}</p></div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>State</label><p>${data.state ?? '-'}</p></div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>Status</label>
-                            <p>${data.status == 1 
-                                ? '<span class="badge badge-glow bg-success">Active</span>' 
-                                : '<span class="badge badge-glow bg-danger">InActive</span>'}
-                            </p>
-                        </div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>Is Popular</label>
-                            <p>${data.is_popular == 1 
-                                ? '<span class="badge badge-glow bg-primary">Yes</span>' 
-                                : '<span class="badge badge-glow bg-secondary">No</span>'}
-                            </p>
-                        </div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>Created At</label><p>${data.created_at ? new Date(data.created_at).toLocaleString() : '-'}</p></div></div>
-                        <div class="c-col-6"><div class="c-detail-card"><label>Updated At</label><p>${data.updated_at ? new Date(data.updated_at).toLocaleString() : '-'}</p></div></div>
+                    
+                    // Helpers for Avatar
+                    let avatarHtml = '';
+                    if(data.icon) {
+                        avatarHtml = `<img src="${baseUrl}${data.icon}" class="c-profile-avatar" alt="profile">`;
+                    } else {
+                        let initials = data.name ? data.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??';
+                        avatarHtml = `<div class="c-profile-initials">${initials}</div>`;
+                    }
 
-                        <!-- Icon (Image Preview) -->
+                    let html = `
+                    <div class="c-profile-section">
+                        ${avatarHtml}
+                        <div class="c-profile-info">
+                            <h4>${data.name ?? '-'}</h4>
+                            <p>${data.role ?? '-'}</p>
+                        </div>
+                    </div>
+
+                    <div class="c-row">
+                        <div class="c-col-6">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-telephone"></i> Mobile Number</label>
+                                <p><a href="tel:${data.phone}" style="text-decoration:none; color:inherit;">${data.phone ?? '-'}</a></p>
+                            </div>
+                        </div>
+                        <div class="c-col-6">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-briefcase"></i> Experience</label>
+                                <p>${data.experience_years ?? '-'} Years</p>
+                            </div>
+                        </div>
+                        
                         <div class="c-col-12">
-                            <div class="c-detail-card text-center">
-                                <label>Icon</label><br>
-                                ${
-                                    data.icon 
-                                    ? `<img 
-                                                                    src="${baseUrl + data.icon}" 
-                                                                    alt="Team Icon" 
-                                                                    class="img-fluid service-icon" 
-                                                                    style="max-width:250px; cursor:pointer;" 
-                                                                    onclick="window.open('${baseUrl + data.icon}', '_blank')" 
-                                                                >`
-                                    : '<p>-</p>'
-                                }
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-info-circle"></i> Bio</label>
+                                <p>${data.bio ?? '-'}</p>
+                            </div>
+                        </div>
+
+                        <div class="c-col-12">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-stars"></i> Specialties</label>
+                                <p>${
+                                    data.specialties 
+                                    ? JSON.parse(data.specialties).map(item => `<span class="c-include-badge">${item}</span>`).join("") 
+                                    : '-'
+                                }</p>
+                            </div>
+                        </div>
+
+                        <div class="c-col-12">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-patch-check"></i> Certifications</label>
+                                <p>${
+                                    data.certifications 
+                                    ? JSON.parse(data.certifications).map(item => `<span class="c-include-badge">${item}</span>`).join("") 
+                                    : '-'
+                                }</p>
+                            </div>
+                        </div>
+
+                        <div class="c-col-12">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-geo-alt"></i> Location Details</label>
+                                <p>${data.address ?? ''}${data.village ? ', ' + data.village : ''}${data.taluko ? ', ' + data.taluko : ''}${data.city ? ', ' + data.city : ''}${data.state ? ', ' + data.state : ''}</p>
+                            </div>
+                        </div>
+
+                        <div class="c-col-6">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-toggle-on"></i> Account Status</label>
+                                <p>${data.status == 1 
+                                    ? '<span class="text-success font-weight-bold"><i class="bi bi-check-circle-fill"></i> Active</span>' 
+                                    : '<span class="text-danger font-weight-bold"><i class="bi bi-x-circle-fill"></i> Inactive</span>'
+                                }</p>
+                            </div>
+                        </div>
+
+                        <div class="c-col-6">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-star"></i> Popularity</label>
+                                <p>${data.is_popular == 1 
+                                    ? '<span class="text-warning font-weight-bold"><i class="bi bi-star-fill"></i> Popular</span>' 
+                                    : '<span class="text-muted">Standard</span>'
+                                }</p>
+                            </div>
+                        </div>
+                        <div class="c-col-6">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-calendar-plus"></i> Joined On</label>
+                                <p>${data.created_at ? new Date(data.created_at).toLocaleDateString() : '-'}</p>
+                            </div>
+                        </div>
+                        <div class="c-col-6">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-clock-history"></i> Last Updated</label>
+                                <p>${data.updated_at ? new Date(data.updated_at).toLocaleDateString() : '-'}</p>
                             </div>
                         </div>
                     </div>
@@ -893,6 +1280,8 @@
                                 <thead>
                                     <tr>
                                         <th>Order No.</th>
+                                        <th>Customer</th>
+                                        <th>Mobile</th>
                                         <th>Date</th>
                                         <th>Time</th>
                                         <th>Grand Total</th>
@@ -906,6 +1295,8 @@
                                 html += `
                                     <tr>
                                         <td><strong>${app.order_number}</strong></td>
+                                        <td>${app.customer_name}</td>
+                                        <td><a href="tel:${app.phone}" class="text-primary font-weight-bold" style="text-decoration: none;">${app.phone}</a></td>
                                         <td>${app.date}</td>
                                         <td>${app.time}</td>
                                         <td><span class="report-total-text">${app.total}</span></td>
@@ -913,7 +1304,7 @@
                                 `;
                             });
                         } else {
-                            html += `<tr><td colspan="4" class="text-center py-4 text-muted">No completed appointments found.</td></tr>`;
+                            html += `<tr><td colspan="6" class="text-center py-4 text-muted">No completed appointments found.</td></tr>`;
                         }
 
                         html += `</tbody></table>`;

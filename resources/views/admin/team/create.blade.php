@@ -126,7 +126,31 @@
                                             <div class="col-md-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Address</label>
-                                                    <textarea class="form-control" name="address" rows="2" placeholder="Full Address"></textarea>
+                                                    <textarea class="form-control" name="address" id="member_address" rows="2" placeholder="Full Address"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                <div class="row align-items-end">
+                                                    <div class="col-md-5 mt-2">
+                                                        <div class="form-group">
+                                                            <label>Latitude</label>
+                                                            <input type="text" class="form-control" name="latitude" id="latitude" placeholder="e.g. 23.0225">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-5 mt-2">
+                                                        <div class="form-group">
+                                                            <label>Longitude</label>
+                                                            <input type="text" class="form-control" name="longitude" id="longitude" placeholder="e.g. 72.5714">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2 mt-2">
+                                                        <button type="button" class="btn btn-outline-info w-100" id="btn-fetch-coords" style="height: 40px; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                                            <i class="bi bi-geo-fill"></i> Fetch
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -175,5 +199,42 @@
         var form_url = 'team/store';
         var redirect_url = 'team';
         var is_one_image_and_multiple_image_status = 'is_one_image';
+
+        $('#btn-fetch-coords').on('click', function() {
+            let address = $('#member_address').val();
+            if (!address) {
+                notificationToast('Please enter an address first', 'warning');
+                return;
+            }
+
+            $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+
+            $.ajax({
+                url: 'https://nominatim.openstreetmap.org/search',
+                type: 'GET',
+                data: {
+                    q: address,
+                    format: 'json',
+                    limit: 1,
+                    addressdetails: 1,
+                    countrycodes: 'in'
+                },
+                success: (data) => {
+                    if (data && data.length > 0) {
+                        $('#latitude').val(data[0].lat);
+                        $('#longitude').val(data[0].lon);
+                        notificationToast('Coordinates fetched successfully', 'success');
+                    } else {
+                        notificationToast('Could not find coordinates for this address', 'warning');
+                    }
+                },
+                error: () => {
+                    notificationToast('Error fetching coordinates', 'error');
+                },
+                complete: () => {
+                    $(this).prop('disabled', false).html('<i class="bi bi-geo-fill"></i> Fetch');
+                }
+            });
+        });
     </script>
 @endsection

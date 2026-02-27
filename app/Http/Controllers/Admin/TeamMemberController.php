@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\File;
 use Yajra\DataTables\DataTables;
 use App\Helpers\ImageUploadHelper;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class TeamMemberController extends Controller
 {
@@ -55,6 +56,26 @@ class TeamMemberController extends Controller
                 $query->whereDate('created_at', $request->created_date);
             }
 
+            // Proximity Search
+            $searchLat = $searchLng = null;
+            if ($request->filled('address_search')) {
+                $geo = $this->geocode($request->address_search);
+                if ($geo) {
+                    $searchLat = (float)$geo['lat'];
+                    $searchLng = (float)$geo['lng'];
+                    $radius = 2000; // Updated by user to 2000km
+
+                    // Stable Haversine formula for better precision
+                    $query->selectRaw("team_members.*, 
+                        ( 6371 * 2 * ASIN(SQRT(
+                            POWER(SIN((radians(latitude) - radians(?)) / 2), 2) +
+                            COS(radians(?)) * COS(radians(latitude)) *
+                            POWER(SIN((radians(longitude) - radians(?)) / 2), 2)
+                        ))) AS distance", [$searchLat, $searchLat, $searchLng])
+                        ->having('distance', '<=', $radius);
+                }
+            }
+
             $allMembers = $query->get();
             
             // Summary Stats (Total global counts)
@@ -90,12 +111,20 @@ class TeamMemberController extends Controller
                     'member' => $member,
                     'total_appointments' => $appointments->count(),
                     'total_revenue' => $totalRevenue,
-                    'status_order' => $member->status == 1 ? 0 : 1 // Active first
+                    'status_order' => $member->status == 1 ? 0 : 1, // Active first
+                    'distance' => isset($member->distance) ? round($member->distance, 2) : null
                 ];
             }
 
-            // Global Sort: Active first (by Revenue), then Inactive (by Experience)
-            usort($allStats, function ($a, $b) {
+            // Global Sort
+            usort($allStats, function ($a, $b) use ($request) {
+                // If searching by address, sort primarily by distance
+                if ($request->filled('address_search')) {
+                    if ($a['distance'] !== $b['distance']) {
+                        return $a['distance'] <=> $b['distance'];
+                    }
+                }
+
                 // 1. Sort by Status (Active first)
                 if ($a['status_order'] !== $b['status_order']) {
                     return $a['status_order'] <=> $b['status_order'];
@@ -268,6 +297,8 @@ class TeamMemberController extends Controller
                 'certifications' => 'nullable',
                 'is_popular' => 'nullable|boolean',
                 'status' => 'nullable|boolean',
+                'latitude' => 'nullable|numeric',
+                'longitude' => 'nullable|numeric',
             ];
 
             $validator = Validator::make($request_all, $validateArray);
@@ -325,6 +356,8 @@ class TeamMemberController extends Controller
                 'taluko' => $request->taluko,
                 'village' => $request->village,
                 'address' => $request->address,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
                 'is_popular' => (int) $request->input('is_popular', 0),
                 'status' => (int) $request->input('status', 1),
             ];
@@ -400,6 +433,8 @@ class TeamMemberController extends Controller
                 $servicesData = json_decode($app->services_data, true);
                 $data[] = [
                     'order_number' => $app->order_number,
+                    'customer_name' => ($app->first_name ?? '') . ' ' . ($app->last_name ?? ''),
+                    'phone' => $app->phone,
                     'date' => $app->appointment_date,
                     'time' => $app->appointment_time,
                     'total' => '₹' . number_format((float)($servicesData['summary']['grand_total'] ?? 0), 0),
@@ -414,5 +449,33 @@ class TeamMemberController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    private function geocode($address)
+    {
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => 'BeautyDen-App'
+            ])->get("https://nominatim.openstreetmap.org/search", [
+                'format' => 'json',
+                'q' => $address,
+                'limit' => 1,
+                'addressdetails' => 1,
+                'countrycodes' => 'in' // Filter results for India to improve precision
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                if (!empty($data)) {
+                    return [
+                        'lat' => $data[0]['lat'],
+                        'lng' => $data[0]['lon']
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            logger()->error("Geocoding error: " . $e->getMessage());
+        }
+        return null;
     }
 }
