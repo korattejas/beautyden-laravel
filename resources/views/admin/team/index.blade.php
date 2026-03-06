@@ -346,7 +346,7 @@
     }
     .report-table td {
         padding: 18px;
-        font-size: 1.15rem; /* Increased from 1rem */
+        font-size: 1rem; /* Increased from 1rem */
         font-weight: 600;
         color: var(--mst-text-main);
         background: #fff;
@@ -1283,8 +1283,7 @@
                                         <th>Order No.</th>
                                         <th>Customer</th>
                                         <th>Mobile</th>
-                                        <th>Date</th>
-                                        <th>Time</th>
+                                        <th>Date & Time</th>
                                         <th>Grand Total</th>
                                     </tr>
                                 </thead>
@@ -1298,14 +1297,16 @@
                                         <td><strong>${app.order_number}</strong></td>
                                         <td>${app.customer_name}</td>
                                         <td><a href="tel:${app.phone}" class="text-primary font-weight-bold" style="text-decoration: none;">${app.phone}</a></td>
-                                        <td>${app.date}</td>
-                                        <td>${app.time}</td>
+                                        <td>
+                                            <div class="font-weight-bold">${app.date}</div>
+                                            <small class="text-muted">${app.time}</small>
+                                        </td>
                                         <td><span class="report-total-text">${app.total}</span></td>
                                     </tr>
                                 `;
                             });
                         } else {
-                            html += `<tr><td colspan="6" class="text-center py-4 text-muted">No completed appointments found.</td></tr>`;
+                            html += `<tr><td colspan="5" class="text-center py-4 text-muted">No completed appointments found.</td></tr>`;
                         }
 
                         html += `</tbody></table>`;
