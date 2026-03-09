@@ -233,6 +233,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         /* Appointments Route */
         Route::get('appointments', [AppointmentsController::class, 'index'])->name('admin.appointments.index');
+        Route::get('appointments/export', [AppointmentsController::class, 'export'])->name('admin.appointments.export');
         Route::get('appointments/create', [AppointmentsController::class, 'create'])->name('admin.appointments.create');
         Route::post('appointments/store', [AppointmentsController::class, 'store']);
         Route::get('appointments/edit/{id}', [AppointmentsController::class, 'edit'])->name('admin.appointments.edit');

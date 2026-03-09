@@ -15,6 +15,8 @@ use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use App\Models\TeamMember;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\AppointmentsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AppointmentsController extends Controller
 {
@@ -610,6 +612,29 @@ class AppointmentsController extends Controller
                 'success' => false,
                 'message' => 'Failed to update amount: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function export(Request $request)
+    {
+        try {
+            $month = $request->month ?? 'all';
+            $year = $request->year ?? 'all';
+
+            $fileName = 'Appointments_Report_';
+            if ($month != 'all') {
+                $fileName .= date('F', mktime(0, 0, 0, $month, 1)) . '_';
+            }
+            if ($year != 'all') {
+                $fileName .= $year;
+            } else {
+                $fileName .= 'All_Years';
+            }
+            $fileName .= '.xlsx';
+
+            return Excel::download(new AppointmentsExport($month, $year), $fileName);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to export appointments: ' . $e->getMessage());
         }
     }
 }

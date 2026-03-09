@@ -594,6 +594,11 @@
                                         @endfor
                                     </select>
                                 </div>
+                                <div class="col-12 mt-1">
+                                    <button id="btn-export-data" class="btn btn-outline-primary w-100" style="border-radius: 50px; font-weight: 700;">
+                                        <i class="bi bi-download me-50"></i> Export Data
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -999,6 +1004,13 @@
                 orderable: false
             },
         ],
+    });
+
+    $(document).on('click', '#btn-export-data', function() {
+        let month = $('#global-month-filter').val();
+        let year = $('#global-year-filter').val();
+        let exportUrl = "{{ route('admin.appointments.export') }}?month=" + month + "&year=" + year;
+        window.location.href = exportUrl;
     });
 
     $(document).on('click', '#saveMembers', function() {
