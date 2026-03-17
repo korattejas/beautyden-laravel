@@ -302,6 +302,20 @@
                                 <div id="hourly-completions-chart"></div>
                             </div>
                         </div>
+
+                        <!-- Return Performance Chart -->
+                        <div class="col-lg-12">
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <div>
+                                        <h4>Beautician Return Performance</h4>
+                                        <span class="text-muted small">Customers who returned after being served by each active beautician</span>
+                                    </div>
+                                    <span class="chart-badge" style="background: rgba(115, 103, 240, 0.1); color: #7367f0;">Retention</span>
+                                </div>
+                                <div id="return-performance-chart"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -524,6 +538,60 @@
         if(document.querySelector("#hourly-completions-chart")) {
             const hourlyChart = new ApexCharts(document.querySelector("#hourly-completions-chart"), hourlyOptions);
             hourlyChart.render();
+        }
+
+        // Return Performance Chart
+        const returnLabels = @json($returnPerformance['labels']);
+        const returnData = @json($returnPerformance['data']);
+
+        const returnOptions = {
+            series: [{
+                name: 'Return Customers Brought Back',
+                data: returnData
+            }],
+            chart: {
+                type: 'bar',
+                height: 350,
+                toolbar: { show: false },
+                fontFamily: 'Montserrat, sans-serif'
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 8,
+                    columnWidth: '40%',
+                    distributed: true
+                }
+            },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            colors: ['#7367f0', '#8e84f3', '#a8a1f6', '#c2bdba', '#dbd9fc'],
+            xaxis: {
+                categories: returnLabels,
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                labels: {
+                    style: { colors: '#64748b', fontSize: '11px', fontWeight: 600 }
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: '#64748b', fontSize: '11px' },
+                    formatter: function (val) { return val.toFixed(0); }
+                }
+            },
+            grid: {
+                borderColor: '#f1f5f9',
+                strokeDashArray: 4
+            },
+            tooltip: {
+                theme: 'light',
+                y: { formatter: function (val) { return val + " Returns"; } }
+            }
+        };
+
+        if(document.querySelector("#return-performance-chart")) {
+            const returnChart = new ApexCharts(document.querySelector("#return-performance-chart"), returnOptions);
+            returnChart.render();
         }
     });
 </script>

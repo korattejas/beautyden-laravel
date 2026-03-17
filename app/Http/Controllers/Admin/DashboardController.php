@@ -104,6 +104,7 @@ class DashboardController extends Controller
                 'todayAppointments'      => $todayAppointments,
                 'chartLabels'            => $chartLabels,
                 'chartData'              => $chartData,
+                'returnPerformance'      => $this->getReturnPerformanceData(),
                 'todayHourlyData'        => $this->getTodayHourlyData(),
             ]);
         } catch (\Exception $e) {
@@ -127,5 +128,42 @@ class DashboardController extends Controller
         }
 
         return $hourlyData;
+    }
+
+    private function getReturnPerformanceData()
+    {
+        $activeMembers = TeamMember::where('status', 1)->get();
+        $allCompletedAppointments = Appointment::where('status', 3)
+            ->orderBy('phone')
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        $returnCredits = [];
+        $lastBeauticians = null;
+        $lastPhone = null;
+
+        foreach ($allCompletedAppointments as $app) {
+            if ($app->phone === $lastPhone && $lastBeauticians) {
+                $beauticianIds = explode(',', $lastBeauticians);
+                foreach ($beauticianIds as $bid) {
+                    $bid = trim($bid);
+                    if ($bid) {
+                        $returnCredits[$bid] = ($returnCredits[$bid] ?? 0) + 1;
+                    }
+                }
+            }
+            $lastPhone = $app->phone;
+            $lastBeauticians = $app->assigned_to;
+        }
+
+        $labels = [];
+        $data = [];
+        foreach ($activeMembers as $member) {
+            $labels[] = $member->name;
+            $data[] = $returnCredits[$member->id] ?? 0;
+        }
+
+        return ['labels' => $labels, 'data' => $data];
     }
 }
