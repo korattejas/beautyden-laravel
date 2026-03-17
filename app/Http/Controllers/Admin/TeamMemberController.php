@@ -78,6 +78,42 @@ class TeamMemberController extends Controller
 
             $allMembers = $query->get();
             
+            // Calculate Return Customer Stats
+            $allCompletedAppointments = DB::table('appointments')
+                ->where('status', 3)
+                ->orderBy('phone')
+                ->orderBy('appointment_date', 'asc')
+                ->orderBy('appointment_time', 'asc')
+                ->get();
+
+            $returnCredits = []; // member_id => count
+            $lastBeauticians = null;
+            $lastPhone = null;
+
+            foreach ($allCompletedAppointments as $app) {
+                if ($app->phone === $lastPhone && $lastBeauticians) {
+                    // This is a return. The previous beauticians get credit.
+                    $beauticianIds = explode(',', $lastBeauticians);
+                    foreach ($beauticianIds as $bid) {
+                        $bid = trim($bid);
+                        if ($bid) {
+                            $returnCredits[$bid] = ($returnCredits[$bid] ?? 0) + 1;
+                        }
+                    }
+                }
+                $lastPhone = $app->phone;
+                $lastBeauticians = $app->assigned_to;
+            }
+
+            // Total Return Customers (Global)
+            $total_return_customers = DB::table('appointments')
+                ->where('status', 3)
+                ->select('phone')
+                ->groupBy('phone')
+                ->havingRaw('COUNT(*) > 1')
+                ->get()
+                ->count();
+
             // Summary Stats (Total global counts)
             $active_count = TeamMember::where('status', 1)->count();
             $inactive_count = TeamMember::where('status', 0)->count();
@@ -111,6 +147,7 @@ class TeamMemberController extends Controller
                     'member' => $member,
                     'total_appointments' => $appointments->count(),
                     'total_revenue' => $totalRevenue,
+                    'return_count' => $returnCredits[$member->id] ?? 0,
                     'status_order' => $member->status == 1 ? 0 : 1, // Active first
                     'distance' => isset($member->distance) ? round($member->distance, 2) : null
                 ];
@@ -157,7 +194,7 @@ class TeamMemberController extends Controller
             // Re-map the stats to match the paginated slice
             $stats = $currentItems;
 
-            return view('admin.team.index', compact('stats', 'members', 'active_count', 'inactive_count'));
+            return view('admin.team.index', compact('stats', 'members', 'active_count', 'inactive_count', 'total_return_customers'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -415,6 +452,64 @@ class TeamMemberController extends Controller
         } catch (\Exception $e) {
             logger()->error("destroy: " . $e->getMessage());
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
+    public function getReturnCustomersReport(Request $request, $id)
+    {
+        try {
+            // Logic to find customers who returned AFTER being served by this member
+            $allCompletedAppointments = DB::table('appointments')
+                ->where('status', 3)
+                ->orderBy('phone')
+                ->orderBy('appointment_date', 'asc')
+                ->orderBy('appointment_time', 'asc')
+                ->get();
+
+            $returnAppointments = [];
+            $lastBeauticians = null;
+            $lastPhone = null;
+
+            foreach ($allCompletedAppointments as $app) {
+                if ($app->phone === $lastPhone && $lastBeauticians) {
+                    $beauticianIds = explode(',', $lastBeauticians);
+                    if (in_array($id, array_map('trim', $beauticianIds))) {
+                        // This appointment is a return specifically from member $id
+                        $servicesData = json_decode($app->services_data, true);
+                        $returnAppointments[] = [
+                            'order_number' => $app->order_number,
+                            'customer_name' => ($app->first_name ?? '') . ' ' . ($app->last_name ?? ''),
+                            'phone' => $app->phone,
+                            'date' => $app->appointment_date,
+                            'time' => $app->appointment_time,
+                            'total' => '₹' . number_format((float)($servicesData['summary']['grand_total'] ?? 0), 0),
+                        ];
+                    }
+                }
+                $lastPhone = $app->phone;
+                $lastBeauticians = $app->assigned_to;
+            }
+
+            // Manual pagination for returnAppointments
+            $perPage = 10;
+            $currentPage = $request->input('page', 1);
+            $pagedData = array_slice($returnAppointments, ($currentPage - 1) * $perPage, $perPage);
+            
+            $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                $pagedData,
+                count($returnAppointments),
+                $perPage,
+                $currentPage,
+                ['path' => Route('admin.team.returnCustomersReport', $id)]
+            );
+
+            return response()->json([
+                'success' => true,
+                'data' => $pagedData,
+                'pagination' => (string) $paginator->links('pagination::bootstrap-5')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 

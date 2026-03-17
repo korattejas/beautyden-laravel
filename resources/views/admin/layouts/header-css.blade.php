@@ -12,6 +12,12 @@
 <link rel="stylesheet" href="{{ asset('panel-assets/vendors/css/extensions/toastr.min.css') }}">
 <link rel="stylesheet" href="{{ asset('panel-assets/vendors/css/animate/animate.min.css') }}">
 <link rel="stylesheet" href="{{ asset('panel-assets/vendors/css/extensions/sweetalert2.min.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .flatpickr-clear-btn:hover { background: #f8f9fa !important; color: #d32f2f !important; }
+    .flatpickr-calendar { box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important; border: none !important; border-radius: 12px !important; }
+</style>
+
 
 <!-- Libraries -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -30,7 +36,6 @@
 
 <!-- Page CSS -->
 <link rel="stylesheet" href="{{ asset('panel-assets/css/core/menu/menu-types/vertical-menu.css') }}">
-<link rel="stylesheet" href="{{ asset('panel-assets/css/plugins/charts/chart-apex.css') }}">
 <link rel="stylesheet" href="{{ asset('panel-assets/css/plugins/extensions/ext-component-toastr.css') }}">
 <link rel="stylesheet" href="{{ asset('panel-assets/css/plugins/extensions/ext-component-sweet-alerts.css') }}">
 <link rel="stylesheet" href="{{ asset('panel-assets/css/pages/app-invoice-list.css') }}">

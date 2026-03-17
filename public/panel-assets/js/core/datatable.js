@@ -68,7 +68,7 @@ $(function () {
                     d.appointment_time = $('#filter-appointment-time').val();
                     d.city_id = $('#filter-city').val();
                     d.signed_date = $('#filter-signed-date').val();
-                    d.filter_type = window.currentFilterType || '';
+                    d.filter_type = $('#filter-type').val() || '';
                     d.month = $('#global-month-filter').val() || '';
                     d.year = $('#global-year-filter').val() || '';
                 }

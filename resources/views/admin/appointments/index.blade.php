@@ -492,6 +492,7 @@
                         <i class="bi bi-funnel"></i> Filter
                     </button>
                     <div class="dropdown-menu dropdown-menu-end p-2" style="min-width: 300px;">
+                        <input type="hidden" id="filter-type" value="total">
                         <div class="mb-2">
                             <label class="form-label">Status</label>
                             <select id="filter-status" class="form-select">
@@ -538,43 +539,45 @@
         <div class="content-body">
             <!-- Summary Boxes -->
             <!-- Premium Revenue Stats & Time Filter -->
-            <div class="row g-2 mb-2">
-                <div class="col-md-4">
-                    <div class="card h-100 mb-0" style="background: linear-gradient(135deg, #7367f0 0%, #ce9ffc 100%); border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(115,103,240,0.25);">
+            <div class="row g-1 mb-2">
+                <div class="col-md-3">
+                    <div class="card h-100 mb-0" style="border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; position: relative; background: #fff;">
+                        <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #7367f0;"></div>
                         <div class="card-body p-2 d-flex align-items-center">
-                            <div class="avatar p-1 m-0 me-2" style="background: rgba(255,255,255,0.2); border-radius: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-wallet2 text-white" style="font-size: 1.6rem;"></i>
+                            <div class="avatar p-1 m-0 me-1" style="background: rgba(115,103,240,0.1); border-radius: 12px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-wallet2" style="font-size: 1.6rem; color: #7367f0;"></i>
                             </div>
                             <div>
-                                <h2 class="text-white fw-bolder mb-0" style="font-size: 1.6rem;">₹{{ number_format($totalRevenue, 2) }}</h2>
-                                <p class="text-white mb-0" style="opacity: 0.9; font-weight: 600; font-size: 0.9rem; letter-spacing: 0.5px;">TOTAL REVENUE</p>
+                                <p class="mb-0 text-uppercase fw-bold" style="color: #82868b; font-size: 0.85rem; letter-spacing: 1px;">Total Revenue</p>
+                                <h2 class="fw-bolder mb-0" style="color: #1e293b; font-size: 1.6rem;">₹{{ number_format($totalRevenue, 2) }}</h2>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card h-100 mb-0" style="background: linear-gradient(135deg, #28c76f 0%, #81fbb8 100%); border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(40,199,111,0.25);">
+                <div class="col-md-3">
+                    <div class="card h-100 mb-0" style="border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; position: relative; background: #fff;">
+                        <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #28c76f;"></div>
                         <div class="card-body p-2 d-flex align-items-center">
-                            <div class="avatar p-1 m-0 me-2" style="background: rgba(255,255,255,0.2); border-radius: 14px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-bank2 text-white" style="font-size: 1.6rem;"></i>
+                            <div class="avatar p-1 m-0 me-1" style="background: rgba(40,199,111,0.1); border-radius: 12px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-bank2" style="font-size: 1.6rem; color: #28c76f;"></i>
                             </div>
                             <div>
-                                <h2 class="text-white fw-bolder mb-0" style="font-size: 1.6rem;">₹{{ number_format($companyRevenue, 2) }}</h2>
-                                <p class="text-white mb-0" style="opacity: 0.9; font-weight: 600; font-size: 0.9rem; letter-spacing: 0.5px;">COMPANY REVENUE</p>
+                                <p class="mb-0 text-uppercase fw-bold" style="color: #82868b; font-size: 0.85rem; letter-spacing: 1px;">Company Revenue</p>
+                                <h2 class="fw-bolder mb-0" style="color: #1e293b; font-size: 1.6rem;">₹{{ number_format($companyRevenue, 2) }}</h2>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="card h-100 mb-0 period-filter-card">
-                        <div class="period-filter-header d-flex align-items-center justify-content-center">
+                        <div class="period-filter-header d-flex align-items-center justify-content-center py-75">
                             <i class="bi bi-calendar3 me-1 text-primary"></i>
                             <span class="fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 1px; color: #6e6b7b;">Select Period</span>
                         </div>
-                        <div class="card-body p-2 d-flex align-items-center justify-content-center">
-                            <div class="row g-1 w-100">
-                                <div class="col-6">
-                                    <select id="global-month-filter" class="form-select custom-pill-select w-100">
+                        <div class="card-body p-2">
+                            <div class="row g-1">
+                                <div class="col-md-5">
+                                    <select id="global-month-filter" class="form-select custom-pill-select w-100" style="padding: 10px 20px !important; font-size: 1rem !important;">
                                         <option value="all" {{ $month == 'all' ? 'selected' : '' }}>All Months</option>
                                         @for ($m = 1; $m <= 12; $m++)
                                             <option value="{{ sprintf('%02d', $m) }}" {{ $month == sprintf('%02d', $m) ? 'selected' : '' }}>
@@ -583,20 +586,18 @@
                                         @endfor
                                     </select>
                                 </div>
-                                <div class="col-6">
-                                    <select id="global-year-filter" class="form-select custom-pill-select w-100">
-                                        <option value="all" {{ $year == 'all' ? 'selected' : '' }}>All Years</option>
-                                        @php
-                                            $currentYear = date('Y');
-                                        @endphp
+                                <div class="col-md-3">
+                                    <select id="global-year-filter" class="form-select custom-pill-select w-100" style="padding: 10px 15px !important; font-size: 1rem !important;">
+                                        <option value="all" {{ $year == 'all' ? 'selected' : '' }}>Year</option>
+                                        @php $currentYear = date('Y'); @endphp
                                         @for ($y = $currentYear - 2; $y <= $currentYear + 1; $y++)
                                             <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                                         @endfor
                                     </select>
                                 </div>
-                                <div class="col-12 mt-1">
-                                    <button id="btn-export-data" class="btn btn-outline-primary w-100" style="border-radius: 50px; font-weight: 700;">
-                                        <i class="bi bi-download me-50"></i> Export Data
+                                <div class="col-md-4">
+                                    <button id="btn-export-data" class="btn btn-outline-primary w-100" style="border-radius: 50px; font-weight: 700; font-size: 1rem; padding: 13px 15px;">
+                                        <i class="bi bi-download"></i> Export
                                     </button>
                                 </div>
                             </div>
@@ -607,7 +608,7 @@
 
             <!-- Status Stats Row - Quick Filters -->
             <div class="row g-1 mb-2">
-                <div class="col-md-2 col-sm-4 col-6">
+                <div class="col-md col-sm-4 col-6">
                     <div class="card h-100 mb-0 stat-filter-card active-stat" data-type="total">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #f3e8ff !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
@@ -620,7 +621,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 col-sm-4 col-6">
+                <div class="col-md col-sm-4 col-6">
                     <div class="card h-100 mb-0 stat-filter-card" data-type="today">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fff1f2 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
@@ -633,8 +634,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 col-sm-4 col-6">
-                    <div class="card h-100 mb-0 stat-filter-card" data-type="pending">
+                <div class="col-md col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="tomorrow">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #f0fdf4 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-calendar-plus" style="font-size: 1.2rem; color: #16a34a;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $tomorrowAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Tomorrow</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="1" data-is-status="true">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fff7ed !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-clock-history" style="font-size: 1.2rem; color: #ea580c;"></i>
@@ -646,7 +660,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 col-sm-4 col-6">
+                <div class="col-md col-sm-4 col-6">
                     <div class="card h-100 mb-0 stat-filter-card" data-type="2" data-is-status="true">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #e0f2fe !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
@@ -659,7 +673,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 col-sm-4 col-6">
+                <div class="col-md col-sm-4 col-6">
                     <div class="card h-100 mb-0 stat-filter-card" data-type="3" data-is-status="true">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #dcfce7 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
@@ -672,7 +686,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 col-sm-4 col-6">
+                <div class="col-md col-sm-4 col-6">
                     <div class="card h-100 mb-0 stat-filter-card" data-type="4" data-is-status="true">
                         <div class="card-body d-flex align-items-center p-1">
                             <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fee2e2 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
@@ -686,13 +700,27 @@
                     </div>
                 </div>
             </div>
+            <div class="d-flex align-items-center justify-content-between mb-1">
+                <div class="d-flex align-items-center gap-1">
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                    <div class="input-group" style="width: 250px;">
+                        <span class="input-group-text bg-light border-end-0" style="border-radius: 10px 0 0 10px;">
+                            <i class="bi bi-calendar-event text-primary"></i>
+                        </span>
+                        <input type="text" id="main-date-filter" class="form-control border-start-0 shadow-none flatpickr-basic" 
+                            placeholder="Select Date"
+                            style="border-radius: 0 10px 10px 0; font-weight: 700; color: #1a4a7a; background-color: #fff !important;">
+                    </div>
+                </div>
+            </div>
 
             <!-- Column Search -->
             <section id="column-search-datatable">
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-datatable">
+                            <div class="card-datatable px-1 pt-1">
                                 <table class="dt-column-search table w-100 dataTable" id="table-appointments">
                                     <thead>
                                         <tr>
@@ -871,20 +899,123 @@
         window.location.href = url.toString();
     });
 
-    window.currentFilterType = 'total';
+    let isInternalChange = false;
+
+    // Initialize Flatpickr for the main date filter with a clear button
+    const mainDateFilter = $('#main-date-filter').flatpickr({
+        altInput: true,
+        altFormat: "F j, Y",
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        onReady: function(selectedDates, dateStr, instance) {
+            const clearBtn = document.createElement("div");
+            clearBtn.innerHTML = '<i class="bi bi-eraser-fill me-25"></i> Clear Date';
+            clearBtn.classList.add("flatpickr-clear-btn");
+            clearBtn.style.cssText = "text-align: center; padding: 12px; cursor: pointer; color: #ea5455; font-weight: 800; border-top: 1px solid #ebe9f1; background: #fff; transition: all 0.2s ease; font-size: 0.9rem; letter-spacing: 0.5px;";
+            
+            // Hover effects
+            clearBtn.onmouseover = function() { this.style.backgroundColor = "#fff5f5"; this.style.color = "#d32f2f"; };
+            clearBtn.onmouseout = function() { this.style.backgroundColor = "#fff"; this.style.color = "#ea5455"; };
+            
+            clearBtn.addEventListener("click", () => {
+                instance.clear();
+                instance.close();
+            });
+            instance.calendarContainer.appendChild(clearBtn);
+        },
+        onClear: function() {
+            if (isInternalChange) return;
+            $('#filter-appointment-date').val('');
+            $('.stat-filter-card').removeClass('active-stat');
+            $('[data-type="total"]').addClass('active-stat');
+            $('#filter-type').val('total');
+            $('#table-appointments').DataTable().ajax.reload();
+        }
+    });
+
+    // Initial filter state
+    $('#filter-type').val('total');
+    
+    // Main Date Filter - Quick Filter Without Apply Button
+    $(document).on('change', '#main-date-filter', function() {
+        if (isInternalChange) {
+            return;
+        }
+
+        let val = $(this).val();
+        
+        if (val) {
+            // Clear quick stat filters as we are now in custom date mode
+            $('.stat-filter-card').removeClass('active-stat');
+            $('#filter-type').val('');
+        } else {
+            // Only reset to "Total" if no other filter is active
+            if (!$('#filter-type').val() || $('#filter-type').val() == 'total' || !$('.stat-filter-card.active-stat').length) {
+                $('.stat-filter-card').removeClass('active-stat');
+                $('[data-type="total"]').addClass('active-stat');
+                $('#filter-type').val('total');
+            }
+        }
+        
+        // Sync with hidden filter inside dropdown so DataTables picks it up
+        $('#filter-appointment-date').val(val);
+        
+        // Reload DataTable
+        $('#table-appointments').DataTable().ajax.reload();
+    });
+
     $(document).on('click', '.stat-filter-card', function() {
         $('.stat-filter-card').removeClass('active-stat');
         $(this).addClass('active-stat');
-        window.currentFilterType = $(this).data('type');
+        let type = $(this).data('type');
+        $('#filter-type').val(type);
         
-        // Show/hide status filter based on whether we are using status-specific filter
+        // Reset custom date filter when switching to predefined stats
+        if (typeof mainDateFilter !== 'undefined' && mainDateFilter) {
+            isInternalChange = true;
+            mainDateFilter.clear();
+            setTimeout(() => { isInternalChange = false; }, 50);
+        }
+        $('#filter-appointment-date').val('');
+        
+        // Handle Status Filtering: Always reset status unless it's a specific status card
         if ($(this).data('is-status')) {
-            $('#filter-status').val($(this).data('type'));
-        } else if (window.currentFilterType !== 'total') {
-            $('#filter-status').val(''); // Reset status if using other filter
+            $('#filter-status').val(type);
+        } else {
+            $('#filter-status').val(''); 
+        }
+        // Reload Table
+        $('#table-appointments').DataTable().ajax.reload();
+    });
+
+    // Dropdown Filter Buttons
+    $(document).on('click', '#btn-apply-filters', function() {
+        $('#table-appointments').DataTable().ajax.reload();
+        // Close the dropdown
+        $(this).closest('.dropdown-menu').prev('.dropdown-toggle').dropdown('toggle');
+    });
+
+    $(document).on('click', '#btn-reset-filters', function() {
+        // Reset dropdown fields
+        $('#filter-status').val('');
+        $('#filter-appointment-date').val('');
+        $('#filter-appointment-time').val('');
+        $('#filter-created-date').val('');
+        $('#filter-city').val('');
+        
+        // Reset stat cards to total
+        $('.stat-filter-card').removeClass('active-stat');
+        $('[data-type="total"]').addClass('active-stat');
+        $('#filter-type').val('total');
+        
+        // Clear Flatpickr without triggering internal reset
+        if (typeof mainDateFilter !== 'undefined' && mainDateFilter) {
+            isInternalChange = true;
+            mainDateFilter.clear();
+            isInternalChange = false;
         }
         
-        $('.dt-column-search').DataTable().ajax.reload();
+        $('#table-appointments').DataTable().ajax.reload();
     });
 
     datatable_url = '/getDataAppointments';
@@ -1238,7 +1369,9 @@
         text += `---------------------------------\n`;
         
         text += `Subtotal: ₹${parseFloat(summary.sub_total || 0).toFixed(2)}\n`;
-        text += `Discount: - ₹${parseFloat(summary.discount_amount || 0).toFixed(2)}\n`;
+        if (parseFloat(summary.discount_amount || 0) > 0) {
+            text += `Discount: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
+        }
         text += `Travel Charges: + ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}\n`;
         text += `Grand Total: ₹${parseFloat(summary.grand_total || 0).toFixed(2)}\n\n`;
 

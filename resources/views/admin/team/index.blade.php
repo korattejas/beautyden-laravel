@@ -120,12 +120,13 @@
 
     .all-time-stats {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
         margin: 1.5rem 0;
         padding: 12px 0;
         border-top: 1px solid #f1f5f9;
         border-bottom: 1px solid #f1f5f9;
+        row-gap: 15px;
     }
 
     .stat-box-mini {
@@ -318,6 +319,20 @@
         font-size: 1.5rem;
         color: var(--mst-text-main);
         line-height: 1.2;
+    }
+
+    .icon-return {
+        background: rgba(115, 103, 240, 0.1);
+        color: #7367f0;
+    }
+
+    .chart-container {
+        background: #fff;
+        border-radius: var(--mst-radius);
+        padding: 1.5rem;
+        box-shadow: var(--mst-shadow);
+        border: 1px solid #eef2f7;
+        margin-bottom: 2rem;
     }
 
     .summary-info span {
@@ -804,6 +819,35 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="summary-box">
+                            <div class="summary-icon icon-return">
+                                <i class="bi bi-person-heart"></i>
+                            </div>
+                            <div class="summary-info">
+                                <h3>{{ $total_return_customers }}</h3>
+                                <span>Return Customers</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Return Customers Chart -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-container">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h4 class="mb-0 fw-bold">Beautician Return Performance</h4>
+                                    <p class="text-muted small mb-0">Total customers who returned after being served by each beautician</p>
+                                </div>
+                                <div class="badge bg-light-primary text-primary px-3 py-2 rounded-pill fw-bold">
+                                    <i class="bi bi-graph-up-arrow me-1"></i> Performance Analytics
+                                </div>
+                            </div>
+                            <canvas id="returnPerformanceChart" style="max-height: 300px;"></canvas>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="team-card-grid">
@@ -853,6 +897,10 @@
                                     <span class="revenue-text">₹{{ number_format($stat['total_revenue'], 0) }}</span>
                                 </div>
                                 <div class="stat-box-mini">
+                                    <label>Returns</label>
+                                    <span class="text-primary">{{ $stat['return_count'] }}</span>
+                                </div>
+                                <div class="stat-box-mini">
                                     <label>Exp.</label>
                                     <span>{{ $stat['member']->experience_years ?? 0 }}y</span>
                                 </div>
@@ -878,6 +926,11 @@
                                 <!-- Report -->
                                 <button type="button" class="btn-action-pill btn-report btn-report-view" data-id="{{ $stat['member']->id }}" title="Appointments Report">
                                     <i class="bi bi-file-earmark-text"></i>
+                                </button>
+
+                                <!-- Return Report -->
+                                <button type="button" class="btn-action-pill btn-return-report btn-return-report-view" data-id="{{ $stat['member']->id }}" title="Return Customers Detail">
+                                    <i class="bi bi-person-check"></i>
                                 </button>
 
                                 <!-- Popularity Toggle -->
@@ -952,6 +1005,27 @@
             </div>
         </div>
     </div>
+
+    <!-- Return Customers Report Modal -->
+    <div id="c-returnReportModal" class="c-modal">
+        <div class="c-modal-dialog" style="max-width: 850px;">
+            <div class="c-modal-content">
+                <div class="c-modal-header" style="background: linear-gradient(135deg, #7367f0 0%, #a889f4 100%);">
+                    <h5 class="c-modal-title report-modal-header-title text-white"><i class="bi bi-person-heart"></i> Return Customers Detail</h5>
+                    <button class="c-close-btn" data-c-close-return-report>&times;</button>
+                </div>
+                <div class="c-modal-body" id="return-report-modal-body">
+                    <div id="return-report-table-container">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-2 text-muted">Fetching return customers...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @endsection
 
 @section('footer_script_content')
@@ -1330,6 +1404,160 @@
             e.preventDefault();
             let page = $(this).attr('href').split('page=')[1];
             loadReport(currentReportId, page);
+        });
+
+        // Return Customer Report Logic
+        let currentReturnReportId = null;
+
+        $(document).on('click', '.btn-return-report-view', function() {
+            currentReturnReportId = $(this).data('id');
+            $("#c-returnReportModal").addClass("show");
+            loadReturnReport(currentReturnReportId, 1);
+        });
+
+        $(document).on("click", "[data-c-close-return-report]", function() {
+            $("#c-returnReportModal").removeClass("show");
+            $("#return-report-table-container").html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Fetching return customers...</p>
+                </div>
+            `);
+        });
+
+        function loadReturnReport(id, page) {
+            $.ajax({
+                url: `/admin/team/return-customers-report/${id}?page=${page}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        let html = `
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Return Order</th>
+                                        <th>Customer</th>
+                                        <th>Mobile</th>
+                                        <th>Date & Time</th>
+                                        <th>Revenue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+
+                        if (response.data.length > 0) {
+                            response.data.forEach(app => {
+                                html += `
+                                    <tr>
+                                        <td><strong>${app.order_number}</strong></td>
+                                        <td>${app.customer_name}</td>
+                                        <td><a href="tel:${app.phone}" class="text-primary font-weight-bold" style="text-decoration: none;">${app.phone}</a></td>
+                                        <td>
+                                            <div class="font-weight-bold">${app.date}</div>
+                                            <small class="text-muted">${app.time}</small>
+                                        </td>
+                                        <td><span class="report-total-text" style="color: #7367f0;">${app.total}</span></td>
+                                    </tr>
+                                `;
+                            });
+                        } else {
+                            html += `<tr><td colspan="5" class="text-center py-4 text-muted">No return customers found for this beautician's previous service.</td></tr>`;
+                        }
+
+                        html += `</tbody></table>`;
+                        
+                        if (response.pagination) {
+                            html += `<div class="pagination-wrapper mt-3">${response.pagination}</div>`;
+                        }
+
+                        $("#return-report-table-container").html(html);
+                    }
+                },
+                error: function() {
+                    $("#return-report-table-container").html('<div class="alert alert-danger">Failed to load return report.</div>');
+                }
+            });
+        }
+
+        $(document).on('click', '#c-returnReportModal .pagination a', function(e) {
+            e.preventDefault();
+            let page = $(this).attr('href').split('page=')[1];
+            loadReturnReport(currentReturnReportId, page);
+        });
+
+        // Chart Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('returnPerformanceChart');
+            if (ctx) {
+                const labels = [
+                    @foreach($stats as $s)
+                        @if($s['member']->status == 1)
+                            "{{ $s['member']->name }}",
+                        @endif
+                    @endforeach
+                ];
+                const data = [
+                    @foreach($stats as $s)
+                        @if($s['member']->status == 1)
+                            {{ $s['return_count'] }},
+                        @endif
+                    @endforeach
+                ];
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Return Customers Brought Back',
+                            data: data,
+                            backgroundColor: 'rgba(115, 103, 240, 0.7)',
+                            borderColor: 'rgba(115, 103, 240, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            hoverBackgroundColor: 'rgba(115, 103, 240, 0.9)',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#1e293b',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 13 },
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    font: { weight: '600' }
+                                },
+                                grid: {
+                                    display: true,
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { weight: '600' }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         });
     </script>
 @endsection

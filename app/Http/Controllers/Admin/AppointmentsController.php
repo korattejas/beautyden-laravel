@@ -53,7 +53,8 @@ class AppointmentsController extends Controller
             $pendingAppointments = (clone $query)->where('status', 1)->count();
             $assignedAppointments = (clone $query)->where('status', 2)->count();
             $completedAppointments = (clone $query)->where('status', 3)->count();
-            $todayAppointments = (clone $query)->whereDate('appointment_date', today())->count();
+            $todayAppointments = Appointment::whereDate('appointment_date', today()->toDateString())->count();
+            $tomorrowAppointments = Appointment::whereDate('appointment_date', today()->addDay()->toDateString())->count();
             $rejectedAppointments = (clone $query)->where('status', 4)->count();
 
             // Calculate total revenue for filtered completed appointments
@@ -74,6 +75,7 @@ class AppointmentsController extends Controller
                 'totalRevenue',
                 'companyRevenue',
                 'todayAppointments',
+                'tomorrowAppointments',
                 'rejectedAppointments',
                 'month',
                 'year'
@@ -253,24 +255,32 @@ class AppointmentsController extends Controller
                     )
                     ->orderBy('appointments.appointment_date', 'DESC');
 
-                if ($request->month && $request->month != 'all') {
-                    $appointments->whereMonth('appointments.appointment_date', $request->month);
-                }
+                // Only apply month/year filter if we are NOT filtering by a specific date or type (stat box that defines a date)
+                if (!$request->appointment_date && !in_array($request->filter_type, ['today', 'tomorrow'])) {
+                    if ($request->month && $request->month != 'all') {
+                        $appointments->whereMonth('appointments.appointment_date', $request->month);
+                    }
 
-                if ($request->year && $request->year != 'all') {
-                    $appointments->whereYear('appointments.appointment_date', $request->year);
+                    if ($request->year && $request->year != 'all') {
+                        $appointments->whereYear('appointments.appointment_date', $request->year);
+                    }
                 }
 
                 if ($request->filter_type) {
                     if ($request->filter_type == 'today') {
-                        $appointments->whereDate('appointments.appointment_date', today());
+                        $appointments->whereDate('appointments.appointment_date', today()->toDateString());
+                    } elseif ($request->filter_type == 'tomorrow') {
+                        $appointments->whereDate('appointments.appointment_date', today()->addDay()->toDateString());
                     } elseif ($request->filter_type == 'unassigned') {
                         $appointments->where(function($q) {
                             $q->whereNull('appointments.assigned_to')->orWhere('appointments.assigned_to', '');
                         });
+                    } elseif (in_array($request->filter_type, ['1', '2', '3', '4'])) {
+                        $appointments->where('appointments.status', $request->filter_type);
                     } elseif ($request->filter_type == 'pending') {
                         $appointments->where('appointments.status', 1);
                     }
+                    // 'total' is handled by not adding any additional where clauses here
                 }
 
                 if ($request->status !== null && $request->status !== '') {
