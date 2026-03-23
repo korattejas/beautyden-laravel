@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Service;
+use App\Models\ServiceCityPrice;
 use Twilio\Rest\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -41,6 +42,7 @@ class AppointmentsController extends Controller
 
         try {
             $validator = Validator::make($request->all(), [
+                'city_id'             => 'required|integer',
                 'service_category_id' => 'nullable|integer',
                 'service_sub_category_id' => 'nullable|integer',
                 'service_id'          => 'required',
@@ -66,32 +68,35 @@ class AppointmentsController extends Controller
             $orderNumber = '#BD' . Str::upper(Str::random(8));
 
             $quantity = 1;
-            $price    = $request->price ?? 0;
+            $subTotal = 0;
+            $serviceIds = explode(',', $request->service_id);
+            $services = [];
 
-            $subTotal = $price * $quantity;
+            foreach ($serviceIds as $id) {
+                $service = Service::find($id);
+
+                if ($service) {
+                    $cityPrice = ServiceCityPrice::where('city_id', $request->city_id)
+                        ->where('service_id', $id)
+                        ->first();
+
+                    $priceToUse = $cityPrice ? $cityPrice->price : 0;
+
+                    $services[] = [
+                        'type'  => 'service',
+                        'name'  => $service->name,
+                        'price' => $priceToUse,
+                        'qty'   => $quantity,
+                        'total' => $priceToUse * $quantity,
+                    ];
+                    $subTotal += ($priceToUse * $quantity);
+                }
+            }
+
             $discountAmount = $request->discount_price ?? 0;
             $travelCharges = 0;
 
             $grandTotal = ($subTotal + $travelCharges) - $discountAmount;
-
-            $serviceIds = explode(',', $request->service_id);
-
-            $services = [];
-
-            foreach ($serviceIds as $id) {
-
-                $service = Service::find($id);
-
-                if ($service) {
-                    $services[] = [
-                        'type'  => 'service',
-                        'name'  => $service->name,
-                        'price' => $service->price ?? $price,
-                        'qty'   => $quantity,
-                        'total' => ($service->price ?? $price) * $quantity,
-                    ];
-                }
-            }
 
             $servicesData = [
                 'client' => [
@@ -128,7 +133,7 @@ class AppointmentsController extends Controller
                 'service_category_id' => $request->service_category_id,
                 'service_sub_category_id' => $request->service_sub_category_id,
                 'quantity'            => $request->quantity,
-                'price'               => $request->price,
+                'price'               => $subTotal,
                 'discount_price'      => $request->discount_price,
                 'service_address'     => $request->service_address,
                 'appointment_date'    => $request->appointment_date,
