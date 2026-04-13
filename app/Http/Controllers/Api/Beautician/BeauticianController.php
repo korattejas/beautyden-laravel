@@ -114,10 +114,10 @@ class BeauticianController extends Controller
             }
 
             $response = Http::withHeaders([
-                'authkey' => $authKey,
+                'authkey' => '507306ArgjzTLrNf69d8d30bP1',
                 'Content-Type' => 'application/json'
             ])->post('https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/', [
-                'integrated_number' => $senderNumber,
+                'integrated_number' => '919574758282',
                 'content_type' => 'template',
                 'payload' => [
                     'messaging_product' => 'whatsapp',
