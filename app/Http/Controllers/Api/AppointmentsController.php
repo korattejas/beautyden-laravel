@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Exception;
 
 class AppointmentsController extends Controller
@@ -195,6 +196,68 @@ class AppointmentsController extends Controller
     protected function sendWhatsAppBooking($phone, $customerName, $orderNumber, $appointmentDate = null, $appointmentTime = null)
     {
         try {
+            $authKey = env('MSG91_AUTH_KEY');
+            $senderNumber = env('MSG91_WHATSAPP_NUMBER');
+            $templateName = 'beautyden_booking_confirmation';
+
+            $cleanedNumber = preg_replace('/\D/', '', $phone);
+            // Ensure number has country code for MSG91
+            if (strlen($cleanedNumber) == 10) {
+                $to = '91' . $cleanedNumber;
+            } else {
+                $to = $cleanedNumber;
+            }
+
+            $response = Http::withHeaders([
+                'authkey' => $authKey,
+                'Content-Type' => 'application/json'
+            ])->post('https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/', [
+                'integrated_number' => $senderNumber,
+                'content_type' => 'template',
+                'payload' => [
+                    'messaging_product' => 'whatsapp',
+                    'type' => 'template',
+                    'template' => [
+                        'name' => $templateName,
+                        'language' => [
+                            'code' => 'en',
+                            'policy' => 'deterministic'
+                        ],
+                        'namespace' => '74620ab4_9b20_468c_8d6d_d17ebaa631a0',
+                        'to_and_components' => [
+                            [
+                                'to' => [(string) $to, '916352755075'],
+                                'components' => [
+                                    'body_1' => [
+                                        'type' => 'text',
+                                        'value' => (string) $customerName
+                                    ],
+                                    'body_2' => [
+                                        'type' => 'text',
+                                        'value' => (string) $orderNumber
+                                    ],
+                                    'body_3' => [
+                                        'type' => 'text',
+                                        'value' => (string) ($appointmentDate ?? 'N/A')
+                                    ],
+                                    'body_4' => [
+                                        'type' => 'text',
+                                        'value' => (string) ($appointmentTime ?? 'N/A')
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+
+            if ($response->successful()) {
+                Log::info("MSG91 WhatsApp Booking sent successfully to $to. Response: " . $response->body());
+            } else {
+                Log::error("MSG91 WhatsApp Booking send failed for $to. Status: " . $response->status() . " Body: " . $response->body());
+            }
+
+            /*
             $sid    = env('TWILIO_ACCOUNT_SID');
             $token  = env('TWILIO_AUTH_TOKEN');
             $from   = env('TWILIO_WHATSAPP_FROM');
@@ -219,8 +282,9 @@ class AppointmentsController extends Controller
             ]);
 
             Log::info("WhatsApp message sent, SID: " . $message->sid);
+            */
         } catch (\Exception $e) {
-            Log::error("WhatsApp send failed: " . $e->getMessage());
+            Log::error("MSG91 WhatsApp Booking send exception: " . $e->getMessage());
         }
     }
 }

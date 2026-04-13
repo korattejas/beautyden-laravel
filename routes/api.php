@@ -21,7 +21,7 @@ use App\Http\Middleware\RequestModifier;
 use App\Http\Middleware\ResponseModifier;
 use App\Http\Middleware\SanitizeInput;
 use App\Http\Middleware\JWTTokenMiddleware;
-
+use App\Http\Controllers\Api\Beautician\BeauticianController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -46,6 +46,25 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('getTotalBookService', [AuthenticationController::class, 'getTotalBookService']);
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
         Route::get('logout', [AuthenticationController::class, 'logout']);
+    });
+
+    
+});
+
+Route::middleware([SanitizeInput::class])->group(function () {
+    Route::prefix('V1/beautician')->group(function () {
+        Route::post('sendLoginOtp', [BeauticianController::class, 'sendLoginOtp']);
+        Route::post('verifyLoginOtp', [BeauticianController::class, 'verifyLoginOtp']);
+    });
+});
+
+Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(function () {
+    Route::prefix('V1/beautician')->group(function () {
+        Route::post('dashboard', [BeauticianController::class, 'dashboard']);
+        Route::post('getAppointments', [BeauticianController::class, 'getAppointments']);
+        Route::post('getAppointmentDetails', [BeauticianController::class, 'getAppointmentDetails']);
+        Route::post('updateStatus', [BeauticianController::class, 'updateStatus']);
+        Route::post('getProfile', [BeauticianController::class, 'getProfile']);
     });
 });
 
