@@ -193,7 +193,58 @@
             </tbody>
         </table>
 
-        <h2>3. Update FCM Token</h2>
+        <h2>3. Profile Update</h2>
+        <p>Updates the customer's profile information. Mobile number cannot be updated.</p>
+        <div class="endpoint">
+            <span class="badge badge-post">POST</span> /V1/customer/profileUpdate<br>
+            <span class="badge badge-auth">Bearer Auth Required</span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Presence</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>name</td>
+                    <td>String</td>
+                    <td>Required</td>
+                    <td>Full name of the customer</td>
+                </tr>
+                <tr>
+                    <td>email</td>
+                    <td>String</td>
+                    <td>Required</td>
+                    <td>Email address</td>
+                </tr>
+                <tr>
+                    <td>address</td>
+                    <td>String</td>
+                    <td>Required</td>
+                    <td>Service address</td>
+                </tr>
+                <tr>
+                    <td>city_id</td>
+                    <td>Integer</td>
+                    <td>Required</td>
+                    <td>Numeric ID of the city</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>4. Get Profile</h2>
+        <p>Fetches the authenticated customer's profile details.</p>
+        <div class="endpoint">
+            <span class="badge badge-post">POST</span> /V1/customer/getProfile<br>
+            <span class="badge badge-auth">Bearer Auth Required</span>
+        </div>
+
+        <h2>5. Update FCM Token</h2>
         <p>Updates the Firebase token for the user. Call this whenever the user opens the Home Screen.</p>
         <div class="endpoint">
             <span class="badge badge-post">POST</span> /V1/customer/updateFcmToken<br>
@@ -237,7 +288,7 @@
             </tbody>
         </table>
 
-        <h2>4. Get Cities List</h2>
+        <h2>6. Get Cities List</h2>
         <p>Provides a list of all cities to choose from.</p>
         <div class="endpoint"><span class="badge badge-get">GET</span> /V1/cities</div>
 

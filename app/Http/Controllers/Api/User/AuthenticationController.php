@@ -42,8 +42,13 @@ class AuthenticationController extends Controller
     {
         $function_name = 'updateFcmToken';
         try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
             $validator = Validator::make($request->all(), [
-                'user_id' => 'required|exists:users,id',
                 'fcm_token' => 'required|string',
                 'device_type' => 'nullable|string|in:android,ios',
                 'device_name' => 'nullable|string|max:255',
@@ -53,7 +58,7 @@ class AuthenticationController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
-            $token = UserFcmToken::where('user_id', $request->user_id)
+            $token = UserFcmToken::where('user_id', $authUser->id)
                 ->where('fcm_token', $request->fcm_token)
                 ->first();
 
@@ -65,7 +70,7 @@ class AuthenticationController extends Controller
                 ]);
             } else {
                 UserFcmToken::create([
-                    'user_id' => $request->user_id,
+                    'user_id' => $authUser->id,
                     'fcm_token' => $request->fcm_token,
                     'device_type' => $request->device_type,
                     'device_name' => $request->device_name,
@@ -290,20 +295,22 @@ class AuthenticationController extends Controller
         $function_name = 'profileUpdate';
 
         try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
             $validateArray = [
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
                 'address' => 'required|string|max:500',
-                'mobile_number' => [
-                    'required',
-                    'regex:/^\+?[1-9]\d{1,14}$/',
-                ],
+                'city_id' => 'required|integer',
             ];
 
             $validateMessage = [
-                'mobile_number.required' => 'Mobile number is required.',
-                'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
                 'email.email' => 'Enter a valid email address.',
+                'city_id.required' => 'City is required.',
             ];
 
             $validator = Validator::make($request->all(), $validateArray, $validateMessage);
@@ -311,14 +318,6 @@ class AuthenticationController extends Controller
             if ($validator->fails()) {
                 logValidationException($this->controller_name, $function_name, $validator);
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
-            }
-
-            $authUser = User::where('mobile_number', $request->mobile_number)
-                ->whereNotNull('mobile_verified_at')
-                ->first();
-
-            if (!$authUser) {
-                return $this->sendError('User not found or not verified.', 404);
             }
 
             if ($request->filled('email') && $request->email !== $authUser->email) {
@@ -335,6 +334,7 @@ class AuthenticationController extends Controller
 
             $authUser->name = $request->name ?? $authUser->name;
             $authUser->address = $request->address ?? $authUser->address;
+            $authUser->city_id = $request->city_id ?? $authUser->city_id;
             $authUser->save();
 
             $success = [
@@ -354,38 +354,21 @@ class AuthenticationController extends Controller
         $function_name = 'getProfile';
 
         try {
-            $mobile_number = $request->mobile_number;
-
-            $validator = Validator::make($request->all(), [
-                'mobile_number' => [
-                    'required',
-                    'regex:/^\+?[1-9]\d{1,14}$/',
-                ],
-            ], [
-                'mobile_number.required' => 'Mobile number is required.',
-                'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
-            ]);
-
-            if ($validator->fails()) {
-                logValidationException($this->controller_name, $function_name, $validator);
-                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
-            }
-
-            $authUser = User::where('mobile_number', $mobile_number)
-                ->whereNotNull('mobile_verified_at')
-                ->first();
+            $authUser = auth('user')->user();
 
             if (!$authUser) {
-                return $this->sendError('User not found or not verified.', 404);
+                return $this->sendError('User not authenticated.', 401);
             }
 
             $success = [
                 'customer' => [
+                    'id' => $authUser->id,
                     'name' => $authUser->name,
                     'email' => $authUser->email,
                     'address' => $authUser->address,
                     'mobile_number' => $authUser->mobile_number,
                     'mobile_verified_at' => $authUser->mobile_verified_at,
+                    'city_id' => $authUser->city_id,
                 ],
             ];
 
@@ -401,30 +384,13 @@ class AuthenticationController extends Controller
         $function_name = 'getTotalBookService';
 
         try {
-            $validator = Validator::make($request->all(), [
-                'mobile_number' => [
-                    'required',
-                    'regex:/^\+?[1-9]\d{1,14}$/',
-                ],
-            ], [
-                'mobile_number.required' => 'Mobile number is required.',
-                'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
-            ]);
-
-            if ($validator->fails()) {
-                logValidationException($this->controller_name, $function_name, $validator);
-                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
-            }
-
-            $mobile_number = $request->mobile_number;
-
-            $authUser = User::where('mobile_number', $mobile_number)
-                ->whereNotNull('mobile_verified_at')
-                ->first();
+            $authUser = auth('user')->user();
 
             if (!$authUser) {
-                return $this->sendError('User not found or not verified.', 404);
+                return $this->sendError('User not authenticated.', 401);
             }
+
+            $mobile_number = $authUser->mobile_number;
 
             $appointments = Appointment::leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
                 ->select(
@@ -470,15 +436,15 @@ class AuthenticationController extends Controller
         $function_name = 'getBookServiceDetails';
 
         try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
             $validator = Validator::make($request->all(), [
-                'mobile_number' => [
-                    'required',
-                    'regex:/^\+?[1-9]\d{1,14}$/',
-                ],
                 'appointment_id' => 'required|integer',
             ], [
-                'mobile_number.required' => 'Mobile number is required.',
-                'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
                 'appointment_id.required' => 'Appointment ID is required.',
             ]);
 
@@ -487,16 +453,8 @@ class AuthenticationController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
-            $mobile_number = $request->mobile_number;
+            $mobile_number = $authUser->mobile_number;
             $appointmentId = $request->appointment_id;
-
-            $authUser = User::where('mobile_number', $mobile_number)
-                ->whereNotNull('mobile_verified_at')
-                ->first();
-
-            if (!$authUser) {
-                return $this->sendError('User not found or not verified.', 404);
-            }
 
             $appointment = Appointment::leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
                 ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'appointments.service_sub_category_id')
