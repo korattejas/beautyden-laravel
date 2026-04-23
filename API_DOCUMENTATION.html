@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beauty Den API Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #f4f7f6;
+        }
+
+        .container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+        }
+
+        .endpoint {
+            background: #eef2f7;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #c0392b;
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .badge-post {
+            background-color: #e67e22;
+        }
+
+        .badge-get {
+            background-color: #27ae60;
+        }
+
+        .badge-auth {
+            background-color: #8e44ad;
+        }
+
+        .note {
+            background-color: #fff3cd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #ffc107;
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>📱 Beauty Den - Customer API Documentation</h1>
+
+        <div class="note">
+            <strong>🔒 Encryption Requirement:</strong><br>
+            All responses are encrypted using <strong>AES-128-CBC</strong>.
+            You will receive a string: <code>"ENCRYPTED_DATA:IV"</code>.
+            You must decrypt this using your shared key to get the JSON result.
+        </div>
+
+        <h2>1. Send OTP (Login / Register)</h2>
+        <p>Initiates OTP process for existing login or new user registration.</p>
+        <div class="endpoint"><span class="badge badge-post">POST</span> /V1/customer/sendOtpOnMobileNumber</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Presence</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>mobile_number</td>
+                    <td>String</td>
+                    <td>Required</td>
+                    <td>International format (+91...)</td>
+                </tr>
+                <tr>
+                    <td>name</td>
+                    <td>String</td>
+                    <td>New User</td>
+                    <td>Full name of the customer</td>
+                </tr>
+                <tr>
+                    <td>city_id</td>
+                    <td>Integer</td>
+                    <td>New User</td>
+                    <td>Numeric ID of the city</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>2. Verify OTP</h2>
+        <p>Validates OTP and returns authentication token.</p>
+        <div class="endpoint"><span class="badge badge-post">POST</span> /V1/customer/verifyOtpOnMobileNumber</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Presence</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>mobile_number</td>
+                    <td>String</td>
+                    <td>Required</td>
+                    <td>Same as above</td>
+                </tr>
+                <tr>
+                    <td>otp</td>
+                    <td>String</td>
+                    <td>Required</td>
+                    <td>6-digit numeric string</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. Update FCM Token</h2>
+        <p>Updates the Firebase token for the user. Call this whenever the user opens the Home Screen.</p>
+        <div class="endpoint">
+            <span class="badge badge-post">POST</span> /V1/customer/updateFcmToken<br>
+            <span class="badge badge-auth">Bearer Auth Required</span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                    <th>Presence</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>user_id</td>
+                    <td>Integer</td>
+                    <td>Required</td>
+                    <td>Numeric ID of logged-in user</td>
+                </tr>
+                <tr>
+                    <td>fcm_token</td>
+                    <td>String</td>
+                    <td>Required</td>
+                    <td>Token from Firebase</td>
+                </tr>
+                <tr>
+                    <td>device_type</td>
+                    <td>String</td>
+                    <td>Optional</td>
+                    <td>"android" or "ios"</td>
+                </tr>
+                <tr>
+                    <td>device_name</td>
+                    <td>String</td>
+                    <td>Optional</td>
+                    <td>Model name (e.g., iPhone X)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>4. Get Cities List</h2>
+        <p>Provides a list of all cities to choose from.</p>
+        <div class="endpoint"><span class="badge badge-get">GET</span> /V1/cities</div>
+
+        <p>Returns an array of city objects: <code>[{"id": 1, "name": "Surat"}, ...]</code></p>
+
+        <div style="margin-top: 50px; text-align: center; color: #95a5a6; font-size: 0.8em;">
+            &copy; 2026 Beauty Den
+        </div>
+    </div>
+
+</body>
+
+</html>

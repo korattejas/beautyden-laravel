@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('appointments', function (Blueprint $table) {
-            if (!Schema::hasColumn('appointments', 'status')) {
-                $table->tinyInteger('status')->default(1)->comment('1 = Pending, 2 = Assigned, 3 = Completed, 4 = Rejected');
-            }
-            $table->decimal('company_amount', 10, 2)->nullable()->after('status')->comment('Amount received by the company');
+            //
         });
     }
 
@@ -25,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('appointments', function (Blueprint $table) {
-            $table->dropColumn('company_amount');
+            //
         });
     }
 };

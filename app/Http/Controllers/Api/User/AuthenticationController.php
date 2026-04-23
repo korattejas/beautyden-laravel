@@ -17,6 +17,9 @@ use App\Models\Appointment;
 use App\Models\ServiceCategory;
 use App\Models\ServiceSubcategory;
 use App\Models\City;
+use App\Models\UserFcmToken;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class AuthenticationController extends Controller
 {
@@ -35,6 +38,48 @@ class AuthenticationController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
+    public function updateFcmToken(Request $request): JsonResponse
+    {
+        $function_name = 'updateFcmToken';
+        try {
+            $validator = Validator::make($request->all(), [
+                'user_id' => 'required|exists:users,id',
+                'fcm_token' => 'required|string',
+                'device_type' => 'nullable|string|in:android,ios',
+                'device_name' => 'nullable|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $token = UserFcmToken::where('user_id', $request->user_id)
+                ->where('fcm_token', $request->fcm_token)
+                ->first();
+
+            if ($token) {
+                $token->update([
+                    'device_type' => $request->device_type ?? $token->device_type,
+                    'device_name' => $request->device_name ?? $token->device_name,
+                    'ip_address' => $request->ip(),
+                ]);
+            } else {
+                UserFcmToken::create([
+                    'user_id' => $request->user_id,
+                    'fcm_token' => $request->fcm_token,
+                    'device_type' => $request->device_type,
+                    'device_name' => $request->device_name,
+                    'ip_address' => $request->ip(),
+                ]);
+            }
+
+            return $this->sendResponse([], 'FCM token updated successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
     public function sendOtpOnMobileNumber(Request $request): JsonResponse
     {
         $function_name = 'sendOtpOnMobileNumber';
@@ -51,7 +96,6 @@ class AuthenticationController extends Controller
             $validateMessage = [
                 'mobile_number.required' => 'Mobile number is required.',
                 'mobile_number.regex' => 'Enter a valid international mobile number with country code.',
-                'mobile_number.unique' => 'Mobile number already exists!',
             ];
 
             $validator = Validator::make($request->all(), $validateArray, $validateMessage);
@@ -61,11 +105,22 @@ class AuthenticationController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
+            $user = User::where('mobile_number', $mobile_number)->first();
+
+            if (!$user) {
+                $validator = Validator::make($request->all(), [
+                    'name' => 'required|string|max:255',
+                    'city_id' => 'required',
+                ]);
+
+                if ($validator->fails()) {
+                    return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+                }
+            }
+
             $otp = rand(100000, 999999);
             $otpExpirationTime = (int) config('custom.otp_expiration_time');
             $expiry = now()->addSeconds($otpExpirationTime);
-
-            $user = User::where('mobile_number', $mobile_number)->first();
 
             if ($user) {
                 $user->update([
@@ -75,55 +130,104 @@ class AuthenticationController extends Controller
                     'mobile_verified_at' => null,
                 ]);
             } else {
+                $city_id = $request->city_id;
+                if (!is_numeric($city_id)) {
+                    $city = City::firstOrCreate(['name' => $city_id], ['status' => 1]);
+                    $city_id = $city->id;
+                } else {
+                    if (!City::where('id', $city_id)->exists()) {
+                         $city = City::firstOrCreate(['name' => $city_id], ['status' => 1]);
+                         $city_id = $city->id;
+                    }
+                }
+
                 $user = User::create([
+                    'name' => $request->name,
                     'mobile_number' => $mobile_number,
+                    'city_id' => $city_id,
                     'otp' => $otp,
                     'otp_expiration_at' => $expiry,
                     'ip_address' => $request->ip(),
                     'role' => 2,
+                    'status' => 1,
                 ]);
             }
 
-            // $this->sendWhatsAppOtp($mobile_number, $otp);
-            $user = User::where('mobile_number', $mobile_number)->first();
+            $this->sendWhatsAppOtp($mobile_number, $user->name, $otp);
+
             $success = [
                 'customer' => $user,
                 'otp_expiration_time' => $otpExpirationTime,
                 'resend_otp_time' => config('custom.resend_otp_time'),
                 'resend_otp_max_limit' => config('custom.resend_otp_max_limit'),
+                'is_new_user' => !$user->wasRecentlyCreated ? false : true,
             ];
 
-
-            return $this->sendResponse($success, 'User register successfully.', $this->success_status);
+            return $this->sendResponse($success, 'OTP sent successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
 
-    protected function sendWhatsAppOtp($phone, $otp)
+    protected function sendWhatsAppOtp($phone, $name, $otp)
     {
         try {
-            $sid    = env('TWILIO_ACCOUNT_SID');
-            $token  = env('TWILIO_AUTH_TOKEN');
-            $from   = env('TWILIO_WHATSAPP_FROM');
-            $templateSid = 'HX3e6d0aac83cf42ed0c9269971562d295';
+            $authKey = env('MSG91_AUTH_KEY');
+            $senderNumber = env('MSG91_WHATSAPP_NUMBER');
+            $templateName = 'beautyden_otp';
 
-            $client = new Client($sid, $token);
             $cleanedNumber = preg_replace('/\D/', '', $phone);
-            $to = 'whatsapp:+91' . $cleanedNumber;
+            // Ensure number has country code for MSG91
+            if (strlen($cleanedNumber) == 10) {
+                $to = '91' . $cleanedNumber;
+            } else {
+                $to = $cleanedNumber;
+            }
 
-            $contentVariables = json_encode(['1' => (string) $otp], JSON_UNESCAPED_UNICODE);
-
-            $message = $client->messages->create($to, [
-                'from' => $from,
-                'contentSid' => $templateSid,
-                'contentVariables' => $contentVariables
+            $response = Http::withHeaders([
+                'authkey' => $authKey,
+                'Content-Type' => 'application/json'
+            ])->post('https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/', [
+                'integrated_number' => $senderNumber,
+                'content_type' => 'template',
+                'payload' => [
+                    'messaging_product' => 'whatsapp',
+                    'type' => 'template',
+                    'template' => [
+                        'name' => $templateName,
+                        'language' => [
+                            'code' => 'en',
+                            'policy' => 'deterministic'
+                        ],
+                        'namespace' => '74620ab4_9b20_468c_8d6d_d17ebaa631a0',
+                        'to_and_components' => [
+                            [
+                                'to' => [(string) $to, '916352755075'],
+                                'components' => [
+                                    'body_1' => [
+                                        'type' => 'text',
+                                        'value' => (string) $otp
+                                    ],
+                                    'button_1' => [
+                                        'subtype' => 'url',
+                                        'type' => 'text',
+                                        'value' => (string) $otp
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ]);
 
-            logger()->error("✅ WhatsApp OTP sent successfully. SID: " . $message->sid);
+            if ($response->successful()) {
+                Log::info("MSG91 WhatsApp OTP sent successfully to $to. Response: " . $response->body());
+            } else {
+                Log::error("MSG91 WhatsApp OTP send failed for $to. Status: " . $response->status() . " Body: " . $response->body());
+            }
         } catch (\Exception $e) {
-            logger()->error("❌ WhatsApp OTP send failed: " . $e->getMessage());
+            Log::error("MSG91 WhatsApp OTP send exception: " . $e->getMessage());
         }
     }
 
@@ -158,21 +262,23 @@ class AuthenticationController extends Controller
                 return $this->sendError('Invalid OTP.', $this->backend_error_status);
             }
 
-            if (is_null($user->mobile_verified_at)) {
-                $user->update(['mobile_verified_at' => now()]);
+            $user->update([
+                'mobile_verified_at' => now(),
+                'otp' => null,
+                'otp_expiration_at' => null
+            ]);
 
-                $token = JWTAuth::fromUser($user);
+            $token = JWTAuth::fromUser($user);
 
-                $success = [
-                    'id' => $user->id,
-                    'mobile_no' => $mobile_number,
-                    'token' => $token,
-                ];
+            $success = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'mobile_no' => $mobile_number,
+                'token' => $token,
+                'customer' => $user
+            ];
 
-                return $this->sendResponse($success, 'Mobile verified successfully.', $this->success_status);
-            } else {
-                return $this->sendError('Mobile number already verified.', $this->backend_error_status);
-            }
+            return $this->sendResponse($success, 'Mobile verified successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);

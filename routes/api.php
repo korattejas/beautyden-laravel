@@ -45,6 +45,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('getProfile', [AuthenticationController::class, 'getProfile']);
         Route::post('getTotalBookService', [AuthenticationController::class, 'getTotalBookService']);
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
+        Route::post('updateFcmToken', [AuthenticationController::class, 'updateFcmToken']);
         Route::get('logout', [AuthenticationController::class, 'logout']);
     });
 
@@ -106,6 +107,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('getProfile', [AuthenticationController::class, 'getProfile']);
         Route::post('getTotalBookService', [AuthenticationController::class, 'getTotalBookService']);
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
+        Route::post('updateFcmToken', [AuthenticationController::class, 'updateFcmToken']);
         Route::get('logout', [AuthenticationController::class, 'logout']);
     });
 });
