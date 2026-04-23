@@ -216,6 +216,31 @@
             </li>
 
             <li class=" navigation-header">
+                <span>Promotions</span>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.offers.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.offers.index') }}">
+                    <i data-feather="gift"></i>
+                    <span class="menu-title text-truncate">Offers (Banners)</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.coupon-codes.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.coupon-codes.index') }}">
+                    <i data-feather="tag"></i>
+                    <span class="menu-title text-truncate">Coupon Codes</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.coupon-usage.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.coupon-usage.index') }}">
+                    <i data-feather="file-text"></i>
+                    <span class="menu-title text-truncate">Coupon Usage Logs</span>
+                </a>
+            </li>
+
+            <li class=" navigation-header">
                 <span>Communication</span>
             </li>
 

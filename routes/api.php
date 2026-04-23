@@ -52,6 +52,10 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
+        
+        /* Coupons */
+        Route::get('listCoupons', [\App\Http\Controllers\Api\CouponController::class, 'listCoupons']);
+        Route::post('applyCoupon', [\App\Http\Controllers\Api\CouponController::class, 'applyCoupon']);
     });
 
     
@@ -119,6 +123,10 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
+
+        /* Coupons */
+        Route::get('listCoupons', [\App\Http\Controllers\Api\CouponController::class, 'listCoupons']);
+        Route::post('applyCoupon', [\App\Http\Controllers\Api\CouponController::class, 'applyCoupon']);
     });
 });
 

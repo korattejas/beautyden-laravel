@@ -22,6 +22,8 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TeamMemberController;
 use App\Http\Controllers\Admin\ContractSignedController;
 use App\Http\Controllers\Admin\OfferController;
+use App\Http\Controllers\Admin\CouponCodeController;
+use App\Http\Controllers\Admin\CouponUsageController;
 use App\Http\Controllers\ContractController;
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
@@ -265,5 +267,19 @@ Route::group(['prefix' => 'admin'], function () {
         /* Policies Route */
         Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');
         Route::post('policies/store', [PoliciesController::class, 'store']);
+
+        /* Coupon Codes Route */
+        Route::get('coupon-codes', [CouponCodeController::class, 'index'])->name('admin.coupon-codes.index');
+        Route::get('coupon-codes/create', [CouponCodeController::class, 'create'])->name('admin.coupon-codes.create');
+        Route::post('coupon-codes/store', [CouponCodeController::class, 'store'])->name('admin.coupon-codes.store');
+        Route::get('coupon-codes/edit/{id}', [CouponCodeController::class, 'edit'])->name('admin.coupon-codes.edit');
+        Route::get('getDataCouponCodes', [CouponCodeController::class, 'getDataCouponCodes'])->name('getDataCouponCodes');
+        Route::get('coupon-codes/status/{id}/{status}', [CouponCodeController::class, 'changeStatus']);
+        Route::delete('coupon-codes/{id}', [CouponCodeController::class, 'destroy']);
+
+        /* Coupon Usage Route */
+        Route::get('coupon-usage', [CouponUsageController::class, 'index'])->name('admin.coupon-usage.index');
+        Route::get('getDataCouponUsages', [CouponUsageController::class, 'getDataCouponUsages'])->name('getDataCouponUsages');
+        Route::delete('coupon-usage/{id}', [CouponUsageController::class, 'destroy']);
     });
 });

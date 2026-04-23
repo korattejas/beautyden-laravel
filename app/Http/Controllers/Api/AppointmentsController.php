@@ -57,8 +57,9 @@ class AppointmentsController extends Controller
                 'service_address'     => 'nullable|string',
                 'appointment_date'    => 'nullable|date',
                 'appointment_time'    => 'nullable',
-                'notes'       => 'nullable|string',
+                'notes'               => 'nullable|string',
                 'status'              => 'nullable|in:0,1',
+                'coupon_id'           => 'nullable|integer|exists:coupon_codes,id',
             ]);
 
             if ($validator->fails()) {
@@ -95,8 +96,23 @@ class AppointmentsController extends Controller
             }
 
             $discountAmount = $request->discount_price ?? 0;
-            $travelCharges = 0;
+            
+            // Re-calculate or verify discount if coupon_id is provided
+            if ($request->filled('coupon_id')) {
+                $coupon = \App\Models\CouponCode::find($request->coupon_id);
+                if ($coupon) {
+                    if ($coupon->discount_type == 'percentage') {
+                        $discountAmount = ($subTotal * $coupon->discount_value) / 100;
+                        if ($coupon->max_discount_amount && $discountAmount > $coupon->max_discount_amount) {
+                            $discountAmount = $coupon->max_discount_amount;
+                        }
+                    } else {
+                        $discountAmount = $coupon->discount_value;
+                    }
+                }
+            }
 
+            $travelCharges = 0;
             $grandTotal = ($subTotal + $travelCharges) - $discountAmount;
 
             $servicesData = [
@@ -122,7 +138,6 @@ class AppointmentsController extends Controller
                 ],
             ];
 
-
             $appointment = Appointment::create([
                 'order_number'        => $orderNumber,
                 'city_id'             => $request->city_id,
@@ -135,14 +150,24 @@ class AppointmentsController extends Controller
                 'service_sub_category_id' => $request->service_sub_category_id,
                 'quantity'            => $request->quantity,
                 'price'               => $subTotal,
-                'discount_price'      => $request->discount_price,
+                'discount_price'      => $discountAmount,
                 'service_address'     => $request->service_address,
                 'appointment_date'    => $request->appointment_date,
                 'appointment_time'    => $request->appointment_time,
-                'special_notes'               => $request->notes,
-                'services_data'    => $servicesData,
+                'special_notes'       => $request->notes,
+                'services_data'       => $servicesData,
                 'status'              => '1',
             ]);
+
+            // Record Coupon Usage
+            if ($appointment && $request->filled('coupon_id')) {
+                \App\Models\CouponUsage::create([
+                    'coupon_id' => $request->coupon_id,
+                    'user_id' => auth('user')->check() ? auth('user')->id() : null,
+                    'appointment_id' => $appointment->id,
+                    'discount_amount' => $discountAmount,
+                ]);
+            }
 
             if (!empty($request->phone)) {
                 $this->sendWhatsAppBooking($request->phone, $request->first_name, $orderNumber, $request->appointment_date, $request->appointment_time);
