@@ -89,7 +89,13 @@ class SettingController extends Controller
                             'action_array' => $action_array
                         ])->render();
                     })
-                    ->rawColumns(['action', 'status'])
+                    ->addColumn('image', function ($setting) {
+                        if (!empty($setting->image)) {
+                            return '<img src="' . asset('uploads/settings/' . $setting->image) . '" alt="image" style="width: 50px;">';
+                        }
+                        return 'N/A';
+                    })
+                    ->rawColumns(['action', 'status', 'image'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -127,10 +133,16 @@ class SettingController extends Controller
             }
 
             if ($id == 0) {
+                $image = '';
+                if ($request->hasFile('image')) {
+                    $image = \App\Helpers\ImageUploadHelper::settingImageUpload($request->file('image'));
+                }
+
                 Setting::create([
                     'screen_name' => $request->screen_name,
                     'key' => $request->key,
                     'value' => $request->value,
+                    'image' => $image,
                     'status' => (int) $request->status,
                 ]);
 
@@ -139,10 +151,24 @@ class SettingController extends Controller
                     'message' => trans('admin_string.setting_added_successfully')
                 ]);
             } else {
+                $setting = Setting::find($id);
+                $image = $setting->image;
+
+                if ($request->hasFile('image')) {
+                    if (!empty($setting->image)) {
+                        $old_image_path = public_path('uploads/settings/' . $setting->image);
+                        if (file_exists($old_image_path)) {
+                            unlink($old_image_path);
+                        }
+                    }
+                    $image = \App\Helpers\ImageUploadHelper::settingImageUpload($request->file('image'));
+                }
+
                 Setting::where('id', $id)->update([
                     'screen_name' => $request->screen_name,
                     'key' => $request->key,
                     'value' => $request->value,
+                    'image' => $image,
                     'status' => (int) $request->status,
                 ]);
                 return response()->json([
@@ -176,6 +202,12 @@ class SettingController extends Controller
         try {
             $setting = Setting::where('id', $id)->first();
             if ($setting) {
+                if (!empty($setting->image)) {
+                    $old_image_path = public_path('uploads/settings/' . $setting->image);
+                    if (file_exists($old_image_path)) {
+                        unlink($old_image_path);
+                    }
+                }
                 $setting->delete();
 
                 return response()->json([

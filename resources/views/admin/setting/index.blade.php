@@ -42,6 +42,7 @@
                                                 <th>{{ trans('admin_string.screen_name') }}</th>
                                                 <th>{{ trans('admin_string.key') }}</th>
                                                 <th>{{ trans('admin_string.value') }}</th>
+                                                <th>{{ trans('admin_string.image') }}</th>
                                                 <th data-stuff="Active,InActive">{{ trans('admin_string.status') }}</th>
                                                 <th data-search="false">{{ trans('admin_string.action') }}</th>
 
@@ -100,6 +101,12 @@
                         }
                         return data;
                     }
+                },
+                {
+                    data: 'image',
+                    name: 'image',
+                    orderable: false,
+                    searchable: false
                 },
                 {
                     data: 'status',

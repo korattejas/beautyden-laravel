@@ -31,10 +31,15 @@ class SettingController extends Controller
 
         try {
             $settings = DB::table('settings as s')
-                ->select('s.id', 's.screen_name', 's.key', 's.value')
+                ->select('s.id', 's.screen_name', 's.key', 's.value', 's.image')
                 ->where('s.status', 1)
                 ->orderBy('s.id', 'ASC')
                 ->get();
+
+            $settings = $settings->map(function ($setting) {
+                $setting->image = !empty($setting->image) ? asset('uploads/settings/' . $setting->image) : '';
+                return $setting;
+            });
 
             if ($settings->isEmpty()) {
                 return $this->sendError('No Setting found.', $this->backend_error_status);

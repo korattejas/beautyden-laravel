@@ -406,4 +406,18 @@ class ImageUploadHelper
         $files->move($destination_path, $file_name);
         return $image_path . '/' . $file_name;
     }
+    public static function settingImageUpload($files): string
+    {
+        $image_path = 'uploads/settings';
+        if (!File::exists(public_path($image_path))) {
+            File::makeDirectory(public_path($image_path), 0777, true);
+        }
+
+        $extension = $files->getClientOriginalExtension();
+        $file_name = uniqid() . '.' . $extension;
+
+        $files->move(public_path($image_path), $file_name);
+
+        return $file_name;
+    }
 }

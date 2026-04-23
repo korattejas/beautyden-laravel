@@ -30,7 +30,7 @@
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
                                     <div class="card-body">
-                                        <form method="POST" data-parsley-validate="" id="addEditForm" role="form">
+                                        <form method="POST" data-parsley-validate="" id="addEditForm" role="form" enctype="multipart/form-data">
                                             @csrf
                                             <input type="hidden" name="edit_value" value="0">
                                             <input type="hidden" id="form-method" value="add">
@@ -62,7 +62,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-12 mt-2">
+                                                 <div class="col-12 mt-2">
                                                     <div class="form-group">
                                                         <label>{{ trans('admin_string.status') }}</label>
                                                         <select id="status" name="status" class="form-control" required>
@@ -72,6 +72,14 @@
                                                             <option value="1" selected>Active</option>
                                                             <option value="0">Inactive</option>
                                                         </select>
+                                                        <div class="valid-feedback"></div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 mt-2">
+                                                    <div class="form-group">
+                                                        <label>{{ trans('admin_string.image') }}</label>
+                                                        <input type="file" class="form-control" name="image">
                                                         <div class="valid-feedback"></div>
                                                     </div>
                                                 </div>

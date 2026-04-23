@@ -15,6 +15,7 @@ class Setting extends Model
         'screen_name',
         'key',
         'value',
+        'image',
         'status',
     ];
 }
