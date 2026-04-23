@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TeamMemberController;
 use App\Http\Controllers\Admin\ContractSignedController;
+use App\Http\Controllers\Admin\OfferController;
 use App\Http\Controllers\ContractController;
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
@@ -96,6 +97,16 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('getDataPortfolio', [PortfolioController::class, 'getDataPortfolio'])->name('getDataPortfolio');
         Route::get('portfolio/status/{id}/{status}', [PortfolioController::class, 'changeStatus'])->name('admin.portfolio.changeStatus');
         Route::post('portfolio/remove-image', [PortfolioController::class, 'removeImage'])->name('admin.portfolio.removeImage');
+
+        /* Offers */
+        Route::get('offers', [OfferController::class, 'index'])->name('admin.offers.index');
+        Route::get('offers/create', [OfferController::class, 'create'])->name('admin.offers.create');
+        Route::post('offers/store', [OfferController::class, 'store'])->name('admin.offers.store');
+        Route::get('offers/edit/{id}', [OfferController::class, 'edit'])->name('admin.offers.edit');
+        Route::get('getDataOffers', [OfferController::class, 'getDataOffers'])->name('admin.offers.getDataOffers');
+        Route::delete('offers/{id}', [OfferController::class, 'destroy'])->name('admin.offers.destroy');
+        Route::get('offers/status/{id}/{status}', [OfferController::class, 'changeStatus'])->name('admin.offers.changeStatus');
+        Route::post('offers/remove-media', [OfferController::class, 'removeMedia'])->name('admin.offers.removeMedia');
 
     
 

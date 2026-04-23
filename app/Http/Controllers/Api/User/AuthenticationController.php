@@ -18,6 +18,7 @@ use App\Models\ServiceCategory;
 use App\Models\ServiceSubcategory;
 use App\Models\City;
 use App\Models\UserFcmToken;
+use App\Models\UserAddress;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 
@@ -338,7 +339,9 @@ class AuthenticationController extends Controller
             $authUser->save();
 
             $success = [
-                'customer' => $authUser->fresh(),
+                'customer' => $authUser->fresh()->load(['addresses' => function($query) {
+                    $query->orderBy('is_default', 'desc')->orderBy('id', 'desc');
+                }]),
             ];
 
             return $this->sendResponse($success, 'Profile updated successfully.', $this->success_status);
@@ -369,6 +372,7 @@ class AuthenticationController extends Controller
                     'mobile_number' => $authUser->mobile_number,
                     'mobile_verified_at' => $authUser->mobile_verified_at,
                     'city_id' => $authUser->city_id,
+                    'addresses' => $authUser->addresses()->orderBy('is_default', 'desc')->orderBy('id', 'desc')->get(),
                 ],
             ];
 
@@ -429,6 +433,119 @@ class AuthenticationController extends Controller
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
+
+    public function saveUserAddress(Request $request): JsonResponse
+    {
+        $function_name = 'saveUserAddress';
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'id' => 'nullable|integer|exists:user_addresses,id',
+                'address' => 'required|string|max:500',
+                'latitude' => 'nullable|numeric',
+                'longitude' => 'nullable|numeric',
+                'type' => 'nullable|string|max:50',
+                'is_default' => 'nullable|boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            if ($request->id) {
+                $userAddress = UserAddress::where('id', $request->id)->where('user_id', $authUser->id)->first();
+                if (!$userAddress) {
+                    return $this->sendError('Address not found or doesn\'t belong to you.', $this->backend_error_status);
+                }
+                $userAddress->update($request->only(['address', 'latitude', 'longitude', 'type', 'is_default']));
+            } else {
+                $addressCount = UserAddress::where('user_id', $authUser->id)->count();
+                if ($addressCount >= 3) {
+                    return $this->sendError('You can only add up to 3 addresses.', $this->validation_error_status);
+                }
+
+                $userAddress = UserAddress::create([
+                    'user_id' => $authUser->id,
+                    'address' => $request->address,
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
+                    'type' => $request->type,
+                    'is_default' => $request->is_default ?? false,
+                ]);
+            }
+
+            if ($request->is_default) {
+                UserAddress::where('user_id', $authUser->id)
+                    ->where('id', '!=', $userAddress->id)
+                    ->update(['is_default' => false]);
+            }
+
+            return $this->sendResponse($userAddress, 'Address saved successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function getUserAddresses(Request $request): JsonResponse
+    {
+        $function_name = 'getUserAddresses';
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            $addresses = UserAddress::where('user_id', $authUser->id)
+                ->orderBy('is_default', 'desc')
+                ->orderBy('id', 'desc')
+                ->get();
+
+            return $this->sendResponse($addresses, 'Addresses fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function deleteUserAddress(Request $request): JsonResponse
+    {
+        $function_name = 'deleteUserAddress';
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'address_id' => 'required|integer|exists:user_addresses,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $userAddress = UserAddress::where('id', $request->address_id)->where('user_id', $authUser->id)->first();
+            if (!$userAddress) {
+                return $this->sendError('Address not found or doesn\'t belong to you.', $this->backend_error_status);
+            }
+
+            $userAddress->delete();
+
+            return $this->sendResponse([], 'Address deleted successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
 
 
     public function getBookServiceDetails(Request $request): JsonResponse

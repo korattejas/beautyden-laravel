@@ -22,6 +22,8 @@ use App\Http\Middleware\ResponseModifier;
 use App\Http\Middleware\SanitizeInput;
 use App\Http\Middleware\JWTTokenMiddleware;
 use App\Http\Controllers\Api\Beautician\BeauticianController;
+use App\Http\Controllers\Api\OfferController;
+use App\Http\Controllers\Api\ApplicationHomeController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -47,6 +49,9 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
         Route::post('updateFcmToken', [AuthenticationController::class, 'updateFcmToken']);
         Route::get('logout', [AuthenticationController::class, 'logout']);
+        Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
+        Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
+        Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
     });
 
     
@@ -89,6 +94,8 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
+        Route::get('offers', [OfferController::class, 'getOffers']);
+        Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
     });
 });
 
@@ -109,6 +116,9 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
         Route::post('updateFcmToken', [AuthenticationController::class, 'updateFcmToken']);
         Route::get('logout', [AuthenticationController::class, 'logout']);
+        Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
+        Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
+        Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
     });
 });
 
@@ -132,5 +142,7 @@ Route::middleware([])->group(function () {
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
+        Route::get('offers', [OfferController::class, 'getOffers']);
+        Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
     });
 });

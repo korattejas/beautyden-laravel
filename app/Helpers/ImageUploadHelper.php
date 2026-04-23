@@ -87,6 +87,36 @@ class ImageUploadHelper
         return $file_name;
     }
 
+    public static function OfferImageUpload($files): string
+    {
+        $image_path = 'uploads/offers/images';
+        if (!File::exists(public_path($image_path))) {
+            File::makeDirectory(public_path($image_path), 0777, true);
+        }
+
+        $extension = $files->getClientOriginalExtension();
+        $file_name = uniqid('offer_img_') . '.' . $extension;
+
+        $files->move(public_path($image_path), $file_name);
+
+        return $file_name;
+    }
+
+    public static function OfferVideoUpload($file): string
+    {
+        $video_path = 'uploads/offers/videos';
+        if (!File::exists(public_path($video_path))) {
+            File::makeDirectory(public_path($video_path), 0777, true);
+        }
+
+        $extension = $file->getClientOriginalExtension();
+        $file_name = uniqid('offer_vid_') . '.' . $extension;
+
+        $file->move(public_path($video_path), $file_name);
+
+        return $file_name;
+    }
+
     public static function blogCategoryimageUpload($files): string
     {
         $image_path = 'uploads/blog-category';
