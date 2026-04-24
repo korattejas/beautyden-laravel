@@ -21,9 +21,14 @@ return new class extends Migration
             $table->decimal('rating', 3, 2)->nullable();
             $table->integer('reviews')->nullable();
             $table->longText('description')->nullable();
-            $table->string('icon')->nullable();
+            
+            // New Banner Media (Multiple Images/Videos)
+            $table->json('banner_media')->nullable(); 
 
-            // Unified Content Field
+            // New Before/After
+            $table->json('before_after')->nullable();
+
+            // Dynamic Content
             $table->json('content_json')->nullable();
 
             $table->tinyInteger('is_popular')->default(0);

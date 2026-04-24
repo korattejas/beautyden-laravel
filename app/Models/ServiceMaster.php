@@ -19,13 +19,16 @@ class ServiceMaster extends Model
         'rating',
         'reviews',
         'description',
-        'icon',
-        'content_json', // Unified dynamic content
+        'banner_media',   // Media carousel
+        'before_after',   // Before/After pairs
+        'content_json',   // Dynamic sections
         'is_popular',
         'status',
     ];
 
     protected $casts = [
+        'banner_media' => 'array',
+        'before_after' => 'array',
         'content_json' => 'array',
     ];
 }

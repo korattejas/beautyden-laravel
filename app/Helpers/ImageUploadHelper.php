@@ -284,6 +284,21 @@ class ImageUploadHelper
         return $file_name;
     }
 
+    public static function serviceMediaUpload($files): string
+    {
+        $media_path = 'uploads/service-media';
+        if (!File::exists(public_path($media_path))) {
+            File::makeDirectory(public_path($media_path), 0777, true);
+        }
+
+        $extension = $files->getClientOriginalExtension();
+        $file_name = uniqid('media_') . '.' . $extension;
+
+        $files->move(public_path($media_path), $file_name);
+
+        return $file_name;
+    }
+
 
 
 

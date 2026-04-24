@@ -61,6 +61,18 @@ class ServiceMasterController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        try {
+            $service = ServiceMaster::findOrFail(decryptId($id));
+            $essentials = ServiceEssential::where('status', 1)->get()->keyBy('id');
+            return view('admin.service-masters.show', compact('service', 'essentials'));
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, 'show');
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
     public function getDataServiceMaster(Request $request)
     {
         try {
@@ -84,6 +96,8 @@ class ServiceMasterController extends Controller
                     ->addColumn('action', function ($s) {
                         $action_array = [
                             'is_simple_action' => 1,
+                            'is_view_action' => 1,
+                            'view_route' => route('admin.service-master.show', encryptId($s->id)),
                             'edit_route' => route('admin.service-master.edit', encryptId($s->id)),
                             'delete_id' => $s->id,
                             'current_status' => $s->status,
@@ -91,13 +105,7 @@ class ServiceMasterController extends Controller
                         ];
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })
-                    ->addColumn('icon', function ($s) {
-                        if ($s->icon && file_exists(public_path('uploads/service/' . $s->icon))) {
-                            return '<img src="' . asset('uploads/service/' . $s->icon) . '" style="max-width:50px;" />';
-                        }
-                        return '-';
-                    })
-                    ->rawColumns(['action', 'icon', 'status'])
+                    ->rawColumns(['action', 'status'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -114,7 +122,6 @@ class ServiceMasterController extends Controller
             'name'            => 'required|string|max:255',
             'category_id'     => 'required|exists:service_categories,id',
             'sub_category_id' => 'nullable|exists:service_subcategories,id',
-            'icon'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -125,14 +132,50 @@ class ServiceMasterController extends Controller
         try {
             $service = $id ? ServiceMaster::find($id) : null;
 
-            // Handle Main Icon
-            $icon = $service?->icon;
-            if ($request->hasFile('icon')) {
-                if ($icon) File::delete(public_path('uploads/service/' . $icon));
-                $icon = ImageUploadHelper::serviceimageUpload($request->file('icon'));
+            // Handle Banner Media (Multiple Images/Videos)
+            $banner_media = [];
+            if ($request->banner) {
+                foreach ($request->banner as $key => $item) {
+                    $file_url = $item['old_file'] ?? null;
+                    $type = $item['old_type'] ?? 'image';
+
+                    if ($request->hasFile("banner.$key.file")) {
+                        if ($file_url) File::delete(public_path('uploads/service-media/' . $file_url));
+                        $file = $request->file("banner.$key.file");
+                        $file_url = ImageUploadHelper::serviceMediaUpload($file);
+                        $extension = strtolower($file->getClientOriginalExtension());
+                        $type = in_array($extension, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
+                    }
+
+                    if ($file_url) {
+                        $banner_media[] = ['url' => $file_url, 'type' => $type];
+                    }
+                }
             }
 
-            // Dynamic Content Builder Processing
+            // Handle Before / After Pairs
+            $before_after = [];
+            if ($request->ba_pair) {
+                foreach ($request->ba_pair as $key => $pair) {
+                    $before = $pair['old_before'] ?? null;
+                    if ($request->hasFile("ba_pair.$key.before")) {
+                        if ($before) File::delete(public_path('uploads/service-media/' . $before));
+                        $before = ImageUploadHelper::serviceMediaUpload($request->file("ba_pair.$key.before"));
+                    }
+
+                    $after = $pair['old_after'] ?? null;
+                    if ($request->hasFile("ba_pair.$key.after")) {
+                        if ($after) File::delete(public_path('uploads/service-media/' . $after));
+                        $after = ImageUploadHelper::serviceMediaUpload($request->file("ba_pair.$key.after"));
+                    }
+
+                    if ($before || $after) {
+                        $before_after[] = ['before' => $before, 'after' => $after];
+                    }
+                }
+            }
+
+            // Handle Dynamic Content Builder
             $content_builder = [];
             if ($request->sections) {
                 foreach ($request->sections as $key => $section) {
@@ -152,11 +195,7 @@ class ServiceMasterController extends Controller
                                     if ($img) File::delete(public_path('uploads/service-content/' . $img));
                                     $img = ImageUploadHelper::serviceContentImageUpload($request->file("sections.$key.steps.$sKey.image"));
                                 }
-                                $steps[] = [
-                                    'title' => $step['title'] ?? '',
-                                    'desc'  => $step['desc'] ?? '',
-                                    'image' => $img
-                                ];
+                                $steps[] = ['title' => $step['title'] ?? '', 'desc'  => $step['desc'] ?? '', 'image' => $img];
                             }
                         }
                         $processed_section['steps'] = $steps;
@@ -184,15 +223,11 @@ class ServiceMasterController extends Controller
                                     if ($img) File::delete(public_path('uploads/service-content/' . $img));
                                     $img = ImageUploadHelper::serviceContentImageUpload($request->file("sections.$key.items.$iKey.image"));
                                 }
-                                $items[] = [
-                                    'title' => $item['title'] ?? '',
-                                    'image' => $img
-                                ];
+                                $items[] = ['title' => $item['title'] ?? '', 'image' => $img];
                             }
                         }
                         $processed_section['items'] = $items;
                     }
-
                     $content_builder[] = $processed_section;
                 }
             }
@@ -207,7 +242,8 @@ class ServiceMasterController extends Controller
                 'rating'              => $request->rating,
                 'reviews'             => $request->reviews,
                 'description'         => $request->description,
-                'icon'                => $icon,
+                'banner_media'        => $banner_media,
+                'before_after'        => $before_after,
                 'content_json'        => $content_builder,
                 'is_popular'          => (int) $request->is_popular,
                 'status'              => (int) $request->status,
@@ -233,14 +269,20 @@ class ServiceMasterController extends Controller
         try {
             $service = ServiceMaster::find($id);
             if ($service) {
-                if ($service->icon) File::delete(public_path('uploads/service/' . $service->icon));
+                // Cleanup medias
+                if($service->banner_media) {
+                    foreach($service->banner_media as $m) File::delete(public_path('uploads/service-media/' . $m['url']));
+                }
+                if($service->before_after) {
+                    foreach($service->before_after as $ba) {
+                        if($ba['before']) File::delete(public_path('uploads/service-media/' . $ba['before']));
+                        if($ba['after']) File::delete(public_path('uploads/service-media/' . $ba['after']));
+                    }
+                }
                 
-                // Cleanup all content images
                 if ($service->content_json) {
                     foreach ($service->content_json as $section) {
-                        if (isset($section['image']) && $section['image']) {
-                            File::delete(public_path('uploads/service-content/' . $section['image']));
-                        }
+                        if (isset($section['image']) && $section['image']) File::delete(public_path('uploads/service-content/' . $section['image']));
                         if (isset($section['steps'])) {
                             foreach ($section['steps'] as $step) {
                                 if (!empty($step['image'])) File::delete(public_path('uploads/service-content/' . $step['image']));
