@@ -53,10 +53,10 @@
 @endsection
 @section('footer_script_content')
     <script>
-        const sweetalert_delete_title = "Delete usage record?";
-        const sweetalert_delete_text = "This will allow the user to reuse the coupon code!";
-        const form_url = '/coupon-usage';
-        datatable_url = '/getDataCouponUsages';
+        var sweetalert_delete_title = "Delete usage record?";
+        var sweetalert_delete_text = "This will allow the user to reuse the coupon code!";
+        var form_url = '/coupon-usage';
+        var datatable_url = '/getDataCouponUsages';
 
         $.extend(true, $.fn.dataTable.defaults, {
             pageLength: 10,

@@ -17,19 +17,19 @@
     @yield('header_style_content')
 
     <script type="text/javascript">
-        let APP_URL = {!! json_encode(url('/admin')) !!};
-        let JS_URL = '{{ url('/') }}';
-        let datatable_url = '/';
-        let is_admin_open = 1;
-        const status_msg = "Are You Sure?";
-        const confirmButtonText = "Yes,change it";
-        const cancelButtonText = "No";
-        const sweetalert_delete_text = "Are you sure want to delete this record?";
-        const cancel_button_text = "Cancel";
-        const delete_button_text = "Delete";
-        const sweetalert_change_status_text = "Are you sure want to change status of this record?";
-        const sweetalert_change_priority_status_text = "Are you sure want to change priority status of this record?";
-        const yes_change_it = "Change";
+        var APP_URL = {!! json_encode(url('/admin')) !!};
+        var JS_URL = '{{ url('/') }}';
+        var datatable_url = '/';
+        var is_admin_open = 1;
+        var status_msg = "Are You Sure?";
+        var confirmButtonText = "Yes,change it";
+        var cancelButtonText = "No";
+        var sweetalert_delete_text = "Are you sure want to delete this record?";
+        var cancel_button_text = "Cancel";
+        var delete_button_text = "Delete";
+        var sweetalert_change_status_text = "Are you sure want to change status of this record?";
+        var sweetalert_change_priority_status_text = "Are you sure want to change priority status of this record?";
+        var yes_change_it = "Change";
     </script>
 
 </head>

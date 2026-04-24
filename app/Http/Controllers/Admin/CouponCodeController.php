@@ -78,6 +78,7 @@ class CouponCodeController extends Controller
                             'delete_id' => $coupon->id,
                             'current_status' => $coupon->status,
                             'hidden_id' => $coupon->id,
+                            'view_id' => $coupon->id,
                         ];
                         return view('admin.render-view.datable-action', [
                             'action_array' => $action_array
@@ -172,6 +173,20 @@ class CouponCodeController extends Controller
             return response()->json(['error' => 'Coupon not found.'], 500);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, 'destroy');
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $coupon = CouponCode::find($id);
+            if ($coupon) {
+                return view('admin.coupon_codes.view_details', compact('coupon'));
+            }
+            return response()->json(['error' => 'Coupon not found.'], 404);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, 'show');
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
         }
     }

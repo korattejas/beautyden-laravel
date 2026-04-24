@@ -2,136 +2,118 @@
 
 @section('header_style_content')
 <style>
-    :root {
-        --mst-indigo: #102365;
-        --mst-indigo-light: #f5f7ff;
-        --mst-success: #059669;
-        --mst-danger: #dc2626;
-        --mst-text-main: #1e293b;
-        --mst-text-muted: #64748b;
-        --mst-bg-body: #f8fafc;
-        --mst-border: #e2e8f0;
-    }
-
-    .offers-index-container {
-        padding: 2rem;
-        background: var(--mst-bg-body);
-        min-height: 100vh;
-    }
-
-    .offers-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2.5rem;
-    }
-
-    .title-area h2 {
-        font-weight: 800;
-        color: var(--mst-indigo);
-        font-size: 2rem;
-        margin: 0;
-        letter-spacing: -0.5px;
-    }
-
-    .title-area p {
-        color: var(--mst-text-muted);
-        margin: 5px 0 0;
-    }
-
-    .btn-add-offer {
-        background: var(--mst-indigo);
-        color: #fff;
-        padding: 12px 28px;
-        border-radius: 14px;
-        font-weight: 700;
+    /* Photo Stack CSS from Portfolio */
+    .photo-stack {
         display: flex;
         align-items: center;
-        gap: 10px;
-        transition: 0.3s;
-        box-shadow: 0 4px 12px rgba(16, 35, 101, 0.2);
-        border: none;
     }
 
-    .btn-add-offer:hover {
-        background: #0a1740;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(16, 35, 101, 0.3);
-        color: #fff;
-    }
-
-    .premium-table-card {
-        background: #fff;
-        border-radius: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        border: 1px solid var(--mst-border);
-        overflow: hidden;
-        padding: 1rem;
-    }
-
-    .dataTable thead th {
-        background: #f8fafc;
-        color: var(--mst-text-main);
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        letter-spacing: 1px;
-        padding: 20px 15px !important;
-        border-bottom: 1px solid var(--mst-border) !important;
-    }
-
-    .dataTable tbody td {
-        padding: 18px 15px !important;
-        vertical-align: middle !important;
-        color: var(--mst-text-main);
-        font-weight: 500;
-    }
-
-    .media-preview img {
+    .photo-stack-item {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        border: 2px solid #fff;
+        object-fit: cover;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-left: -12px;
         transition: 0.3s;
     }
 
-    .media-preview img:hover {
-        transform: scale(1.2);
+    .photo-stack-item:first-child {
+        margin-left: 0;
+    }
+
+    .photo-stack-item:hover {
+        transform: translateY(-3px) scale(1.1);
         z-index: 10;
-        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+    }
+
+    .photo-count-badge {
+        width: 30px;
+        height: 30px;
+        background: #f1f5f9;
+        color: #102365;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-left: 8px;
+        border: 1px solid #e2e8f0;
     }
 </style>
 @endsection
 
 @section('content')
     <div class="app-content content">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
         <div class="content-wrapper">
-            <div class="offers-index-container">
-                
-                <div class="offers-header">
-                    <div class="title-area">
-                        <h2>Offer Management 🎁</h2>
-                        <p>Manage promotional banners, sliders, and footer offers.</p>
-                    </div>
-                    <a href="{{ route('admin.offers.create') }}" class="btn-add-offer">
-                        <i class="bi bi-plus-lg"></i> Add New Offer
-                    </a>
-                </div>
-
-                <div class="premium-table-card">
-                    <div class="card-datatable table-responsive">
-                        <table class="dt-column-search table w-100 dataTable" id="table-1">
-                            <thead>
-                                <tr>
-                                    <th style="width: 50px;">#</th>
-                                    <th>Title</th>
-                                    <th>Position</th>
-                                    <th>Media</th>
-                                    <th data-search="false">Priority</th>
-                                    <th data-stuff="Active,InActive" style="width: 120px;">Status</th>
-                                    <th data-search="false" style="width: 150px;">Operations</th>
-                                </tr>
-                            </thead>
-                        </table>
+            <div class="content-header row">
+                <div class="content-header-left col-md-9 col-12 mb-2">
+                    <div class="row breadcrumbs-top">
+                        <div class="col-12">
+                            <h2 class="content-header-title float-start mb-0">Offer Management</h2>
+                            <div class="breadcrumb-wrapper">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                                    <li class="breadcrumb-item active">Offers</li>
+                                </ol>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                    <div class="mb-1 breadcrumb-right">
+                        <a href="{{ route('admin.offers.create') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i> Add New Offer
+                        </a>
+                    </div>
+                </div>
+            </div>
 
+            <div class="content-body">
+                <section id="offers-list">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-datatable table-responsive p-2">
+                                    <table class="dt-column-search table w-100 dataTable" id="table-1">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 50px;">#</th>
+                                                <th>Title</th>
+                                                <th>Position</th>
+                                                <th>Media Assets</th>
+                                                <th data-search="false">Priority</th>
+                                                <th data-stuff="Active,InActive" style="width: 120px;">Status</th>
+                                                <th data-search="false" style="width: 150px;">Operations</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Details Modal -->
+    <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-labelledby="viewDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+                <div id="viewDetailsContent">
+                    <!-- Loaded via AJAX -->
+                    <div class="p-5 text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -166,7 +148,7 @@
                     data: 'position_label',
                     name: 'position',
                     render: function(data) {
-                        return `<span class="badge bg-light-primary text-primary">${data}</span>`;
+                        return `<span class="badge bg-light-primary text-primary px-3 py-2 rounded-pill">${data}</span>`;
                     }
                 },
                 {
@@ -176,7 +158,10 @@
                 },
                 {
                     data: 'priority',
-                    name: 'priority'
+                    name: 'priority',
+                    render: function(data) {
+                        return `<div class="text-center fw-bold">${data}</div>`;
+                    }
                 },
                 {
                     data: 'status',
@@ -188,7 +173,7 @@
                     orderable: false
                 },
             ],
-            order: [[4, 'asc']],
+            order: [[0, 'desc']],
             language: {
                 search: "",
                 searchPlaceholder: "Search Offers...",
@@ -198,6 +183,26 @@
                 }
             }
         });
+
+        // Handle Quick View Click
+        $(document).on('click', '.btn-view', function() {
+            const id = $(this).data('id');
+            $('#viewDetailsContent').html('<div class="p-5 text-center"><div class="spinner-border text-primary" role="status"></div></div>');
+            $('#viewDetailsModal').modal('show');
+
+            $.ajax({
+                url: `/admin/offers-view/${id}`,
+                type: 'GET',
+                success: function(response) {
+                    $('#viewDetailsContent').html(response);
+                },
+                error: function() {
+                    $('#viewDetailsContent').html('<div class="p-5 text-center text-danger">Error loading details.</div>');
+                }
+            });
+        });
     </script>
     <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
 @endsection
+
+

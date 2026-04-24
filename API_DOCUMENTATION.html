@@ -4,299 +4,548 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beauty Den API Documentation</title>
+    <title>Beauty Den - API Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --info: #8e44ad;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #334155;
+            --text-light: #64748b;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #333;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px;
-            background-color: #f4f7f6;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
         }
 
-        .container {
-            background: #fff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background: var(--secondary);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            padding: 20px 0;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+        .sidebar-header {
+            padding: 0 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: #fff;
+        }
+
+        .nav-item {
+            padding: 12px 25px;
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 40px 60px;
+            max-width: 1000px;
+        }
+
+        header {
+            margin-bottom: 50px;
             text-align: center;
         }
 
-        h2 {
-            color: #2980b9;
-            margin-top: 30px;
-            border-left: 5px solid #3498db;
-            padding-left: 15px;
+        h1 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
         }
 
-        .endpoint {
-            background: #eef2f7;
-            padding: 10px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-weight: bold;
-            color: #c0392b;
-            margin: 10px 0;
+        .encryption-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        h2 {
+            color: var(--secondary);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .endpoint-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f1f5f9;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            border: 1px solid #cbd5e1;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: white;
+        }
+
+        .post {
+            background: var(--warning);
+        }
+
+        .get {
+            background: var(--success);
+        }
+
+        .auth {
+            background: var(--info);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-        }
-
-        table,
-        th,
-        td {
-            border: 1px solid #ddd;
-        }
-
-        th,
-        td {
-            padding: 12px;
-            text-align: left;
+            font-size: 0.9rem;
         }
 
         th {
-            background-color: #3498db;
-            color: white;
+            background: #f8fafc;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #e2e8f0;
+            color: var(--text-light);
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
+        .response-title {
+            font-weight: 700;
+            margin: 25px 0 10px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            position: relative;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
             border-radius: 4px;
-            font-size: 0.9em;
-            font-weight: bold;
-            color: #fff;
         }
 
-        .badge-post {
-            background-color: #e67e22;
-        }
-
-        .badge-get {
-            background-color: #27ae60;
-        }
-
-        .badge-auth {
-            background-color: #8e44ad;
-        }
-
-        .note {
-            background-color: #fff3cd;
-            border-radius: 4px;
-            padding: 15px;
-            margin: 20px 0;
-            border-left: 5px solid #ffc107;
-        }
-
-        @media print {
-            body {
-                background-color: #fff;
-                padding: 0;
-            }
-
-            .container {
-                box-shadow: none;
-                width: 100%;
-            }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h1>📱 Beauty Den - Customer API Documentation</h1>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Beauty Den API</h2>
+        </div>
+        <a href="#auth" class="nav-item">Core Authentication</a>
+        <a href="#profile" class="nav-item">Profile Operations</a>
+        <a href="#fcm" class="nav-item">Device Management</a>
+        <a href="#cities" class="nav-item">Geography</a>
+    </div>
 
-        <div class="note">
-            <strong>🔒 Encryption Requirement:</strong><br>
-            All responses are encrypted using <strong>AES-128-CBC</strong>.
-            You will receive a string: <code>"ENCRYPTED_DATA:IV"</code>.
-            You must decrypt this using your shared key to get the JSON result.
+    <div class="main-content">
+        <header>
+            <h1>📱 Customer API Portal</h1>
+            <p style="color: var(--text-light)">Official Request & Response Documentation for Mobile Integration</p>
+        </header>
+
+        <div class="encryption-box">
+            <h4><i class="bi bi-shield-lock-fill"></i> Transport Encryption</h4>
+            <p><strong>IMPORTANT:</strong> In production, all responses are encrypted via <strong>AES-128-CBC</strong>.
+                Decrypt using the shared key to access the JSON objects documented below.</p>
         </div>
 
-        <h2>1. Send OTP (Login / Register)</h2>
-        <p>Initiates OTP process for existing login or new user registration.</p>
-        <div class="endpoint"><span class="badge badge-post">POST</span> /V1/customer/sendOtpOnMobileNumber</div>
+        <h2 id="auth"><i class="bi bi-shield-lock text-primary"></i> 1. Authentication Flow</h2>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Presence</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>mobile_number</td>
-                    <td>String</td>
-                    <td>Required</td>
-                    <td>International format (+91...)</td>
-                </tr>
-                <tr>
-                    <td>name</td>
-                    <td>String</td>
-                    <td>New User</td>
-                    <td>Full name of the customer</td>
-                </tr>
-                <tr>
-                    <td>city_id</td>
-                    <td>Integer</td>
-                    <td>New User</td>
-                    <td>Numeric ID of the city</td>
-                </tr>
-            </tbody>
-        </table>
+        <section>
+            <h3>Send OTP</h3>
+            <p>Initiates OTP delivery via MSG91 WhatsApp/SMS.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/sendOtpOnMobileNumber
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>mobile_number</td>
+                        <td>String</td>
+                        <td>10-digit number</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "OTP sent successfully.",
+    "data": {
+        "customer": {
+            "id": 4,
+            "name": "Tejas",
+            "mobile_number": "6352755075",
+            "email": "korattejas@gmail.com",
+            "address": "Ahmedabad",
+            "city_id": null,
+            "otp": 117190,
+            "role": "3",
+            "status": "1",
+            "otp_expiration_at": "2026-04-24T04:21:15.416761Z",
+            "mobile_verified_at": null,
+            "email_verified_at": null,
+            "ip_address": "183.83.240.93",
+            "created_at": "2025-11-05T16:53:35.000000Z",
+            "updated_at": "2026-04-24T04:19:15.000000Z"
+        },
+        "otp_expiration_time": 120,
+        "resend_otp_time": "120",
+        "resend_otp_max_limit": "5",
+        "is_new_user": false
+    }
+}</code></pre>
+        </section>
 
-        <h2>2. Verify OTP</h2>
-        <p>Validates OTP and returns authentication token.</p>
-        <div class="endpoint"><span class="badge badge-post">POST</span> /V1/customer/verifyOtpOnMobileNumber</div>
+        <section>
+            <h3>Verify OTP</h3>
+            <p>Validates the OTP and returns the JWT access token.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/verifyOtpOnMobileNumber
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Mobile verified successfully.",
+    "data": {
+        "id": 4,
+        "name": "Tejas",
+        "mobile_no": "6352755075",
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+        "customer": {
+            "id": 4,
+            "name": "Tejas",
+            "mobile_number": "6352755075",
+            "email": "korattejas@gmail.com",
+            "address": "Ahmedabad",
+            "city_id": null,
+            "otp": null,
+            "role": "3",
+            "status": "1",
+            "otp_expiration_at": null,
+            "mobile_verified_at": "2026-04-24T04:20:40.098164Z",
+            "email_verified_at": null,
+            "ip_address": "183.83.240.93",
+            "created_at": "2025-11-05T16:53:35.000000Z",
+            "updated_at": "2026-04-24T04:20:40.000000Z"
+        }
+    }
+}</code></pre>
+        </section>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Presence</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>mobile_number</td>
-                    <td>String</td>
-                    <td>Required</td>
-                    <td>Same as above</td>
-                </tr>
-                <tr>
-                    <td>otp</td>
-                    <td>String</td>
-                    <td>Required</td>
-                    <td>6-digit numeric string</td>
-                </tr>
-            </tbody>
-        </table>
+        <h2 id="profile"><i class="bi bi-person-check text-primary"></i> 2. Profile Operations</h2>
 
-        <h2>3. Profile Update</h2>
-        <p>Updates the customer's profile information. Mobile number cannot be updated.</p>
-        <div class="endpoint">
-            <span class="badge badge-post">POST</span> /V1/customer/profileUpdate<br>
-            <span class="badge badge-auth">Bearer Auth Required</span>
-        </div>
+        <section>
+            <h3>Get Profile</h3>
+            <p>Retrieves the authenticated user's current profile state.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/getProfile
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Profile fetched successfully.",
+    "data": {
+        "customer": {
+            "id": 4,
+            "name": "Tejas",
+            "email": "korattejas@gmail.com",
+            "address": "Ahmedabad",
+            "mobile_number": "6352755075",
+            "mobile_verified_at": "2026-04-24 04:20:40",
+            "city_id": null,
+            "addresses": []
+        }
+    }
+}</code></pre>
+        </section>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Presence</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>name</td>
-                    <td>String</td>
-                    <td>Required</td>
-                    <td>Full name of the customer</td>
-                </tr>
-                <tr>
-                    <td>email</td>
-                    <td>String</td>
-                    <td>Required</td>
-                    <td>Email address</td>
-                </tr>
-                <tr>
-                    <td>address</td>
-                    <td>String</td>
-                    <td>Required</td>
-                    <td>Service address</td>
-                </tr>
-                <tr>
-                    <td>city_id</td>
-                    <td>Integer</td>
-                    <td>Required</td>
-                    <td>Numeric ID of the city</td>
-                </tr>
-            </tbody>
-        </table>
+        <section>
+            <h3>Profile Update</h3>
+            <p>Updates name, email, and address details.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/profileUpdate
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Profile updated successfully.",
+    "data": {
+        "customer": {
+            "id": 4,
+            "name": "Tejas Korat",
+            "mobile_number": "6352755075",
+            "email": "tejas@gmail.com",
+            "address": "Nikol,Ahmedabad",
+            "city_id": "24",
+            "otp": null,
+            "role": "3",
+            "status": "1",
+            "otp_expiration_at": null,
+            "mobile_verified_at": "2026-04-24 04:20:40",
+            "email_verified_at": null,
+            "ip_address": "183.83.240.93",
+            "created_at": "2025-11-05T16:53:35.000000Z",
+            "updated_at": "2026-04-24T04:25:02.000000Z",
+            "addresses": []
+        }
+    }
+}</code></pre>
+        </section>
 
-        <h2>4. Get Profile</h2>
-        <p>Fetches the authenticated customer's profile details.</p>
-        <div class="endpoint">
-            <span class="badge badge-post">POST</span> /V1/customer/getProfile<br>
-            <span class="badge badge-auth">Bearer Auth Required</span>
-        </div>
+        <h2 id="fcm"><i class="bi bi-phone text-primary"></i> 3. Device Management</h2>
+        <section>
+            <h3>Update FCM Token</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/updateFcmToken
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "FCM token updated successfully.",
+    "data": []
+}</code></pre>
+        </section>
 
-        <h2>5. Update FCM Token</h2>
-        <p>Updates the Firebase token for the user. Call this whenever the user opens the Home Screen.</p>
-        <div class="endpoint">
-            <span class="badge badge-post">POST</span> /V1/customer/updateFcmToken<br>
-            <span class="badge badge-auth">Bearer Auth Required</span>
-        </div>
+        <h2 id="cities"><i class="bi bi-geo-alt text-primary"></i> 4. Geography</h2>
+        <section>
+            <h3>List Cities</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/cities
+            </div>
+            <p>Returns an array of city objects for initial user selection.</p>
+            <div class="note" style="margin: 10px 0; background: #e0f2fe; border-left-color: #0ea5e9;">
+                <i class="bi bi-info-circle-fill text-info"></i> <strong>Business Logic:</strong><br>
+                • <code>status: 0</code> &rarr; Services are <strong>Available</strong>. Show these for selection and
+                active booking.<br>
+                • <code>status: 1</code> &rarr; <strong>Coming Soon</strong>. Display as disabled or with "Coming Soon"
+                badge.
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Cities retrieved successfully",
+    "data": [
+        {
+            "id": "23",
+            "name": "Gandhinagar",
+            "state": "Gujarat",
+            "area": null,
+            "slug": "gandhinagar",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/city/68ca3b2b887cd.webp",
+            "launch_quarter": "2025",
+            "status": 0,
+            "is_popular": 1
+        },
+        {
+            "id": "18",
+            "name": "Rajkot",
+            "state": "Gujarat",
+            "area": null,
+            "slug": "rajkot",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/city/68ca39f6ba758.webp",
+            "launch_quarter": "2025",
+            "status": 1,
+            "is_popular": 1
+        },
+        {
+            "id": "17",
+            "name": "Surat",
+            "state": "Gujarat",
+            "area": null,
+            "slug": "surat",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/city/68ca3a291b5e4.webp",
+            "launch_quarter": "2025",
+            "status": 1,
+            "is_popular": 1
+        },
+        {
+            "id": "24",
+            "name": "Ahmedabad",
+            "state": "Gujarat",
+            "area": null,
+            "slug": "ahmedabad",
+            "icon": null,
+            "launch_quarter": "2025",
+            "status": 0,
+            "is_popular": 0
+        },
+        {
+            "id": "22",
+            "name": "Amreli",
+            "state": "Gujarat",
+            "area": null,
+            "slug": "amreli",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/city/68be3c19c2c8f.jpg",
+            "launch_quarter": "2026",
+            "status": 1,
+            "is_popular": 0
+        },
+        {
+            "id": "19",
+            "name": "Jamnagar",
+            "state": "Gujarat",
+            "area": null,
+            "slug": "jamnagar",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/city/68be3f1755803.jpeg",
+            "launch_quarter": "2025",
+            "status": 1,
+            "is_popular": 0
+        },
+        {
+            "id": "20",
+            "name": "Junagadh",
+            "state": "Gujarat",
+            "area": null,
+            "slug": "junagadh",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/city/68be4041971e5.jpeg",
+            "launch_quarter": "2025",
+            "status": 1,
+            "is_popular": 0
+        },
+        {
+            "id": "21",
+            "name": "Morbi",
+            "state": "Gujarat",
+            "area": null,
+            "slug": "morbi",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/city/68ca3aeb8e24e.webp",
+            "launch_quarter": "2026",
+            "status": 1,
+            "is_popular": 0
+        },
+        {
+            "id": "16",
+            "name": "Vadodara",
+            "state": "Gujarat",
+            "area": null,
+            "slug": "vadodara",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/city/68ca3a5fcb6b8.webp",
+            "launch_quarter": "2025",
+            "status": 1,
+            "is_popular": 0
+        }
+    ]
+}</code></pre>
+        </section>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                    <th>Presence</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>user_id</td>
-                    <td>Integer</td>
-                    <td>Required</td>
-                    <td>Numeric ID of logged-in user</td>
-                </tr>
-                <tr>
-                    <td>fcm_token</td>
-                    <td>String</td>
-                    <td>Required</td>
-                    <td>Token from Firebase</td>
-                </tr>
-                <tr>
-                    <td>device_type</td>
-                    <td>String</td>
-                    <td>Optional</td>
-                    <td>"android" or "ios"</td>
-                </tr>
-                <tr>
-                    <td>device_name</td>
-                    <td>String</td>
-                    <td>Optional</td>
-                    <td>Model name (e.g., iPhone X)</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h2>6. Get Cities List</h2>
-        <p>Provides a list of all cities to choose from.</p>
-        <div class="endpoint"><span class="badge badge-get">GET</span> /V1/cities</div>
-
-        <p>Returns an array of city objects: <code>[{"id": 1, "name": "Surat"}, ...]</code></p>
-
-        <div style="margin-top: 50px; text-align: center; color: #95a5a6; font-size: 0.8em;">
-            &copy; 2026 Beauty Den
-        </div>
+        <p style="text-align: center; color: var(--text-light); margin: 60px 0;">
+            &copy; 2026 Beauty Den. For any API issues, contact the Backend Team.
+        </p>
     </div>
 
 </body>

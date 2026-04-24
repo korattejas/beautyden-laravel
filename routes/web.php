@@ -109,6 +109,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('offers/{id}', [OfferController::class, 'destroy'])->name('admin.offers.destroy');
         Route::get('offers/status/{id}/{status}', [OfferController::class, 'changeStatus'])->name('admin.offers.changeStatus');
         Route::post('offers/remove-media', [OfferController::class, 'removeMedia'])->name('admin.offers.removeMedia');
+        Route::get('offers-view/{id}', [OfferController::class, 'show']);
+
 
     
 
@@ -276,6 +278,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('getDataCouponCodes', [CouponCodeController::class, 'getDataCouponCodes'])->name('getDataCouponCodes');
         Route::get('coupon-codes/status/{id}/{status}', [CouponCodeController::class, 'changeStatus']);
         Route::delete('coupon-codes/{id}', [CouponCodeController::class, 'destroy']);
+        Route::get('coupon-codes-view/{id}', [CouponCodeController::class, 'show']);
 
         /* Coupon Usage Route */
         Route::get('coupon-usage', [CouponUsageController::class, 'index'])->name('admin.coupon-usage.index');

@@ -188,6 +188,7 @@ class OfferController extends Controller
                     ->addColumn('action', function ($offer) {
                         $action_array = [
                             'is_simple_action' => 1,
+                            'view_id'         => $offer->id,
                             'edit_route'      => route('admin.offers.edit', encryptId($offer->id)),
                             'delete_id'       => $offer->id,
                             'current_status'  => $offer->status,
@@ -199,19 +200,33 @@ class OfferController extends Controller
                         ])->render();
                     })
                     ->addColumn('media', function ($offer) {
-                        if (empty($offer->media)) return '<span class="text-muted">No Media</span>';
-                        
-                        $html = '<div class="media-preview">';
-                        if ($offer->media_type == 'image') {
-                            foreach (array_slice($offer->media, 0, 3) as $img) {
-                                $url = asset('uploads/offers/images/' . $img);
-                                $html .= '<img src="' . $url . '" style="width:50px; height:50px; object-fit:cover; margin-right:5px; border-radius:5px;" />';
-                            }
-                            if (count($offer->media) > 3) $html .= '<span>+' . (count($offer->media) - 3) . '</span>';
-                        } else {
-                            $html .= '<span class="badge badge-info">Video</span>';
+                        if (empty($offer->media)) {
+                            return '<span class="text-muted">No Media</span>';
                         }
-                        $html .= '</div>';
+
+                        if ($offer->media_type == 'image') {
+                            $html = '<div class="photo-stack">';
+                            $limit = 4;
+                            $count = 0;
+                            $total = count($offer->media);
+
+                            foreach ($offer->media as $img) {
+                                if ($count >= $limit) break;
+                                $url = asset('uploads/offers/images/' . $img);
+                                $html .= '<img src="' . $url . '" class="photo-stack-item" title="Offer Image" />';
+                                $count++;
+                            }
+
+                            if ($total > $limit) {
+                                $html .= '<div class="photo-count-badge">+' . ($total - $limit) . '</div>';
+                            }
+
+                            $html .= '</div>';
+                        } else {
+                            $html = '<div class="badge bg-light-info text-info d-inline-flex align-items-center gap-1">
+                                        <i class="bi bi-play-circle-fill"></i> Video
+                                     </div>';
+                        }
                         return $html;
                     })
                     ->addColumn('position_label', function ($offer) {
@@ -228,6 +243,22 @@ class OfferController extends Controller
             ], $this->exception_error_code);
         }
     }
+
+    public function show(int $id)
+    {
+        try {
+            $offer = Offer::find($id);
+            if ($offer) {
+                return view('admin.offers.view_details', [
+                    'offer' => $offer
+                ])->render();
+            }
+            return response()->json(['error' => 'Offer not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
 
     public function changeStatus($id, $status)
     {
