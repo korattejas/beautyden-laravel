@@ -113,17 +113,6 @@ class AuthenticationController extends Controller
 
             $user = User::where('mobile_number', $mobile_number)->first();
 
-            if (!$user) {
-                $validator = Validator::make($request->all(), [
-                    'name' => 'required|string|max:255',
-                    'city_id' => 'required',
-                ]);
-
-                if ($validator->fails()) {
-                    return $this->sendError($validator->errors()->first(), $this->validation_error_status);
-                }
-            }
-
             $otp = rand(100000, 999999);
             $otpExpirationTime = (int) config('custom.otp_expiration_time');
             $expiry = now()->addSeconds($otpExpirationTime);
@@ -136,25 +125,13 @@ class AuthenticationController extends Controller
                     'mobile_verified_at' => null,
                 ]);
             } else {
-                $city_id = $request->city_id;
-                if (!is_numeric($city_id)) {
-                    $city = City::firstOrCreate(['name' => $city_id], ['status' => 1]);
-                    $city_id = $city->id;
-                } else {
-                    if (!City::where('id', $city_id)->exists()) {
-                         $city = City::firstOrCreate(['name' => $city_id], ['status' => 1]);
-                         $city_id = $city->id;
-                    }
-                }
-
                 $user = User::create([
-                    'name' => $request->name,
+                    'name' => 'Customer',
                     'mobile_number' => $mobile_number,
-                    'city_id' => $city_id,
                     'otp' => $otp,
                     'otp_expiration_at' => $expiry,
                     'ip_address' => $request->ip(),
-                    'role' => 2,
+                    'role' => 1,
                     'status' => 1,
                 ]);
             }
@@ -162,7 +139,6 @@ class AuthenticationController extends Controller
             $this->sendWhatsAppOtp($mobile_number, $user->name, $otp);
 
             $success = [
-                'customer' => $user,
                 'otp_expiration_time' => $otpExpirationTime,
                 'resend_otp_time' => config('custom.resend_otp_time'),
                 'resend_otp_max_limit' => config('custom.resend_otp_max_limit'),
@@ -305,13 +281,14 @@ class AuthenticationController extends Controller
             $validateArray = [
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
-                'address' => 'required|string|max:500',
+                'dob' => 'nullable|date',
                 'city_id' => 'required|integer',
             ];
 
             $validateMessage = [
                 'email.email' => 'Enter a valid email address.',
                 'city_id.required' => 'City is required.',
+                'dob.date' => 'Enter a valid date of birth.',
             ];
 
             $validator = Validator::make($request->all(), $validateArray, $validateMessage);
@@ -334,8 +311,11 @@ class AuthenticationController extends Controller
             }
 
             $authUser->name = $request->name ?? $authUser->name;
-            $authUser->address = $request->address ?? $authUser->address;
+            $authUser->dob = $request->dob ?? $authUser->dob;
             $authUser->city_id = $request->city_id ?? $authUser->city_id;
+            if ($request->has('address')) {
+                $authUser->address = $request->address;
+            }
             $authUser->save();
 
             $success = [
@@ -377,6 +357,125 @@ class AuthenticationController extends Controller
             ];
 
             return $this->sendResponse($success, 'Profile fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function saveUserAddress(Request $request): JsonResponse
+    {
+        $function_name = 'saveUserAddress';
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'id' => 'nullable|integer|exists:user_addresses,id',
+                'address' => 'required|string|max:500',
+                'city_id' => 'required|integer',
+                'latitude' => 'nullable|numeric',
+                'longitude' => 'nullable|numeric',
+                'type' => 'nullable|string|max:50',
+                'is_default' => 'nullable|boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            if ($request->id) {
+                $userAddress = UserAddress::where('id', $request->id)->where('user_id', $authUser->id)->first();
+                if (!$userAddress) {
+                    return $this->sendError('Address not found or doesn\'t belong to you.', $this->backend_error_status);
+                }
+                $userAddress->update($request->only(['address', 'latitude', 'longitude', 'type', 'is_default']));
+            } else {
+                $addressCount = UserAddress::where('user_id', $authUser->id)->count();
+
+                if ($addressCount >= 3) {
+                    return $this->sendError('You can only add up to 3 addresses.', $this->validation_error_status);
+                }
+
+                $userAddress = UserAddress::create([
+                    'user_id' => $authUser->id,
+                    'address' => $request->address,
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
+                    'type' => $request->type,
+                    'is_default' => $request->is_default ?? false,
+                ]);
+            }
+
+            if ($request->is_default) {
+                UserAddress::where('user_id', $authUser->id)
+                    ->where('id', '!=', $userAddress->id)
+                    ->update(['is_default' => false]);
+
+                $authUser->update([
+                    'city_id' => $request->city_id,
+                    'address' => $request->address,
+                ]);
+            }
+
+            return $this->sendResponse($userAddress, 'Address saved successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function getUserAddresses(Request $request): JsonResponse
+    {
+        $function_name = 'getUserAddresses';
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            $addresses = UserAddress::where('user_id', $authUser->id)
+                ->orderBy('is_default', 'desc')
+                ->orderBy('id', 'desc')
+                ->get();
+
+            return $this->sendResponse($addresses, 'Addresses fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function deleteUserAddress(Request $request): JsonResponse
+    {
+        $function_name = 'deleteUserAddress';
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'address_id' => 'required|integer|exists:user_addresses,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $userAddress = UserAddress::where('id', $request->address_id)->where('user_id', $authUser->id)->first();
+            if (!$userAddress) {
+                return $this->sendError('Address not found or doesn\'t belong to you.', $this->backend_error_status);
+            }
+
+            $userAddress->delete();
+
+            return $this->sendResponse([], 'Address deleted successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
@@ -486,118 +585,6 @@ class AuthenticationController extends Controller
             ];
 
             return $this->sendResponse($data, 'Booking details fetched successfully.', $this->success_status);
-        } catch (Exception $e) {
-            logCatchException($e, $this->controller_name, $function_name);
-            return $this->sendError($this->common_error_message, $this->exception_status);
-        }
-    }
-
-    public function saveUserAddress(Request $request): JsonResponse
-    {
-        $function_name = 'saveUserAddress';
-        try {
-            $authUser = auth('user')->user();
-
-            if (!$authUser) {
-                return $this->sendError('User not authenticated.', 401);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'id' => 'nullable|integer|exists:user_addresses,id',
-                'address' => 'required|string|max:500',
-                'latitude' => 'nullable|numeric',
-                'longitude' => 'nullable|numeric',
-                'type' => 'nullable|string|max:50',
-                'is_default' => 'nullable|boolean',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
-            }
-
-            if ($request->id) {
-                $userAddress = UserAddress::where('id', $request->id)->where('user_id', $authUser->id)->first();
-                if (!$userAddress) {
-                    return $this->sendError('Address not found or doesn\'t belong to you.', $this->backend_error_status);
-                }
-                $userAddress->update($request->only(['address', 'latitude', 'longitude', 'type', 'is_default']));
-            } else {
-                $addressCount = UserAddress::where('user_id', $authUser->id)->count();
-                if ($addressCount >= 3) {
-                    return $this->sendError('You can only add up to 3 addresses.', $this->validation_error_status);
-                }
-
-                $userAddress = UserAddress::create([
-                    'user_id' => $authUser->id,
-                    'address' => $request->address,
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
-                    'type' => $request->type,
-                    'is_default' => $request->is_default ?? false,
-                ]);
-            }
-
-            if ($request->is_default) {
-                UserAddress::where('user_id', $authUser->id)
-                    ->where('id', '!=', $userAddress->id)
-                    ->update(['is_default' => false]);
-            }
-
-            return $this->sendResponse($userAddress, 'Address saved successfully.', $this->success_status);
-        } catch (Exception $e) {
-            logCatchException($e, $this->controller_name, $function_name);
-            return $this->sendError($this->common_error_message, $this->exception_status);
-        }
-    }
-
-    public function getUserAddresses(Request $request): JsonResponse
-    {
-        $function_name = 'getUserAddresses';
-        try {
-            $authUser = auth('user')->user();
-
-            if (!$authUser) {
-                return $this->sendError('User not authenticated.', 401);
-            }
-
-            $addresses = UserAddress::where('user_id', $authUser->id)
-                ->orderBy('is_default', 'desc')
-                ->orderBy('id', 'desc')
-                ->get();
-
-            return $this->sendResponse($addresses, 'Addresses fetched successfully.', $this->success_status);
-        } catch (Exception $e) {
-            logCatchException($e, $this->controller_name, $function_name);
-            return $this->sendError($this->common_error_message, $this->exception_status);
-        }
-    }
-
-    public function deleteUserAddress(Request $request): JsonResponse
-    {
-        $function_name = 'deleteUserAddress';
-        try {
-            $authUser = auth('user')->user();
-
-            if (!$authUser) {
-                return $this->sendError('User not authenticated.', 401);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'address_id' => 'required|integer|exists:user_addresses,id',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
-            }
-
-            $userAddress = UserAddress::where('id', $request->address_id)->where('user_id', $authUser->id)->first();
-            if (!$userAddress) {
-                return $this->sendError('Address not found or doesn\'t belong to you.', $this->backend_error_status);
-            }
-
-            $userAddress->delete();
-
-            return $this->sendResponse([], 'Address deleted successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
