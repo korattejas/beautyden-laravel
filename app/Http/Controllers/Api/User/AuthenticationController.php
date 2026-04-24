@@ -434,6 +434,64 @@ class AuthenticationController extends Controller
         }
     }
 
+     public function getBookServiceDetails(Request $request): JsonResponse
+    {
+        $function_name = 'getBookServiceDetails';
+
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'appointment_id' => 'required|integer',
+            ], [
+                'appointment_id.required' => 'Appointment ID is required.',
+            ]);
+
+            if ($validator->fails()) {
+                logValidationException($this->controller_name, $function_name, $validator);
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $mobile_number = $authUser->mobile_number;
+            $appointmentId = $request->appointment_id;
+
+            $appointment = Appointment::leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select(
+                    'appointments.*',
+                    'ct.name as city_name'
+                )
+                ->where('appointments.id', $appointmentId)
+                ->first();
+
+            if (!$appointment) {
+                return $this->sendError('Appointment not found.', 404);
+            }
+
+            // Decode the structured services_data
+            $servicesData = $appointment->services_data ? json_decode($appointment->services_data, true) : null;
+
+            $data = [
+                'id'                     => $appointment->id,
+                'order_number'           => $appointment->order_number,
+                'status'                 => (int) $appointment->status,
+                'company_amount'         => $appointment->company_amount,
+                'city_name'              => $appointment->city_name,
+                'booking_details'        => $servicesData, // This contains client, appointment, services, and summary
+                'created_at'             => $appointment->created_at,
+                'updated_at'             => $appointment->updated_at,
+            ];
+
+            return $this->sendResponse($data, 'Booking details fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
     public function saveUserAddress(Request $request): JsonResponse
     {
         $function_name = 'saveUserAddress';
@@ -540,76 +598,6 @@ class AuthenticationController extends Controller
             $userAddress->delete();
 
             return $this->sendResponse([], 'Address deleted successfully.', $this->success_status);
-        } catch (Exception $e) {
-            logCatchException($e, $this->controller_name, $function_name);
-            return $this->sendError($this->common_error_message, $this->exception_status);
-        }
-    }
-
-
-
-    public function getBookServiceDetails(Request $request): JsonResponse
-    {
-        $function_name = 'getBookServiceDetails';
-
-        try {
-            $authUser = auth('user')->user();
-
-            if (!$authUser) {
-                return $this->sendError('User not authenticated.', 401);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'appointment_id' => 'required|integer',
-            ], [
-                'appointment_id.required' => 'Appointment ID is required.',
-            ]);
-
-            if ($validator->fails()) {
-                logValidationException($this->controller_name, $function_name, $validator);
-                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
-            }
-
-            $mobile_number = $authUser->mobile_number;
-            $appointmentId = $request->appointment_id;
-
-            $appointment = Appointment::leftJoin('service_categories as sc', 'sc.id', '=', 'appointments.service_category_id')
-                ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'appointments.service_sub_category_id')
-                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
-                ->select(
-                    'appointments.*',
-                    'sc.name as service_category_name',
-                    'ssc.name as service_sub_category_name',
-                    'ct.name as city_name',
-                )
-                ->where('appointments.id', $appointmentId)
-                ->first();
-
-            if (!$appointment) {
-                return $this->sendError('Appointment not found.', 404);
-            }
-
-            $serviceIds = $appointment->service_id ? explode(',', $appointment->service_id) : [];
-            $serviceIds = array_map('intval', $serviceIds);
-            $services = Service::whereIn('id', $serviceIds)->pluck('name')->toArray();
-
-            $data = [
-                'id'                     => $appointment->id,
-                'order_number'           => $appointment->order_number,
-                'price'                  => $appointment->price,
-                'discount_price'         => $appointment->discount_price,
-                'service_address'        => $appointment->service_address,
-                'appointment_date'       => $appointment->appointment_date,
-                'appointment_time'       => $appointment->appointment_time,
-                'special_notes'          => $appointment->special_notes,
-                'status'                 => $appointment->status,
-                'created_at'             => $appointment->created_at,
-                'updated_at'             => $appointment->updated_at,
-                'city_name'              => $appointment->city_name,
-                'services'               => $services,
-            ];
-
-            return $this->sendResponse($data, 'Booking details fetched successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
