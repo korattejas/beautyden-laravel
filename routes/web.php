@@ -22,6 +22,8 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TeamMemberController;
 use App\Http\Controllers\Admin\ContractSignedController;
 use App\Http\Controllers\Admin\OfferController;
+use App\Http\Controllers\Admin\ServiceEssentialController;
+use App\Http\Controllers\Admin\ServiceMasterController;
 use App\Http\Controllers\Admin\CouponCodeController;
 use App\Http\Controllers\Admin\CouponUsageController;
 use App\Http\Controllers\ContractController;
@@ -113,6 +115,25 @@ Route::group(['prefix' => 'admin'], function () {
 
 
     
+
+        /* Service Essential Route */
+        Route::get('service-essential', [ServiceEssentialController::class, 'index'])->name('admin.service-essential.index');
+        Route::get('service-essential/create', [ServiceEssentialController::class, 'create'])->name('admin.service-essential.create');
+        Route::post('service-essential/store', [ServiceEssentialController::class, 'store']);
+        Route::delete('service-essential/{id}', [ServiceEssentialController::class, 'destroy']);
+        Route::get('service-essential/edit/{id}', [ServiceEssentialController::class, 'edit'])->name('admin.service-essential.edit');
+        Route::get('getDataEssential', [ServiceEssentialController::class, 'getDataEssential'])->name('getDataEssential');
+        Route::get('service-essential/status/{id}/{status}', [ServiceEssentialController::class, 'changeStatus']);
+
+        /* Service Master Route */
+        Route::get('service-master', [ServiceMasterController::class, 'index'])->name('admin.service-master.index');
+        Route::get('service-master/create', [ServiceMasterController::class, 'create'])->name('admin.service-master.create');
+        Route::post('service-master/store', [ServiceMasterController::class, 'store']);
+        Route::delete('service-master/{id}', [ServiceMasterController::class, 'destroy']);
+        Route::get('service-master/edit/{id}', [ServiceMasterController::class, 'edit'])->name('admin.service-master.edit');
+        Route::get('getDataServiceMaster', [ServiceMasterController::class, 'getDataServiceMaster'])->name('getDataServiceMaster');
+        Route::get('service-master/status/{id}/{status}', [ServiceMasterController::class, 'changeStatus']);
+        Route::get('service-master/get-subcategories/{categoryId}', [ServiceMasterController::class, 'getSubcategories']);
 
         /* Blog Category Route */
         Route::get('blog-category', [BlogCategoryController::class, 'index'])->name('admin.blog-category.index');

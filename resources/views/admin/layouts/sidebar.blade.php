@@ -183,6 +183,20 @@
                 </a>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.service-master.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.service-master.index') }}">
+                    <i data-feather="zap"></i>
+                    <span class="menu-title text-truncate">Advanced Catalog</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.service-essential.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.service-essential.index') }}">
+                    <i data-feather="grid"></i>
+                    <span class="menu-title text-truncate">Master Essentials</span>
+                </a>
+            </li>
+
             <li class=" navigation-header">
                 <span>Configuration</span>
             </li>
