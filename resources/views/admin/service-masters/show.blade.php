@@ -20,7 +20,14 @@
             <!-- Header Section -->
             <div class="service-view-header shadow-lg">
                 <div class="row align-items-center">
-                    <div class="col-md-8">
+                    <div class="col-md-2 text-center">
+                        @if($service->icon)
+                            <img src="{{ asset('uploads/service/' . $service->icon) }}" class="rounded-circle border border-3 border-white shadow-lg bg-white p-1" style="width: 100px; height: 100px; object-fit: cover;">
+                        @else
+                            <div class="bg-white rounded-circle shadow-lg d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;"><i data-feather="image" class="text-primary"></i></div>
+                        @endif
+                    </div>
+                    <div class="col-md-6">
                         <span class="badge-premium mb-1 d-inline-block">Premium Service ID: #{{ str_pad($service->id, 4, '0', STR_PAD_LEFT) }}</span>
                         <h1 class="text-white fw-bold mb-1">{{ $service->name }}</h1>
                         <p class="text-white-50 mb-0"><i data-feather="clock" class="me-1"></i> {{ $service->duration ?? 'Standard' }} | <i data-feather="tag" class="me-1"></i> {{ $service->price }} INR (Disc: {{ $service->discount_price ?? 0 }} INR)</p>

@@ -36,6 +36,18 @@
                         <div class="card shadow-sm border-0">
                             <div class="card-header border-bottom"><h4 class="card-title">Basic Service Info</h4></div>
                             <div class="card-body pt-2">
+                                <div class="mb-2">
+                                    <label class="form-label">Service Master Icon (Thumbnail)</label>
+                                    @if($service->icon)
+                                        <img src="{{ asset('uploads/service/' . $service->icon) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 80px;">
+                                    @endif
+                                    <div class="premium-file-input">
+                                        <i data-feather="image" class="text-primary mb-1"></i>
+                                        <p class="mb-0 fw-bold">Change Icon</p>
+                                        <input type="file" name="icon" onchange="updatePreview(this)">
+                                    </div>
+                                    <div class="file-preview mt-1" style="display:none"></div>
+                                </div>
                                 <div class="mb-1">
                                     <label class="form-label">Service Title</label>
                                     <input type="text" name="name" class="form-control form-control-lg" value="{{ $service->name }}" required>

@@ -19,6 +19,7 @@ class ServiceMaster extends Model
         'rating',
         'reviews',
         'description',
+        'icon',
         'banner_media',   // Media carousel
         'before_after',   // Before/After pairs
         'content_json',   // Dynamic sections

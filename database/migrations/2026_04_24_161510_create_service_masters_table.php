@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('rating', 3, 2)->nullable();
             $table->integer('reviews')->nullable();
             $table->longText('description')->nullable();
+            $table->string('icon')->nullable();
             
             // New Banner Media (Multiple Images/Videos)
             $table->json('banner_media')->nullable(); 

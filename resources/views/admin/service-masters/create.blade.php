@@ -36,6 +36,15 @@
                         <div class="card shadow-sm border-0">
                             <div class="card-header border-bottom"><h4 class="card-title"><i data-feather="info" class="me-1"></i>Basic Service Info</h4></div>
                             <div class="card-body pt-2">
+                                <div class="mb-2">
+                                    <label class="form-label">Service Master Icon (Thumbnail)</label>
+                                    <div class="premium-file-input">
+                                        <i data-feather="image" class="text-primary mb-1"></i>
+                                        <p class="mb-0 fw-bold">Select Icon Image</p>
+                                        <input type="file" name="icon" onchange="updatePreview(this)" required>
+                                    </div>
+                                    <div class="file-preview mt-1" style="display:none"></div>
+                                </div>
                                 <div class="mb-1">
                                     <label class="form-label">Service Title</label>
                                     <input type="text" name="name" class="form-control form-control-lg border-primary border-opacity-25" placeholder="e.g. Luxury Fruit Facial" required>

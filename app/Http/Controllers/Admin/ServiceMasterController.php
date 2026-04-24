@@ -86,6 +86,12 @@ class ServiceMasterController extends Controller
                 }
 
                 return DataTables::of($services)
+                    ->addColumn('icon', function ($s) {
+                        if ($s->icon) {
+                            return '<img src="' . asset('uploads/service/' . $s->icon) . '" class="rounded-circle border" style="width: 40px; height: 40px; object-fit: cover;">';
+                        }
+                        return '<div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i data-feather="image"></i></div>';
+                    })
                     ->addColumn('status', function ($s) {
                         $status_array = [
                             'is_simple_active' => 1,
@@ -105,7 +111,7 @@ class ServiceMasterController extends Controller
                         ];
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })
-                    ->rawColumns(['action', 'status'])
+                    ->rawColumns(['action', 'status', 'icon'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -131,6 +137,13 @@ class ServiceMasterController extends Controller
 
         try {
             $service = $id ? ServiceMaster::find($id) : null;
+
+            // Handle Single Icon
+            $icon = $service ? $service->icon : null;
+            if ($request->hasFile('icon')) {
+                if ($icon) File::delete(public_path('uploads/service/' . $icon));
+                $icon = ImageUploadHelper::serviceimageUpload($request->file('icon'));
+            }
 
             // Handle Banner Media (Multiple Images/Videos)
             $banner_media = [];
@@ -242,6 +255,7 @@ class ServiceMasterController extends Controller
                 'rating'              => $request->rating,
                 'reviews'             => $request->reviews,
                 'description'         => $request->description,
+                'icon'                => $icon,
                 'banner_media'        => $banner_media,
                 'before_after'        => $before_after,
                 'content_json'        => $content_builder,
@@ -269,6 +283,9 @@ class ServiceMasterController extends Controller
         try {
             $service = ServiceMaster::find($id);
             if ($service) {
+                // Cleanup icon
+                if($service->icon) File::delete(public_path('uploads/service/' . $service->icon));
+                
                 // Cleanup medias
                 if($service->banner_media) {
                     foreach($service->banner_media as $m) File::delete(public_path('uploads/service-media/' . $m['url']));

@@ -36,10 +36,10 @@
                                         <thead>
                                             <tr>
                                                 <th>Id</th>
+                                                <th data-search="false">Icon</th>
                                                 <th>Name</th>
                                                 <th>Category</th>
                                                 <th>Price</th>
-                                                <th data-search="false">Icon</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-search="false">Action</th>
                                             </tr>
