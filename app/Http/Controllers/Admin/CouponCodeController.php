@@ -54,6 +54,9 @@ class CouponCodeController extends Controller
             if ($request->ajax()) {
                 $coupons = CouponCode::query();
                 return DataTables::of($coupons)
+                    ->addColumn('code', function ($coupon) {
+                        return $coupon->code;
+                    })
                     ->addColumn('discount', function ($coupon) {
                         return $coupon->discount_type == 'percentage' ? $coupon->discount_value . '%' : '₹' . $coupon->discount_value;
                     })

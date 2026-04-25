@@ -31,7 +31,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-datatable table-responsive">
+                                <div class="card-datatable table-responsive p-2">
                                     <table class="dt-column-search table" id="table-1">
                                         <thead>
                                             <tr>
