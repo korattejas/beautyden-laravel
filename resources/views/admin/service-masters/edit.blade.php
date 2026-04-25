@@ -83,6 +83,16 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="mb-1">
+                                    <label class="form-label">Recommended Skin Type</label>
+                                    <select name="skin_type" class="form-select select2">
+                                        <option value="All Skin Types" {{ $service->skin_type == 'All Skin Types' ? 'selected' : '' }}>All Skin Types</option>
+                                        <option value="Normal Skin" {{ $service->skin_type == 'Normal Skin' ? 'selected' : '' }}>Normal Skin</option>
+                                        <option value="Dry Skin" {{ $service->skin_type == 'Dry Skin' ? 'selected' : '' }}>Dry Skin</option>
+                                        <option value="Normal To Dry Skin" {{ $service->skin_type == 'Normal To Dry Skin' ? 'selected' : '' }}>Normal To Dry Skin</option>
+                                        <option value="Oily Skin" {{ $service->skin_type == 'Oily Skin' ? 'selected' : '' }}>Oily Skin</option>
+                                    </select>
+                                </div>
                                 <div class="row">
                                     <div class="col-6 mb-1"><label class="form-label">Base Price</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="price" class="form-control" value="{{ $service->price }}"></div></div>
                                     <div class="col-6 mb-1"><label class="form-label">Discounted</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="discount_price" class="form-control" value="{{ $service->discount_price }}"></div></div>

@@ -13,6 +13,7 @@ class ServiceMaster extends Model
         'category_id',
         'sub_category_id',
         'name',
+        'skin_type',
         'price',
         'discount_price',
         'duration',

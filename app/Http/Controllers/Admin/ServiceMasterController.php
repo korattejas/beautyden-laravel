@@ -129,6 +129,7 @@ class ServiceMasterController extends Controller
 
         $rules = [
             'name'            => 'required|string|max:255|unique:service_masters,name,' . $id,
+            'skin_type'       => 'required|string|max:255',
             'category_id'     => 'required|exists:service_categories,id',
             'sub_category_id' => 'nullable|exists:service_subcategories,id',
         ];
@@ -247,6 +248,7 @@ class ServiceMasterController extends Controller
                 'category_id'         => $request->category_id,
                 'sub_category_id'     => $request->sub_category_id,
                 'name'                => $request->name,
+                'skin_type'           => $request->skin_type ?? 'All Skin Types',
                 'price'               => $request->price,
                 'discount_price'      => $request->discount_price,
                 'duration'            => $request->duration,

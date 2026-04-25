@@ -79,6 +79,16 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="mb-1">
+                                    <label class="form-label">Recommended Skin Type</label>
+                                    <select name="skin_type" class="form-select select2">
+                                        <option value="All Skin Types" selected>All Skin Types</option>
+                                        <option value="Normal Skin">Normal Skin</option>
+                                        <option value="Dry Skin">Dry Skin</option>
+                                        <option value="Normal To Dry Skin">Normal To Dry Skin</option>
+                                        <option value="Oily Skin">Oily Skin</option>
+                                    </select>
+                                </div>
                                 <div class="row">
                                     <div class="col-6 mb-1"><label class="form-label">Base Price</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="price" class="form-control"></div></div>
                                     <div class="col-6 mb-1"><label class="form-label">Discounted</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="discount_price" class="form-control"></div></div>
