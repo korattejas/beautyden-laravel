@@ -1,36 +1,6 @@
 @extends('admin.layouts.app')
 @section('content')
-<style>
-    .builder-card { border: 2px dashed #e2e8f0; background: #f8fafc; transition: all 0.3s ease; }
-    .builder-card:hover { border-color: #1a237e; }
-    .premium-file-input { 
-        position: relative; 
-        border: 2px dashed #d1d5db; 
-        border-radius: 12px; 
-        padding: 10px; 
-        text-align: center; 
-        background: #fff; 
-        cursor: pointer; 
-        transition: all 0.3s; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: center;
-        min-height: 80px;
-    }
-    .step-card .premium-file-input { min-height: 60px; padding: 5px; }
-    .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
-    .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
-    .premium-file-input .placeholder-content { transition: all 0.3s; }
-    .premium-file-input.has-preview { border-style: solid; border-color: #e2e8f0; background: #f8fafc; }
-    .premium-file-input.has-preview .placeholder-content { display: none; }
-    .preview-media { max-width: 100%; max-height: 120px; border-radius: 8px; object-fit: cover; }
-    .step-card .preview-media { max-height: 80px; }
-    .section-header { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px 8px 0 0; }
-    .form-label { font-weight: 600; color: #334155; margin-bottom: 5px; }
-    .step-card { border-left: 4px solid #6366f1 !important; transition: transform 0.2s; }
-    .step-card:hover { transform: translateX(5px); }
-</style>
+
 
 <div class="app-content content">
     <div class="content-overlay"></div>
@@ -107,44 +77,23 @@
                             </div>
                         </div>
 
-                        <!-- Banner Media Section -->
                         <div class="card shadow-sm border-0">
-                            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                            <div class="card-header border-bottom">
                                 <h4 class="card-title">Banner Media (Carousel)</h4>
-                                <button type="button" class="btn btn-sm btn-outline-primary add-banner">+ Add File</button>
                             </div>
-                            <div class="card-body pt-2" id="banner-media-container">
-                                <div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50">
-                                    <div class="premium-file-input">
-                                        <div class="placeholder-content">
-                                            <i data-feather="upload-cloud" class="text-primary mb-1"></i>
-                                            <p class="mb-0 fw-bold">Click to upload Image or Video</p>
-                                            <small class="text-muted">Supports MP4, JPG, PNG, WEBP</small>
-                                        </div>
-                                        <input type="file" name="banner[0][file]" onchange="updatePreview(this)">
-                                    </div>
-                                    <div class="file-preview mt-1" style="display:none"></div>
-                                </div>
+                            <div class="card-body pt-2">
+                                <input type="file" class="filepond" name="banner_files[]" multiple data-max-files="10">
+                                <small class="text-muted">You can upload multiple images and videos for the service banner.</small>
                             </div>
                         </div>
 
-                        <!-- Before / After -->
                         <div class="card shadow-sm border-0">
-                            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                            <div class="card-header border-bottom">
                                 <h4 class="card-title">Before & After Results</h4>
-                                <button type="button" class="btn btn-sm btn-outline-primary add-ba">+ Add Result</button>
                             </div>
-                            <div class="card-body pt-2" id="ba-container">
-                                <div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative">
-                                    <div class="premium-file-input">
-                                        <div class="placeholder-content">
-                                            <i data-feather="image" class="text-primary mb-1"></i>
-                                            <p class="mb-0 fw-bold small">Upload Before & After Image</p>
-                                        </div>
-                                        <input type="file" name="ba_images[]" onchange="updatePreview(this)">
-                                    </div>
-                                    <div class="file-preview mt-1" style="display:none"></div>
-                                </div>
+                            <div class="card-body pt-2">
+                                <input type="file" class="filepond" name="ba_images[]" multiple>
+                                <small class="text-muted">Upload Before and After result images.</small>
                             </div>
                         </div>
                     </div>
@@ -230,13 +179,8 @@
         <div class="card-body py-1 bg-white">
             <div class="row align-items-center">
                 <div class="col-md-4">
-                    <div class="premium-file-input p-1">
-                        <div class="placeholder-content">
-                            <p class="mb-0 small fw-bold">Expert Image</p>
-                        </div>
-                        <input type="file" name="sections[INDEX][image]" onchange="updatePreview(this)">
-                    </div>
-                    <div class="file-preview mt-1" style="display:none"></div>
+                    <label class="form-label small fw-bold">Expert Image</label>
+                    <input type="file" class="filepond" name="sections[INDEX][image]">
                 </div>
                 <div class="col-md-8">
                     <div class="points-container">
@@ -281,7 +225,6 @@
     $(function() {
         FilePond.registerPlugin(FilePondPluginImagePreview);
 
-        // Function to init FilePond on elements
         const initPonds = () => {
             $('.filepond:not(.filepond--root)').each(function() {
                 FilePond.create(this, {
@@ -296,7 +239,7 @@
 
         initPonds();
 
-        $('.add-section, .add-step, .add-protocol-item, .add-banner, .add-ba').click(function() {
+        $('.add-section, .add-step, .add-protocol-item').click(function() {
             setTimeout(initPonds, 100);
         });
 
@@ -319,24 +262,6 @@
         var sectionIndex = 0;
         $('.select2').select2({ width: '100%' });
 
-        var bannerIndex = 1;
-        $('.add-banner').click(function() {
-            var html = '<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn">' +
-                       '<button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>' +
-                       '<input type="file" class="form-control filepond" name="banner['+bannerIndex+'][file]"></div>';
-            $('#banner-media-container').append(html);
-            bannerIndex++;
-            feather.replace();
-        });
-
-        $('.add-ba').click(function() {
-            var html = '<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn">' +
-                       '<button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>' +
-                       '<input type="file" class="form-control filepond" name="ba_images[]"></div>';
-            $('#ba-container').append(html);
-            feather.replace();
-        });
-
         $('.add-section').click(function() {
             $('.empty-msg').hide();
             var type = $(this).data('type');
@@ -349,13 +274,13 @@
 
         $(document).on('click', '.add-step', function() {
             var con = $(this).siblings('.steps-container');
-            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><input type="file" class="form-control filepond" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
+            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><input type="file" class="filepond" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
             feather.replace();
         });
 
         $(document).on('click', '.add-protocol-item', function() {
             var con = $(this).siblings('.protocol-items-container');
-            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><input type="file" class="form-control filepond" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
+            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><input type="file" class="filepond" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
             feather.replace();
         });
 
@@ -365,7 +290,7 @@
             feather.replace();
         });
 
-        $(document).on('click', '.remove-row', function() { $(this).closest('.step-card, .banner-media-row, .ba-row, .col-6, .input-group').remove(); });
+        $(document).on('click', '.remove-row', function() { $(this).closest('.step-card, .col-6, .input-group').remove(); });
         $(document).on('click', '.remove-section', function() { $(this).closest('.section-block').remove(); if(!$('.section-block').length) $('.empty-msg').show(); });
 
         $('#category_id').on('change', function() {
