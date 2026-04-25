@@ -16,6 +16,9 @@
         justify-content: center;
         min-height: 80px;
     }
+    .section-block {
+        padding: 12px;
+    }
     .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
     .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; }
     .premium-file-input.has-preview { border-style: solid; border-color: #e2e8f0; background: #f8fafc; }
@@ -317,17 +320,43 @@
     <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="expert">
         <input type="hidden" name="sections[INDEX][type]" value="expert">
         <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">Expert Profile</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
-        <div class="card-body py-1 bg-white"><div class="row"><div class="col-md-4"><div class="premium-file-input p-1"><p class="mb-0 small fw-bold">Expert Image</p><input type="file" name="sections[INDEX][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div><div class="col-md-8"><div class="points-container"><div class="input-group mb-1"><input type="text" name="sections[INDEX][points][]" class="form-control"><button type="button" class="btn btn-outline-indigo add-point">+</button></div></div></div></div></div>
+        <div class="card-body py-1 bg-white">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="premium-file-input">
+                        <div class="placeholder-content">
+                            <p class="mb-0 small fw-bold">Expert Image</p>
+                        </div>
+                        <input type="file" name="sections[INDEX][image]" onchange="handlePreview(this)">
+                    </div>
+                    <div class="preview-container"></div>
+                </div>
+                <div class="col-md-8">
+                    <div class="points-container">
+                        <div class="input-group mb-1"><span class="input-group-text"><i data-feather="check"></i></span><input type="text" name="sections[INDEX][points][]" class="form-control"><button type="button" class="btn btn-outline-indigo add-point">+</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="list">
         <input type="hidden" name="sections[INDEX][type]" value="list">
-        <div class="card-header border-bottom py-1 d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">List Section</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
-        <div class="card-body py-1 bg-white"><input type="text" name="sections[INDEX][title]" class="form-control mb-1 fw-bold"><div class="points-container"><div class="input-group mb-1"><input type="text" name="sections[INDEX][points][]" class="form-control"><button type="button" class="btn btn-outline-indigo add-point">+</button></div></div></div>
+        <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">Information List</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
+        <div class="card-body py-1 bg-white">
+            <input type="text" name="sections[INDEX][title]" class="form-control mb-1 fw-bold" placeholder="List Heading">
+            <div class="points-container">
+                <div class="input-group mb-1"><input type="text" name="sections[INDEX][points][]" class="form-control"><button type="button" class="btn btn-outline-indigo add-point">+</button></div>
+            </div>
+        </div>
     </div>
     <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="protocol">
         <input type="hidden" name="sections[INDEX][type]" value="protocol">
-        <div class="section-header border-bottom py-1 d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">Hygiene</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
-        <div class="card-body py-1 bg-white"><input type="text" name="sections[INDEX][title]" class="form-control mb-1 fw-bold"><div class="protocol-items-container row"></div><button type="button" class="btn btn-sm btn-outline-indigo add-protocol-item w-100" data-prefix="sections[INDEX][items]">+ Add Item</button></div>
+        <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">Hygiene Standards</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
+        <div class="card-body py-1 bg-white">
+            <input type="text" name="sections[INDEX][title]" class="form-control mb-1 fw-bold" placeholder="Safety Header">
+            <div class="protocol-items-container row"></div>
+            <button type="button" class="btn btn-sm btn-outline-indigo add-protocol-item w-100" data-prefix="sections[INDEX][items]">+ Add Standard / Icon</button>
+        </div>
     </div>
 </div>
 @endsection
@@ -339,7 +368,8 @@
 
     function handlePreview(input) {
         const file = input.files[0];
-        const container = $(input).closest('.premium-file-input').siblings('.preview-container');
+        const container = $(input).closest('.premium-file-input').parent().find('.preview-container');
+        
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -347,11 +377,13 @@
                 html += '<button type="button" class="action-btn text-primary view-full" data-url="'+e.target.result+'"><i data-feather="maximize" style="width:14px"></i></button>';
                 html += '<button type="button" class="action-btn text-danger clear-input"><i data-feather="trash-2" style="width:14px"></i></button>';
                 html += '</div>';
+                
                 if (file.type.startsWith('video/')) {
                     html += '<video src="'+e.target.result+'" class="preview-media" controls></video>';
                 } else {
                     html += '<img src="'+e.target.result+'" class="preview-media">';
                 }
+                
                 container.html(html).fadeIn();
                 $(input).closest('.premium-file-input').addClass('has-preview').find('.placeholder-content').hide();
                 feather.replace();
@@ -359,6 +391,8 @@
             reader.readAsDataURL(file);
         }
     }
+
+    window.updatePreview = function(input) { handlePreview(input); };
 
     $(function() {
         FilePond.registerPlugin(FilePondPluginImagePreview);

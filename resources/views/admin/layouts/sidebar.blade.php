@@ -1,33 +1,36 @@
 <style>
-    /* Premium Sidebar Redesign */
+    /* Premium Sidebar Redesign - Deep Indigo Edition */
     .main-menu {
-        background: #ffffff !important;
-        border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.02) !important;
+        background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%) !important;
+        border-right: none !important;
+        box-shadow: 15px 0 35px rgba(0, 0, 0, 0.1) !important;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
     .main-menu .navbar-header {
-        height: 100px !important;
-        padding: 1.5rem 1rem !important;
+        height: 110px !important;
+        padding: 2rem 1.5rem !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        background: transparent !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(10px);
+        margin-bottom: 1rem;
     }
 
     .sidebar-main-logo {
-        height: 75px !important;
+        height: 65px !important;
         width: auto !important;
-        transition: transform 0.3s ease;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .navbar-brand:hover .sidebar-main-logo {
-        transform: scale(1.05);
+        transform: scale(1.1) rotate(-2deg);
     }
 
     .main-menu-content {
-        padding: 1rem 0.8rem !important;
+        padding: 0.5rem 1rem !important;
     }
 
     .navigation-main {
@@ -35,88 +38,95 @@
     }
 
     .navigation-main .nav-item {
-        margin: 6px 0 !important;
-        border-radius: 12px !important;
-        overflow: hidden;
-        transition: all 0.3s ease !important;
+        margin: 8px 0 !important;
+        border-radius: 14px !important;
+        position: relative;
     }
 
     .navigation-main .nav-item a {
-        padding: 12px 18px !important;
-        border-radius: 12px !important;
-        color: #64748b !important;
+        padding: 14px 20px !important;
+        border-radius: 14px !important;
+        color: #cbd5e1 !important;
         font-weight: 500 !important;
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
         transition: all 0.3s ease !important;
         background: transparent !important;
         display: flex !important;
         align-items: center !important;
-        gap: 12px !important;
+        gap: 14px !important;
+        letter-spacing: 0.3px;
     }
 
     /* Icon Styling */
     .navigation-main .nav-item a i, 
     .navigation-main .nav-item a svg {
-        width: 20px !important;
-        height: 20px !important;
-        font-size: 1.25rem !important;
+        width: 18px !important;
+        height: 18px !important;
         transition: all 0.3s ease !important;
         color: #94a3b8 !important;
+        opacity: 0.8;
     }
 
     /* Hover State */
     .navigation-main .nav-item:not(.active) a:hover {
-        background: #f8fafc !important;
-        color: #1a237e !important;
-        transform: translateX(5px);
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+        transform: translateX(8px);
     }
 
     .navigation-main .nav-item:not(.active) a:hover i,
     .navigation-main .nav-item:not(.active) a:hover svg {
-        color: #1a237e !important;
+        color: #ffffff !important;
+        opacity: 1;
+        transform: scale(1.1);
     }
 
-    /* Active State - Premium Look */
+    /* Active State - Premium Gradient Look */
     .navigation-main .nav-item.active {
-        box-shadow: 0 10px 20px rgba(26, 35, 126, 0.1) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
     }
 
     .navigation-main .nav-item.active a {
-        background: linear-gradient(135deg, #1a237e 0%, #311b92 100%) !important;
+        background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%) !important;
         color: #ffffff !important;
         font-weight: 600 !important;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
     }
 
     .navigation-main .nav-item.active a i,
     .navigation-main .nav-item.active a svg {
         color: #ffffff !important;
+        opacity: 1;
         transform: scale(1.1);
     }
 
     /* Navigation Header */
     .navigation-header {
-        margin: 1.5rem 0 0.8rem 1.2rem !important;
+        margin: 2rem 0 1rem 1.5rem !important;
         padding: 0 !important;
         text-transform: uppercase !important;
-        letter-spacing: 1.5px !important;
-        font-size: 0.75rem !important;
-        font-weight: 700 !important;
-        color: #94a3b8 !important;
-        opacity: 0.8;
+        letter-spacing: 2px !important;
+        font-size: 0.7rem !important;
+        font-weight: 800 !important;
+        color: #6366f1 !important;
+        position: relative;
     }
 
     .navigation-header::after {
         content: '';
-        display: block;
-        width: 30px;
+        display: inline-block;
+        width: 20px;
         height: 2px;
-        background: #e2e8f0;
-        margin-top: 5px;
+        background: #6366f1;
+        margin-left: 10px;
+        vertical-align: middle;
+        border-radius: 10px;
     }
 
     /* Scrollbar Style */
     .main-menu-content::-webkit-scrollbar {
-        width: 4px;
+        width: 5px;
     }
 
     .main-menu-content::-webkit-scrollbar-track {
@@ -124,13 +134,14 @@
     }
 
     .main-menu-content::-webkit-scrollbar-thumb {
-        background: #e2e8f0;
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
     }
 
     .main-menu-content:hover::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
+        background: rgba(255, 255, 255, 0.2);
     }
+</style>
 
 </style>
 

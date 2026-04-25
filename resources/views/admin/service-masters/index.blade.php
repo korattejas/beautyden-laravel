@@ -75,7 +75,7 @@
                     data: 'icon', 
                     name: 'icon',
                     render: function(data, type, row) {
-                        var img = data ? APP_URL + '/uploads/service/' + data : APP_URL + '/panel-assets/images/no-image.png';
+                        var img = data ? JS_URL + '/uploads/service/' + data : JS_URL + '/panel-assets/images/no-image.png';
                         return '<div class="avatar avatar-lg shadow-sm border"><img src="'+img+'" alt="icon" style="object-fit: cover;"></div>';
                     },
                     orderable: false,

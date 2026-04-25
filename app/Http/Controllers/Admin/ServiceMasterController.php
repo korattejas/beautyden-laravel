@@ -128,7 +128,7 @@ class ServiceMasterController extends Controller
         $id = $request->input('edit_value', 0);
 
         $rules = [
-            'name'            => 'required|string|max:255',
+            'name'            => 'required|string|max:255|unique:service_masters,name,' . $id,
             'category_id'     => 'required|exists:service_categories,id',
             'sub_category_id' => 'nullable|exists:service_subcategories,id',
         ];
@@ -198,9 +198,10 @@ class ServiceMasterController extends Controller
                         if (isset($section['steps'])) {
                             foreach ($section['steps'] as $sKey => $step) {
                                 $img = $step['old_image'] ?? null;
-                                if ($request->hasFile("sections.$key.steps.$sKey.image")) {
+                                $step_file = $request->file("sections.$key.steps.$sKey.image");
+                                if ($step_file) {
                                     if ($img) File::delete(public_path('uploads/service-content/' . $img));
-                                    $img = ImageUploadHelper::serviceContentImageUpload($request->file("sections.$key.steps.$sKey.image"));
+                                    $img = ImageUploadHelper::serviceContentImageUpload($step_file);
                                 }
                                 $steps[] = ['title' => $step['title'] ?? '', 'desc'  => $step['desc'] ?? '', 'image' => $img];
                             }
@@ -209,9 +210,11 @@ class ServiceMasterController extends Controller
                     }
                     elseif ($type == 'expert') {
                         $img = $section['old_image'] ?? null;
-                        if ($request->hasFile("sections.$key.image")) {
+                        // Robust check for expert image in nested array
+                        $expert_file = $request->file("sections.$key.image");
+                        if ($expert_file) {
                             if ($img) File::delete(public_path('uploads/service-content/' . $img));
-                            $img = ImageUploadHelper::serviceContentImageUpload($request->file("sections.$key.image"));
+                            $img = ImageUploadHelper::serviceContentImageUpload($expert_file);
                         }
                         $processed_section['image'] = $img;
                         $processed_section['points'] = array_values(array_filter($section['points'] ?? []));
@@ -226,9 +229,10 @@ class ServiceMasterController extends Controller
                         if (isset($section['items'])) {
                             foreach ($section['items'] as $iKey => $item) {
                                 $img = $item['old_image'] ?? null;
-                                if ($request->hasFile("sections.$key.items.$iKey.image")) {
+                                $item_file = $request->file("sections.$key.items.$iKey.image");
+                                if ($item_file) {
                                     if ($img) File::delete(public_path('uploads/service-content/' . $img));
-                                    $img = ImageUploadHelper::serviceContentImageUpload($request->file("sections.$key.items.$iKey.image"));
+                                    $img = ImageUploadHelper::serviceContentImageUpload($item_file);
                                 }
                                 $items[] = ['title' => $item['title'] ?? '', 'image' => $img];
                             }

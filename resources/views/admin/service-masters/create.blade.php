@@ -16,6 +16,9 @@
         justify-content: center;
         min-height: 100px;
     }
+    .section-block {
+        padding: 12px;
+    }
     .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
     .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; }
     .premium-file-input.has-preview { border-style: solid; border-color: #e2e8f0; background: #f8fafc; }
@@ -272,7 +275,8 @@
 
     function handlePreview(input) {
         const file = input.files[0];
-        const container = $(input).closest('.premium-file-input').siblings('.preview-container');
+        const container = $(input).closest('.premium-file-input').parent().find('.preview-container');
+        
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -286,13 +290,16 @@
                 } else {
                     html += '<img src="'+e.target.result+'" class="preview-media">';
                 }
+                
                 container.html(html).fadeIn();
-                $(input).closest('.premium-file-input').addClass('has-preview');
+                $(input).closest('.premium-file-input').addClass('has-preview').find('.placeholder-content').hide();
                 feather.replace();
             }
             reader.readAsDataURL(file);
         }
     }
+
+    window.updatePreview = function(input) { handlePreview(input); };
 
     $(function() {
         FilePond.registerPlugin(FilePondPluginImagePreview);
