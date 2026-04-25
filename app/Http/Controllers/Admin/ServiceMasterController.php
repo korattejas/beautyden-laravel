@@ -148,21 +148,24 @@ class ServiceMasterController extends Controller
                 $icon = ImageUploadHelper::serviceimageUpload($request->file('icon'));
             }
 
-            // Handle Banner Media (New approach with multi-upload)
+            // Handle Banner Media (Reverting to row-based structure)
             $banner_media = [];
             if ($request->banner) {
-                foreach ($request->banner as $item) {
-                    if (isset($item['old_file'])) {
-                        $banner_media[] = ['url' => $item['old_file'], 'type' => $item['old_type'] ?? 'image'];
+                foreach ($request->banner as $key => $item) {
+                    $file_url = $item['old_file'] ?? null;
+                    $type = $item['old_type'] ?? 'image';
+
+                    if ($request->hasFile("banner.$key.file")) {
+                        if ($file_url) File::delete(public_path('uploads/service-media/' . $file_url));
+                        $file = $request->file("banner.$key.file");
+                        $file_url = ImageUploadHelper::serviceMediaUpload($file);
+                        $extension = strtolower($file->getClientOriginalExtension());
+                        $type = in_array($extension, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
                     }
-                }
-            }
-            if ($request->hasFile('banner_files')) {
-                foreach ($request->file('banner_files') as $file) {
-                    $file_url = ImageUploadHelper::serviceMediaUpload($file);
-                    $extension = strtolower($file->getClientOriginalExtension());
-                    $type = in_array($extension, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
-                    $banner_media[] = ['url' => $file_url, 'type' => $type];
+
+                    if ($file_url) {
+                        $banner_media[] = ['url' => $file_url, 'type' => $type];
+                    }
                 }
             }
 

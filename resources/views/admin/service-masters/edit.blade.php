@@ -1,5 +1,30 @@
 @extends('admin.layouts.app')
 @section('content')
+<style>
+    .premium-file-input { 
+        position: relative; 
+        border: 2px dashed #d1d5db; 
+        border-radius: 12px; 
+        padding: 15px; 
+        text-align: center; 
+        background: #fff; 
+        cursor: pointer; 
+        transition: all 0.3s; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center;
+        min-height: 80px;
+    }
+    .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
+    .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; }
+    .premium-file-input.has-preview { border-style: solid; border-color: #e2e8f0; background: #f8fafc; }
+    .preview-container { position: relative; margin-top: 10px; }
+    .preview-media { max-width: 100%; max-height: 120px; border-radius: 8px; border: 1px solid #ddd; }
+    .preview-actions { position: absolute; top: 5px; right: 5px; display: flex; gap: 5px; z-index: 10; }
+    .action-btn { background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
+    .action-btn:hover { background: #fff; transform: scale(1.1); }
+</style>
 
 
 <div class="app-content content">
@@ -81,46 +106,59 @@
                         <div class="card shadow-sm border-0">
                             <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                                 <h4 class="card-title">Banner Media</h4>
+                                <button type="button" class="btn btn-sm btn-outline-primary add-banner">+ Add Media</button>
                             </div>
-                            <div class="card-body pt-2">
-                                <div class="d-flex flex-wrap gap-1 mb-1">
-                                    @foreach($service->banner_media ?? [] as $key => $media)
-                                        <div class="position-relative border rounded p-25 bg-light banner-media-row">
-                                            <input type="hidden" name="banner[{{ $key }}][old_file]" value="{{ $media['url'] }}">
-                                            <input type="hidden" name="banner[{{ $key }}][old_type]" value="{{ $media['type'] }}">
-                                            @if($media['type'] == 'image')
-                                                <img src="{{ asset('uploads/service-media/' . $media['url']) }}" class="rounded" style="height: 60px; width: 60px; object-fit: cover;">
-                                            @else
-                                                <div class="d-flex align-items-center justify-content-center bg-dark rounded" style="height: 60px; width: 60px;"><i data-feather="video" class="text-white"></i></div>
-                                            @endif
-                                            <button type="button" class="btn btn-sm btn-icon btn-danger position-absolute top-0 end-0 m-25 remove-row" style="padding: 2px;"><i data-feather="x" style="width: 12px; height: 12px;"></i></button>
+                            <div class="card-body pt-2" id="banner-media-container">
+                                @foreach($service->banner_media ?? [] as $key => $media)
+                                    <div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative">
+                                        <button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>
+                                        <input type="hidden" name="banner[{{ $key }}][old_file]" value="{{ $media['url'] }}">
+                                        <input type="hidden" name="banner[{{ $key }}][old_type]" value="{{ $media['type'] }}">
+                                        <div class="premium-file-input has-preview">
+                                            <div class="placeholder-content" style="display:none">
+                                                <i data-feather="upload-cloud" class="text-primary mb-1"></i>
+                                                <p class="mb-0 fw-bold small">Change Media</p>
+                                            </div>
+                                            <input type="file" name="banner[{{ $key }}][file]" onchange="handlePreview(this)">
                                         </div>
-                                    @endforeach
-                                </div>
-                                <input type="file" class="filepond" name="banner_files[]" multiple>
-                                <small class="text-muted">Add more images or videos to the banner.</small>
+                                        <div class="preview-container">
+                                            <div class="preview-actions">
+                                                <button type="button" class="action-btn text-primary view-full" data-url="{{ asset('uploads/service-media/' . $media['url']) }}"><i data-feather="maximize" style="width:14px"></i></button>
+                                            </div>
+                                            @if($media['type'] == 'image')
+                                                <img src="{{ asset('uploads/service-media/' . $media['url']) }}" class="preview-media">
+                                            @else
+                                                <div class="mb-1">🎥 Video: {{ $media['url'] }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
 
                         <div class="card shadow-sm border-0">
-                            <div class="card-header border-bottom">
+                            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                                 <h4 class="card-title">Before & After Results</h4>
+                                <button type="button" class="btn btn-sm btn-outline-primary add-ba">+ Add Result</button>
                             </div>
-                            <div class="card-body pt-2">
-                                <div class="d-flex flex-wrap gap-1 mb-1">
-                                    @foreach($service->before_after ?? [] as $key => $ba)
-                                        @php $img = is_array($ba) ? ($ba['before'] ?? ($ba['after'] ?? null)) : $ba; @endphp
-                                        @if($img)
-                                            <div class="position-relative border rounded p-25 bg-light ba-row">
-                                                <input type="hidden" name="old_ba_images[]" value="{{ $img }}">
-                                                <img src="{{ asset('uploads/service-media/' . $img) }}" class="rounded" style="height: 60px; width: 60px; object-fit: cover;">
-                                                <button type="button" class="btn btn-sm btn-icon btn-danger position-absolute top-0 end-0 m-25 remove-row" style="padding: 2px;"><i data-feather="x" style="width: 12px; height: 12px;"></i></button>
+                            <div class="card-body pt-2" id="ba-container">
+                                @foreach($service->before_after ?? [] as $key => $ba)
+                                    @php $img = is_array($ba) ? ($ba['before'] ?? ($ba['after'] ?? null)) : $ba; @endphp
+                                    <div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative">
+                                        <button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>
+                                        <input type="hidden" name="old_ba_images[]" value="{{ $img }}">
+                                        <div class="premium-file-input has-preview">
+                                            <div class="placeholder-content" style="display:none"><i data-feather="image"></i></div>
+                                            <input type="file" name="ba_images[]" onchange="handlePreview(this)">
+                                        </div>
+                                        <div class="preview-container">
+                                            <div class="preview-actions">
+                                                <button type="button" class="action-btn text-primary view-full" data-url="{{ asset('uploads/service-media/' . $img) }}"><i data-feather="maximize" style="width:14px"></i></button>
                                             </div>
-                                        @endif
-                                    @endforeach
-                                </div>
-                                <input type="file" class="filepond" name="ba_images[]" multiple>
-                                <small class="text-muted">Add more result images.</small>
+                                            <img src="{{ asset('uploads/service-media/' . $img) }}" class="preview-media">
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -166,12 +204,18 @@
                                                             <div class="row">
                                                                  <div class="col-4">
                                                                     <input type="hidden" name="sections[{{ $idx }}][steps][{{ $sIdx }}][old_image]" value="{{ $step['image'] }}">
-                                                                    @if($step['image'])
-                                                                        <div class="mb-50 text-center border rounded p-25 bg-light position-relative">
-                                                                            <img src="{{ asset('uploads/service-content/' . $step['image']) }}" class="rounded" style="max-height: 50px; max-width: 100%;">
-                                                                        </div>
-                                                                    @endif
-                                                                    <input type="file" class="filepond" name="sections[{{ $idx }}][steps][{{ $sIdx }}][image]">
+                                                                    <div class="premium-file-input {{ $step['image'] ? 'has-preview' : '' }}" style="min-height:60px">
+                                                                        <div class="placeholder-content" style="{{ $step['image'] ? 'display:none' : '' }}"><p class="mb-0 x-small fw-bold">Img</p></div>
+                                                                        <input type="file" name="sections[{{ $idx }}][steps][{{ $sIdx }}][image]" onchange="handlePreview(this)">
+                                                                    </div>
+                                                                    <div class="preview-container" style="{{ $step['image'] ? 'display:block' : '' }}">
+                                                                        @if($step['image'])
+                                                                            <div class="preview-actions">
+                                                                                <button type="button" class="action-btn text-primary view-full" data-url="{{ asset('uploads/service-content/' . $step['image']) }}"><i data-feather="maximize" style="width:14px"></i></button>
+                                                                            </div>
+                                                                            <img src="{{ asset('uploads/service-content/' . $step['image']) }}" class="preview-media">
+                                                                        @endif
+                                                                    </div>
                                                                 </div>
                                                                 <div class="col-8">
                                                                     <input type="text" name="sections[{{ $idx }}][steps][{{ $sIdx }}][title]" class="form-control mb-1 form-control-sm" value="{{ $step['title'] }}">
@@ -186,12 +230,18 @@
                                                 <div class="row align-items-center">
                                                      <div class="col-md-4">
                                                         <input type="hidden" name="sections[{{ $idx }}][old_image]" value="{{ $section['image'] ?? '' }}">
-                                                        @if(!empty($section['image']))
-                                                            <div class="mb-50 border rounded p-25 bg-light text-center">
-                                                                <img src="{{ asset('uploads/service-content/' . $section['image']) }}" class="rounded" style="max-height: 80px; max-width: 100%;">
-                                                            </div>
-                                                        @endif
-                                                        <input type="file" class="filepond" name="sections[{{ $idx }}][image]">
+                                                        <div class="premium-file-input {{ !empty($section['image']) ? 'has-preview' : '' }}">
+                                                            <div class="placeholder-content" style="{{ !empty($section['image']) ? 'display:none' : '' }}"><p class="mb-0 small fw-bold">Expert</p></div>
+                                                            <input type="file" name="sections[{{ $idx }}][image]" onchange="handlePreview(this)">
+                                                        </div>
+                                                        <div class="preview-container" style="{{ !empty($section['image']) ? 'display:block' : '' }}">
+                                                            @if(!empty($section['image']))
+                                                                <div class="preview-actions">
+                                                                    <button type="button" class="action-btn text-primary view-full" data-url="{{ asset('uploads/service-content/' . $section['image']) }}"><i data-feather="maximize" style="width:14px"></i></button>
+                                                                </div>
+                                                                <img src="{{ asset('uploads/service-content/' . $section['image']) }}" class="preview-media">
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-8">
                                                         <div class="points-container">
@@ -216,12 +266,18 @@
                                                             <div class="border rounded p-1 bg-white position-relative">
                                                                 <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>
                                                                 <input type="hidden" name="sections[{{ $idx }}][items][{{ $iIdx }}][old_image]" value="{{ $item['image'] }}">
-                                                                @if($item['image'])
-                                                                    <div class="mb-50 text-center border rounded p-25 bg-light">
-                                                                        <img src="{{ asset('uploads/service-content/' . $item['image']) }}" class="rounded" style="height: 40px; object-fit: contain;">
-                                                                    </div>
-                                                                @endif
-                                                                <input type="file" class="filepond" name="sections[{{ $idx }}][items][{{ $iIdx }}][image]">
+                                                                <div class="premium-file-input {{ $item['image'] ? 'has-preview' : '' }}" style="min-height:50px">
+                                                                    <div class="placeholder-content" style="{{ $item['image'] ? 'display:none' : '' }}"><i data-feather="image" style="width:16px"></i></div>
+                                                                    <input type="file" name="sections[{{ $idx }}][items][{{ $iIdx }}][image]" onchange="handlePreview(this)">
+                                                                </div>
+                                                                <div class="preview-container" style="{{ $item['image'] ? 'display:block' : '' }}">
+                                                                    @if($item['image'])
+                                                                        <div class="preview-actions">
+                                                                            <button type="button" class="action-btn text-primary view-full" data-url="{{ asset('uploads/service-content/' . $item['image']) }}"><i data-feather="maximize" style="width:14px"></i></button>
+                                                                        </div>
+                                                                        <img src="{{ asset('uploads/service-content/' . $item['image']) }}" class="preview-media" style="height:40px; object-fit:contain">
+                                                                    @endif
+                                                                </div>
                                                                 <input type="text" name="sections[{{ $idx }}][items][{{ $iIdx }}][title]" class="form-control form-control-sm mt-1" value="{{ $item['title'] }}">
                                                             </div>
                                                         </div>
@@ -281,24 +337,48 @@
     var form_url = 'service-master/store';
     var redirect_url = 'service-master';
 
+    function handlePreview(input) {
+        const file = input.files[0];
+        const container = $(input).closest('.premium-file-input').siblings('.preview-container');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let html = '<div class="preview-actions">';
+                html += '<button type="button" class="action-btn text-primary view-full" data-url="'+e.target.result+'"><i data-feather="maximize" style="width:14px"></i></button>';
+                html += '<button type="button" class="action-btn text-danger clear-input"><i data-feather="trash-2" style="width:14px"></i></button>';
+                html += '</div>';
+                if (file.type.startsWith('video/')) {
+                    html += '<video src="'+e.target.result+'" class="preview-media" controls></video>';
+                } else {
+                    html += '<img src="'+e.target.result+'" class="preview-media">';
+                }
+                container.html(html).fadeIn();
+                $(input).closest('.premium-file-input').addClass('has-preview').find('.placeholder-content').hide();
+                feather.replace();
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
     $(function() {
         FilePond.registerPlugin(FilePondPluginImagePreview);
+        FilePond.create($('.filepond')[0], {
+            allowMultiple: false,
+            instantUpload: false,
+            allowProcess: false,
+            storeAsFile: true,
+            labelIdle: 'Drag & Drop or <span class="filepond--label-action">Browse</span>'
+        });
 
-        const initPonds = () => {
-            $('.filepond:not(.filepond--root)').each(function() {
-                FilePond.create(this, {
-                    allowMultiple: $(this).prop('multiple'),
-                    instantUpload: false,
-                    allowProcess: false,
-                    storeAsFile: true,
-                    labelIdle: 'Drag & Drop or <span class="filepond--label-action">Browse</span>'
-                });
-            });
-        };
-        initPonds();
+        $(document).on('click', '.clear-input', function() {
+            const row = $(this).closest('.preview-container').siblings('.premium-file-input');
+            row.find('input[type="file"]').val('');
+            row.removeClass('has-preview').find('.placeholder-content').show();
+            $(this).closest('.preview-container').fadeOut().empty();
+        });
 
-        $('.add-section, .add-step, .add-protocol-item').click(function() {
-            setTimeout(initPonds, 100);
+        $(document).on('click', '.view-full', function() {
+            window.open($(this).data('url'), '_blank');
         });
 
         $('#catalogForm').on('submit', function(e) {
@@ -317,8 +397,19 @@
         });
 
         var sectionIndex = {{ count($sections) }};
+        var bannerIndex = {{ count($service->banner_media ?? []) }};
 
         $('.select2').select2({ width: '100%' });
+
+        $('.add-banner').click(function() {
+            $('#banner-media-container').append('<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><div class="placeholder-content"><i data-feather="upload-cloud" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload File</p></div><input type="file" name="banner['+bannerIndex+'][file]" onchange="handlePreview(this)"></div><div class="preview-container"></div></div>');
+            bannerIndex++; feather.replace();
+        });
+
+        $('.add-ba').click(function() {
+            $('#ba-container').append('<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><div class="placeholder-content"><i data-feather="image" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload Image</p></div><input type="file" name="ba_images[]" onchange="handlePreview(this)"></div><div class="preview-container"></div></div>');
+            feather.replace();
+        });
 
         $('.add-section').click(function() {
             var html = $('#templates [data-type="'+$(this).data('type')+'"]').clone();
@@ -329,13 +420,15 @@
 
         $(document).on('click', '.add-step', function() {
             var con = $(this).siblings('.steps-container');
-            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><input type="file" class="filepond" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
+            var idx = con.children().length;
+            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1" style="min-height:60px"><div class="placeholder-content"><p class="mb-0 x-small fw-bold">Img</p></div><input type="file" name="'+$(this).data('prefix')+'['+idx+'][image]" onchange="handlePreview(this)"></div><div class="preview-container"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+idx+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+idx+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
             feather.replace();
         });
 
         $(document).on('click', '.add-protocol-item', function() {
             var con = $(this).siblings('.protocol-items-container');
-            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><input type="file" class="filepond" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
+            var idx = con.children().length;
+            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="premium-file-input p-1" style="min-height:50px"><div class="placeholder-content"><i data-feather="image" style="width:16px"></i></div><input type="file" name="'+$(this).data('prefix')+'['+idx+'][image]" onchange="handlePreview(this)"></div><div class="preview-container"></div><input type="text" name="'+$(this).data('prefix')+'['+idx+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
             feather.replace();
         });
 
