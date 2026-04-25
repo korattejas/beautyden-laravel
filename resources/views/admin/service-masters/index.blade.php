@@ -36,6 +36,7 @@
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
+                                                <th>ICON</th>
                                                 <th>CATEGORY</th>
                                                 <th>SUB CATEGORY</th>
                                                 <th>NAME</th>
@@ -70,6 +71,16 @@
             lengthMenu: [[10, 25, 50, 100, 200, -1], [10, 25, 50, 100, 200, "All"]],
             columns: [
                 { data: null, name: 'id', render: (data, type, row, meta) => meta.row + 1 },
+                { 
+                    data: 'icon', 
+                    name: 'icon',
+                    render: function(data, type, row) {
+                        var img = data ? APP_URL + '/uploads/service/' + data : APP_URL + '/panel-assets/images/no-image.png';
+                        return '<div class="avatar avatar-lg shadow-sm border"><img src="'+img+'" alt="icon" style="object-fit: cover;"></div>';
+                    },
+                    orderable: false,
+                    searchable: false
+                },
                 { data: 'category_name', name: 'sc.name' },
                 { data: 'subcategory_name', name: 'ssc.name' },
                 { 

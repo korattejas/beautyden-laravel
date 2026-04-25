@@ -261,6 +261,57 @@ class ServiceMasterController extends Controller
                 ServiceMaster::create($data);
                 $msg = "Service catalog created successfully";
             } else {
+                // Orphaned file cleanup
+                if ($service) {
+                    // 1. Check Banner Media
+                    $old_banners = $service->banner_media ?? [];
+                    $new_banners = array_column($banner_media, 'url');
+                    foreach ($old_banners as $old) {
+                        if (!in_array($old['url'], $new_banners)) {
+                            File::delete(public_path('uploads/service-media/' . $old['url']));
+                        }
+                    }
+
+                    // 2. Check Before After
+                    $old_ba = $service->before_after ?? [];
+                    $new_ba = $before_after;
+                    foreach ($old_ba as $old) {
+                        $old_url = is_array($old) ? ($old['before'] ?? ($old['after'] ?? null)) : $old;
+                        if ($old_url && !in_array($old_url, $new_ba)) {
+                            File::delete(public_path('uploads/service-media/' . $old_url));
+                        }
+                    }
+
+                    // 3. Check Content Sections (Ritual, Expert, etc)
+                    $old_content = $service->content_json ?? [];
+                    $new_files = [];
+                    foreach ($content_builder as $sec) {
+                        if (isset($sec['image'])) $new_files[] = $sec['image'];
+                        if (isset($sec['steps'])) foreach ($sec['steps'] as $st) if (isset($st['image'])) $new_files[] = $st['image'];
+                        if (isset($sec['items'])) foreach ($sec['items'] as $it) if (isset($it['image'])) $new_files[] = $it['image'];
+                    }
+
+                    foreach ($old_content as $old_sec) {
+                        if (isset($old_sec['image']) && !in_array($old_sec['image'], $new_files)) {
+                            File::delete(public_path('uploads/service-content/' . $old_sec['image']));
+                        }
+                        if (isset($old_sec['steps'])) {
+                            foreach ($old_sec['steps'] as $old_st) {
+                                if (isset($old_st['image']) && !in_array($old_st['image'], $new_files)) {
+                                    File::delete(public_path('uploads/service-content/' . $old_st['image']));
+                                }
+                            }
+                        }
+                        if (isset($old_sec['items'])) {
+                            foreach ($old_sec['items'] as $old_it) {
+                                if (isset($old_it['image']) && !in_array($old_it['image'], $new_files)) {
+                                    File::delete(public_path('uploads/service-content/' . $old_it['image']));
+                                }
+                            }
+                        }
+                    }
+                }
+
                 ServiceMaster::where('id', $id)->update($data);
                 $msg = "Service catalog updated successfully";
             }
