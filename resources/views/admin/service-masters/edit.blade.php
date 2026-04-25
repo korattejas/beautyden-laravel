@@ -3,11 +3,30 @@
 <style>
     .builder-card { border: 2px dashed #e2e8f0; background: #f8fafc; transition: all 0.3s ease; }
     .builder-card:hover { border-color: #1a237e; }
-    .premium-file-input { position: relative; border: 2px dashed #d1d5db; border-radius: 12px; padding: 20px; text-align: center; background: #fff; cursor: pointer; transition: all 0.3s; }
+    .premium-file-input { 
+        position: relative; 
+        border: 2px dashed #d1d5db; 
+        border-radius: 12px; 
+        padding: 15px; 
+        text-align: center; 
+        background: #fff; 
+        cursor: pointer; 
+        transition: all 0.3s; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center;
+        min-height: 100px;
+    }
     .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
-    .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
+    .premium-file-input .placeholder-content { transition: all 0.3s; }
+    .premium-file-input.has-preview .placeholder-content { display: none; }
+    .preview-media { max-width: 100%; max-height: 150px; border-radius: 8px; object-fit: contain; }
     .section-header { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px 8px 0 0; }
     .form-label { font-weight: 600; color: #334155; margin-bottom: 5px; }
+    .step-card { border-left: 4px solid #6366f1 !important; transition: transform 0.2s; }
+    .step-card:hover { transform: translateX(5px); }
 </style>
 
 <div class="app-content content">
@@ -42,8 +61,10 @@
                                         <img src="{{ asset('uploads/service/' . $service->icon) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 80px;">
                                     @endif
                                     <div class="premium-file-input">
-                                        <i data-feather="image" class="text-primary mb-1"></i>
-                                        <p class="mb-0 fw-bold">Change Icon</p>
+                                        <div class="placeholder-content">
+                                            <i data-feather="image" class="text-primary mb-1"></i>
+                                            <p class="mb-0 fw-bold">Change Icon</p>
+                                        </div>
                                         <input type="file" name="icon" onchange="updatePreview(this)">
                                     </div>
                                     <div class="file-preview mt-1" style="display:none"></div>
@@ -71,13 +92,21 @@
                                     <div class="col-6 mb-1"><label class="form-label">Discounted</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="discount_price" class="form-control" value="{{ $service->discount_price }}"></div></div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-6 mb-1"><label class="form-label">Duration</label><div class="input-group"><span class="input-group-text"><i data-feather="clock"></i></span><input type="text" name="duration" class="form-control" value="{{ $service->duration }}"></div></div>
-                                    <div class="col-6 mb-1"><label class="form-label">Status</label><select name="status" class="form-select"><option value="1" {{ $service->status == 1 ? 'selected' : '' }}>Active</option><option value="0" {{ $service->status == 0 ? 'selected' : '' }}>Inactive</option></select></div>
+                                    <div class="col-md-4 mb-1"><label class="form-label">Duration</label><div class="input-group"><span class="input-group-text"><i data-feather="clock"></i></span><input type="text" name="duration" class="form-control" value="{{ $service->duration }}"></div></div>
+                                    <div class="col-md-4 mb-1"><label class="form-label">Status</label><select name="status" class="form-select"><option value="1" {{ $service->status == 1 ? 'selected' : '' }}>Active</option><option value="0" {{ $service->status == 0 ? 'selected' : '' }}>Inactive</option></select></div>
+                                    <div class="col-md-4 mb-1">
+                                        <label class="form-label">Popularity</label>
+                                        <div class="form-check form-switch mt-50">
+                                            <input class="form-check-input" type="checkbox" name="is_popular" value="1" id="is_popular" {{ $service->is_popular ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold" for="is_popular">Is Popular?</label>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-6 mb-1"><label class="form-label">Rating</label><input type="number" step="0.1" name="rating" class="form-control" value="{{ $service->rating }}"></div>
                                     <div class="col-6 mb-1"><label class="form-label">Reviews</label><input type="number" name="reviews" class="form-control" value="{{ $service->reviews }}"></div>
                                 </div>
+
                             </div>
                         </div>
 
@@ -180,7 +209,7 @@
                                                                 <div class="col-4">
                                                                     <input type="hidden" name="sections[{{ $idx }}][steps][{{ $sIdx }}][old_image]" value="{{ $step['image'] }}">
                                                                     @if($step['image']) <img src="{{ asset('uploads/service-content/' . $step['image']) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 80px; width:100%; object-fit: cover;"> @endif
-                                                                    <div class="premium-file-input p-1 shadow-none"><input type="file" name="sections[{{ $idx }}][steps][{{ $sIdx }}][image]" onchange="updatePreview(this)"></div>
+                                                                    <div class="premium-file-input p-1 shadow-none"><div class="placeholder-content"><i data-feather="image"></i></div><input type="file" name="sections[{{ $idx }}][steps][{{ $sIdx }}][image]" onchange="updatePreview(this)"></div>
                                                                     <div class="file-preview mt-1" style="display:none"></div>
                                                                 </div>
                                                                 <div class="col-8">
@@ -197,7 +226,7 @@
                                                     <div class="col-md-4">
                                                         <input type="hidden" name="sections[{{ $idx }}][old_image]" value="{{ $section['image'] ?? '' }}">
                                                         @if(isset($section['image']) && $section['image']) <img src="{{ asset('uploads/service-content/' . $section['image']) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 100px; width:100%; object-fit: cover;"> @endif
-                                                        <div class="premium-file-input p-1"><input type="file" name="sections[{{ $idx }}][image]" onchange="updatePreview(this)"></div>
+                                                        <div class="premium-file-input p-1"><div class="placeholder-content"><i data-feather="user"></i><p class="mb-0 small fw-bold">Change Image</p></div><input type="file" name="sections[{{ $idx }}][image]" onchange="updatePreview(this)"></div>
                                                         <div class="file-preview mt-1" style="display:none"></div>
                                                     </div>
                                                     <div class="col-md-8">
@@ -224,7 +253,7 @@
                                                                 <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>
                                                                 <input type="hidden" name="sections[{{ $idx }}][items][{{ $iIdx }}][old_image]" value="{{ $item['image'] }}">
                                                                 @if($item['image']) <img src="{{ asset('uploads/service-content/' . $item['image']) }}" class="img-fluid rounded mb-1" style="height: 50px; width:100%; object-fit: contain;"> @endif
-                                                                <div class="premium-file-input p-1 shadow-none"><input type="file" name="sections[{{ $idx }}][items][{{ $iIdx }}][image]" onchange="updatePreview(this)"></div>
+                                                                <div class="premium-file-input p-1 shadow-none"><div class="placeholder-content"><i data-feather="image"></i></div><input type="file" name="sections[{{ $idx }}][items][{{ $iIdx }}][image]" onchange="updatePreview(this)"></div>
                                                                 <div class="file-preview mt-1" style="display:none"></div>
                                                                 <input type="text" name="sections[{{ $idx }}][items][{{ $iIdx }}][title]" class="form-control form-control-sm mt-1" value="{{ $item['title'] }}">
                                                             </div>
@@ -286,12 +315,16 @@
     var redirect_url = 'service-master';
 
     function updatePreview(input) {
-        var preview = $(input).parent().siblings('.file-preview');
+        var wrapper = $(input).parent();
+        var preview = wrapper.siblings('.file-preview');
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function(e) {
-                var content = input.files[0].type.includes('video') ? '<video controls class="img-fluid rounded mt-1 shadow-sm" style="max-height:150px;"><source src="'+e.target.result+'"></video>' : '<img src="'+e.target.result+'" class="img-fluid rounded mt-1 shadow-sm" style="max-height:150px;">';
+                var content = input.files[0].type.includes('video') 
+                    ? '<video controls class="preview-media shadow-sm"><source src="'+e.target.result+'"></video>' 
+                    : '<img src="'+e.target.result+'" class="preview-media shadow-sm">';
                 preview.html(content).fadeIn();
+                wrapper.addClass('has-preview');
             }
             reader.readAsDataURL(input.files[0]);
         }
@@ -305,12 +338,12 @@
         $('.select2').select2({ width: '100%' });
 
         $('.add-banner').click(function() {
-            $('#banner-media-container').append('<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><i data-feather="upload-cloud" class="text-primary mb-1"></i><p class="mb-0 fw-bold">Click to upload Media</p><input type="file" name="banner['+bannerIndex+'][file]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div>');
+            $('#banner-media-container').append('<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><div class="placeholder-content"><i data-feather="upload-cloud" class="text-primary mb-1"></i><p class="mb-0 fw-bold">Click to upload Media</p></div><input type="file" name="banner['+bannerIndex+'][file]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div>');
             bannerIndex++; feather.replace();
         });
 
         $('.add-ba').click(function() {
-            $('#ba-container').append('<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><i data-feather="image" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload B&A Result</p><input type="file" name="ba_images[]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div>');
+            $('#ba-container').append('<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><div class="placeholder-content"><i data-feather="image" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload B&A Result</p></div><input type="file" name="ba_images[]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div>');
             feather.replace();
         });
 
@@ -323,7 +356,7 @@
 
         $(document).on('click', '.add-step', function() {
             var con = $(this).siblings('.steps-container');
-            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1 shadow-none" style="height:100%"><i data-feather="image"></i><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
+            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1 shadow-none" style="height:100%"><div class="placeholder-content"><i data-feather="image"></i></div><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
             feather.replace();
         });
 
@@ -337,7 +370,7 @@
             feather.replace();
         });
 
-        $(document).on('click', '.remove-row', function() { $(this).closest('div').parent().closest('div').remove(); });
+        $(document).on('click', '.remove-row', function() { $(this).closest('.step-card, .banner-media-row, .ba-row, .col-6, .input-group').remove(); });
         $(document).on('click', '.remove-section', function() { $(this).closest('.section-block').remove(); });
 
         $('#category_id').on('change', function() {

@@ -3,11 +3,30 @@
 <style>
     .builder-card { border: 2px dashed #e2e8f0; background: #f8fafc; transition: all 0.3s ease; }
     .builder-card:hover { border-color: #1a237e; }
-    .premium-file-input { position: relative; border: 2px dashed #d1d5db; border-radius: 12px; padding: 20px; text-align: center; background: #fff; cursor: pointer; transition: all 0.3s; }
+    .premium-file-input { 
+        position: relative; 
+        border: 2px dashed #d1d5db; 
+        border-radius: 12px; 
+        padding: 15px; 
+        text-align: center; 
+        background: #fff; 
+        cursor: pointer; 
+        transition: all 0.3s; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center;
+        min-height: 100px;
+    }
     .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
-    .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
+    .premium-file-input .placeholder-content { transition: all 0.3s; }
+    .premium-file-input.has-preview .placeholder-content { display: none; }
+    .preview-media { max-width: 100%; max-height: 150px; border-radius: 8px; object-fit: contain; }
     .section-header { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px 8px 0 0; }
     .form-label { font-weight: 600; color: #334155; margin-bottom: 5px; }
+    .step-card { border-left: 4px solid #6366f1 !important; transition: transform 0.2s; }
+    .step-card:hover { transform: translateX(5px); }
 </style>
 
 <div class="app-content content">
@@ -39,8 +58,10 @@
                                 <div class="mb-2">
                                     <label class="form-label">Service Master Icon (Thumbnail)</label>
                                     <div class="premium-file-input">
-                                        <i data-feather="image" class="text-primary mb-1"></i>
-                                        <p class="mb-0 fw-bold">Select Icon Image</p>
+                                        <div class="placeholder-content">
+                                            <i data-feather="image" class="text-primary mb-1"></i>
+                                            <p class="mb-0 fw-bold">Select Icon Image</p>
+                                        </div>
                                         <input type="file" name="icon" onchange="updatePreview(this)" required>
                                     </div>
                                     <div class="file-preview mt-1" style="display:none"></div>
@@ -69,8 +90,15 @@
                                     <div class="col-6 mb-1"><label class="form-label">Discounted</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="discount_price" class="form-control"></div></div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-6 mb-1"><label class="form-label">Duration</label><div class="input-group"><span class="input-group-text"><i data-feather="clock"></i></span><input type="text" name="duration" class="form-control" placeholder="30 Min"></div></div>
-                                    <div class="col-6 mb-1"><label class="form-label">Status</label><select name="status" class="form-select"><option value="1">Active</option><option value="0">Inactive</option></select></div>
+                                    <div class="col-md-4 mb-1"><label class="form-label">Duration</label><div class="input-group"><span class="input-group-text"><i data-feather="clock"></i></span><input type="text" name="duration" class="form-control" placeholder="30 Min"></div></div>
+                                    <div class="col-md-4 mb-1"><label class="form-label">Status</label><select name="status" class="form-select"><option value="1">Active</option><option value="0">Inactive</option></select></div>
+                                    <div class="col-md-4 mb-1">
+                                        <label class="form-label">Popularity</label>
+                                        <div class="form-check form-switch mt-50">
+                                            <input class="form-check-input" type="checkbox" name="is_popular" value="1" id="is_popular">
+                                            <label class="form-check-label fw-bold" for="is_popular">Is Popular?</label>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-6 mb-1"><label class="form-label">Rating</label><input type="number" step="0.1" name="rating" class="form-control" placeholder="e.g. 4.5"></div>
@@ -92,9 +120,11 @@
                             <div class="card-body pt-2" id="banner-media-container">
                                 <div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50">
                                     <div class="premium-file-input">
-                                        <i data-feather="upload-cloud" class="text-primary mb-1"></i>
-                                        <p class="mb-0 fw-bold">Click to upload Image or Video</p>
-                                        <small class="text-muted">Supports MP4, JPG, PNG, WEBP</small>
+                                        <div class="placeholder-content">
+                                            <i data-feather="upload-cloud" class="text-primary mb-1"></i>
+                                            <p class="mb-0 fw-bold">Click to upload Image or Video</p>
+                                            <small class="text-muted">Supports MP4, JPG, PNG, WEBP</small>
+                                        </div>
                                         <input type="file" name="banner[0][file]" onchange="updatePreview(this)">
                                     </div>
                                     <div class="file-preview mt-1" style="display:none"></div>
@@ -111,8 +141,10 @@
                             <div class="card-body pt-2" id="ba-container">
                                 <div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative">
                                     <div class="premium-file-input">
-                                        <i data-feather="image" class="text-primary mb-1"></i>
-                                        <p class="mb-0 fw-bold small">Upload Before & After Image</p>
+                                        <div class="placeholder-content">
+                                            <i data-feather="image" class="text-primary mb-1"></i>
+                                            <p class="mb-0 fw-bold small">Upload Before & After Image</p>
+                                        </div>
                                         <input type="file" name="ba_images[]" onchange="updatePreview(this)">
                                     </div>
                                     <div class="file-preview mt-1" style="display:none"></div>
@@ -203,7 +235,9 @@
             <div class="row align-items-center">
                 <div class="col-md-4">
                     <div class="premium-file-input p-1">
-                        <p class="mb-0 small fw-bold">Expert Image</p>
+                        <div class="placeholder-content">
+                            <p class="mb-0 small fw-bold">Expert Image</p>
+                        </div>
                         <input type="file" name="sections[INDEX][image]" onchange="updatePreview(this)">
                     </div>
                     <div class="file-preview mt-1" style="display:none"></div>
@@ -249,18 +283,16 @@
     var redirect_url = 'service-master';
 
     function updatePreview(input) {
-        var preview = $(input).parent().siblings('.file-preview');
+        var wrapper = $(input).parent();
+        var preview = wrapper.siblings('.file-preview');
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function(e) {
-                var content = '';
-                if(input.files[0].type.includes('video')) {
-                    content = '<video controls class="img-fluid rounded shadow-sm mt-1" style="max-height: 150px;"><source src="'+e.target.result+'"></video>';
-                } else {
-                    content = '<img src="'+e.target.result+'" class="img-fluid rounded shadow-sm mt-1" style="max-height: 150px;">';
-                }
+                var content = input.files[0].type.includes('video') 
+                    ? '<video controls class="preview-media shadow-sm"><source src="'+e.target.result+'"></video>' 
+                    : '<img src="'+e.target.result+'" class="preview-media shadow-sm">';
                 preview.html(content).fadeIn();
-                $(input).siblings('p').text('Change Selected File');
+                wrapper.addClass('has-preview');
             }
             reader.readAsDataURL(input.files[0]);
         }
@@ -274,7 +306,7 @@
         $('.add-banner').click(function() {
             var html = '<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn">' +
                        '<button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>' +
-                       '<div class="premium-file-input"><i data-feather="upload-cloud" class="text-primary mb-1"></i><p class="mb-0 fw-bold">Click to upload Media</p>' +
+                       '<div class="premium-file-input"><div class="placeholder-content"><i data-feather="upload-cloud" class="text-primary mb-1"></i><p class="mb-0 fw-bold">Click to upload Media</p></div>' +
                        '<input type="file" name="banner['+bannerIndex+'][file]" onchange="updatePreview(this)"></div>' +
                        '<div class="file-preview mt-1" style="display:none"></div></div>';
             $('#banner-media-container').append(html);
@@ -285,7 +317,7 @@
         $('.add-ba').click(function() {
             var html = '<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn">' +
                        '<button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>' +
-                       '<div class="premium-file-input"><i data-feather="image" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload B&A Image</p>' +
+                       '<div class="premium-file-input"><div class="placeholder-content"><i data-feather="image" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload B&A Image</p></div>' +
                        '<input type="file" name="ba_images[]" onchange="updatePreview(this)"></div>' +
                        '<div class="file-preview mt-1" style="display:none"></div></div>';
             $('#ba-container').append(html);
@@ -304,13 +336,14 @@
 
         $(document).on('click', '.add-step', function() {
             var con = $(this).siblings('.steps-container');
-            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1 shadow-none" style="height:100%"><i data-feather="image"></i><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
+            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1 shadow-none" style="height:100%"><div class="placeholder-content"><i data-feather="image"></i></div><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
             feather.replace();
         });
 
         $(document).on('click', '.add-protocol-item', function() {
             var con = $(this).siblings('.protocol-items-container');
-            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="premium-file-input p-1 shadow-none"><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
+            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="premium-file-input p-1 shadow-none"><div class="placeholder-content"><i data-feather="image"></i></div><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
+            feather.replace();
         });
 
         $(document).on('click', '.add-point', function() {
@@ -319,7 +352,7 @@
             feather.replace();
         });
 
-        $(document).on('click', '.remove-row', function() { $(this).closest('div').parent().closest('div').remove(); });
+        $(document).on('click', '.remove-row', function() { $(this).closest('.step-card, .banner-media-row, .ba-row, .col-6, .input-group').remove(); });
         $(document).on('click', '.remove-section', function() { $(this).closest('.section-block').remove(); if(!$('.section-block').length) $('.empty-msg').show(); });
 
         $('#category_id').on('change', function() {

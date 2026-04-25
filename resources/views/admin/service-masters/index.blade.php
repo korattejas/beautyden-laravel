@@ -72,7 +72,13 @@
                 { data: null, name: 'id', render: (data, type, row, meta) => meta.row + 1 },
                 { data: 'category_name', name: 'sc.name' },
                 { data: 'subcategory_name', name: 'ssc.name' },
-                { data: 'name', name: 'name' },
+                { 
+                    data: 'name', 
+                    name: 'name',
+                    render: function(data, type, row) {
+                        return '<a href="'+row.view_url+'" class="fw-bold text-primary">'+data+'</a>';
+                    }
+                },
                 { data: 'price', name: 'price' },
                 { data: 'discount_price', name: 'discount_price' },
                 { data: 'status', name: 'status' },

@@ -111,6 +111,9 @@ class ServiceMasterController extends Controller
                         ];
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })
+                    ->addColumn('view_url', function($s) {
+                        return route('admin.service-master.show', encryptId($s->id));
+                    })
                     ->rawColumns(['action', 'status', 'is_popular'])
                     ->make(true);
             }
