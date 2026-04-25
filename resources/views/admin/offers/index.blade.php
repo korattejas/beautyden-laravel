@@ -48,7 +48,7 @@
 
     .card-media-wrapper {
         position: relative;
-        height: 180px;
+        height: 160px;
         background: #eee;
         overflow: hidden;
     }
@@ -94,7 +94,7 @@
     }
 
     .card-content {
-        padding: 1.25rem;
+        padding: 1rem;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
@@ -313,9 +313,8 @@
         </div>
     </div>
 
-    <!-- View Details Modal -->
     <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
                 <div id="viewDetailsContent">
                     <div class="p-5 text-center">
