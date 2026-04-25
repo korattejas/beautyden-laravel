@@ -64,14 +64,7 @@ class CouponUsageController extends Controller
                                     <span class="text-muted small">' . $usage->created_at->format('h:i A') . '</span>
                                 </div>';
                     })
-                    ->addColumn('action', function ($usage) {
-                        return '<div class="d-flex justify-content-center">
-                                    <button class="btn btn-icon btn-flat-danger delete-record" data-id="'.$usage->id.'" title="Delete Usage">
-                                        <i class="bi bi-trash-fill" style="font-size: 1.2rem;"></i>
-                                    </button>
-                                </div>';
-                    })
-                    ->rawColumns(['action', 'user_details', 'appointment_number', 'discount', 'used_at'])
+                    ->rawColumns(['user_details', 'appointment_number', 'discount', 'used_at'])
                     ->make(true);
             }
         } catch (\Exception $e) {

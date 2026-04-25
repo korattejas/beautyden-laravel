@@ -123,7 +123,7 @@
                     name: 'code',
                     render: function(data, type, row) {
                         var codeVal = data || row.code || 'N/A';
-                        return '<span class="badge bg-light-primary text-uppercase fw-bolder" style="letter-spacing: 1px; padding: 0.6em 1.2em; font-size: 0.9rem;">' + codeVal + '</span>';
+                        return '<span class="badge text-uppercase fw-bolder" style="background: #e8eaf6; color: #1a237e; letter-spacing: 1px; padding: 0.6em 1.2em; font-size: 0.85rem; border: 1px solid #c5cae9;">' + codeVal + '</span>';
                     }
                 },
                 {

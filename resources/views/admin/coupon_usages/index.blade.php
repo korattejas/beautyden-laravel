@@ -46,7 +46,7 @@
                                                 <th>Appointment #</th>
                                                 <th>Discount Amt</th>
                                                 <th>Used At</th>
-                                                <th data-search="false">{{ trans('admin_string.action') }}</th>
+
                                             </tr>
                                         </thead>
                                     </table>
@@ -99,11 +99,7 @@
                     data: 'used_at',
                     name: 'used_at'
                 },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false
-                },
+
             ],
             order: [
                 [0, 'DESC']
