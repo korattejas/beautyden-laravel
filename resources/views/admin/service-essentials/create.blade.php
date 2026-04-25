@@ -1,27 +1,6 @@
 @extends('admin.layouts.app')
 @section('content')
-<style>
-    .premium-file-input { 
-        position: relative; 
-        border: 2px dashed #d1d5db; 
-        border-radius: 12px; 
-        padding: 20px; 
-        text-align: center; 
-        background: #fff; 
-        cursor: pointer; 
-        transition: all 0.3s; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: center;
-        min-height: 150px;
-    }
-    .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
-    .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
-    .premium-file-input .placeholder-content { transition: all 0.3s; }
-    .premium-file-input.has-preview .placeholder-content { display: none; }
-    .preview-media { max-width: 100%; max-height: 200px; border-radius: 12px; object-fit: contain; }
-</style>
+
 
 <div class="app-content content">
     <div class="content-overlay"></div>
@@ -50,7 +29,7 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="card shadow-sm border-0">
                             <div class="card-body">
-                                <form method="POST" data-parsley-validate="" id="addEditForm" role="form" enctype="multipart/form-data">
+                                <form method="POST" id="essentialForm" role="form" enctype="multipart/form-data">
                                     @csrf
                                     <input type="hidden" name="edit_value" value="0">
                                     <input type="hidden" id="form-method" value="add">
@@ -102,6 +81,33 @@
 <script>
     var form_url = 'service-essential/store';
     var redirect_url = 'service-essential';
-    var is_one_image_and_multiple_image_status = 'is_one_image';
+
+    $(function() {
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+        $('.filepond').each(function() {
+            FilePond.create(this, {
+                allowMultiple: false,
+                instantUpload: false,
+                allowProcess: false,
+                storeAsFile: true,
+                labelIdle: 'Drag & Drop or <span class="filepond--label-action">Browse</span>'
+            });
+        });
+
+        $('#essentialForm').on('submit', function(e) {
+            e.preventDefault();
+            loaderView();
+            let formData = new FormData(this);
+            axios.post(APP_URL + '/' + form_url, formData)
+                .then(res => {
+                    notificationToast(res.data.message, 'success');
+                    setTimeout(() => window.location.href = APP_URL + '/' + redirect_url, 1000);
+                })
+                .catch(err => {
+                    loaderHide();
+                    notificationToast(err.response?.data?.message || 'Something went wrong', 'warning');
+                });
+        });
+    });
 </script>
 @endsection

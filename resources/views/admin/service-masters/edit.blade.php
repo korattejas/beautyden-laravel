@@ -37,7 +37,7 @@
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
         <div class="content-body">
-            <form method="POST" id="addEditForm" enctype="multipart/form-data">
+            <form method="POST" id="catalogForm" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="edit_value" value="{{ $service->id }}">
                 
@@ -335,25 +335,42 @@
 <script>
     var form_url = 'service-master/store';
     var redirect_url = 'service-master';
-    var is_one_image_and_multiple_image_status = 'is_one_image';
-
-    function updatePreview(input) {
-        var wrapper = $(input).parent();
-        var preview = wrapper.siblings('.file-preview');
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var content = input.files[0].type.includes('video') 
-                    ? '<video controls class="preview-media shadow-sm"><source src="'+e.target.result+'"></video>' 
-                    : '<img src="'+e.target.result+'" class="preview-media shadow-sm">';
-                preview.html(content).fadeIn();
-                wrapper.addClass('has-preview');
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
 
     $(function() {
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+
+        const initPonds = () => {
+            $('.filepond:not(.filepond--root)').each(function() {
+                FilePond.create(this, {
+                    allowMultiple: $(this).prop('multiple'),
+                    instantUpload: false,
+                    allowProcess: false,
+                    storeAsFile: true,
+                    labelIdle: 'Drag & Drop or <span class="filepond--label-action">Browse</span>'
+                });
+            });
+        };
+        initPonds();
+
+        $('.add-section, .add-step, .add-protocol-item, .add-banner, .add-ba').click(function() {
+            setTimeout(initPonds, 100);
+        });
+
+        $('#catalogForm').on('submit', function(e) {
+            e.preventDefault();
+            loaderView();
+            let formData = new FormData(this);
+            axios.post(APP_URL + '/' + form_url, formData)
+                .then(res => {
+                    notificationToast(res.data.message, 'success');
+                    setTimeout(() => window.location.href = APP_URL + '/' + redirect_url, 1000);
+                })
+                .catch(err => {
+                    loaderHide();
+                    notificationToast(err.response?.data?.message || 'Something went wrong', 'warning');
+                });
+        });
+
         var sectionIndex = {{ count($sections) }};
         var bannerIndex = {{ count($service->banner_media ?? []) }};
         var baIndex = {{ count($service->before_after ?? []) }};
@@ -361,12 +378,12 @@
         $('.select2').select2({ width: '100%' });
 
         $('.add-banner').click(function() {
-            $('#banner-media-container').append('<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><div class="placeholder-content"><i data-feather="upload-cloud" class="text-primary mb-1"></i><p class="mb-0 fw-bold">Click to upload Media</p></div><input type="file" name="banner['+bannerIndex+'][file]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div>');
+            $('#banner-media-container').append('<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><input type="file" class="form-control filepond" name="banner['+bannerIndex+'][file]"></div>');
             bannerIndex++; feather.replace();
         });
 
         $('.add-ba').click(function() {
-            $('#ba-container').append('<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><div class="placeholder-content"><i data-feather="image" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload B&A Result</p></div><input type="file" name="ba_images[]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div>');
+            $('#ba-container').append('<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><input type="file" class="form-control filepond" name="ba_images[]"></div>');
             feather.replace();
         });
 
@@ -379,13 +396,13 @@
 
         $(document).on('click', '.add-step', function() {
             var con = $(this).siblings('.steps-container');
-            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1 shadow-none" style="height:100%"><div class="placeholder-content"><i data-feather="image"></i></div><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
+            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><input type="file" class="form-control filepond" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
             feather.replace();
         });
 
         $(document).on('click', '.add-protocol-item', function() {
             var con = $(this).siblings('.protocol-items-container');
-            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="premium-file-input p-1 shadow-none"><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
+            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><input type="file" class="form-control filepond" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
         });
 
         $(document).on('click', '.add-point', function() {

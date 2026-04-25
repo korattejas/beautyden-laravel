@@ -29,7 +29,7 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="card shadow-sm border-0">
                             <div class="card-body">
-                                <form method="POST" data-parsley-validate="" id="addEditForm" role="form" enctype="multipart/form-data">
+                                <form method="POST" id="essentialForm" role="form" enctype="multipart/form-data">
                                     @csrf
                                     <input type="hidden" name="edit_value" value="{{ $essential->id }}">
                                     <input type="hidden" id="form-method" value="edit">
@@ -84,6 +84,33 @@
 <script>
     var form_url = 'service-essential/store';
     var redirect_url = 'service-essential';
-    var is_one_image_and_multiple_image_status = 'is_one_image';
+
+    $(function() {
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+        $('.filepond').each(function() {
+            FilePond.create(this, {
+                allowMultiple: false,
+                instantUpload: false,
+                allowProcess: false,
+                storeAsFile: true,
+                labelIdle: 'Drag & Drop or <span class="filepond--label-action">Browse</span>'
+            });
+        });
+
+        $('#essentialForm').on('submit', function(e) {
+            e.preventDefault();
+            loaderView();
+            let formData = new FormData(this);
+            axios.post(APP_URL + '/' + form_url, formData)
+                .then(res => {
+                    notificationToast(res.data.message, 'success');
+                    setTimeout(() => window.location.href = APP_URL + '/' + redirect_url, 1000);
+                })
+                .catch(err => {
+                    loaderHide();
+                    notificationToast(err.response?.data?.message || 'Something went wrong', 'warning');
+                });
+        });
+    });
 </script>
 @endsection
