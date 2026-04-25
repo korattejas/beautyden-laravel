@@ -1,4 +1,14 @@
 @extends('admin.layouts.app')
+
+@section('header_style_content')
+<style>
+    .fw-number { font-family: 'JetBrains Mono', 'Courier New', monospace; font-weight: 600; color: #1a237e; }
+    .badge-id { background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; }
+    .btn-delete-icon { width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #fff5f5; color: #e53e3e; border: 1px solid #feb2b2; transition: all 0.2s; }
+    .btn-delete-icon:hover { background: #e53e3e; color: #fff; transform: scale(1.1); box-shadow: 0 4px 12px rgba(229, 62, 62, 0.2); }
+</style>
+@endsection
+
 @section('content')
     <div class="app-content content">
         <div class="content-overlay"></div>
@@ -14,9 +24,7 @@
                                     <li class="breadcrumb-item">
                                         <a href="{{ route('admin.dashboard') }}">{{ trans('admin_string.home') }}</a>
                                     </li>
-                                    <li class="breadcrumb-item active"><a
-                                            href="#">Coupon Usage Logs</a>
-                                    </li>
+                                    <li class="breadcrumb-item active">Coupon Usage Logs</li>
                                 </ol>
                             </div>
                         </div>
@@ -28,7 +36,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-datatable">
+                                <div class="card-datatable table-responsive p-2">
                                     <table class="dt-column-search table w-100 dataTable" id="table-1">
                                         <thead>
                                             <tr>
@@ -68,7 +76,7 @@
                     data: null,
                     name: 'id',
                     render: function(data, type, row, meta) {
-                        return meta.row + 1;
+                        return '<span class="badge-id">#' + (meta.row + 1) + '</span>';
                     }
                 },
                 {

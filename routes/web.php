@@ -111,7 +111,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('offers/{id}', [OfferController::class, 'destroy'])->name('admin.offers.destroy');
         Route::get('offers/status/{id}/{status}', [OfferController::class, 'changeStatus'])->name('admin.offers.changeStatus');
         Route::post('offers/remove-media', [OfferController::class, 'removeMedia'])->name('admin.offers.removeMedia');
-        Route::get('offers-view/{id}', [OfferController::class, 'show']);
+
 
 
     

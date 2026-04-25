@@ -281,9 +281,7 @@
                                 </div>
 
                                 <div class="card-actions">
-                                    <button class="btn-action-pill btn-view" data-id="{{ $offer->id }}" title="View Details">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
+
                                     <a href="{{ route('admin.offers.edit', encryptId($offer->id)) }}" class="btn-action-pill" title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
@@ -313,18 +311,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-                <div id="viewDetailsContent">
-                    <div class="p-5 text-center">
-                        <div class="spinner-border text-primary" role="status"></div>
-                        <p class="mt-2 text-muted">Loading offer details...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 @endsection
 
 @section('footer_script_content')
@@ -335,28 +322,7 @@
         var sweetalert_change_status_text = "Do you want to change the visibility of this banner?";
         var form_url = '/offers';
 
-        // View Details Modal
-        $(document).on('click', '.btn-view', function() {
-            const id = $(this).data('id');
-            $('#viewDetailsContent').html(`
-                <div class="p-5 text-center">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-2 text-muted font-weight-bold">Fetching latest data...</p>
-                </div>
-            `);
-            $('#viewDetailsModal').modal('show');
 
-            $.ajax({
-                url: `/admin/offers-view/${id}`,
-                type: 'GET',
-                success: function(response) {
-                    $('#viewDetailsContent').html(response);
-                },
-                error: function() {
-                    $('#viewDetailsContent').html('<div class="p-5 text-center text-danger"><i class="bi bi-exclamation-triangle display-4"></i><p class="mt-2">Failed to load offer details. Please try again.</p></div>');
-                }
-            });
-        });
 
         // Status Change
         $(document).on('click', '.status-change', function(e) {

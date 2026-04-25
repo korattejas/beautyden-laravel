@@ -35,32 +35,43 @@ class CouponUsageController extends Controller
                     })
                     ->addColumn('user_details', function ($usage) {
                         if ($usage->user) {
-                            return $usage->user->name . '<br><small>' . $usage->user->mobile_number . '</small>';
+                            $wa_url = "https://wa.me/91" . $usage->user->mobile_number;
+                            return '<div class="d-flex flex-column">
+                                        <span class="fw-bold text-dark">' . $usage->user->name . '</span>
+                                        <a href="'.$wa_url.'" target="_blank" class="text-muted small d-flex align-items-center">
+                                            <i class="bi bi-whatsapp text-success me-25"></i>' . $usage->user->mobile_number . '
+                                        </a>
+                                    </div>';
                         }
-                        return 'Guest';
+                        return '<span class="badge bg-light-secondary">Guest</span>';
                     })
                     ->addColumn('appointment_number', function ($usage) {
                         $appointment = \App\Models\Appointment::find($usage->appointment_id);
-                        return $appointment ? $appointment->order_number : 'N/A';
+                        if ($appointment) {
+                            $url = route('admin.appointments.edit', encryptId($appointment->id));
+                            return '<a href="'.$url.'" class="fw-bold text-primary d-flex align-items-center">
+                                        <i class="bi bi-hash me-25"></i>'.$appointment->order_number.'
+                                    </a>';
+                        }
+                        return '<span class="text-muted">N/A</span>';
                     })
                     ->addColumn('discount', function ($usage) {
-                        return '₹' . $usage->discount_amount;
+                        return '<span class="fw-bold text-success" style="font-family: \'JetBrains Mono\', monospace;">₹' . number_format($usage->discount_amount, 2) . '</span>';
                     })
                     ->addColumn('used_at', function ($usage) {
-                        return $usage->created_at->format('d-m-Y H:i');
+                        return '<div class="d-flex flex-column" style="line-height: 1.2;">
+                                    <span class="text-dark fw-bold">' . $usage->created_at->format('d-m-Y') . '</span>
+                                    <span class="text-muted small">' . $usage->created_at->format('h:i A') . '</span>
+                                </div>';
                     })
                     ->addColumn('action', function ($usage) {
-                        $action_array = [
-                            'is_simple_action' => 1,
-                            'delete_id' => $usage->id,
-                            'hidden_id' => $usage->id,
-                        ];
-                        // Using a simplified layout for delete only
-                        return '<a href="javascript:void(0)" class="text-danger delete-record" data-id="'.$usage->id.'">
-                                    <i data-feather="trash-2"></i> Delete Usage
-                                </a>';
+                        return '<div class="d-flex justify-content-center">
+                                    <button class="btn btn-icon btn-flat-danger delete-record" data-id="'.$usage->id.'" title="Delete Usage">
+                                        <i class="bi bi-trash-fill" style="font-size: 1.2rem;"></i>
+                                    </button>
+                                </div>';
                     })
-                    ->rawColumns(['action', 'user_details'])
+                    ->rawColumns(['action', 'user_details', 'appointment_number', 'discount', 'used_at'])
                     ->make(true);
             }
         } catch (\Exception $e) {

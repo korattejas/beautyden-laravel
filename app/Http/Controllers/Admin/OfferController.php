@@ -245,20 +245,7 @@ class OfferController extends Controller
         }
     }
 
-    public function show(int $id)
-    {
-        try {
-            $offer = Offer::find($id);
-            if ($offer) {
-                return view('admin.offers.view_details', [
-                    'offer' => $offer
-                ])->render();
-            }
-            return response()->json(['error' => 'Offer not found'], 404);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $this->error_message], $this->exception_error_code);
-        }
-    }
+
 
 
     public function changeStatus($id, $status)
