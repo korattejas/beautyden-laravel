@@ -72,6 +72,10 @@
                                     <div class="col-6 mb-1"><label class="form-label">Duration</label><div class="input-group"><span class="input-group-text"><i data-feather="clock"></i></span><input type="text" name="duration" class="form-control" placeholder="30 Min"></div></div>
                                     <div class="col-6 mb-1"><label class="form-label">Status</label><select name="status" class="form-select"><option value="1">Active</option><option value="0">Inactive</option></select></div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-6 mb-1"><label class="form-label">Rating</label><input type="number" step="0.1" name="rating" class="form-control" placeholder="e.g. 4.5"></div>
+                                    <div class="col-6 mb-1"><label class="form-label">Reviews</label><input type="number" name="reviews" class="form-control" placeholder="e.g. 150"></div>
+                                </div>
                                 <div class="mb-1">
                                     <label class="form-label">Search Keywords / Short Description</label>
                                     <textarea name="description" class="form-control" rows="2" placeholder="Brief info for meta data..."></textarea>
@@ -178,6 +182,18 @@
             <button type="button" class="btn btn-sm btn-outline-indigo add-step w-100" data-prefix="sections[INDEX][steps]">+ Add New Step Item</button>
         </div>
     </div>
+    <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="procedure">
+        <input type="hidden" name="sections[INDEX][type]" value="procedure">
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-indigo"><i data-feather="repeat" class="me-50"></i> Procedure (Carousel)</h5>
+            <button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button>
+        </div>
+        <div class="card-body py-1 bg-white">
+            <input type="text" name="sections[INDEX][title]" class="form-control mb-1 fw-bold" placeholder="Carousel Title">
+            <div class="steps-container"></div>
+            <button type="button" class="btn btn-sm btn-outline-indigo add-step w-100" data-prefix="sections[INDEX][steps]">+ Add Carousel Item</button>
+        </div>
+    </div>
 
     <!-- Expert -->
     <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="expert">
@@ -185,9 +201,14 @@
         <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">Expert Profile</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
         <div class="card-body py-1 bg-white">
             <div class="row align-items-center">
-                <div class="col-md-4"><div class="premium-file-input p-1"><small class="fw-bold">Expert Photo</small><input type="file" name="sections[INDEX][image]"></div></div>
+                <div class="col-md-4">
+                    <div class="premium-file-input p-1">
+                        <p class="mb-0 small fw-bold">Expert Image</p>
+                        <input type="file" name="sections[INDEX][image]" onchange="updatePreview(this)">
+                    </div>
+                    <div class="file-preview mt-1" style="display:none"></div>
+                </div>
                 <div class="col-md-8">
-                    <label class="form-label">Professional Summary Points</label>
                     <div class="points-container">
                         <div class="input-group mb-1"><span class="input-group-text"><i data-feather="check"></i></span><input type="text" name="sections[INDEX][points][]" class="form-control"><button type="button" class="btn btn-outline-indigo add-point">+</button></div>
                     </div>
@@ -283,20 +304,13 @@
 
         $(document).on('click', '.add-step', function() {
             var con = $(this).siblings('.steps-container');
-            var idx = con.children().length;
-            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>' +
-                       '<div class="row"><div class="col-4"><div class="premium-file-input p-1 shadow-none" style="height:100%"><i data-feather="image" style="width:14px"></i><input type="file" name="'+$(this).data('prefix')+'['+idx+'][image]"></div></div>' +
-                       '<div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+idx+'][title]" class="form-control mb-1 form-control-sm" placeholder="Step Title">' +
-                       '<textarea name="'+$(this).data('prefix')+'['+idx+'][desc]" class="form-control form-control-sm" rows="2" placeholder="Instruction..."></textarea></div></div></div>');
+            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1 shadow-none" style="height:100%"><i data-feather="image"></i><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
             feather.replace();
         });
 
         $(document).on('click', '.add-protocol-item', function() {
             var con = $(this).siblings('.protocol-items-container');
-            var idx = con.children().length;
-            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>' +
-                       '<div class="premium-file-input p-1 shadow-none"><input type="file" name="'+$(this).data('prefix')+'['+idx+'][image]"></div>' +
-                       '<input type="text" name="'+$(this).data('prefix')+'['+idx+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
+            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="premium-file-input p-1 shadow-none"><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
         });
 
         $(document).on('click', '.add-point', function() {

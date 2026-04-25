@@ -100,11 +100,11 @@
                             @foreach($service->content_json ?? [] as $section)
                                 @php $type = $section['type']; @endphp
 
-                                <div class="section-preview">
-                                    @if($type == 'overview')
+                                @if($type == 'overview' && !empty($section['essential_ids']))
+                                    <div class="section-preview">
                                         <h5 class="mb-1">Service Essentials</h5>
                                         <div class="d-flex flex-wrap">
-                                            @foreach($section['essential_ids'] ?? [] as $eid)
+                                            @foreach($section['essential_ids'] as $eid)
                                                 @if(isset($essentials[$eid]))
                                                     <div class="d-flex align-items-center me-2 mb-2 p-1 border rounded bg-white shadow-sm" style="min-width: 150px;">
                                                         <div class="essential-icon-view">
@@ -115,11 +115,13 @@
                                                 @endif
                                             @endforeach
                                         </div>
+                                    </div>
 
-                                    @elseif($type == 'ritual' || $type == 'procedure')
+                                @elseif(($type == 'ritual' || $type == 'procedure') && !empty($section['steps']))
+                                    <div class="section-preview">
                                         <h5 class="mb-1 text-primary">{{ $section['title'] ?? 'The Process' }}</h5>
                                         <div class="row mt-2">
-                                            @foreach($section['steps'] ?? [] as $sKey => $step)
+                                            @foreach($section['steps'] as $sKey => $step)
                                                 <div class="col-md-6 mb-2">
                                                     <div class="card h-100 shadow-sm border mb-0">
                                                         @if($step['image'])
@@ -133,12 +135,14 @@
                                                 </div>
                                             @endforeach
                                         </div>
+                                    </div>
 
-                                    @elseif($type == 'expert')
+                                @elseif($type == 'expert' && (!empty($section['points']) || !empty($section['image'])))
+                                    <div class="section-preview">
                                         <div class="bg-primary bg-opacity-10 p-2 rounded border-start border-primary border-4">
                                             <div class="row align-items-center">
                                                 <div class="col-md-3 text-center">
-                                                    @if($section['image'])
+                                                    @if(!empty($section['image']))
                                                         <img src="{{ asset('uploads/service-content/' . $section['image']) }}" class="rounded-circle border border-3 border-white shadow-lg" style="width: 120px; height: 120px; object-fit: cover;">
                                                     @endif
                                                     <h6 class="mt-1 mb-0 fw-bold">Service Expert</h6>
@@ -153,11 +157,13 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                    @elseif($type == 'list')
+                                @elseif($type == 'list' && !empty($section['points']))
+                                    <div class="section-preview">
                                         <h5 class="mb-1">{{ $section['title'] ?? 'Information' }}</h5>
                                         <div class="row">
-                                            @foreach($section['points'] ?? [] as $p)
+                                            @foreach($section['points'] as $p)
                                                 <div class="col-md-6">
                                                     <div class="d-flex mb-1 align-items-start">
                                                         <i data-feather="arrow-right" class="text-primary me-1" style="width: 15px; margin-top: 3px;"></i>
@@ -166,11 +172,13 @@
                                                 </div>
                                             @endforeach
                                         </div>
+                                    </div>
 
-                                    @elseif($type == 'protocol')
+                                @elseif($type == 'protocol' && !empty($section['items']))
+                                    <div class="section-preview">
                                         <h5 class="mb-1">Safety & Hygiene Protocols</h5>
                                         <div class="row mt-1">
-                                            @foreach($section['items'] ?? [] as $item)
+                                            @foreach($section['items'] as $item)
                                                 <div class="col-4 text-center mb-2">
                                                     @if($item['image'])
                                                         <div class="bg-white p-1 rounded shadow-sm mb-1 d-inline-block">
@@ -181,10 +189,10 @@
                                                 </div>
                                             @endforeach
                                         </div>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endif
                             @endforeach
-                            
+
                             @if(count($service->content_json ?? []) == 0)
                                 <div class="text-center py-5">
                                     <img src="https://cdni.iconscout.com/illustration/premium/thumb/no-data-found-8867280-7223933.png" style="max-width: 200px;">

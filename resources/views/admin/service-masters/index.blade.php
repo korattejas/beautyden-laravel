@@ -35,13 +35,15 @@
                                     <table class="dt-column-search table w-100 dataTable" id="table-1">
                                         <thead>
                                             <tr>
-                                                <th>Id</th>
-                                                <th data-search="false">Icon</th>
-                                                <th>Name</th>
-                                                <th>Category</th>
-                                                <th>Price</th>
-                                                <th data-stuff="Active,InActive">Status</th>
-                                                <th data-search="false">Action</th>
+                                                <th>ID</th>
+                                                <th>CATEGORY</th>
+                                                <th>SUB CATEGORY</th>
+                                                <th>NAME</th>
+                                                <th>PRICE</th>
+                                                <th>DISCOUNT PRICE</th>
+                                                <th data-stuff="Active,InActive">STATUS</th>
+                                                <th>IS POPULAR</th>
+                                                <th data-search="false">ACTION</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -68,11 +70,13 @@
             lengthMenu: [[10, 25, 50, 100, 200, -1], [10, 25, 50, 100, 200, "All"]],
             columns: [
                 { data: null, name: 'id', render: (data, type, row, meta) => meta.row + 1 },
-                { data: 'name', name: 'name' },
                 { data: 'category_name', name: 'sc.name' },
+                { data: 'subcategory_name', name: 'ssc.name' },
+                { data: 'name', name: 'name' },
                 { data: 'price', name: 'price' },
-                { data: 'icon', name: 'icon', orderable: false },
+                { data: 'discount_price', name: 'discount_price' },
                 { data: 'status', name: 'status' },
+                { data: 'is_popular', name: 'is_popular' },
                 { data: 'action', name: 'action', orderable: false },
             ],
             order: [[0, 'DESC']],

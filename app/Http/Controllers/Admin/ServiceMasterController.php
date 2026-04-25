@@ -79,18 +79,18 @@ class ServiceMasterController extends Controller
             if ($request->ajax()) {
                 $services = ServiceMaster::query()
                     ->leftJoin('service_categories as sc', 'sc.id', '=', 'service_masters.category_id')
-                    ->select('service_masters.*', 'sc.name as category_name');
+                    ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'service_masters.sub_category_id')
+                    ->select('service_masters.*', 'sc.name as category_name', 'ssc.name as subcategory_name');
 
                 if ($request->status !== null && $request->status !== '') {
                     $services->where('service_masters.status', $request->status);
                 }
 
                 return DataTables::of($services)
-                    ->addColumn('icon', function ($s) {
-                        if ($s->icon) {
-                            return '<img src="' . asset('uploads/service/' . $s->icon) . '" class="rounded-circle border" style="width: 40px; height: 40px; object-fit: cover;">';
-                        }
-                        return '<div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i data-feather="image"></i></div>';
+                    ->addColumn('is_popular', function ($s) {
+                        return $s->is_popular 
+                            ? '<span class="badge badge-light-success">Popular</span>' 
+                            : '<span class="badge badge-light-secondary">No</span>';
                     })
                     ->addColumn('status', function ($s) {
                         $status_array = [
@@ -111,7 +111,7 @@ class ServiceMasterController extends Controller
                         ];
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })
-                    ->rawColumns(['action', 'status', 'icon'])
+                    ->rawColumns(['action', 'status', 'is_popular'])
                     ->make(true);
             }
         } catch (\Exception $e) {

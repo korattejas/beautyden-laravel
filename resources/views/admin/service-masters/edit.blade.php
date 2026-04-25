@@ -74,7 +74,10 @@
                                     <div class="col-6 mb-1"><label class="form-label">Duration</label><div class="input-group"><span class="input-group-text"><i data-feather="clock"></i></span><input type="text" name="duration" class="form-control" value="{{ $service->duration }}"></div></div>
                                     <div class="col-6 mb-1"><label class="form-label">Status</label><select name="status" class="form-select"><option value="1" {{ $service->status == 1 ? 'selected' : '' }}>Active</option><option value="0" {{ $service->status == 0 ? 'selected' : '' }}>Inactive</option></select></div>
                                 </div>
-                                <div class="mb-1 text-primary">Rating: {{ $service->rating }} ⭐ ({{ $service->reviews }} Reviews)</div>
+                                <div class="row">
+                                    <div class="col-6 mb-1"><label class="form-label">Rating</label><input type="number" step="0.1" name="rating" class="form-control" value="{{ $service->rating }}"></div>
+                                    <div class="col-6 mb-1"><label class="form-label">Reviews</label><input type="number" name="reviews" class="form-control" value="{{ $service->reviews }}"></div>
+                                </div>
                             </div>
                         </div>
 
@@ -177,7 +180,8 @@
                                                                 <div class="col-4">
                                                                     <input type="hidden" name="sections[{{ $idx }}][steps][{{ $sIdx }}][old_image]" value="{{ $step['image'] }}">
                                                                     @if($step['image']) <img src="{{ asset('uploads/service-content/' . $step['image']) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 80px; width:100%; object-fit: cover;"> @endif
-                                                                    <div class="premium-file-input p-1 shadow-none"><input type="file" name="sections[{{ $idx }}][steps][{{ $sIdx }}][image]"></div>
+                                                                    <div class="premium-file-input p-1 shadow-none"><input type="file" name="sections[{{ $idx }}][steps][{{ $sIdx }}][image]" onchange="updatePreview(this)"></div>
+                                                                    <div class="file-preview mt-1" style="display:none"></div>
                                                                 </div>
                                                                 <div class="col-8">
                                                                     <input type="text" name="sections[{{ $idx }}][steps][{{ $sIdx }}][title]" class="form-control mb-1 form-control-sm" value="{{ $step['title'] }}">
@@ -193,7 +197,8 @@
                                                     <div class="col-md-4">
                                                         <input type="hidden" name="sections[{{ $idx }}][old_image]" value="{{ $section['image'] ?? '' }}">
                                                         @if(isset($section['image']) && $section['image']) <img src="{{ asset('uploads/service-content/' . $section['image']) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 100px; width:100%; object-fit: cover;"> @endif
-                                                        <div class="premium-file-input p-1"><input type="file" name="sections[{{ $idx }}][image]"></div>
+                                                        <div class="premium-file-input p-1"><input type="file" name="sections[{{ $idx }}][image]" onchange="updatePreview(this)"></div>
+                                                        <div class="file-preview mt-1" style="display:none"></div>
                                                     </div>
                                                     <div class="col-md-8">
                                                         <div class="points-container">
@@ -219,7 +224,8 @@
                                                                 <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>
                                                                 <input type="hidden" name="sections[{{ $idx }}][items][{{ $iIdx }}][old_image]" value="{{ $item['image'] }}">
                                                                 @if($item['image']) <img src="{{ asset('uploads/service-content/' . $item['image']) }}" class="img-fluid rounded mb-1" style="height: 50px; width:100%; object-fit: contain;"> @endif
-                                                                <div class="premium-file-input p-1 shadow-none"><input type="file" name="sections[{{ $idx }}][items][{{ $iIdx }}][image]"></div>
+                                                                <div class="premium-file-input p-1 shadow-none"><input type="file" name="sections[{{ $idx }}][items][{{ $iIdx }}][image]" onchange="updatePreview(this)"></div>
+                                                                <div class="file-preview mt-1" style="display:none"></div>
                                                                 <input type="text" name="sections[{{ $idx }}][items][{{ $iIdx }}][title]" class="form-control form-control-sm mt-1" value="{{ $item['title'] }}">
                                                             </div>
                                                         </div>
@@ -251,10 +257,15 @@
         <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">Ritual / Steps</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
         <div class="card-body py-1 bg-white"><input type="text" name="sections[INDEX][title]" class="form-control mb-1 fw-bold" placeholder="Title"><div class="steps-container"></div><button type="button" class="btn btn-sm btn-outline-indigo add-step w-100" data-prefix="sections[INDEX][steps]">+ Add Step</button></div>
     </div>
+    <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="procedure">
+        <input type="hidden" name="sections[INDEX][type]" value="procedure">
+        <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">Procedure (Carousel)</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
+        <div class="card-body py-1 bg-white"><input type="text" name="sections[INDEX][title]" class="form-control mb-1 fw-bold" placeholder="Title"><div class="steps-container"></div><button type="button" class="btn btn-sm btn-outline-indigo add-step w-100" data-prefix="sections[INDEX][steps]">+ Add Item</button></div>
+    </div>
     <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="expert">
         <input type="hidden" name="sections[INDEX][type]" value="expert">
         <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">Expert Profile</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
-        <div class="card-body py-1 bg-white"><div class="row"><div class="col-md-4"><div class="premium-file-input p-1"><input type="file" name="sections[INDEX][image]"></div></div><div class="col-md-8"><div class="points-container"><div class="input-group mb-1"><input type="text" name="sections[INDEX][points][]" class="form-control"><button type="button" class="btn btn-outline-indigo add-point">+</button></div></div></div></div></div>
+        <div class="card-body py-1 bg-white"><div class="row"><div class="col-md-4"><div class="premium-file-input p-1"><p class="mb-0 small fw-bold">Expert Image</p><input type="file" name="sections[INDEX][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div><div class="col-md-8"><div class="points-container"><div class="input-group mb-1"><input type="text" name="sections[INDEX][points][]" class="form-control"><button type="button" class="btn btn-outline-indigo add-point">+</button></div></div></div></div></div>
     </div>
     <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="list">
         <input type="hidden" name="sections[INDEX][type]" value="list">
@@ -312,13 +323,13 @@
 
         $(document).on('click', '.add-step', function() {
             var con = $(this).siblings('.steps-container');
-            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1 shadow-none" style="height:100%"><i data-feather="image"></i><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
+            con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1 shadow-none" style="height:100%"><i data-feather="image"></i><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+con.children().length+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
             feather.replace();
         });
 
         $(document).on('click', '.add-protocol-item', function() {
             var con = $(this).siblings('.protocol-items-container');
-            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="premium-file-input p-1 shadow-none"><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]"></div><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
+            con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="premium-file-input p-1 shadow-none"><input type="file" name="'+$(this).data('prefix')+'['+con.children().length+'][image]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div><input type="text" name="'+$(this).data('prefix')+'['+con.children().length+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
         });
 
         $(document).on('click', '.add-point', function() {
