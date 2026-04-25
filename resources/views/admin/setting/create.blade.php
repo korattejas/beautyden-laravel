@@ -78,12 +78,7 @@
                                             <div class="col-12 mb-2">
                                                 <div class="form-group">
                                                     <label class="form-label fw-bold">{{ trans('admin_string.image') }}</label>
-                                                    <div class="upload-zone p-2 border rounded text-center bg-light">
-                                                        <i class="bi bi-cloud-arrow-up text-primary fs-3"></i>
-                                                        <h6 class="mt-1">Select Setting Image</h6>
-                                                        <p class="text-muted small mb-1">Drag & drop or browse</p>
-                                                        <input type="file" id="image_input" class="form-control" name="image" accept="image/*">
-                                                    </div>
+                                                    <input type="file" class="filepond" name="image" accept="image/*">
                                                 </div>
                                             </div>
 
@@ -111,6 +106,16 @@
     <script>
         var form_url = 'setting/store';
         var redirect_url = 'setting';
+
+        $(function() {
+            FilePond.registerPlugin(FilePondPluginImagePreview);
+            FilePond.create(document.querySelector('.filepond'), {
+                allowMultiple: false,
+                allowImagePreview: true,
+                imagePreviewHeight: 150,
+                credits: false
+            });
+        });
     </script>
 @endsection
 

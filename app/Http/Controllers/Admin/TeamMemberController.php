@@ -326,6 +326,7 @@ class TeamMemberController extends Controller
 
             $validateArray = [
                 'name' => 'required|string|max:100',
+                'id_number' => 'nullable|string|max:50',
                 'role' => 'nullable|string|max:150',
                 'experience_years' => 'nullable|integer|min:0',
                 'specialties' => 'nullable|string|max:255',
@@ -381,6 +382,7 @@ class TeamMemberController extends Controller
 
             $data = [
                 'name' => $request->name,
+                'id_number' => $request->id_number ?? '0',
                 'role' => $request->role,
                 'experience_years' => $request->experience_years,
                 'phone' => $request->phone,

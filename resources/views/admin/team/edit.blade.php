@@ -41,6 +41,14 @@
 
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
+                                                    <label>ID Number</label>
+                                                    <input type="text" class="form-control" name="id_number"
+                                                        value="{{ old('id_number', $team->id_number) }}" placeholder="ID Number">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
                                                     <label>Role</label>
                                                     <input type="text" class="form-control" name="role"
                                                         value="{{ old('role', $team->role) }}" required>

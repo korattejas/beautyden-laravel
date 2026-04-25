@@ -40,6 +40,14 @@
 
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
+                                                    <label>ID Number</label>
+                                                    <input type="text" class="form-control" name="id_number"
+                                                        placeholder="ID Number" value="0">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
                                                     <label>Role</label>
                                                     <input type="text" class="form-control" name="role"
                                                         placeholder="e.g. Hair Stylist" required>

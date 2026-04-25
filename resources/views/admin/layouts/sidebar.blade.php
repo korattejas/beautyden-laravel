@@ -19,7 +19,7 @@
     }
 
     .sidebar-main-logo {
-        height: 60px !important;
+        height: 80px !important;
         width: auto !important;
         transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }

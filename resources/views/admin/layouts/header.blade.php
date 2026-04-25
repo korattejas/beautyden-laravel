@@ -1,3 +1,21 @@
+<style>
+    .header-navbar {
+        z-index: 1050 !important; /* Higher than sidebar and content */
+        position: sticky !important;
+        top: 0;
+        background-color: #102365 !important; /* Solid Dark Indigo */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+    .vertical-layout.vertical-menu-modern .header-navbar.floating-nav {
+        width: calc(100% - (260px + 4.4rem)) !important;
+        margin: 1.3rem 2.2rem 0 !important;
+        border-radius: 12px !important;
+    }
+    /* Fix for dashboard text sliding over header */
+    .app-content {
+        overflow: hidden !important;
+    }
+</style>
 <nav
     class="header-navbar navbar navbar-expand-lg align-items-center floating-nav navbar-light navbar-shadow  bg-primary ">
     <div class="navbar-container d-flex content">

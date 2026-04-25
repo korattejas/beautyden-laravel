@@ -874,6 +874,7 @@
                                     <h5>{{ $stat['member']->name }}</h5>
                                     <div class="d-flex align-items-center justify-content-center flex-wrap gap-2 mt-2">
                                         <span class="role-label">{{ $stat['member']->role ?? 'Team Member' }}</span>
+                                        <span class="badge bg-light-primary text-primary" style="font-weight: 700; border: 1px solid rgba(115, 103, 240, 0.2);">ID: {{ $stat['member']->id_number ?? '0' }}</span>
                                         @if(isset($stat['distance']))
                                             <div class="distance-pill" title="Distance from searched location">
                                                 <i class="bi bi-cursor-fill"></i>
@@ -1229,6 +1230,12 @@
                     </div>
 
                     <div class="c-row">
+                        <div class="c-col-6">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-card-text"></i> ID Number</label>
+                                <p>${data.id_number ?? '0'}</p>
+                            </div>
+                        </div>
                         <div class="c-col-6">
                             <div class="c-detail-card">
                                 <label><i class="bi bi-telephone"></i> Mobile Number</label>
