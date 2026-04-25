@@ -7,7 +7,7 @@
         position: relative; 
         border: 2px dashed #d1d5db; 
         border-radius: 12px; 
-        padding: 15px; 
+        padding: 10px; 
         text-align: center; 
         background: #fff; 
         cursor: pointer; 
@@ -16,13 +16,16 @@
         flex-direction: column; 
         align-items: center; 
         justify-content: center;
-        min-height: 100px;
+        min-height: 80px;
     }
+    .step-card .premium-file-input { min-height: 60px; padding: 5px; }
     .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
     .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
     .premium-file-input .placeholder-content { transition: all 0.3s; }
+    .premium-file-input.has-preview { border-style: solid; border-color: #e2e8f0; background: #f8fafc; }
     .premium-file-input.has-preview .placeholder-content { display: none; }
-    .preview-media { max-width: 100%; max-height: 150px; border-radius: 8px; object-fit: contain; }
+    .preview-media { max-width: 100%; max-height: 120px; border-radius: 8px; object-fit: cover; }
+    .step-card .preview-media { max-height: 80px; }
     .section-header { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px 8px 0 0; }
     .form-label { font-weight: 600; color: #334155; margin-bottom: 5px; }
     .step-card { border-left: 4px solid #6366f1 !important; transition: transform 0.2s; }

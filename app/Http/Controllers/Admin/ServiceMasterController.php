@@ -87,10 +87,10 @@ class ServiceMasterController extends Controller
                 }
 
                 return DataTables::of($services)
-                    ->addColumn('is_popular', function ($s) {
+                    ->editColumn('is_popular', function ($s) {
                         return $s->is_popular 
-                            ? '<span class="badge badge-light-success">Popular</span>' 
-                            : '<span class="badge badge-light-secondary">No</span>';
+                            ? '<span class="badge badge-glow bg-success">Popular</span>' 
+                            : '<span class="badge badge-glow bg-secondary">No</span>';
                     })
                     ->addColumn('status', function ($s) {
                         $status_array = [

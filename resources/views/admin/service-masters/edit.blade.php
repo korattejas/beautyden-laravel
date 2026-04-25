@@ -7,7 +7,7 @@
         position: relative; 
         border: 2px dashed #d1d5db; 
         border-radius: 12px; 
-        padding: 15px; 
+        padding: 10px; 
         text-align: center; 
         background: #fff; 
         cursor: pointer; 
@@ -16,13 +16,16 @@
         flex-direction: column; 
         align-items: center; 
         justify-content: center;
-        min-height: 100px;
+        min-height: 80px;
     }
+    .step-card .premium-file-input { min-height: 60px; padding: 5px; }
     .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
     .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
     .premium-file-input .placeholder-content { transition: all 0.3s; }
+    .premium-file-input.has-preview { border-style: solid; border-color: #e2e8f0; background: #f8fafc; }
     .premium-file-input.has-preview .placeholder-content { display: none; }
-    .preview-media { max-width: 100%; max-height: 150px; border-radius: 8px; object-fit: contain; }
+    .preview-media { max-width: 100%; max-height: 120px; border-radius: 8px; object-fit: cover; }
+    .step-card .preview-media { max-height: 80px; }
     .section-header { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 8px 8px 0 0; }
     .form-label { font-weight: 600; color: #334155; margin-bottom: 5px; }
     .step-card { border-left: 4px solid #6366f1 !important; transition: transform 0.2s; }
@@ -206,11 +209,20 @@
                                                         <div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative">
                                                             <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>
                                                             <div class="row">
-                                                                <div class="col-4">
+                                                                 <div class="col-4">
                                                                     <input type="hidden" name="sections[{{ $idx }}][steps][{{ $sIdx }}][old_image]" value="{{ $step['image'] }}">
-                                                                    @if($step['image']) <img src="{{ asset('uploads/service-content/' . $step['image']) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 80px; width:100%; object-fit: cover;"> @endif
-                                                                    <div class="premium-file-input p-1 shadow-none"><div class="placeholder-content"><i data-feather="image"></i></div><input type="file" name="sections[{{ $idx }}][steps][{{ $sIdx }}][image]" onchange="updatePreview(this)"></div>
-                                                                    <div class="file-preview mt-1" style="display:none"></div>
+                                                                    <div class="premium-file-input p-1 shadow-none {{ $step['image'] ? 'has-preview' : '' }}">
+                                                                        <div class="placeholder-content">
+                                                                            <i data-feather="image" style="width: 20px;"></i>
+                                                                            <p class="mb-0 small fw-bold">Upload</p>
+                                                                        </div>
+                                                                        <input type="file" name="sections[{{ $idx }}][steps][{{ $sIdx }}][image]" onchange="updatePreview(this)">
+                                                                    </div>
+                                                                    <div class="file-preview mt-50" style="{{ $step['image'] ? '' : 'display:none' }}">
+                                                                        @if($step['image'])
+                                                                            <img src="{{ asset('uploads/service-content/' . $step['image']) }}" class="preview-media shadow-sm w-100">
+                                                                        @endif
+                                                                    </div>
                                                                 </div>
                                                                 <div class="col-8">
                                                                     <input type="text" name="sections[{{ $idx }}][steps][{{ $sIdx }}][title]" class="form-control mb-1 form-control-sm" value="{{ $step['title'] }}">
@@ -223,11 +235,20 @@
                                                 <button type="button" class="btn btn-sm btn-outline-indigo add-step w-100" data-prefix="sections[{{ $idx }}][steps]">+ Add New Step Item</button>
                                             @elseif($type == 'expert')
                                                 <div class="row align-items-center">
-                                                    <div class="col-md-4">
+                                                     <div class="col-md-4">
                                                         <input type="hidden" name="sections[{{ $idx }}][old_image]" value="{{ $section['image'] ?? '' }}">
-                                                        @if(isset($section['image']) && $section['image']) <img src="{{ asset('uploads/service-content/' . $section['image']) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 100px; width:100%; object-fit: cover;"> @endif
-                                                        <div class="premium-file-input p-1"><div class="placeholder-content"><i data-feather="user"></i><p class="mb-0 small fw-bold">Change Image</p></div><input type="file" name="sections[{{ $idx }}][image]" onchange="updatePreview(this)"></div>
-                                                        <div class="file-preview mt-1" style="display:none"></div>
+                                                        <div class="premium-file-input p-1 {{ !empty($section['image']) ? 'has-preview' : '' }}">
+                                                            <div class="placeholder-content">
+                                                                <i data-feather="user"></i>
+                                                                <p class="mb-0 small fw-bold">Expert Image</p>
+                                                            </div>
+                                                            <input type="file" name="sections[{{ $idx }}][image]" onchange="updatePreview(this)">
+                                                        </div>
+                                                        <div class="file-preview mt-1" style="{{ !empty($section['image']) ? '' : 'display:none' }}">
+                                                            @if(!empty($section['image']))
+                                                                <img src="{{ asset('uploads/service-content/' . $section['image']) }}" class="preview-media shadow-sm w-100">
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-8">
                                                         <div class="points-container">
@@ -252,9 +273,15 @@
                                                             <div class="border rounded p-1 bg-white position-relative">
                                                                 <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>
                                                                 <input type="hidden" name="sections[{{ $idx }}][items][{{ $iIdx }}][old_image]" value="{{ $item['image'] }}">
-                                                                @if($item['image']) <img src="{{ asset('uploads/service-content/' . $item['image']) }}" class="img-fluid rounded mb-1" style="height: 50px; width:100%; object-fit: contain;"> @endif
-                                                                <div class="premium-file-input p-1 shadow-none"><div class="placeholder-content"><i data-feather="image"></i></div><input type="file" name="sections[{{ $idx }}][items][{{ $iIdx }}][image]" onchange="updatePreview(this)"></div>
-                                                                <div class="file-preview mt-1" style="display:none"></div>
+                                                                <div class="premium-file-input p-1 shadow-none {{ $item['image'] ? 'has-preview' : '' }}">
+                                                                    <div class="placeholder-content"><i data-feather="image"></i></div>
+                                                                    <input type="file" name="sections[{{ $idx }}][items][{{ $iIdx }}][image]" onchange="updatePreview(this)">
+                                                                </div>
+                                                                <div class="file-preview mt-50" style="{{ $item['image'] ? '' : 'display:none' }}">
+                                                                    @if($item['image'])
+                                                                        <img src="{{ asset('uploads/service-content/' . $item['image']) }}" class="preview-media shadow-sm w-100" style="height: 50px; object-fit: contain;">
+                                                                    @endif
+                                                                </div>
                                                                 <input type="text" name="sections[{{ $idx }}][items][{{ $iIdx }}][title]" class="form-control form-control-sm mt-1" value="{{ $item['title'] }}">
                                                             </div>
                                                         </div>
