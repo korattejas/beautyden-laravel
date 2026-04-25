@@ -75,13 +75,17 @@ $(function () {
                     }
                 }
             } else {
-                pond.getFiles().forEach((file) => {
-                    formData.append("photos[]", file.file);
-                });
+                if (typeof pond !== 'undefined' && pond) {
+                    pond.getFiles().forEach((file) => {
+                        formData.append("photos[]", file.file);
+                    });
+                }
 
-                thumbnailPond.getFiles().forEach((file) => {
-                    formData.append("thumbnail_image_path[]", file.file);
-                });
+                if (typeof thumbnailPond !== 'undefined' && thumbnailPond) {
+                    thumbnailPond.getFiles().forEach((file) => {
+                        formData.append("thumbnail_image_path[]", file.file);
+                    });
+                }
             }
 
             axios
