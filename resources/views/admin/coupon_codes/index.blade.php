@@ -1,5 +1,24 @@
 @extends('admin.layouts.app')
 
+@section('header_style_content')
+<style>
+    .dataTables_wrapper .dataTables_length, 
+    .dataTables_wrapper .dataTables_filter {
+        padding: 1.5rem 1rem;
+    }
+    .dataTables_wrapper .dataTables_info, 
+    .dataTables_wrapper .dataTables_paginate {
+        padding: 1rem;
+    }
+    table.dataTable thead th {
+        background-color: #f8f9fa;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+</style>
+@endsection
+
 @section('content')
     <div class="app-content content">
         <div class="content-overlay"></div>
@@ -102,8 +121,9 @@
                 {
                     data: 'code',
                     name: 'code',
-                    render: function(data) {
-                        return `<span class="badge bg-light-primary text-uppercase fw-bolder" style="letter-spacing: 1px;">${data}</span>`;
+                    render: function(data, type, row) {
+                        var codeVal = data || row.code || 'N/A';
+                        return '<span class="badge bg-light-primary text-uppercase fw-bolder" style="letter-spacing: 1px; padding: 0.6em 1.2em; font-size: 0.9rem;">' + codeVal + '</span>';
                     }
                 },
                 {

@@ -52,9 +52,9 @@ class CouponCodeController extends Controller
     {
         try {
             if ($request->ajax()) {
-                $coupons = CouponCode::query();
+                $coupons = CouponCode::select('coupon_codes.*');
                 return DataTables::of($coupons)
-                    ->addColumn('code', function ($coupon) {
+                    ->editColumn('code', function ($coupon) {
                         return $coupon->code;
                     })
                     ->addColumn('discount', function ($coupon) {
@@ -87,7 +87,7 @@ class CouponCodeController extends Controller
                             'action_array' => $action_array
                         ])->render();
                     })
-                    ->rawColumns(['action', 'status'])
+                    ->rawColumns(['action', 'status', 'code'])
                     ->make(true);
             }
         } catch (\Exception $e) {
