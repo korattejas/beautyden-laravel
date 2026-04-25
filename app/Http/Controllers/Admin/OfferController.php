@@ -27,7 +27,8 @@ class OfferController extends Controller
     {
         $function_name = 'index';
         try {
-            return view('admin.offers.index');
+            $offers = Offer::orderBy('priority', 'asc')->get();
+            return view('admin.offers.index', compact('offers'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
