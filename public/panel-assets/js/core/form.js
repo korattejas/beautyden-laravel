@@ -101,7 +101,11 @@ $(function () {
                     notificationToast(response.data.message, "success");
                 })
                 .catch(function (error) {
-                    notificationToast(error.response.data.message, "warning");
+                    let msg = "Something went wrong. Please check file size or connection.";
+                    if (error.response && error.response.data && error.response.data.message) {
+                        msg = error.response.data.message;
+                    }
+                    notificationToast(msg, "warning");
                     loaderHide();
                 });
         }

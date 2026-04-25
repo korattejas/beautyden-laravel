@@ -5,6 +5,13 @@
         </button>
         <div class="dropdown-menu dropdown-menu-end shadow-lg" style="border-radius: 12px; border: none; padding: 0.8rem; min-width: 200px; z-index: 9999; background-color: #ffffff !important; box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;">
             
+            @if (isset($action_array['view_route']))
+                <a href="{{ $action_array['view_route'] }}" class="dropdown-item d-flex align-items-center py-50">
+                    <i class="bi bi-eye-fill me-1 text-info"></i>
+                    <span>View Product</span>
+                </a>
+            @endif
+
             @if (isset($action_array['view_id']))
                 <button type="button" class="dropdown-item btn-view d-flex align-items-center py-50" data-id="{{ $action_array['view_id'] }}">
                     <i class="bi bi-eye-fill me-1 text-info"></i>
