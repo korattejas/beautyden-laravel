@@ -102,24 +102,16 @@
                         <div class="card shadow-sm border-0">
                             <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                                 <h4 class="card-title">Before & After Results</h4>
-                                <button type="button" class="btn btn-sm btn-outline-primary add-ba">Add Comparison</button>
+                                <button type="button" class="btn btn-sm btn-outline-primary add-ba">+ Add Result</button>
                             </div>
                             <div class="card-body pt-2" id="ba-container">
-                                <div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50">
-                                    <div class="row g-1">
-                                        <div class="col-6">
-                                            <div class="premium-file-input p-1" style="border-style: solid; border-width: 1px;">
-                                                <small class="fw-bold d-block">Before Image</small>
-                                                <input type="file" name="ba_pair[0][before]">
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="premium-file-input p-1" style="border-style: solid; border-width: 1px;">
-                                                <small class="fw-bold d-block text-success">After Image</small>
-                                                <input type="file" name="ba_pair[0][after]">
-                                            </div>
-                                        </div>
+                                <div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative">
+                                    <div class="premium-file-input">
+                                        <i data-feather="image" class="text-primary mb-1"></i>
+                                        <p class="mb-0 fw-bold small">Upload Before & After Image</p>
+                                        <input type="file" name="ba_images[]" onchange="updatePreview(this)">
                                     </div>
+                                    <div class="file-preview mt-1" style="display:none"></div>
                                 </div>
                             </div>
                         </div>
@@ -269,15 +261,13 @@
             feather.replace();
         });
 
-        var baIndex = 1;
         $('.add-ba').click(function() {
             var html = '<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn">' +
                        '<button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>' +
-                       '<div class="row g-1"><div class="col-6"><div class="premium-file-input p-1" style="border-style: solid; border-width: 1px;"><small class="fw-bold d-block">Before</small><input type="file" name="ba_pair['+baIndex+'][before]"></div></div>' +
-                       '<div class="col-6"><div class="premium-file-input p-1" style="border-style: solid; border-width: 1px;"><small class="fw-bold d-block text-success">After</small><input type="file" name="ba_pair['+baIndex+'][after]"></div></div>' +
-                       '</div></div>';
+                       '<div class="premium-file-input"><i data-feather="image" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload B&A Image</p>' +
+                       '<input type="file" name="ba_images[]" onchange="updatePreview(this)"></div>' +
+                       '<div class="file-preview mt-1" style="display:none"></div></div>';
             $('#ba-container').append(html);
-            baIndex++;
             feather.replace();
         });
 
@@ -321,7 +311,7 @@
         $('#category_id').on('change', function() {
             var id = $(this).val();
             $('#sub_category_id').html('<option value="">Loading...</option>');
-            if(id) $.get('/service-master/get-subcategories/' + id, function(data) {
+            if(id) $.get(APP_URL + '/service-master/get-subcategories/' + id, function(data) {
                 var html = '<option value="">Select</option>';
                 data.forEach(function(i) { html += '<option value="'+i.id+'">'+i.name+'</option>'; });
                 $('#sub_category_id').html(html);

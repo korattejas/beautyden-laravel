@@ -69,18 +69,15 @@
                     @if(count($service->before_after ?? []) > 0)
                         <h5 class="mt-3 mb-1 text-primary fw-bold">Before / After Gallery</h5>
                         @foreach($service->before_after ?? [] as $ba)
-                            <div class="ba-card mb-2 p-1">
-                                <div class="row g-1">
-                                    <div class="col-6 position-relative">
-                                        <div class="ba-tag">Before</div>
-                                        <img src="{{ asset('uploads/service-media/' . $ba['before']) }}" class="img-fluid rounded">
-                                    </div>
-                                    <div class="col-6 position-relative">
-                                        <div class="ba-tag bg-success">After</div>
-                                        <img src="{{ asset('uploads/service-media/' . $ba['after']) }}" class="img-fluid rounded">
-                                    </div>
+                            @php 
+                                $img = is_array($ba) ? ($ba['before'] ?? ($ba['after'] ?? null)) : $ba; 
+                            @endphp
+                            @if($img)
+                                <div class="ba-card mb-2 p-1 position-relative">
+                                    <div class="ba-tag bg-primary shadow-sm">B&A Result</div>
+                                    <img src="{{ asset('uploads/service-media/' . $img) }}" class="img-fluid rounded w-100" style="max-height: 250px; object-fit: cover;">
                                 </div>
-                            </div>
+                            @endif
                         @endforeach
                     @endif
                 </div>

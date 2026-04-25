@@ -166,25 +166,17 @@ class ServiceMasterController extends Controller
                 }
             }
 
-            // Handle Before / After Pairs
+            // Handle Before / After Results (Single Images)
             $before_after = [];
-            if ($request->ba_pair) {
-                foreach ($request->ba_pair as $key => $pair) {
-                    $before = $pair['old_before'] ?? null;
-                    if ($request->hasFile("ba_pair.$key.before")) {
-                        if ($before) File::delete(public_path('uploads/service-media/' . $before));
-                        $before = ImageUploadHelper::serviceMediaUpload($request->file("ba_pair.$key.before"));
-                    }
+            if ($request->old_ba_images) {
+                foreach ($request->old_ba_images as $old_img) {
+                    $before_after[] = $old_img;
+                }
+            }
 
-                    $after = $pair['old_after'] ?? null;
-                    if ($request->hasFile("ba_pair.$key.after")) {
-                        if ($after) File::delete(public_path('uploads/service-media/' . $after));
-                        $after = ImageUploadHelper::serviceMediaUpload($request->file("ba_pair.$key.after"));
-                    }
-
-                    if ($before || $after) {
-                        $before_after[] = ['before' => $before, 'after' => $after];
-                    }
+            if ($request->hasFile('ba_images')) {
+                foreach ($request->file('ba_images') as $file) {
+                    $before_after[] = ImageUploadHelper::serviceMediaUpload($file);
                 }
             }
 
@@ -292,8 +284,8 @@ class ServiceMasterController extends Controller
                 }
                 if($service->before_after) {
                     foreach($service->before_after as $ba) {
-                        if($ba['before']) File::delete(public_path('uploads/service-media/' . $ba['before']));
-                        if($ba['after']) File::delete(public_path('uploads/service-media/' . $ba['after']));
+                        $img = is_array($ba) ? ($ba['before'] ?? ($ba['after'] ?? null)) : $ba;
+                        if($img) File::delete(public_path('uploads/service-media/' . $img));
                     }
                 }
                 

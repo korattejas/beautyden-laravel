@@ -108,24 +108,26 @@
                         <!-- Before / After -->
                         <div class="card shadow-sm border-0">
                             <div class="card-header border-bottom d-flex justify-content-between align-items-center">
-                                <h4 class="card-title">Before & After</h4>
-                                <button type="button" class="btn btn-sm btn-outline-primary add-ba">Add Comparison</button>
+                                <h4 class="card-title">Before & After Results</h4>
+                                <button type="button" class="btn btn-sm btn-outline-primary add-ba">+ Add Result</button>
                             </div>
                             <div class="card-body pt-2" id="ba-container">
                                 @foreach($service->before_after ?? [] as $key => $ba)
+                                    @php 
+                                        $img = is_array($ba) ? ($ba['before'] ?? ($ba['after'] ?? null)) : $ba; 
+                                    @endphp
                                     <div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative">
                                         <button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>
-                                        <div class="row g-1">
-                                            <div class="col-6">
-                                                <input type="hidden" name="ba_pair[{{ $key }}][old_before]" value="{{ $ba['before'] }}">
-                                                @if($ba['before']) <img src="{{ asset('uploads/service-media/' . $ba['before']) }}" class="img-fluid rounded mb-1 shadow-sm" style="height: 60px; width: 100%; object-fit: cover;"> @endif
-                                                <div class="premium-file-input p-1" style="border-style: solid; border-width: 1px;"><small class="fw-bold d-block">Before</small><input type="file" name="ba_pair[{{ $key }}][before]"></div>
+                                        <div class="text-center">
+                                            @if($img) 
+                                                <input type="hidden" name="old_ba_images[]" value="{{ $img }}">
+                                                <img src="{{ asset('uploads/service-media/' . $img) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 120px; object-fit: cover;"> 
+                                            @endif
+                                            <div class="premium-file-input p-1" style="border-style: solid; border-width: 1px;">
+                                                <small class="fw-bold d-block">Change Result Image</small>
+                                                <input type="file" name="ba_images[]" onchange="updatePreview(this)">
                                             </div>
-                                            <div class="col-6">
-                                                <input type="hidden" name="ba_pair[{{ $key }}][old_after]" value="{{ $ba['after'] }}">
-                                                @if($ba['after']) <img src="{{ asset('uploads/service-media/' . $ba['after']) }}" class="img-fluid rounded mb-1 shadow-sm" style="height: 60px; width: 100%; object-fit: cover;"> @endif
-                                                <div class="premium-file-input p-1" style="border-style: solid; border-width: 1px;"><small class="fw-bold d-block">After</small><input type="file" name="ba_pair[{{ $key }}][after]"></div>
-                                            </div>
+                                            <div class="file-preview mt-1" style="display:none"></div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -297,8 +299,8 @@
         });
 
         $('.add-ba').click(function() {
-            $('#ba-container').append('<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="row g-1"><div class="col-6"><div class="premium-file-input p-1" style="border-style: solid; border-width: 1px;"><small class="fw-bold d-block">Before</small><input type="file" name="ba_pair['+baIndex+'][before]"></div></div><div class="col-6"><div class="premium-file-input p-1" style="border-style: solid; border-width: 1px;"><small class="fw-bold d-block">After</small><input type="file" name="ba_pair['+baIndex+'][after]"></div></div></div></div>');
-            baIndex++; feather.replace();
+            $('#ba-container').append('<div class="ba-row border p-1 mb-1 rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><i data-feather="image" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload B&A Result</p><input type="file" name="ba_images[]" onchange="updatePreview(this)"></div><div class="file-preview mt-1" style="display:none"></div></div>');
+            feather.replace();
         });
 
         $('.add-section').click(function() {
@@ -326,6 +328,16 @@
 
         $(document).on('click', '.remove-row', function() { $(this).closest('div').parent().closest('div').remove(); });
         $(document).on('click', '.remove-section', function() { $(this).closest('.section-block').remove(); });
+
+        $('#category_id').on('change', function() {
+            var id = $(this).val();
+            $('#sub_category_id').html('<option value="">Loading...</option>');
+            if(id) $.get(APP_URL + '/service-master/get-subcategories/' + id, function(data) {
+                var html = '<option value="">Select</option>';
+                data.forEach(function(i) { html += '<option value="'+i.id+'">'+i.name+'</option>'; });
+                $('#sub_category_id').html(html);
+            });
+        });
     });
 </script>
 @endsection
