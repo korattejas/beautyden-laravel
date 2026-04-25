@@ -61,16 +61,11 @@
                                 <div class="mb-2">
                                     <label class="form-label">Service Master Icon (Thumbnail)</label>
                                     @if($service->icon)
-                                        <img src="{{ asset('uploads/service/' . $service->icon) }}" class="img-fluid rounded mb-1 shadow-sm" style="max-height: 80px;">
-                                    @endif
-                                    <div class="premium-file-input">
-                                        <div class="placeholder-content">
-                                            <i data-feather="image" class="text-primary mb-1"></i>
-                                            <p class="mb-0 fw-bold">Change Icon</p>
+                                        <div class="mb-1">
+                                            <img src="{{ asset('uploads/service/' . $service->icon) }}" class="img-fluid rounded shadow-sm" style="max-height: 80px;">
                                         </div>
-                                        <input type="file" name="icon" onchange="updatePreview(this)">
-                                    </div>
-                                    <div class="file-preview mt-1" style="display:none"></div>
+                                    @endif
+                                    <input type="file" class="form-control filepond" name="icon">
                                 </div>
                                 <div class="mb-1">
                                     <label class="form-label">Service Title</label>
@@ -340,6 +335,7 @@
 <script>
     var form_url = 'service-master/store';
     var redirect_url = 'service-master';
+    var is_one_image_and_multiple_image_status = 'is_one_image';
 
     function updatePreview(input) {
         var wrapper = $(input).parent();
