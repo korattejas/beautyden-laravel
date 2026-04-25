@@ -330,11 +330,11 @@
 
 @section('footer_script_content')
     <script>
-        const sweetalert_delete_title = "Remove Offer Banner?";
-        const sweetalert_delete_text = "This banner will be permanently removed from the application.";
-        const sweetalert_change_status = "Update Banner Status";
-        const sweetalert_change_status_text = "Do you want to change the visibility of this banner?";
-        const form_url = '/offers';
+        var sweetalert_delete_title = "Remove Offer Banner?";
+        var sweetalert_delete_text = "This banner will be permanently removed from the application.";
+        var sweetalert_change_status = "Update Banner Status";
+        var sweetalert_change_status_text = "Do you want to change the visibility of this banner?";
+        var form_url = '/offers';
 
         // View Details Modal
         $(document).on('click', '.btn-view', function() {
