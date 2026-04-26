@@ -828,28 +828,50 @@
 
                 <div style="display:flex; align-items:center; gap:12px;">
 
-                    <!-- 🔥 Copy Button -->
-                    <button id="copyAppointmentData"
-                        style="
-                            background: rgba(255,255,255,0.15);
-                            color:#fff;
-                            border: 1px solid rgba(255,255,255,0.3);
-                            padding:8px 16px;
-                            border-radius:8px;
-                            font-size:13px;
-                            font-weight: 600;
-                            cursor:pointer;
-                            display:flex;
-                            align-items:center;
-                            gap:8px;
-                            transition:all 0.3s ease;
-                            backdrop-filter: blur(5px);
-                        "
-                        onmouseover="this.style.background='rgba(255,255,255,0.25)'"
-                        onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                    <!-- 🔥 Copy Buttons -->
+                    <div style="display:flex; gap:8px;">
+                        <button id="copyAppointmentData"
+                            style="
+                                background: rgba(255,255,255,0.15);
+                                color:#fff;
+                                border: 1px solid rgba(255,255,255,0.3);
+                                padding:8px 16px;
+                                border-radius:8px;
+                                font-size:13px;
+                                font-weight: 600;
+                                cursor:pointer;
+                                display:flex;
+                                align-items:center;
+                                gap:8px;
+                                transition:all 0.3s ease;
+                                backdrop-filter: blur(5px);
+                            "
+                            onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                            <i class="bi bi-clipboard2-check"></i> <span>Copy for Client</span>
+                        </button>
 
-                        <i class="bi bi-clipboard2-check"></i> <span>Copy Details</span>
-                    </button>
+                        <button id="copyForBeautician"
+                            style="
+                                background: rgba(255,255,255,0.15);
+                                color:#fff;
+                                border: 1px solid rgba(255,255,255,0.3);
+                                padding:8px 16px;
+                                border-radius:8px;
+                                font-size:13px;
+                                font-weight: 600;
+                                cursor:pointer;
+                                display:flex;
+                                align-items:center;
+                                gap:8px;
+                                transition:all 0.3s ease;
+                                backdrop-filter: blur(5px);
+                            "
+                            onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                            <i class="bi bi-person-badge"></i> <span>Copy for Beautician</span>
+                        </button>
+                    </div>
 
                     <!-- Close Button -->
                     <button class="c-close-btn" data-c-close 
@@ -1323,13 +1345,14 @@
                             <i class="bi bi-sticky"></i> Special Instructions
                         </div>
                         <p style="margin:0; font-size: 0.95rem; color: #1e293b; font-weight: 600; font-style: italic; line-height: 1.5;">
-                            "${appointment.special_notes ?? 'No special instructions provided for this appointment.'}"
+                            ${data.special_notes ?? 'No special instructions provided for this appointment.'}
                         </p>
                     </div>
                 `);
 
                 // Update copy button text
-                $("#copyAppointmentData").html('<i class="bi bi-clipboard2-check"></i> <span>Copy Details</span>');
+                $("#copyAppointmentData").html('<i class="bi bi-clipboard2-check"></i> <span>Copy for Client</span>');
+                $("#copyForBeautician").html('<i class="bi bi-person-badge"></i> <span>Copy for Beautician</span>');
             },
             error: function() {
                 $("#c-appointment-details").html(
@@ -1385,7 +1408,62 @@
             btn.css('background', '#28a745');
 
             setTimeout(() => {
-                btn.html('<i class="bi bi-clipboard2-check"></i> <span>Copy Details</span>');
+                btn.html('<i class="bi bi-clipboard2-check"></i> <span>Copy for Client</span>');
+                btn.css('background', 'rgba(255,255,255,0.15)');
+            }, 2000);
+        });
+    });
+
+    $(document).on('click', '#copyForBeautician', function() {
+        if (!currentAppointmentData) return;
+
+        let d = currentAppointmentData;
+        let client = d.client || {};
+        let appointment = d.appointment || {};
+        let summary = d.summary || {};
+        let services = d.services || [];
+
+        let text = `*New Appointment Assignment* 💇‍♀️\n\n`;
+        
+        text += `📋 Appointment Details\n`;
+        text += `---------------------------------\n`;
+        text += `Order: ${d.order_number}\n`;
+        text += `Customer: ${client.first_name} ${client.last_name || ''}\n`;
+        text += `Phone: ${client.phone}\n`;
+        text += `City: ${d.city_name || 'Ahmedabad'}\n`;
+        text += `Date: ${appointment.date}\n`;
+        text += `Time: ${appointment.time}\n`;
+        text += `Address: ${appointment.address}\n\n`;
+
+        text += `🛍 Services:\n`;
+        text += `---------------------------------\n`;
+        services.forEach((s) => {
+            text += `${s.name} (${s.qty} x ₹${parseFloat(s.price).toFixed(0)}) = ₹${parseFloat(s.total).toFixed(0)}\n`;
+        });
+        text += `---------------------------------\n`;
+        
+        text += `Subtotal: ₹${parseFloat(summary.sub_total || 0).toFixed(2)}\n`;
+        if (parseFloat(summary.discount_amount || 0) > 0) {
+            text += `Discount: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
+        }
+        text += `Travel Charges: + ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}\n`;
+        text += `Grand Total: ₹${parseFloat(summary.grand_total || 0).toFixed(2)}\n\n`;
+
+        text += `⚠️ *Important Instructions:*\n`;
+        text += `• Use hygienic and original products only\n`;
+        text += `• Maintain proper cleanliness and kit hygiene\n`;
+        text += `• Do not share personal contact number with client\n`;
+        text += `• Follow all BeautyDen service guidelines\n\n`;
+        
+        text += `Best of luck for the service! 💖`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            let btn = $('#copyForBeautician');
+            btn.html('<i class="bi bi-check-circle"></i> Copied');
+            btn.css('background', '#28a745');
+
+            setTimeout(() => {
+                btn.html('<i class="bi bi-person-badge"></i> <span>Copy for Beautician</span>');
                 btn.css('background', 'rgba(255,255,255,0.15)');
             }, 2000);
         });
