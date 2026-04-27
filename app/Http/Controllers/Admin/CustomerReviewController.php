@@ -111,7 +111,8 @@ class CustomerReviewController extends Controller
                     ->addColumn('status', function ($r) {
                         $status_array = [
                             'is_simple_active' => 1,
-                            'current_status'   => $r->status
+                            'current_status'   => $r->status,
+                            'is_review'        => 1
                         ];
                         return view('admin.render-view.datable-label', compact('status_array'))->render();
                     })

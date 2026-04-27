@@ -202,10 +202,10 @@
                             <div class="c-col-12"><div class="c-detail-card"><label>Review</label><p>${data.review ?? '-'}</p></div></div>
                             <div class="c-col-6"><div class="c-detail-card"><label>Review Date</label><p>${data.review_date ?? '-'}</p></div></div>
                             <div class="c-col-6"><div class="c-detail-card"><label>Status</label>
-                                <p>${data.status == 1 
-                                    ? '<span class="badge badge-glow bg-success">Active</span>' 
-                                    : '<span class="badge badge-glow bg-danger">InActive</span>'}
-                                </p>
+                                 <p>${data.status == 1 
+                                     ? '<span class="badge badge-glow bg-success">Active</span>' 
+                                     : '<span class="badge badge-glow bg-warning text-dark">Approval Pending</span>'}
+                                 </p>
                             </div></div>
                             <div class="c-col-6"><div class="c-detail-card"><label>Is Popular</label>
                                 <p>${data.is_popular == 1 

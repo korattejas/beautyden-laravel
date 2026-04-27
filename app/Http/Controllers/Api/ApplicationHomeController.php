@@ -37,6 +37,13 @@ class ApplicationHomeController extends Controller
 
             // 1. User Details (Always return object or null if guest)
             $user = auth('user')->user();
+            if ($user) {
+                $user->update([
+                    'last_login_at' => now(),
+                    'last_login_ip' => $request->ip()
+                ]);
+            }
+
             $userData = $user ? [
                 'id' => (int) $user->id,
                 'name' => $user->name,

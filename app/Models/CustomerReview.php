@@ -10,6 +10,8 @@ class CustomerReview extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
+        'appointment_id',
         'category_id',
         'service_id',
         'customer_name',
@@ -24,4 +26,13 @@ class CustomerReview extends Model
         'status',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(ServiceMaster::class, 'service_id');
+    }
 }

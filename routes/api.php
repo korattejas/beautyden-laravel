@@ -27,6 +27,7 @@ use App\Http\Middleware\JWTTokenMiddleware;
 use App\Http\Controllers\Api\Beautician\BeauticianController;
 use App\Http\Controllers\Api\OfferController;
 use App\Http\Controllers\Api\ApplicationHomeController;
+use App\Http\Controllers\Api\ReviewApiController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -63,6 +64,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         // Membership
         Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
+        Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
     });
 });
 
@@ -151,6 +153,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         // Membership
         Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
+        Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
     });
 });
 

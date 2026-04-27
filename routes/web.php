@@ -108,6 +108,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('portfolio/status/{id}/{status}', [PortfolioController::class, 'changeStatus'])->name('admin.portfolio.changeStatus');
         Route::post('portfolio/remove-image', [PortfolioController::class, 'removeImage'])->name('admin.portfolio.removeImage');
 
+        /* Users */
+        Route::get('users', [UserController::class, 'index'])->name('admin.user.index');
+        Route::get('users/show/{id}', [UserController::class, 'show'])->name('admin.user.show');
+        Route::get('getDataUser', [UserController::class, 'getDataUser'])->name('admin.user.getDataUser');
+
         /* Offers */
         Route::get('offers', [OfferController::class, 'index'])->name('admin.offers.index');
         Route::get('offers/create', [OfferController::class, 'create'])->name('admin.offers.create');

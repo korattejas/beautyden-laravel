@@ -1,5 +1,7 @@
 @if ($status_array['is_simple_active'] == 1 && $status_array['current_status'] == '1')
     <span class="badge badge-glow bg-success">Active</span>
+@elseif($status_array['is_simple_active'] == 1 && $status_array['current_status'] == '0' && isset($status_array['is_review']))
+    <span class="badge badge-glow bg-warning text-dark">Approval Pending</span>
 @elseif($status_array['is_simple_active'] == 1 && $status_array['current_status'] == '0')
     <span class="badge badge-glow bg-danger">Inactive</span>
 @elseif($status_array['is_simple_active'] == 1 && $status_array['current_status'] == '2')
