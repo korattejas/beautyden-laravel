@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\AppointmentsController;
 use App\Http\Controllers\Api\User\AuthenticationController;
 use App\Http\Controllers\Api\PoliciesController;
 use App\Http\Controllers\Api\PortfolioController;
+use App\Http\Controllers\Api\CouponController;
 use App\Http\Middleware\RequestModifier;
 use App\Http\Middleware\ResponseModifier;
 use App\Http\Middleware\SanitizeInput;
@@ -54,8 +55,8 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
         Route::get('offers', [OfferController::class, 'getOffers']);
         Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
-        Route::get('listCoupons', [\App\Http\Controllers\Api\CouponController::class, 'listCoupons']);
-        Route::post('applyCoupon', [\App\Http\Controllers\Api\CouponController::class, 'applyCoupon']);
+        Route::get('listCoupons', [CouponController::class, 'listCoupons']);
+        Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
     });
 
     
@@ -124,8 +125,8 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
         Route::get('offers', [OfferController::class, 'getOffers']);
         Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
-        Route::get('listCoupons', [\App\Http\Controllers\Api\CouponController::class, 'listCoupons']);
-        Route::post('applyCoupon', [\App\Http\Controllers\Api\CouponController::class, 'applyCoupon']);
+        Route::get('listCoupons', [CouponController::class, 'listCoupons']);
+        Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
     });
 });
 
