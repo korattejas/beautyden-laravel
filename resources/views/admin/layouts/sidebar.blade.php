@@ -281,6 +281,17 @@
             </li>
 
             <li class=" navigation-header">
+                <span>Finance</span>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.razorpay.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.razorpay.index') }}">
+                    <i data-feather="credit-card"></i>
+                    <span class="menu-title text-truncate">Razorpay Trans.</span>
+                </a>
+            </li>
+
+            <li class=" navigation-header">
                 <span>Communication</span>
             </li>
 

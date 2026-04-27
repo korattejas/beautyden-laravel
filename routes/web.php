@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\MembershipPlanController;
 use App\Http\Controllers\Admin\ServiceComboController;
 use App\Http\Controllers\Admin\ServiceCityMasterController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\RazorpayTransactionController;
 use App\Http\Controllers\ContractController;
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
@@ -348,5 +349,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('notifications/create', [NotificationController::class, 'create'])->name('admin.notifications.create');
         Route::post('notifications/store', [NotificationController::class, 'store'])->name('admin.notifications.store');
         Route::get('getDataNotifications', [NotificationController::class, 'getData'])->name('admin.notifications.getData');
+
+        /* Razorpay Transaction Routes */
+        Route::get('razorpay', [RazorpayTransactionController::class, 'index'])->name('admin.razorpay.index');
+        Route::get('getDataRazorpay', [RazorpayTransactionController::class, 'getData'])->name('admin.razorpay.getData');
+        Route::get('razorpay/{id}', [RazorpayTransactionController::class, 'show'])->name('admin.razorpay.show');
     });
 });
