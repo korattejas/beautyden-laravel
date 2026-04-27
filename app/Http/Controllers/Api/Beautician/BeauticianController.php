@@ -387,9 +387,9 @@ class BeauticianController extends Controller
     /**
      * Update Appointment Status
      */
-    public function updateStatus(Request $request): JsonResponse
+    public function appointmentUpdateStatus(Request $request): JsonResponse
     {
-        $function_name = 'updateStatus';
+        $function_name = 'appointmentUpdateStatus';
         try {
             $validator = Validator::make($request->all(), [
                 'appointment_id' => 'required|integer|exists:appointments,id',

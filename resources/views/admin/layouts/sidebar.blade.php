@@ -174,6 +174,13 @@
                 </a>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.attendance.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.attendance.index') }}">
+                    <i data-feather="clock"></i>
+                    <span class="menu-title text-truncate">Attendance</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ Request::routeIs('admin.service.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.service.index') }}">
                     <i data-feather="shopping-bag"></i>
@@ -223,7 +230,14 @@
             <li class="nav-item {{ Request::routeIs('admin.service-city-price.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.service-city-price.index') }}">
                     <i data-feather="dollar-sign"></i>
-                    <span class="menu-title text-truncate">Service Pricing</span>
+                    <span class="menu-title text-truncate">Service Pricing (Web)</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.service-city-master.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.service-city-master.index') }}">
+                    <i data-feather="monitor"></i>
+                    <span class="menu-title text-truncate">Service Pricing (App)</span>
                 </a>
             </li>
 
@@ -249,6 +263,20 @@
                 <a class="d-flex align-items-center" href="{{ route('admin.coupon-usage.index') }}">
                     <i data-feather="file-text"></i>
                     <span class="menu-title text-truncate">Coupon Usage Logs</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.membership.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.membership.index') }}">
+                    <i data-feather="award"></i>
+                    <span class="menu-title text-truncate">Memberships</span>
+                </a>
+            </li>
+
+            <li class="nav-item {{ Request::routeIs('admin.combo.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.combo.index') }}">
+                    <i data-feather="package"></i>
+                    <span class="menu-title text-truncate">Service Combos</span>
                 </a>
             </li>
 

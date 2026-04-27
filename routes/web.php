@@ -26,6 +26,10 @@ use App\Http\Controllers\Admin\ServiceEssentialController;
 use App\Http\Controllers\Admin\ServiceMasterController;
 use App\Http\Controllers\Admin\CouponCodeController;
 use App\Http\Controllers\Admin\CouponUsageController;
+use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\MembershipPlanController;
+use App\Http\Controllers\Admin\ServiceComboController;
+use App\Http\Controllers\Admin\ServiceCityMasterController;
 use App\Http\Controllers\ContractController;
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
@@ -306,5 +310,36 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('coupon-usage', [CouponUsageController::class, 'index'])->name('admin.coupon-usage.index');
         Route::get('getDataCouponUsages', [CouponUsageController::class, 'getDataCouponUsages'])->name('getDataCouponUsages');
         Route::delete('coupon-usage/{id}', [CouponUsageController::class, 'destroy']);
+
+        /* Attendance/Availability Route */
+        Route::get('attendance', [AttendanceController::class, 'index'])->name('admin.attendance.index');
+        Route::post('attendance/store', [AttendanceController::class, 'store'])->name('admin.attendance.store');
+        Route::delete('attendance/{id}', [AttendanceController::class, 'destroy'])->name('admin.attendance.destroy');
+
+        /* Membership Routes */
+        Route::get('membership', [MembershipPlanController::class, 'index'])->name('admin.membership.index');
+        Route::get('membership/create', [MembershipPlanController::class, 'create'])->name('admin.membership.create');
+        Route::get('membership/edit/{id}', [MembershipPlanController::class, 'edit'])->name('admin.membership.edit');
+        Route::post('membership/store', [MembershipPlanController::class, 'store'])->name('admin.membership.store');
+        Route::get('getDataMembership', [MembershipPlanController::class, 'getData'])->name('admin.membership.getData');
+        Route::get('membership/status/{id}/{status}', [MembershipPlanController::class, 'changeStatus'])->name('admin.membership.changeStatus');
+        Route::delete('membership/{id}', [MembershipPlanController::class, 'destroy'])->name('admin.membership.destroy');
+
+        /* Combo Routes */
+        Route::get('combo', [ServiceComboController::class, 'index'])->name('admin.combo.index');
+        Route::get('combo/create', [ServiceComboController::class, 'create'])->name('admin.combo.create');
+        Route::get('combo/edit/{id}', [ServiceComboController::class, 'edit'])->name('admin.combo.edit');
+        Route::post('combo/store', [ServiceComboController::class, 'store'])->name('admin.combo.store');
+        Route::get('getDataCombo', [ServiceComboController::class, 'getData'])->name('admin.combo.getData');
+        Route::delete('combo/{id}', [ServiceComboController::class, 'destroy'])->name('admin.combo.destroy');
+
+        /* App Service City Master Routes */
+        Route::get('service-city-master', [ServiceCityMasterController::class, 'index'])->name('admin.service-city-master.index');
+        Route::get('service-city-master/create', [ServiceCityMasterController::class, 'create'])->name('admin.service-city-master.create');
+        Route::get('service-city-master/edit/{id}', [ServiceCityMasterController::class, 'edit'])->name('admin.service-city-master.edit');
+        Route::post('service-city-master/store', [ServiceCityMasterController::class, 'store'])->name('admin.service-city-master.store');
+        Route::get('getDataServiceCityMaster', [ServiceCityMasterController::class, 'getData'])->name('admin.service-city-master.getData');
+        Route::delete('service-city-master/{id}', [ServiceCityMasterController::class, 'destroy'])->name('admin.service-city-master.destroy');
+        Route::get('service-city-master/subcategories/{categoryId}', [ServiceCityMasterController::class, 'getSubcategories']);
     });
 });

@@ -77,4 +77,22 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(UserAddress::class);
     }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    /**
+     * Get the current active membership subscription for the user
+     */
+    public function activeSubscription()
+    {
+        return $this->subscriptions()
+            ->where('status', 1)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->with('plan')
+            ->first();
+    }
 }

@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\User\AuthenticationController;
 use App\Http\Controllers\Api\PoliciesController;
 use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\CouponController;
+use App\Http\Controllers\Api\MembershipController;
+use App\Http\Controllers\Api\AttendanceApiController;
 use App\Http\Middleware\RequestModifier;
 use App\Http\Middleware\ResponseModifier;
 use App\Http\Middleware\SanitizeInput;
@@ -57,25 +59,10 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
         Route::get('listCoupons', [CouponController::class, 'listCoupons']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
-    });
 
-    
-});
-
-Route::middleware([SanitizeInput::class])->group(function () {
-    Route::prefix('V1/beautician')->group(function () {
-        Route::post('sendLoginOtp', [BeauticianController::class, 'sendLoginOtp']);
-        Route::post('verifyLoginOtp', [BeauticianController::class, 'verifyLoginOtp']);
-    });
-});
-
-Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(function () {
-    Route::prefix('V1/beautician')->group(function () {
-        Route::post('dashboard', [BeauticianController::class, 'dashboard']);
-        Route::post('getAppointments', [BeauticianController::class, 'getAppointments']);
-        Route::post('getAppointmentDetails', [BeauticianController::class, 'getAppointmentDetails']);
-        Route::post('updateStatus', [BeauticianController::class, 'updateStatus']);
-        Route::post('getProfile', [BeauticianController::class, 'getProfile']);
+        // Membership
+        Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
+        Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
     });
 });
 
@@ -103,6 +90,39 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
     });
 });
 
+/*======================================================== Beautician API ==============================================*/
+
+Route::middleware([SanitizeInput::class])->group(function () {
+    Route::prefix('V1/beautician')->group(function () {
+        Route::post('sendLoginOtp', [BeauticianController::class, 'sendLoginOtp']);
+        Route::post('verifyLoginOtp', [BeauticianController::class, 'verifyLoginOtp']);
+    });
+});
+
+Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(function () {
+    Route::prefix('V1/beautician')->group(function () {
+        Route::post('dashboard', [BeauticianController::class, 'dashboard']);
+        Route::post('getAppointments', [BeauticianController::class, 'getAppointments']);
+        Route::post('getAppointmentDetails', [BeauticianController::class, 'getAppointmentDetails']);
+        Route::post('appointmentUpdateStatus', [BeauticianController::class, 'appointmentUpdateStatus']);
+        Route::post('getProfile', [BeauticianController::class, 'getProfile']);
+
+        // Attendance / Availability
+        Route::get('getAvailability', [AttendanceApiController::class, 'index']);
+        Route::post('markLeave', [AttendanceApiController::class, 'store']);
+        Route::post('cancelLeave', [AttendanceApiController::class, 'destroy']);
+    });
+});
+
+
+
+
+
+
+
+
+
+
 /*======================================================== Debug API ==============================================*/
 
 Route::middleware([])->group(function () {
@@ -127,6 +147,10 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
         Route::get('listCoupons', [CouponController::class, 'listCoupons']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
+
+        // Membership
+        Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
+        Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
     });
 });
 
