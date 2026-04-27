@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\Beautician\BeauticianController;
 use App\Http\Controllers\Api\OfferController;
 use App\Http\Controllers\Api\ApplicationHomeController;
 use App\Http\Controllers\Api\ReviewApiController;
+use App\Http\Controllers\Api\ServiceMasterController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -89,6 +90,9 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
         
+        // Service Master API
+        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
+        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
     });
 });
 
@@ -178,5 +182,8 @@ Route::middleware([])->group(function () {
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
        
+        // Service Master API
+        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
+        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
     });
 });

@@ -33,4 +33,14 @@ class ServiceMaster extends Model
         'before_after' => 'array',
         'content_json' => 'array',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(ServiceCategory::class, 'category_id');
+    }
+
+    public function subcategory()
+    {
+        return $this->belongsTo(ServiceSubcategory::class, 'sub_category_id');
+    }
 }
