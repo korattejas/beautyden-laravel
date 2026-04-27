@@ -291,6 +291,13 @@
                 </a>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.notifications.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.notifications.index') }}">
+                    <i data-feather="bell"></i>
+                    <span class="menu-title text-truncate">Push Notifications</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ Request::routeIs('admin.reviews.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.reviews.index') }}">
                     <i data-feather="star"></i>

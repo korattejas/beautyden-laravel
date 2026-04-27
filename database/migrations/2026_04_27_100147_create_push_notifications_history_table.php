@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('push_notifications', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->text('message');
+            $table->string('image')->nullable();
+            $table->string('target_type')->default('all')->comment('all, individual, segments');
+            $table->json('custom_data')->nullable()->comment('To pass offer_id, service_id etc');
+            $table->dateTime('scheduled_at')->nullable();
+            $table->tinyInteger('is_sent')->default(0)->comment('0=Pending, 1=Sent, 2=Failed');
+            $table->integer('success_count')->default(0);
+            $table->integer('failure_count')->default(0);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('push_notifications');
+    }
+};

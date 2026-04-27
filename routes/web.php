@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\MembershipPlanController;
 use App\Http\Controllers\Admin\ServiceComboController;
 use App\Http\Controllers\Admin\ServiceCityMasterController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\ContractController;
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
@@ -341,5 +342,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('getDataServiceCityMaster', [ServiceCityMasterController::class, 'getData'])->name('admin.service-city-master.getData');
         Route::delete('service-city-master/{id}', [ServiceCityMasterController::class, 'destroy'])->name('admin.service-city-master.destroy');
         Route::get('service-city-master/subcategories/{categoryId}', [ServiceCityMasterController::class, 'getSubcategories']);
+
+        /* Notification Routes */
+        Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
+        Route::get('notifications/create', [NotificationController::class, 'create'])->name('admin.notifications.create');
+        Route::post('notifications/store', [NotificationController::class, 'store'])->name('admin.notifications.store');
+        Route::get('getDataNotifications', [NotificationController::class, 'getData'])->name('admin.notifications.getData');
     });
 });
