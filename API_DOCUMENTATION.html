@@ -222,7 +222,7 @@
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <h2></h2>
+            <h2>Beautyden - API</h2>
         </div>
         <a href="#auth" class="nav-item">Core Authentication</a>
         <a href="#profile" class="nav-item">Profile Operations</a>
@@ -235,6 +235,7 @@
         <a href="#membership" class="nav-item">Membership</a>
         <a href="#home" class="nav-item">Home Content</a>
         <a href="#feedback" class="nav-item">Feedback & Reviews</a>
+        <a href="#config" class="nav-item">App Settings</a>
     </div>
 
     <div class="main-content">
@@ -403,9 +404,10 @@
         <section>
             <h3>List Cities</h3>
             <div class="endpoint-wrapper">
-                <span class="badge get">GET</span> /V1/cities
+                <span class="badge get">GET</span> /V1/customer/cities
+                <span class="badge auth">Token Required</span>
             </div>
-            <p>Returns an array of city objects for initial user selection.</p>
+            <p>Returns an array of city objects. (Also available as public GET /V1/cities for website)</p>
             <div class="note" style="margin: 10px 0; background: #e0f2fe; border-left-color: #0ea5e9;">
                 <i class="bi bi-info-circle-fill text-info"></i> <strong>Business Logic:</strong><br>
                 • <code>status: 0</code> &rarr; Services are <strong>Available</strong>. Show these for selection and
@@ -660,14 +662,32 @@
             <h2><i class="bi bi-stars text-primary"></i> 6. Services & Categories</h2>
             <h3>List Categories</h3>
             <div class="endpoint-wrapper">
-                <span class="badge get">GET</span> /V1/serviceCategory
+                <span class="badge get">GET</span> /V1/customer/serviceCategory
+                <span class="badge auth">Token Required</span>
             </div>
-            <p>Returns all active service categories with their subcategories.</p>
+            <p>Returns all active service categories with their subcategories. (Also available as public GET
+                /V1/serviceCategory for website)</p>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Categories retrieved successfully",
+    "data": [
+        {
+            "id": 16,
+            "name": "Waxing",
+            "icon": "https://...",
+            "subcategories": [...]
+        }
+    ]
+}</code></pre>
 
             <h3>Search Services (Master)</h3>
             <p>Search and filter all available services globally or by city.</p>
             <div class="endpoint-wrapper">
-                <span class="badge post">POST</span> /V1/serviceMasters
+                <span class="badge post">POST</span> /V1/customer/serviceMasters
+                <span class="badge auth">Token Required</span>
             </div>
             <table>
                 <thead>
@@ -715,11 +735,34 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Services retrieved successfully",
+    "data": {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 3,
+                "name": "Brazilian Full Face Wax",
+                "price": "2000.00",
+                "discount_price": "20.00",
+                "icon": "https://...",
+                "rating": "4.80",
+                "reviews": 200
+            }
+        ],
+        "total": 1
+    }
+}</code></pre>
 
             <h3>Service Details</h3>
             <p>Get full details of a specific service including rich content sections.</p>
             <div class="endpoint-wrapper">
-                <span class="badge post">POST</span> /V1/serviceMasterDetails
+                <span class="badge post">POST</span> /V1/customer/serviceMasterDetails
+                <span class="badge auth">Token Required</span>
             </div>
             <table>
                 <thead>
@@ -742,6 +785,21 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Service details retrieved successfully",
+    "data": {
+        "id": 3,
+        "name": "Brazilian Full Face Wax",
+        "banner_media": [{"url": "https://...", "type": "image"}],
+        "before_after": ["https://...", "https://..."],
+        "content_json": [...],
+        "price": "2000.00"
+    }
+}</code></pre>
         </section>
 
         <section id="booking">
@@ -752,6 +810,23 @@
                 <span class="badge auth">Token Required</span>
             </div>
             <p>Returns summary list of all previous and upcoming appointments for the user.</p>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "All booking details fetched successfully.",
+    "data": [
+        {
+            "id": 12,
+            "order_number": "ORD-12345",
+            "appointment_date": "2026-05-01",
+            "appointment_time": "10:30 AM",
+            "city_name": "Ahmedabad",
+            "total_services": 2
+        }
+    ]
+}</code></pre>
 
             <h3>Get Booking Details</h3>
             <div class="endpoint-wrapper">
@@ -774,21 +849,70 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Booking details fetched successfully.",
+    "data": {
+        "id": 12,
+        "order_number": "ORD-12345",
+        "appointment_date": "2026-05-01",
+        "appointment_time": "10:30 AM",
+        "status": 1,
+        "total_amount": "2500.00",
+        "service_data": {
+            "client": { "name": "Tejas", "mobile": "6352755075" },
+            "services": [ { "name": "Deep Tissue Massage", "price": "1500" } ],
+            "financials": { "subtotal": 2500, "discount": 0, "final": 2500 }
+        }
+    }
+}</code></pre>
         </section>
 
         <section id="offers">
             <h2><i class="bi bi-ticket-perforated text-primary"></i> 8. Offers & Coupons</h2>
-            <h3>List Available Offers</h3>
+            <h3>Offers Banner</h3>
             <div class="endpoint-wrapper">
-                <span class="badge get">GET</span> /V1/customer/offers
+                <span class="badge get">GET</span> /V1/customer/offerBanner
                 <span class="badge auth">Token Required</span>
             </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Offers retrieved successfully",
+    "data": [
+        {
+            "id": 1,
+            "title": "Summer Special",
+            "media_urls": ["https://.../slider1.jpg"]
+        }
+    ]
+}</code></pre>
 
             <h3>List Coupons</h3>
             <div class="endpoint-wrapper">
                 <span class="badge get">GET</span> /V1/customer/listCoupons
                 <span class="badge auth">Token Required</span>
             </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Coupons retrieved successfully.",
+    "data": [
+        {
+            "id": 1,
+            "code": "WELCOME50",
+            "discount_type": "percentage",
+            "discount_value": "50.00"
+        }
+    ]
+}</code></pre>
 
             <h3>Apply Coupon</h3>
             <div class="endpoint-wrapper">
@@ -816,6 +940,18 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Coupon applied successfully.",
+    "data": {
+        "original_amount": 2500,
+        "discount_amount": 500,
+        "final_amount": 2000
+    }
+}</code></pre>
         </section>
 
         <section id="membership">
@@ -825,12 +961,38 @@
                 <span class="badge get">GET</span> /V1/customer/membershipPlans
                 <span class="badge auth">Token Required</span>
             </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Plans fetched successfully.",
+    "data": {
+        "plans": [
+            { "id": 1, "name": "Basic", "price": "1000", "duration_months": 1 }
+        ],
+        "my_subscription": null
+    }
+}</code></pre>
 
             <h3>Buy Membership</h3>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customer/buyMembership
                 <span class="badge auth">Token Required</span>
             </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Membership activated successfully!",
+    "data": {
+        "user_id": 4,
+        "plan_id": 1,
+        "start_date": "...",
+        "end_date": "..."
+    }
+}</code></pre>
         </section>
 
         <section id="home">
@@ -841,6 +1003,23 @@
                 <span class="badge auth">Token Required</span>
             </div>
             <p>Aggregated endpoint returning Sliders, Categories, Popular Services, and User context.</p>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Home page data retrieved successfully",
+    "data": {
+        "user": { ... },
+        "selected_city": null,
+        "offers": [ ... ],
+        "categories": [ ... ],
+        "services": [ ... ],
+        "reviews": [ ... ],
+        "brands": [ ... ],
+        "all_cities": [ ... ]
+    }
+}</code></pre>
         </section>
 
         <section id="feedback">
@@ -850,10 +1029,49 @@
                 <span class="badge post">POST</span> /V1/customer/submitReview
                 <span class="badge auth">Token Required</span>
             </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Review submitted successfully. It will be visible after admin approval.",
+    "data": {
+        "id": 1,
+        "customer_name": "Tejas",
+        "rating": 5,
+        "review": "Excellent service!"
+    }
+}</code></pre>
+        </section>
+
+        <section id="config">
+            <h2><i class="bi bi-gear text-primary"></i> 12. App Settings</h2>
+            <h3>Get App Settings</h3>
+            <p>Returns mobile-specific app settings and configurations.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/customer/appSettings
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "App settings retrieved successfully",
+    "data": [
+        {
+            "id": 1,
+            "screen_name": "Home",
+            "key": "app_primary_color",
+            "value": "#6366f1",
+            "image": "https://..."
+        }
+    ]
+}</code></pre>
         </section>
 
         <p style="text-align: center; color: var(--text-light); margin: 60px 0;">
-            &copy; 2026 Beauty Den. For any API issues, contact the Backend Team.
+            &copy; 2026 Beautyden. For any API issues, contact the Backend Team.
         </p>
     </div>
 

@@ -465,4 +465,19 @@ class ImageUploadHelper
 
         return $file_name;
     }
+
+    public static function appSettingImageUpload($files): string
+    {
+        $image_path = 'uploads/app-settings';
+        if (!File::exists(public_path($image_path))) {
+            File::makeDirectory(public_path($image_path), 0777, true);
+        }
+
+        $extension = $files->getClientOriginalExtension();
+        $file_name = uniqid() . '.' . $extension;
+
+        $files->move(public_path($image_path), $file_name);
+
+        return $file_name;
+    }
 }

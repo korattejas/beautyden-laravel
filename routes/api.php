@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\OfferController;
 use App\Http\Controllers\Api\ApplicationHomeController;
 use App\Http\Controllers\Api\ReviewApiController;
 use App\Http\Controllers\Api\ServiceMasterController;
+use App\Http\Controllers\Api\AppSettingController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -57,15 +58,18 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
-        Route::get('offers', [OfferController::class, 'getOffers']);
         Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
+        Route::get('offerBanner', [OfferController::class, 'getOffers']);
         Route::get('listCoupons', [CouponController::class, 'listCoupons']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
-
-        // Membership
         Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
+        Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
+        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
+        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
+        Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
     });
 });
 
@@ -90,9 +94,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
         
-        // Service Master API
-        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
-        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
+       
     });
 });
 
@@ -149,15 +151,18 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
-        Route::get('offers', [OfferController::class, 'getOffers']);
         Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
+        Route::get('offerBanner', [OfferController::class, 'getOffers']);
         Route::get('listCoupons', [CouponController::class, 'listCoupons']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
-
-        // Membership
         Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
+        Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
+        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
+        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
+        Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
     });
 });
 
@@ -181,9 +186,5 @@ Route::middleware([])->group(function () {
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
-       
-        // Service Master API
-        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
-        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
     });
 });

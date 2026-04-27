@@ -338,6 +338,13 @@
                 <span>System</span>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.app-setting.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.app-setting.index') }}">
+                    <i data-feather="smartphone"></i>
+                    <span class="menu-title text-truncate">App Settings</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ Request::routeIs('admin.setting.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.setting.index') }}">
                     <i data-feather="settings"></i>

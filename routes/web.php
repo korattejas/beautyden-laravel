@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\ServiceSubcategoryController;
 use App\Http\Controllers\Admin\ServiceCityPriceController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\AppSettingController;
 use App\Http\Controllers\Admin\TeamMemberController;
 use App\Http\Controllers\Admin\ContractSignedController;
 use App\Http\Controllers\Admin\OfferController;
@@ -272,6 +273,15 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('setting/edit/{id}', [SettingController::class, 'edit'])->name('admin.setting.edit');
         Route::get('getDataSetting', [SettingController::class, 'getDataSetting'])->name('getDataSetting');
         Route::get('setting/status/{id}/{status}', [SettingController::class, 'changeStatus']);
+
+        /* App Setting Route */
+        Route::get('app-setting', [AppSettingController::class, 'index'])->name('admin.app-setting.index');
+        Route::get('app-setting/create', [AppSettingController::class, 'create'])->name('admin.app-setting.create');
+        Route::post('app-setting/store', [AppSettingController::class, 'store']);
+        Route::delete('app-setting/{id}', [AppSettingController::class, 'destroy']);
+        Route::get('app-setting/edit/{id}', [AppSettingController::class, 'edit'])->name('admin.app-setting.edit');
+        Route::get('getDataAppSetting', [AppSettingController::class, 'getDataSetting'])->name('getDataAppSetting');
+        Route::get('app-setting/status/{id}/{status}', [AppSettingController::class, 'changeStatus']);
 
         /* Contact Submissions Route */
         Route::get('contact-submissions', [ContactSubmissionsController::class, 'index'])->name('admin.contact-submissions.index');
