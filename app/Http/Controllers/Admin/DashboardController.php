@@ -14,6 +14,11 @@ use App\Models\CustomerReview;
 use App\Models\ContactSubmission;
 use App\Models\Hiring;
 use App\Models\ProductBrand;
+use App\Models\User;
+use App\Models\UserSubscription;
+use App\Models\RazorpayTransaction;
+use App\Models\StaffAttendance;
+use App\Models\ServiceCombo;
 
 class DashboardController extends Controller
 {
@@ -34,6 +39,7 @@ class DashboardController extends Controller
     {
         $function_name = 'index';
         try {
+            // Existing stats
             $totalAppointments      = Appointment::count();
             $totalAppointmentsPending   = Appointment::where('status', 1)->count(); 
             $totalAppointmentsAssigned  = Appointment::where('status', 2)->count(); 
@@ -47,20 +53,38 @@ class DashboardController extends Controller
             $totalTeamMember = TeamMember::where('status', 1)->count();
             $totalHirings = Hiring::where('status', 1)->count();
             $totalCustomerReviews = CustomerReview::where('status', 1)->count();
+            
+            // New Module Stats
+            $pendingReviews = CustomerReview::where('status', 0)->count();
+            $activeMemberships = UserSubscription::where('status', 1)
+                ->where('end_date', '>=', now())
+                ->count();
+            $totalRazorpayRevenue = RazorpayTransaction::where('status', 'captured')->sum('amount');
+            $newUsersToday = User::whereDate('created_at', now())->count();
+            $totalUsers = User::count();
+            $activeCombos = ServiceCombo::where('status', 1)->count();
+
+            // Staff on leave today
+            $onLeaveToday = StaffAttendance::with('beautician')
+                ->whereDate('attendance_date', now())
+                ->where('status', 1) // 1 = Leave
+                ->get();
+
             $totalCity = City::where('status', 1)->count();
             $totalProductBrand = ProductBrand::where('status', 1)->count();
 
-            // Total Revenue from Completed Appointments
-            $completedAppointments = Appointment::where('status', 3)->get();
+            // Total Revenue (Hybrid: Services + Memberships)
             $totalRevenue = 0;
+            $completedAppointments = Appointment::where('status', 3)->get();
             foreach ($completedAppointments as $app) {
                 $servicesData = $app->services_data;
                 $totalRevenue += (float)($servicesData['summary']['grand_total'] ?? 0);
             }
+            $totalRevenue += UserSubscription::sum('price_paid');
 
             $todayAppointments = Appointment::whereDate('appointment_date', date('Y-m-d'))->count();
 
-            // Completed Appointments Chart Data (Current Month Only)
+            // Charts
             $startDate = now()->startOfMonth();
             $endDate = now()->endOfMonth();
             $totalDays = $startDate->daysInMonth;
@@ -75,7 +99,6 @@ class DashboardController extends Controller
             $chartLabels = [];
             $chartData = [];
             
-            // Fill all dates of the current month
             for ($i = 0; $i < $totalDays; $i++) {
                 $currentDate = $startDate->copy()->addDays($i);
                 $dateString = $currentDate->format('Y-m-d');
@@ -104,6 +127,16 @@ class DashboardController extends Controller
                 'todayAppointments'      => $todayAppointments,
                 'chartLabels'            => $chartLabels,
                 'chartData'              => $chartData,
+                
+                // New Module Data pass
+                'pendingReviews'         => $pendingReviews,
+                'activeMemberships'      => $activeMemberships,
+                'totalRazorpayRevenue'   => $totalRazorpayRevenue,
+                'newUsersToday'          => $newUsersToday,
+                'totalUsers'             => $totalUsers,
+                'activeCombos'           => $activeCombos,
+                'onLeaveToday'           => $onLeaveToday,
+
                 'returnPerformance'      => $this->getReturnPerformanceData(),
                 'todayHourlyData'        => $this->getTodayHourlyData(),
             ]);
@@ -140,8 +173,8 @@ class DashboardController extends Controller
             ->get();
 
         $returnCredits = [];
-        $lastBeauticians = null;
         $lastPhone = null;
+        $lastBeauticians = null;
 
         foreach ($allCompletedAppointments as $app) {
             if ($app->phone === $lastPhone && $lastBeauticians) {

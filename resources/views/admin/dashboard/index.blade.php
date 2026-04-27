@@ -38,7 +38,7 @@
     /* Primary Stats Grid */
     .primary-stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 1.5rem;
         margin-bottom: 3rem;
     }
@@ -80,12 +80,12 @@
     }
 
     .card-revenue .stat-icon-wrapper { background: rgba(255, 255, 255, 0.15); color: #fff; }
-    .card-pending .stat-icon-wrapper { background: #fffbeb; color: var(--mst-warning); }
-    .card-completed .stat-icon-wrapper { background: #ecfdf5; color: var(--mst-success); }
-    .card-assigned .stat-icon-wrapper { background: #eff6ff; color: var(--mst-info); }
+    .card-membership .stat-icon-wrapper { background: #f0fdf4; color: var(--mst-success); }
+    .card-users .stat-icon-wrapper { background: #eff6ff; color: var(--mst-info); }
+    .card-reviews .stat-icon-wrapper { background: #fff1f2; color: var(--mst-danger); }
 
     .stat-value {
-        font-size: 2rem;
+        font-size: 1.8rem;
         font-weight: 800;
         margin-bottom: 4px;
         color: var(--mst-text-main);
@@ -93,7 +93,7 @@
     .card-revenue .stat-value { color: #fff; }
 
     .stat-label {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
         font-weight: 600;
         color: var(--mst-text-muted);
         text-transform: uppercase;
@@ -101,117 +101,41 @@
     }
     .card-revenue .stat-label { color: rgba(255, 255, 255, 0.8); }
 
-    /* Module Sections */
-    .dashboard-section {
-        margin-bottom: 3.5rem;
-    }
-
-    .section-title {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 1.5rem;
-        padding-left: 8px;
-    }
-    .section-title i {
-        font-size: 1.4rem;
-        color: var(--mst-indigo);
-    }
-    .section-title h4 {
-        margin: 0;
-        font-weight: 700;
-        color: var(--mst-text-main);
-        font-size: 1.25rem;
-    }
-
-    .module-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .module-card-mini {
-        background: #fff;
-        padding: 30px 24px;
-        border-radius: 24px;
-        border: 1px solid #f1f5f9;
-        text-decoration: none !important;
-        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-    }
-
-    .module-card-mini:hover {
-        background: var(--mst-indigo-light);
-        border-color: var(--mst-indigo);
-        transform: translateY(-4px);
-    }
-
-    .module-icon-mini {
-        font-size: 1.85rem;
-        color: var(--mst-indigo);
-        margin-bottom: 15px;
-        background: #f8fafc;
-        width: 64px;
-        height: 64px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 18px;
-        transition: 0.2s;
-    }
-    .module-card-mini:hover .module-icon-mini {
-        background: var(--mst-indigo);
-        color: #fff;
-    }
-
-    .module-count {
-        font-weight: 800;
-        font-size: 1.75rem;
-        color: var(--mst-text-main);
-        display: block;
-        margin-bottom: 4px;
-    }
-
-    .module-name {
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--mst-text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    /* Chart Section */
-    .chart-container {
-        background: #fff;
-        border-radius: 24px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        border: 1px solid rgba(226, 232, 240, 0.8);
+    /* Action Required Section */
+    .action-required-banner {
+        background: #fdf2f2;
+        border: 1px solid #fee2e2;
+        border-radius: 16px;
+        padding: 1.5rem;
         margin-bottom: 2.5rem;
-    }
-    .chart-header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
+        justify-content: space-between;
     }
-    .chart-header h4 {
-        margin: 0;
-        font-weight: 700;
-        color: var(--mst-indigo);
+    .action-text h5 { color: #991b1b; font-weight: 700; margin-bottom: 0.25rem; }
+    .action-text p { color: #b91c1c; margin: 0; font-size: 0.9rem; }
+
+    /* Module Sections */
+    .dashboard-section { margin-bottom: 3.5rem; }
+    .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; padding-left: 8px; }
+    .section-title i { font-size: 1.4rem; color: var(--mst-indigo); }
+    .section-title h4 { margin: 0; font-weight: 700; color: var(--mst-text-main); font-size: 1.25rem; }
+
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
+    .module-card-mini {
+        background: #fff; padding: 24px; border-radius: 20px; border: 1px solid #f1f5f9;
+        text-decoration: none !important; transition: 0.3s; text-align: center;
     }
-    .chart-badge {
-        background: var(--mst-indigo-light);
-        color: var(--mst-indigo);
-        padding: 6px 14px;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        font-weight: 600;
+    .module-card-mini:hover { background: var(--mst-indigo-light); border-color: var(--mst-indigo); transform: translateY(-3px); }
+    .module-icon-mini { font-size: 1.5rem; color: var(--mst-indigo); margin-bottom: 10px; }
+
+    .leave-card {
+        background: #fff; border-radius: 20px; border: 1px solid #f1f5f9; padding: 20px;
     }
+    .leave-item {
+        display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f8fafc;
+    }
+    .leave-item:last-child { border: none; }
 
 </style>
 @endsection
@@ -223,184 +147,124 @@
             <section id="beautyden-dashboard">
                 
                 <!-- Welcome Header -->
-                <div class="dashboard-welcome">
-                    <h1>Welcome Back, BeautyDen Admin! ✨</h1>
-                    <p>Here's what's happening with your business today.</p>
+                <div class="dashboard-welcome d-flex justify-content-between align-items-end">
+                    <div>
+                        <h1>BeautyDen Dashboard ✨</h1>
+                        <p>Real-time insights for your beauty empire.</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-light-primary text-primary px-3 py-1 fs-6 rounded-pill">
+                            <i class="bi bi-clock"></i> Last updated: {{ now()->format('h:i A') }}
+                        </span>
+                    </div>
                 </div>
 
-                <!-- Primary Vital Signs -->
-                <div class="primary-stats-grid">
-                    <!-- Total Revenue -->
-                    <div class="stat-card-luxury card-revenue">
-                        <div class="stat-icon-wrapper">
-                            <i class="bi bi-wallet2"></i>
+                <!-- Priority Action Alerts -->
+                @if($pendingReviews > 0)
+                <div class="action-required-banner">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon-wrapper bg-danger text-white mb-0" style="width: 48px; height: 48px; border-radius: 12px;">
+                            <i class="bi bi-exclamation-octagon"></i>
                         </div>
+                        <div class="action-text">
+                            <h5>Pending Reviews Approval</h5>
+                            <p>You have <strong>{{ $pendingReviews }}</strong> new customer reviews waiting for your approval.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.reviews.index', ['status' => 0]) }}" class="btn btn-danger btn-sm px-4 rounded-pill">Take Action</a>
+                </div>
+                @endif
+
+                <!-- Critical Vital Signs -->
+                <div class="primary-stats-grid">
+                    <div class="stat-card-luxury card-revenue">
+                        <div class="stat-icon-wrapper"><i class="bi bi-wallet2"></i></div>
                         <div class="stat-value">₹{{ number_format($totalRevenue, 0) }}</div>
-                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-label">Total Revenue (App + Membership)</div>
+                        <small class="text-white-50 mt-2 d-block">Razorpay Online: ₹{{ number_format($totalRazorpayRevenue, 0) }}</small>
                     </div>
 
-                    <!-- Today's Appointments -->
-                    <a href="{{ route('admin.appointments.index') }}" class="stat-card-luxury card-pending">
-                        <div class="stat-icon-wrapper">
-                            <i class="bi bi-calendar-event"></i>
-                        </div>
+                    <a href="{{ route('admin.membership.index') }}" class="stat-card-luxury card-membership">
+                        <div class="stat-icon-wrapper"><i class="bi bi-gem"></i></div>
+                        <div class="stat-value">{{ $activeMemberships }}</div>
+                        <div class="stat-label">Active Memberships</div>
+                        <small class="text-muted mt-2 d-block">Premium Subscription Base</small>
+                    </a>
+
+                    <a href="{{ route('admin.user.index') }}" class="stat-card-luxury card-users">
+                        <div class="stat-icon-wrapper"><i class="bi bi-people"></i></div>
+                        <div class="stat-value">{{ $totalUsers }}</div>
+                        <div class="stat-label">Total Registered Users</div>
+                        <small class="text-success mt-2 d-block">+{{ $newUsersToday }} Joined Today</small>
+                    </a>
+
+                    <a href="{{ route('admin.appointments.index', ['date' => date('Y-m-d')]) }}" class="stat-card-luxury card-assigned">
+                        <div class="stat-icon-wrapper"><i class="bi bi-calendar-event"></i></div>
                         <div class="stat-value">{{ $todayAppointments }}</div>
                         <div class="stat-label">Today's Appointments</div>
-                    </a>
-
-                    <!-- Pending Approval -->
-                    <a href="{{ route('admin.appointments.index', ['status' => 1]) }}" class="stat-card-luxury card-pending" style="--mst-warning: #f59e0b;">
-                        <div class="stat-icon-wrapper">
-                            <i class="bi bi-hourglass-split"></i>
-                        </div>
-                        <div class="stat-value">{{ $totalAppointmentsPending }}</div>
-                        <div class="stat-label">Pending Approval</div>
-                    </a>
-
-                    <!-- Total Experts -->
-                    <a href="{{ route('admin.team.index') }}" class="stat-card-luxury card-assigned">
-                        <div class="stat-icon-wrapper">
-                            <i class="bi bi-people-fill"></i>
-                        </div>
-                        <div class="stat-value">{{ $totalTeamMember }}</div>
-                        <div class="stat-label">Expert Professionals</div>
+                        <small class="text-info mt-2 d-block">{{ $totalAppointmentsPending }} Approval Required</small>
                     </a>
                 </div>
 
-                <!-- Performance Analytics -->
-                <div class="dashboard-section">
-                    <div class="section-title">
-                        <i class="bi bi-graph-up-arrow"></i>
-                        <h4>Appointment Analytics</h4>
+                <div class="row">
+                    <!-- Charts -->
+                    <div class="col-lg-8">
+                        <div class="chart-container bg-white p-3 rounded-4 shadow-sm mb-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-graph-up text-primary me-2"></i> Booking Trends</h5>
+                            <div id="completed-appointments-chart"></div>
+                        </div>
                     </div>
-                    
-                    <div class="row">
-                        <!-- Date-wise Chart -->
-                        <div class="col-lg-8">
-                            <div class="chart-container">
-                                <div class="chart-header">
-                                    <div>
-                                        <h4>Daily Completions</h4>
-                                        <span class="text-muted small">Completed appointments for the current month</span>
-                                    </div>
-                                    <span class="chart-badge">Current Month</span>
-                                </div>
-                                <div id="completed-appointments-chart"></div>
-                            </div>
-                        </div>
 
-                        <!-- Time-wise Chart -->
-                        <div class="col-lg-4">
-                            <div class="chart-container">
-                                <div class="chart-header">
-                                    <div>
-                                        <h4>Hourly Load</h4>
-                                        <span class="text-muted small">Completions by hour today</span>
+                    <!-- Staff Availability -->
+                    <div class="col-lg-4">
+                        <div class="leave-card shadow-sm mb-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-calendar2-x text-danger me-2"></i> Staff on Leave Today</h5>
+                            <div class="leave-list">
+                                @forelse($onLeaveToday as $leave)
+                                <div class="leave-item">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar bg-light-danger p-1"><i class="bi bi-person"></i></div>
+                                        <div>
+                                            <div class="fw-bold small">{{ $leave->beautician->name }}</div>
+                                            <span class="badge bg-light-danger text-danger" style="font-size: 0.6rem;">Status: Leave</span>
+                                        </div>
                                     </div>
-                                    <span class="chart-badge" style="background: #ecfdf5; color: #059669;">Today</span>
+                                    <span class="text-muted small">Full Day</span>
                                 </div>
-                                <div id="hourly-completions-chart"></div>
-                            </div>
-                        </div>
-
-                        <!-- Return Performance Chart -->
-                        <div class="col-lg-12">
-                            <div class="chart-container">
-                                <div class="chart-header">
-                                    <div>
-                                        <h4>Beautician Return Performance</h4>
-                                        <span class="text-muted small">Customers who returned after being served by each active beautician</span>
-                                    </div>
-                                    <span class="chart-badge" style="background: rgba(115, 103, 240, 0.1); color: #7367f0;">Retention</span>
+                                @empty
+                                <div class="text-center py-4">
+                                    <i class="bi bi-check2-circle text-success fs-2"></i>
+                                    <p class="text-muted small mb-0">All staff members are available today.</p>
                                 </div>
-                                <div id="return-performance-chart"></div>
+                                @endforelse
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Content Management Group -->
+                <!-- Admin Modules Breakdown -->
                 <div class="dashboard-section">
                     <div class="section-title">
-                        <i class="bi bi-grid-1x2-fill"></i>
-                        <h4>Service & Catalog</h4>
+                        <i class="bi bi-grid-fill"></i>
+                        <h4>Operations & Intelligence</h4>
                     </div>
                     <div class="module-grid">
-                        <a href="{{ route('admin.service-category.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-layers"></i></div>
-                            <span class="module-count">{{ $totalServiceCategory }}</span>
-                            <span class="module-name">Categories</span>
+                        <a href="{{ route('admin.razorpay.index') }}" class="module-card-mini">
+                            <div class="module-icon-mini"><i class="bi bi-credit-card"></i></div>
+                            <span class="module-name">Transactions</span>
                         </a>
-                        <a href="{{ route('admin.service.index') }}" class="module-card-mini">
+                        <a href="{{ route('admin.combo.index') }}" class="module-card-mini">
+                            <div class="module-icon-mini"><i class="bi bi-box-seam"></i></div>
+                            <span class="module-count">{{ $activeCombos }}</span>
+                            <span class="module-name">Combos</span>
+                        </a>
+                        <a href="{{ route('admin.notifications.index') }}" class="module-card-mini">
+                            <div class="module-icon-mini"><i class="bi bi-megaphone"></i></div>
+                            <span class="module-name">Push Center</span>
+                        </a>
+                        <a href="{{ route('admin.service-master.index') }}" class="module-card-mini">
                             <div class="module-icon-mini"><i class="bi bi-scissors"></i></div>
-                            <span class="module-count">{{ $totalServices }}</span>
-                            <span class="module-name">Services</span>
-                        </a>
-                        <a href="{{ route('admin.city.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-geo-alt"></i></div>
-                            <span class="module-count">{{ $totalCity }}</span>
-                            <span class="module-name">Cities</span>
-                        </a>
-                        <a href="{{ route('admin.product-brand.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-tag-fill"></i></div>
-                            <span class="module-count">{{ $totalProductBrand }}</span>
-                            <span class="module-name">Brands</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Engagement Group -->
-                <div class="dashboard-section">
-                    <div class="section-title">
-                        <i class="bi bi-chat-heart-fill"></i>
-                        <h4>Community & Growth</h4>
-                    </div>
-                    <div class="module-grid">
-                        <a href="{{ route('admin.blogs.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-journal-text"></i></div>
-                            <span class="module-count">{{ $totalBlogs }}</span>
-                            <span class="module-name">Articles</span>
-                        </a>
-                        <a href="{{ route('admin.reviews.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-star-fill"></i></div>
-                            <span class="module-count">{{ $totalCustomerReviews }}</span>
-                            <span class="module-name">Member Reviews</span>
-                        </a>
-                        <a href="{{ route('admin.contact-submissions.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-envelope-heart"></i></div>
-                            <span class="module-count">{{ $totalContacts }}</span>
-                            <span class="module-name">Inquiries</span>
-                        </a>
-                        <a href="{{ route('admin.hirings.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-person-plus-fill"></i></div>
-                            <span class="module-count">{{ $totalHirings }}</span>
-                            <span class="module-name">Hiring Apps</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Secondary Appointment Stats -->
-                <div class="dashboard-section">
-                    <div class="section-title">
-                        <i class="bi bi-calendar-check-fill"></i>
-                        <h4>Appointment Summary</h4>
-                    </div>
-                    <div class="module-grid">
-                        <a href="{{ route('admin.appointments.index') }}" class="module-card-mini" style="border-left: 4px solid var(--mst-indigo);">
-                            <span class="module-count">{{ $totalAppointments }}</span>
-                            <span class="module-name">All Time</span>
-                        </a>
-                        <a href="{{ route('admin.appointments.index', ['status' => 3]) }}" class="module-card-mini" style="border-left: 4px solid var(--mst-success);">
-                            <span class="module-count">{{ $totalAppointmentsCompleted }}</span>
-                            <span class="module-name">Completed</span>
-                        </a>
-                        <a href="{{ route('admin.appointments.index', ['status' => 2]) }}" class="module-card-mini" style="border-left: 4px solid var(--mst-info);">
-                            <span class="module-count">{{ $totalAppointmentsAssigned }}</span>
-                            <span class="module-name">In Progress</span>
-                        </a>
-                        <a href="{{ route('admin.appointments.index', ['status' => 4]) }}" class="module-card-mini" style="border-left: 4px solid var(--mst-danger);">
-                            <span class="module-count">{{ $totalAppointmentsRejected }}</span>
-                            <span class="module-name">Rejected</span>
+                            <span class="module-name">App Pricing</span>
                         </a>
                     </div>
                 </div>
@@ -412,187 +276,25 @@
 @endsection
 
 @section('footer_script_content')
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Daily Chart (Date-wise)
         const chartLabels = @json($chartLabels);
         const chartData = @json($chartData);
 
         const dailyOptions = {
-            series: [{
-                name: 'Completed Appointments',
-                data: chartData
-            }],
-            chart: {
-                type: 'area',
-                height: 350,
-                toolbar: { show: false },
-                zoom: { enabled: false },
-                fontFamily: 'Montserrat, sans-serif'
-            },
+            series: [{ name: 'Bookings', data: chartData }],
+            chart: { type: 'area', height: 350, toolbar: { show: false }, zoom: { enabled: false } },
             dataLabels: { enabled: false },
-            stroke: { curve: 'smooth', width: 3, colors: ['#102365'] },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.4,
-                    opacityTo: 0.05,
-                    stops: [0, 90, 100],
-                    colorStops: [
-                        { offset: 0, color: "#102365", opacity: 0.4 },
-                        { offset: 100, color: "#102365", opacity: 0.05 }
-                    ]
-                }
-            },
-            xaxis: {
-                categories: chartLabels,
-                axisBorder: { show: false },
-                axisTicks: { show: false },
-                labels: { style: { colors: '#64748b', fontSize: '11px' } }
-            },
-            yaxis: {
-                labels: {
-                    style: { colors: '#64748b', fontSize: '11px' },
-                    formatter: function (val) { return val.toFixed(0); }
-                }
-            },
-            grid: {
-                borderColor: '#f1f5f9',
-                strokeDashArray: 4,
-                padding: { left: 10, right: 10 }
-            },
+            stroke: { curve: 'smooth', width: 4 },
+            xaxis: { categories: chartLabels, labels: { style: { colors: '#64748b' } } },
+            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1 } },
             colors: ['#102365'],
-            tooltip: {
-                theme: 'light',
-                y: { formatter: function (val) { return val + " Appointments"; } }
-            },
-            markers: {
-                size: 4,
-                colors: ['#fff'],
-                strokeColors: '#102365',
-                strokeWidth: 2,
-                hover: { size: 6 }
-            }
+            tooltip: { theme: 'light' }
         };
 
-        if(document.querySelector("#completed-appointments-chart")) {
-            const dailyChart = new ApexCharts(document.querySelector("#completed-appointments-chart"), dailyOptions);
-            dailyChart.render();
-        }
-
-        // Hourly Chart (Time-wise)
-        const hourlyData = @json($todayHourlyData);
-        const hourlyLabels = Array.from({length: 24}, (_, i) => `${i}:00`);
-
-        const hourlyOptions = {
-            series: [{
-                name: 'Completions',
-                data: hourlyData
-            }],
-            chart: {
-                type: 'bar',
-                height: 350,
-                toolbar: { show: false },
-                fontFamily: 'Montserrat, sans-serif'
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 6,
-                    columnWidth: '60%',
-                    distributed: true
-                }
-            },
-            dataLabels: { enabled: false },
-            legend: { show: false },
-            colors: ['#102365', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'],
-            xaxis: {
-                categories: hourlyLabels,
-                axisBorder: { show: false },
-                axisTicks: { show: false },
-                labels: {
-                    show: true,
-                    rotate: -45,
-                    style: { colors: '#64748b', fontSize: '10px' },
-                    formatter: function(val, index) {
-                        return index % 3 === 0 ? val : '';
-                    }
-                }
-            },
-            yaxis: {
-                labels: {
-                    style: { colors: '#64748b', fontSize: '11px' },
-                    formatter: function (val) { return val.toFixed(0); }
-                }
-            },
-            grid: {
-                borderColor: '#f1f5f9',
-                strokeDashArray: 4
-            },
-            tooltip: {
-                theme: 'light',
-                y: { formatter: function (val) { return val + " Appointments"; } }
-            }
-        };
-
-        if(document.querySelector("#hourly-completions-chart")) {
-            const hourlyChart = new ApexCharts(document.querySelector("#hourly-completions-chart"), hourlyOptions);
-            hourlyChart.render();
-        }
-
-        // Return Performance Chart
-        const returnLabels = @json($returnPerformance['labels']);
-        const returnData = @json($returnPerformance['data']);
-
-        const returnOptions = {
-            series: [{
-                name: 'Return Customers Brought Back',
-                data: returnData
-            }],
-            chart: {
-                type: 'bar',
-                height: 350,
-                toolbar: { show: false },
-                fontFamily: 'Montserrat, sans-serif'
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 8,
-                    columnWidth: '40%',
-                    distributed: true
-                }
-            },
-            dataLabels: { enabled: false },
-            legend: { show: false },
-            colors: ['#7367f0', '#8e84f3', '#a8a1f6', '#c2bdba', '#dbd9fc'],
-            xaxis: {
-                categories: returnLabels,
-                axisBorder: { show: false },
-                axisTicks: { show: false },
-                labels: {
-                    style: { colors: '#64748b', fontSize: '11px', fontWeight: 600 }
-                }
-            },
-            yaxis: {
-                labels: {
-                    style: { colors: '#64748b', fontSize: '11px' },
-                    formatter: function (val) { return val.toFixed(0); }
-                }
-            },
-            grid: {
-                borderColor: '#f1f5f9',
-                strokeDashArray: 4
-            },
-            tooltip: {
-                theme: 'light',
-                y: { formatter: function (val) { return val + " Returns"; } }
-            }
-        };
-
-        if(document.querySelector("#return-performance-chart")) {
-            const returnChart = new ApexCharts(document.querySelector("#return-performance-chart"), returnOptions);
-            returnChart.render();
-        }
+        const dailyChart = new ApexCharts(document.querySelector("#completed-appointments-chart"), dailyOptions);
+        dailyChart.render();
     });
 </script>
 @endsection
