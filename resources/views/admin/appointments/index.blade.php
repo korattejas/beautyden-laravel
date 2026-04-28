@@ -734,6 +734,7 @@
                                             <th>Assigned To</th>
                                             <th>Grand Total</th>
                                             <th>Company Amount</th>
+                                            <th data-search="false">Payment Type</th>
                                             <th data-search="false">Status</th>
                                             <th data-search="false">Action</th>
                                         </tr>
@@ -901,6 +902,54 @@
                 </button>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<!-- Payment Type Change Modal -->
+<div id="paymentTypeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; align-items:center; justify-content:center;">
+    <!-- Backdrop -->
+    <div id="paymentTypeBackdrop" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px);"></div>
+    <!-- Modal Box -->
+    <div style="position:relative; background:#fff; border-radius:20px; padding:32px; width:380px; max-width:95%; box-shadow:0 25px 60px rgba(0,0,0,0.2); z-index:1;">
+        <input type="hidden" id="paymentTypeAppointmentId">
+        <!-- Header -->
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+            <div style="width:44px; height:44px; background:linear-gradient(135deg,#667eea,#764ba2); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                <i class="bi bi-credit-card" style="font-size:1.3rem; color:#fff;"></i>
+            </div>
+            <div>
+                <h5 style="margin:0; font-weight:800; color:#1e293b; font-size:1.1rem;">Change Payment Type</h5>
+                <p style="margin:0; font-size:0.82rem; color:#64748b;">Select payment method for this appointment</p>
+            </div>
+        </div>
+        <!-- Options -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
+            <div class="payment-opt" data-value="cash"
+                style="border:2px solid #e2e8f0; border-radius:14px; padding:18px 12px; text-align:center; cursor:pointer; transition:all 0.25s ease;">
+                <div style="width:46px; height:46px; background:#f0fdf4; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;">
+                    <i class="bi bi-cash-coin" style="font-size:1.4rem; color:#16a34a;"></i>
+                </div>
+                <div style="font-weight:800; font-size:1rem; color:#1e293b;">Cash</div>
+                <div style="font-size:0.78rem; color:#64748b; margin-top:3px;">Pay at doorstep</div>
+            </div>
+            <div class="payment-opt" data-value="online"
+                style="border:2px solid #e2e8f0; border-radius:14px; padding:18px 12px; text-align:center; cursor:pointer; transition:all 0.25s ease;">
+                <div style="width:46px; height:46px; background:#eff6ff; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;">
+                    <i class="bi bi-credit-card-2-front" style="font-size:1.4rem; color:#2563eb;"></i>
+                </div>
+                <div style="font-weight:800; font-size:1rem; color:#1e293b;">Online</div>
+                <div style="font-size:0.78rem; color:#64748b; margin-top:3px;">Digital payment</div>
+            </div>
+        </div>
+        <!-- Buttons -->
+        <div style="display:flex; gap:10px;">
+            <button id="cancelPaymentTypeModal" style="flex:1; padding:12px; border:2px solid #e2e8f0; border-radius:10px; background:#fff; font-weight:700; color:#64748b; cursor:pointer; font-size:0.95rem; transition:all 0.2s;">
+                Cancel
+            </button>
+            <button id="savePaymentTypeBtn" style="flex:1; padding:12px; border:none; border-radius:10px; background:linear-gradient(135deg,#667eea,#764ba2); font-weight:800; color:#fff; cursor:pointer; font-size:0.95rem; transition:all 0.2s; opacity:0.5; pointer-events:none;">
+                <i class="bi bi-check-circle me-1"></i> Save
+            </button>
         </div>
     </div>
 </div>
@@ -1146,6 +1195,11 @@
             {
                 data: 'company_amount',
                 name: 'company_amount'
+            },
+            {
+                data: 'payment_type',
+                name: 'payment_type',
+                orderable: false
             },
             {
                 data: 'status',
@@ -1528,10 +1582,79 @@
         });
     }
 
+    // Payment Type Badge click - open popup modal
+    let selectedPaymentType = null;
+
+    $(document).on('click', '.badge-payment-type', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        selectedPaymentType = null;
+        const appointmentId = $(this).data('id');
+        const currentType = $(this).data('type');
+        $('#paymentTypeAppointmentId').val(appointmentId);
+        // Reset selections
+        $('.payment-opt').css({'border-color':'#e2e8f0','background':'#fff'});
+        $('.payment-opt[data-value="cash"] > div:first-child').css('background','#f0fdf4');
+        $('.payment-opt[data-value="online"] > div:first-child').css('background','#eff6ff');
+        // Pre-select current
+        const $current = $('.payment-opt[data-value="' + currentType + '"]');
+        $current.css({'border-color': currentType === 'cash' ? '#16a34a' : '#2563eb','background': currentType === 'cash' ? '#f0fdf4' : '#eff6ff'});
+        selectedPaymentType = currentType;
+        $('#savePaymentTypeBtn').css({'opacity':'1','pointer-events':'auto'});
+        // Show modal
+        $('#paymentTypeModal').css('display','flex');
+    });
+
+    $(document).on('click', '.payment-opt', function() {
+        selectedPaymentType = $(this).data('value');
+        $('.payment-opt').css({'border-color':'#e2e8f0','background':'#fff'});
+        $('.payment-opt[data-value="cash"] > div:first-child').css('background','#f0fdf4');
+        $('.payment-opt[data-value="online"] > div:first-child').css('background','#eff6ff');
+        if (selectedPaymentType === 'cash') {
+            $(this).css({'border-color':'#16a34a','background':'#f0fdf4'});
+        } else {
+            $(this).css({'border-color':'#2563eb','background':'#eff6ff'});
+        }
+        $('#savePaymentTypeBtn').css({'opacity':'1','pointer-events':'auto'});
+    });
+
+    $('#cancelPaymentTypeModal, #paymentTypeBackdrop').on('click', function() {
+        $('#paymentTypeModal').css('display','none');
+        selectedPaymentType = null;
+    });
+
+    $('#savePaymentTypeBtn').on('click', function() {
+        if (!selectedPaymentType) return;
+        const appointmentId = $('#paymentTypeAppointmentId').val();
+        $.ajax({
+            url: '{{ route("admin.appointments.updatePaymentType") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: appointmentId,
+                payment_type: selectedPaymentType
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    $('#table-appointments').DataTable().ajax.reload(false);
+                } else {
+                    toastr.error(response.message);
+                }
+                $('#paymentTypeModal').css('display','none');
+                selectedPaymentType = null;
+            },
+            error: function() {
+                toastr.error('Failed to update payment type');
+                $('#paymentTypeModal').css('display','none');
+            }
+        });
+    });
+
     // Row click to open view modal
     $('#table-appointments tbody').on('click', 'tr', function (e) {
         // Don't trigger if clicking on action items or inputs
-        if ($(e.target).closest('.dropdown, .amount-input, .amount-display, button, a').length) {
+        if ($(e.target).closest('.dropdown, .amount-input, .amount-display, .badge-payment-type, button, a').length) {
             return;
         }
         

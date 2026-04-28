@@ -399,6 +399,23 @@ class AppointmentsController extends Controller
 
                         return $dropdown;
                     })
+                    ->addColumn('payment_type', function ($appointment) {
+                        $type = $appointment->payment_type ?? 'cash';
+                        if ($type === 'online') {
+                            return '<span class="badge-payment-type" 
+                                        data-id="' . $appointment->id . '" 
+                                        data-type="online"
+                                        style="cursor:pointer; display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:50px; background:linear-gradient(135deg,#00c6ff,#0072ff); color:#fff; font-weight:700; font-size:0.82rem; box-shadow:0 3px 8px rgba(0,114,255,0.3);">
+                                        <i class="bi bi-credit-card-2-front"></i> Online
+                                    </span>';
+                        }
+                        return '<span class="badge-payment-type" 
+                                    data-id="' . $appointment->id . '" 
+                                    data-type="cash"
+                                    style="cursor:pointer; display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:50px; background:linear-gradient(135deg,#28c76f,#20a760); color:#fff; font-weight:700; font-size:0.82rem; box-shadow:0 3px 8px rgba(40,199,111,0.3);">
+                                    <i class="bi bi-cash-coin"></i> Cash
+                                </span>';
+                    })
                     ->addColumn('action', function ($appointment) {
                         $action_array = [
                             'is_simple_action' => 1,
@@ -415,7 +432,7 @@ class AppointmentsController extends Controller
                             'action_array' => $action_array
                         ])->render();
                     })
-                    ->rawColumns(['action', 'service_name', 'status', 'assigned_to_name', 'company_amount', 'grand_total', 'schedule'])
+                    ->rawColumns(['action', 'service_name', 'status', 'assigned_to_name', 'company_amount', 'grand_total', 'schedule', 'payment_type'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -621,6 +638,27 @@ class AppointmentsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update amount: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updatePaymentType(Request $request)
+    {
+        try {
+            $appointment = Appointment::findOrFail($request->id);
+            $appointment->update([
+                'payment_type' => $request->payment_type
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment type updated successfully',
+                'payment_type' => $appointment->payment_type
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update payment type: ' . $e->getMessage()
             ], 500);
         }
     }

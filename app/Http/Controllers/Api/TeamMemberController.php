@@ -35,6 +35,9 @@ class TeamMemberController extends Controller
                 ->select(
                     't.id',
                     't.name',
+                    't.phone',
+                    't.dob',
+                    't.blood_group',
                     't.role',
                     't.experience_years',
                     't.bio',

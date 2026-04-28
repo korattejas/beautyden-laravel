@@ -31,6 +31,7 @@ class Appointment extends Model
         'services_data',
         'status',
         'company_amount',
+        'payment_type',
     ];
 
     protected $casts = [

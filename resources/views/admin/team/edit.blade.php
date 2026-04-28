@@ -88,6 +88,26 @@
 
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
+                                                    <label>Date of Birth</label>
+                                                    <input type="date" class="form-control" name="dob"
+                                                        value="{{ old('dob', $team->dob) }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Blood Group</label>
+                                                    <select name="blood_group" class="form-control">
+                                                        <option value="">-- Select Blood Group --</option>
+                                                        @foreach(['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $bg)
+                                                            <option value="{{ $bg }}" {{ old('blood_group', $team->blood_group) == $bg ? 'selected' : '' }}>{{ $bg }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
                                                     <label>Bio</label>
                                                     <textarea class="form-control" name="bio" rows="3">{{ old('bio', $team->bio) }}</textarea>
                                                 </div>

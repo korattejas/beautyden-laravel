@@ -79,6 +79,30 @@
 
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
+                                                    <label>Date of Birth</label>
+                                                    <input type="date" class="form-control" name="dob">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
+                                                    <label>Blood Group</label>
+                                                    <select name="blood_group" class="form-control">
+                                                        <option value="">-- Select Blood Group --</option>
+                                                        <option value="A+">A+</option>
+                                                        <option value="A-">A-</option>
+                                                        <option value="B+">B+</option>
+                                                        <option value="B-">B-</option>
+                                                        <option value="AB+">AB+</option>
+                                                        <option value="AB-">AB-</option>
+                                                        <option value="O+">O+</option>
+                                                        <option value="O-">O-</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mt-2">
+                                                <div class="form-group">
                                                     <label>Bio</label>
                                                     <textarea class="form-control" name="bio" rows="3" placeholder="Write a short bio"></textarea>
                                                 </div>

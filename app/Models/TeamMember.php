@@ -13,6 +13,8 @@ class TeamMember extends Model
         'name',
         'id_number',
         'phone',
+        'dob',
+        'blood_group',
         'role',
         'experience_years',
         'specialties',

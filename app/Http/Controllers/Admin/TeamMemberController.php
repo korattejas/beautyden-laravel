@@ -327,6 +327,9 @@ class TeamMemberController extends Controller
             $validateArray = [
                 'name' => 'required|string|max:100',
                 'id_number' => 'nullable|string|max:50',
+                'phone' => 'nullable|string|max:20',
+                'dob' => 'nullable|date',
+                'blood_group' => 'nullable|string|max:10',
                 'role' => 'nullable|string|max:150',
                 'experience_years' => 'nullable|integer|min:0',
                 'specialties' => 'nullable|string|max:255',
@@ -383,9 +386,11 @@ class TeamMemberController extends Controller
             $data = [
                 'name' => $request->name,
                 'id_number' => $request->id_number ?? '0',
+                'phone' => $request->phone,
+                'dob' => $request->dob ?: null,
+                'blood_group' => $request->blood_group,
                 'role' => $request->role,
                 'experience_years' => $request->experience_years,
-                'phone' => $request->phone,
                 'specialties' => $specialties,
                 'bio' => $request->bio,
                 'icon' => $photoFilename,
@@ -535,6 +540,7 @@ class TeamMemberController extends Controller
                     'date' => $app->appointment_date,
                     'time' => $app->appointment_time,
                     'total' => '₹' . number_format((float)($servicesData['summary']['grand_total'] ?? 0), 0),
+                    'payment_type' => $app->payment_type ?? 'cash',
                 ];
             }
 

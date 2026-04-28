@@ -1244,6 +1244,18 @@
                         </div>
                         <div class="c-col-6">
                             <div class="c-detail-card">
+                                <label><i class="bi bi-calendar-heart"></i> Date of Birth</label>
+                                <p>${data.dob ?? '-'}</p>
+                            </div>
+                        </div>
+                        <div class="c-col-6">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-droplet-half"></i> Blood Group</label>
+                                <p>${data.blood_group ?? '-'}</p>
+                            </div>
+                        </div>
+                        <div class="c-col-6">
+                            <div class="c-detail-card">
                                 <label><i class="bi bi-briefcase"></i> Experience</label>
                                 <p>${data.experience_years ?? '-'} Years</p>
                             </div>
@@ -1365,6 +1377,7 @@
                                         <th>Customer</th>
                                         <th>Mobile</th>
                                         <th>Date & Time</th>
+                                        <th>Payment Type</th>
                                         <th>Grand Total</th>
                                     </tr>
                                 </thead>
@@ -1373,6 +1386,9 @@
 
                         if (response.data.length > 0) {
                             response.data.forEach(app => {
+                                let paymentBadge = app.payment_type === 'online'
+                                    ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:50px;background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;font-weight:700;font-size:0.78rem;"><i class="bi bi-credit-card-2-front"></i> Online</span>`
+                                    : `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:50px;background:linear-gradient(135deg,#28c76f,#20a760);color:#fff;font-weight:700;font-size:0.78rem;"><i class="bi bi-cash-coin"></i> Cash</span>`;
                                 html += `
                                     <tr>
                                         <td><strong>${app.order_number}</strong></td>
@@ -1382,12 +1398,13 @@
                                             <div class="font-weight-bold">${app.date}</div>
                                             <small class="text-muted">${app.time}</small>
                                         </td>
+                                        <td>${paymentBadge}</td>
                                         <td><span class="report-total-text">${app.total}</span></td>
                                     </tr>
                                 `;
                             });
                         } else {
-                            html += `<tr><td colspan="5" class="text-center py-4 text-muted">No completed appointments found.</td></tr>`;
+                            html += `<tr><td colspan="6" class="text-center py-4 text-muted">No completed appointments found.</td></tr>`;
                         }
 
                         html += `</tbody></table>`;
