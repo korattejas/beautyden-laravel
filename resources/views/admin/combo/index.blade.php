@@ -60,8 +60,8 @@
     <script>
         const sweetalert_delete_title = "Delete Combo?";
         const sweetalert_change_status = "Change Status of Combo";
-        const form_url = '/admin/combo';
-        datatable_url = '/admin/getDataCombo';
+        const form_url = '/combo';
+        datatable_url = '/getDataCombo';
 
         $.extend(true, $.fn.dataTable.defaults, {
             pageLength: 100,

@@ -59,8 +59,8 @@
     <script>
         const sweetalert_delete_title = "Delete Notification?";
         const sweetalert_change_status = "Change Status of Notification";
-        const form_url = '/admin/notifications';
-        datatable_url = '/admin/getDataNotifications';
+        const form_url = '/notifications';
+        datatable_url = '/getDataNotifications';
 
         $.extend(true, $.fn.dataTable.defaults, {
             pageLength: 100,

@@ -97,8 +97,8 @@
     <script>
         const sweetalert_delete_title = "Delete App Pricing?";
         const sweetalert_change_status = "Change Status of App Pricing";
-        const form_url = '/admin/service-city-master';
-        datatable_url = '/admin/getDataServiceCityMaster';
+        const form_url = '/service-city-master';
+        datatable_url = '/getDataServiceCityMaster';
 
         $.extend(true, $.fn.dataTable.defaults, {
             pageLength: 100,

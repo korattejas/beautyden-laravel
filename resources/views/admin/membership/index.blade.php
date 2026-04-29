@@ -59,8 +59,8 @@
     <script>
         const sweetalert_delete_title = "Delete Membership Plan?";
         const sweetalert_change_status = "Change Status of Membership Plan";
-        const form_url = '/admin/membership';
-        datatable_url = '/admin/getDataMembership';
+        const form_url = '/membership';
+        datatable_url = '/getDataMembership';
 
         $.extend(true, $.fn.dataTable.defaults, {
             pageLength: 100,

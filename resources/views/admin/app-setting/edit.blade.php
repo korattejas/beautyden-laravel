@@ -110,5 +110,15 @@
     var form_url = 'app-setting/store';
     var redirect_url = 'app-setting';
     var is_one_image_and_multiple_image_status = 'is_one_image';
+
+    $(function() {
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+        FilePond.create(document.querySelector('.filepond'), {
+            allowMultiple: false,
+            allowImagePreview: true,
+            imagePreviewHeight: 150,
+            credits: false
+        });
+    });
 </script>
 @endsection
