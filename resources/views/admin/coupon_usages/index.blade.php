@@ -33,7 +33,7 @@
                                             <th>{{ trans('admin_string.id') }}</th>
                                             <th>Coupon Code</th>
                                             <th>User Details</th>
-                                            <th>Appointment #</th>
+                                            <th>Appointment</th>
                                             <th>Discount Amt</th>
                                             <th>Used At</th>
                                             <th data-search="false">Action</th>

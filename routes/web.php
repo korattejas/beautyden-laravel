@@ -339,7 +339,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('membership/create', [MembershipPlanController::class, 'create'])->name('admin.membership.create');
         Route::get('membership/edit/{id}', [MembershipPlanController::class, 'edit'])->name('admin.membership.edit');
         Route::post('membership/store', [MembershipPlanController::class, 'store'])->name('admin.membership.store');
-        Route::get('getDataMembership', [MembershipPlanController::class, 'getData'])->name('admin.membership.getData');
+        Route::get('getDataMembership', [MembershipPlanController::class, 'getData'])->name('getDataMembership');
         Route::get('membership/status/{id}/{status}', [MembershipPlanController::class, 'changeStatus'])->name('admin.membership.changeStatus');
         Route::delete('membership/{id}', [MembershipPlanController::class, 'destroy'])->name('admin.membership.destroy');
 
@@ -348,7 +348,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('combo/create', [ServiceComboController::class, 'create'])->name('admin.combo.create');
         Route::get('combo/edit/{id}', [ServiceComboController::class, 'edit'])->name('admin.combo.edit');
         Route::post('combo/store', [ServiceComboController::class, 'store'])->name('admin.combo.store');
-        Route::get('getDataCombo', [ServiceComboController::class, 'getData'])->name('admin.combo.getData');
+        Route::get('getDataCombo', [ServiceComboController::class, 'getData'])->name('getDataCombo');
         Route::delete('combo/{id}', [ServiceComboController::class, 'destroy'])->name('admin.combo.destroy');
 
         /* App Service City Master Routes */
@@ -356,7 +356,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('service-city-master/create', [ServiceCityMasterController::class, 'create'])->name('admin.service-city-master.create');
         Route::get('service-city-master/edit/{id}', [ServiceCityMasterController::class, 'edit'])->name('admin.service-city-master.edit');
         Route::post('service-city-master/store', [ServiceCityMasterController::class, 'store'])->name('admin.service-city-master.store');
-        Route::get('getDataServiceCityMaster', [ServiceCityMasterController::class, 'getData'])->name('admin.service-city-master.getData');
+        Route::get('getDataServiceCityMaster', [ServiceCityMasterController::class, 'getData'])->name('getDataServiceCityMaster');
         Route::delete('service-city-master/{id}', [ServiceCityMasterController::class, 'destroy'])->name('admin.service-city-master.destroy');
         Route::get('service-city-master/subcategories/{categoryId}', [ServiceCityMasterController::class, 'getSubcategories']);
         Route::get('service-city-master/get-services-by-category', [ServiceCityMasterController::class, 'getServiceMastersByCategory'])->name('admin.service-city-master.services-by-category');
@@ -365,11 +365,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');
         Route::get('notifications/create', [NotificationController::class, 'create'])->name('admin.notifications.create');
         Route::post('notifications/store', [NotificationController::class, 'store'])->name('admin.notifications.store');
-        Route::get('getDataNotifications', [NotificationController::class, 'getData'])->name('admin.notifications.getData');
+        Route::get('getDataNotifications', [NotificationController::class, 'getData'])->name('getDataNotifications');
 
         /* Razorpay Transaction Routes */
         Route::get('razorpay', [RazorpayTransactionController::class, 'index'])->name('admin.razorpay.index');
-        Route::get('getDataRazorpay', [RazorpayTransactionController::class, 'getData'])->name('admin.razorpay.getData');
+        Route::get('getDataRazorpay', [RazorpayTransactionController::class, 'getData'])->name('getDataRazorpay');
         Route::get('razorpay/{id}', [RazorpayTransactionController::class, 'show'])->name('admin.razorpay.show');
     });
 });

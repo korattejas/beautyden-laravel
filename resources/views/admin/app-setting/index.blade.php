@@ -63,7 +63,7 @@
         const sweetalert_delete_title = "Delete app setting?";
         const sweetalert_change_status = "Change Status of app setting";
         const form_url = '/app-setting';
-        datatable_url = '/getDataSetting';
+        datatable_url = '/getDataAppSetting';
 
         $.extend(true, $.fn.dataTable.defaults, {
             pageLength: 100,
