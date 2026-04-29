@@ -89,8 +89,8 @@ class AppSettingController extends Controller
                         ])->render();
                     })
                     ->addColumn('image', function ($setting) {
-                        if (!empty($setting->image)) {
-                            return '<img src="' . asset('uploads/app-settings/' . $setting->image) . '" alt="image" style="width: 50px;">';
+                        if (!empty($setting->image) && file_exists(public_path('uploads/app-settings/' . $setting->image))) {
+                            return '<img src="' . asset('uploads/app-settings/' . $setting->image) . '" alt="image" style="max-width:80px; height:auto; border-radius:4px;" />';
                         }
                         return 'N/A';
                     })

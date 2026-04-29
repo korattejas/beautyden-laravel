@@ -63,7 +63,7 @@
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Combo Image</label>
-                                                    <input type="file" name="image" class="form-control" required>
+                                                    <input type="file" name="image" class="filepond" accept="image/*">
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
@@ -126,6 +126,16 @@
     var redirect_url = 'combo';
 
     $(document).ready(function() {
+        // FilePond
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+        FilePond.create(document.querySelector('.filepond'), {
+            allowMultiple: false,
+            allowImagePreview: true,
+            imagePreviewHeight: 150,
+            credits: false
+        });
+
+        // Select2
         $('.select2').select2({ placeholder: "Choose services...", width: '100%' });
 
         $('#services-select').on('change', function() {

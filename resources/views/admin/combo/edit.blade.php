@@ -63,10 +63,18 @@
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Combo Image (Leave blank to keep current)</label>
-                                                    <input type="file" name="image" class="form-control">
                                                     @if($combo->image)
-                                                        <img src="{{ asset('uploads/combos/' . $combo->image) }}" class="mt-2 rounded" style="max-width:120px;">
+                                                        <div class="mb-2">
+                                                            <div class="position-relative d-inline-block">
+                                                                <img src="{{ asset('uploads/combos/' . $combo->image) }}"
+                                                                    alt="Current Combo Image"
+                                                                    class="rounded shadow-sm border"
+                                                                    style="max-width: 200px; height: auto;">
+                                                                <span class="badge bg-primary position-absolute top-0 start-0 m-1">Current</span>
+                                                            </div>
+                                                        </div>
                                                     @endif
+                                                    <input type="file" name="image" class="filepond" accept="image/*">
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
@@ -140,6 +148,16 @@
     var redirect_url = 'combo';
 
     $(document).ready(function() {
+        // FilePond
+        FilePond.registerPlugin(FilePondPluginImagePreview);
+        FilePond.create(document.querySelector('.filepond'), {
+            allowMultiple: false,
+            allowImagePreview: true,
+            imagePreviewHeight: 150,
+            credits: false
+        });
+
+        // Select2
         $('.select2').select2({ placeholder: "Choose services...", width: '100%' });
 
         $('#services-select').on('change', function() {
