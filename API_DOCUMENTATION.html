@@ -1010,14 +1010,35 @@
     "status": true,
     "message": "Home page data retrieved successfully",
     "data": {
-        "user": { ... },
-        "selected_city": null,
+        "user": {
+            "id": 4,
+            "name": "Tejas",
+            "email": "...",
+            "active_subscription": {
+                "id": 1,
+                "plan_name": "Elite Pro",
+                "end_date": "2026-12-31"
+            },
+            "addresses": [ ... ]
+        },
         "offers": [ ... ],
+        "membership_plans": [
+            { "id": 1, "name": "Elite Monthly", "price": "999.00" }
+        ],
+        "coupons": [ ... ],
         "categories": [ ... ],
-        "services": [ ... ],
+        "trending_services": [
+            {
+                "category_id": 16,
+                "category_name": "Waxing",
+                "services": [ ... ]
+            }
+        ],
         "reviews": [ ... ],
+        "combos": [ ... ],
         "brands": [ ... ],
-        "all_cities": [ ... ]
+        "active_cities": [ ... ],
+        "coming_soon_cities": [ ... ]
     }
 }</code></pre>
         </section>

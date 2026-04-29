@@ -35,36 +35,46 @@ class ApplicationHomeController extends Controller
             $cityId = $request->input('city_id');
             $search = $request->input('search');
 
-            // 1. User Details (Always return object or null if guest)
+            // 1. User Details & Subscription
             $user = auth('user')->user();
+            $userData = null;
             if ($user) {
                 $user->update([
                     'last_login_at' => now(),
                     'last_login_ip' => $request->ip()
                 ]);
-            }
 
-            $userData = $user ? [
-                'id' => (int) $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'mobile_number' => $user->mobile_number,
-                'city_id' => (int) $user->city_id,
-                'address' => $user->address,
-                'addresses' => $user->addresses()->orderBy('is_default', 'desc')->orderBy('id', 'desc')->get(),
-            ] : null;
+                $addresses = $user->addresses()
+                    ->select('id', 'user_id', 'address', 'latitude', 'longitude', 'type', 'is_default')
+                    ->orderBy('is_default', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->get();
 
-            // 2. Selected City Details
-            $selectedCity = null;
-            if ($cityId) {
-                $selectedCity = DB::table('cities')
-                    ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/city') . '/", icon) AS icon'))
-                    ->where('id', $cityId)
+                // Check active Elite subscription
+                $subscription = DB::table('user_subscriptions as us')
+                    ->join('membership_plans as mp', 'us.plan_id', '=', 'mp.id')
+                    ->where('us.user_id', $user->id)
+                    ->where('us.status', 1)
+                    ->where('us.end_date', '>=', now())
+                    ->select('us.id', 'us.plan_id', 'us.end_date', 'mp.name as plan_name')
                     ->first();
+
+                $userData = [
+                    'id' => (int) $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'mobile_number' => $user->mobile_number,
+                    'city_id' => (int) $user->city_id,
+                    'address' => $user->address,
+                    'active_address' => $addresses->where('is_default', 1)->first(),
+                    'addresses' => $addresses,
+                    'active_subscription' => $subscription
+                ];
             }
 
-            // 3. Offers (Sliders/Banners)
+            // 2. Offers (Sliders/Banners)
             $offers = Offer::where('status', 1)
+                ->select('id', 'name', 'media', 'position', 'media_type', 'priority')
                 ->orderBy('priority', 'asc')
                 ->get()
                 ->map(function ($offer) {
@@ -79,6 +89,12 @@ class ApplicationHomeController extends Controller
                     return $offer;
                 });
 
+            // 3. Membership Plans
+            $membershipPlans = DB::table('membership_plans')
+                ->select('id', 'name', 'description', 'price', 'discount_percentage', 'duration_months')
+                ->where('status', 1)
+                ->get();
+
             // 4. Category List (Service Categories)
             $categories = DB::table('service_categories')
                 ->select(
@@ -92,107 +108,191 @@ class ApplicationHomeController extends Controller
                 ->orderByDesc('is_popular')
                 ->get();
 
-            // 5. City Wise Services (Search or Popular)
-            $servicesQuery = DB::table('services as s')
-                ->join('service_categories as c', 's.category_id', '=', 'c.id')
+            // 5. City Wise Services & Trending Services
+            $servicesQuery = DB::table('service_masters as s')
                 ->where('s.status', 1);
 
-            // If city selected, join with city prices to get specific prices
             if ($cityId) {
-                $servicesQuery->join('service_city_prices as scp', function($join) use ($cityId) {
-                    $join->on('scp.service_id', '=', 's.id')
-                         ->where('scp.city_id', '=', $cityId)
-                         ->where('scp.status', '=', 1);
+                $servicesQuery->join('service_city_masters as scm', function($join) use ($cityId) {
+                    $join->on('scm.service_master_id', '=', 's.id')
+                         ->where('scm.city_id', '=', $cityId)
+                         ->where('scm.status', '=', 1);
                 })
                 ->select(
                     's.id', 
                     's.name', 
-                    'scp.price as base_price', 
-                    'scp.discount_price',
+                    's.category_id',
+                    'scm.price as base_price', 
+                    'scm.discount_price',
                     's.duration', 
                     's.rating', 
                     's.reviews', 
-                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
-                    'c.name as category_name'
+                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon')
                 );
             } else {
                 $servicesQuery->select(
                     's.id', 
                     's.name', 
+                    's.category_id',
                     's.price as base_price', 
                     's.discount_price',
                     's.duration', 
                     's.rating', 
                     's.reviews', 
-                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
-                    'c.name as category_name'
+                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon')
                 );
             }
 
+            // For search results
+            $services = [];
             if (!empty($search)) {
-                $servicesQuery->where(function($q) use ($search) {
+                $services = (clone $servicesQuery)->where(function($q) use ($search) {
                     $q->where('s.name', 'like', "%$search%")
-                      ->orWhere('c.name', 'like', "%$search%")
                       ->orWhere('s.description', 'like', "%$search%");
-                });
-            } else {
-                $servicesQuery->where('s.is_popular', 1)->limit(10);
+                })->get();
             }
 
-            $services = $servicesQuery->get();
+            // Group trending services by category for tabs
+            $trendingServices = (clone $servicesQuery)
+                ->where('s.is_popular', 1)
+                ->get()
+                ->groupBy('category_id');
 
-            // 6. Reviews
+            $trendingData = [];
+            foreach ($trendingServices as $catId => $items) {
+                $category = $categories->where('id', $catId)->first();
+                if ($category) {
+                    $trendingData[] = [
+                        'category_id' => $catId,
+                        'category_name' => $category->name,
+                        'services' => $items
+                    ];
+                }
+            }
+
+            // 6. Reviews (Optimized)
             $reviews = DB::table('customer_reviews as r')
-                ->leftJoin('service_categories as c', 'r.category_id', '=', 'c.id')
-                ->select(
-                    'r.id',
-                    'r.customer_name',
-                    DB::raw('CONCAT("' . asset('uploads/review/customer-photos') . '/", r.customer_photo) AS customer_photo'),
-                    'r.rating',
-                    'r.review',
-                    'r.review_date',
-                    'c.name as category_name',
-                    'r.photos'
-                )
+                ->select('r.id', 'r.customer_name', 'r.rating', 'r.review', 'r.review_date', 'r.appointment_id')
                 ->where('r.status', 1)
                 ->orderByDesc('r.is_popular')
                 ->limit(6)
-                ->get()
-                ->map(function ($review) {
-                    $photos = $review->photos ? json_decode($review->photos, true) : [];
-                    $review->media_photos = array_map(function ($photo) {
-                        return asset('uploads/review/photos/' . $photo);
-                    }, $photos);
+                ->get();
+
+            $appointmentIds = $reviews->pluck('appointment_id')->filter()->unique()->toArray();
+            if (!empty($appointmentIds)) {
+                $appointments = DB::table('appointments')
+                    ->whereIn('id', $appointmentIds)
+                    ->pluck('service_id', 'id');
+
+                $allServiceIds = [];
+                foreach ($appointments as $sidString) {
+                    if ($sidString) {
+                        $allServiceIds = array_merge($allServiceIds, explode(',', $sidString));
+                    }
+                }
+                $allServiceIds = array_unique($allServiceIds);
+
+                $serviceNames = DB::table('service_masters')
+                    ->whereIn('id', $allServiceIds)
+                    ->pluck('name', 'id');
+
+                $reviews->map(function ($review) use ($appointments, $serviceNames) {
+                    $sids = isset($appointments[$review->appointment_id]) ? explode(',', $appointments[$review->appointment_id]) : [];
+                    $review->services = array_map(fn($id) => $serviceNames[$id] ?? null, $sids);
+                    $review->services = array_values(array_filter($review->services));
                     return $review;
                 });
+            } else {
+                $reviews->map(function ($review) {
+                    $review->services = [];
+                    return $review;
+                });
+            }
 
-            // 7. Product Brands
+            // 7. Service Combos (Optimized)
+            $combos = DB::table('service_combos')
+                ->select('id', 'name', 'description', DB::raw('CONCAT("' . asset('uploads/combos') . '/", image) AS image'), 'min_price')
+                ->where('status', 1)
+                ->get();
+
+            $comboIds = $combos->pluck('id')->toArray();
+            if (!empty($comboIds)) {
+                $itemsQuery = DB::table('service_combo_items as sci')
+                    ->join('service_masters as sm', 'sci.service_master_id', '=', 'sm.id');
+                
+                if ($cityId) {
+                    $itemsQuery->leftJoin('service_city_masters as scm', function($join) use ($cityId) {
+                        $join->on('scm.service_master_id', '=', 'sm.id')
+                             ->where('scm.city_id', $cityId);
+                    })
+                    ->select(
+                        'sci.combo_id',
+                        'sm.id',
+                        'sm.name',
+                        DB::raw('IFNULL(scm.price, sm.price) as price'),
+                        DB::raw('IFNULL(scm.discount_price, sm.discount_price) as discount_price'),
+                        'sm.duration',
+                        'sci.is_default'
+                    );
+                } else {
+                    $itemsQuery->select(
+                        'sci.combo_id',
+                        'sm.id',
+                        'sm.name',
+                        'sm.price',
+                        'sm.discount_price',
+                        'sm.duration',
+                        'sci.is_default'
+                    );
+                }
+                
+                $allItems = $itemsQuery->whereIn('sci.combo_id', $comboIds)->get()->groupBy('combo_id');
+                
+                $combos->each(function ($combo) use ($allItems) {
+                    $combo->items = $allItems->get($combo->id, []);
+                });
+            }
+
+            // 8. Others
             $productBrands = DB::table('product_brands')
-                ->select(
-                    'id',
-                    'name',
-                    DB::raw('CONCAT("' . asset('uploads/product-brand') . '/", icon) AS icon')
-                )
+                ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/product-brand') . '/", icon) AS icon'))
                 ->where('status', 1)
                 ->orderBy('name', 'ASC')
                 ->get();
 
-            // 8. All Cities (for selection)
-            $allCities = DB::table('cities')
-                ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/city') . '/", icon) AS icon'))
-                ->where('status', 1)
+            $cities = DB::table('cities')
+                ->select('id', 'name', 'status')
+                ->whereIn('status', [0, 1])
                 ->orderBy('name', 'asc')
+                ->get();
+
+            $activeCities = $cities->where('status', 0)->values();
+            $comingSoonCities = $cities->where('status', 1)->values();
+
+            $coupons = DB::table('coupon_codes')
+                ->select('id', 'code', 'discount_type', 'discount_value', 'description', 'start_date', 'end_date')
+                ->where('status', 1)
+                ->where(function($query) {
+                    $query->whereNull('start_date')->orWhere('start_date', '<=', now());
+                })
+                ->where(function($query) {
+                    $query->whereNull('end_date')->orWhere('end_date', '>=', now());
+                })
                 ->get();
 
             $responseData = [
                 'user' => $userData,
-                'selected_city' => $selectedCity,
-                'offers' => $offers ?? [],
-                'categories' => $categories ?? [],
-                'services' => $services ?? [],
-                'reviews' => $reviews ?? [],
-                'brands' => $productBrands ?? [],
-                'all_cities' => $allCities ?? []
+                'offers' => $offers,
+                'coupons' => $coupons,
+                'membership_plans' => $membershipPlans,
+                'categories' => $categories,
+                'search_results' => $services,
+                'trending_services' => $trendingData,
+                'reviews' => $reviews,
+                'combos' => $combos,
+                'brands' => $productBrands,
+                'active_cities' => $activeCities,
+                'coming_soon_cities' => $comingSoonCities,
             ];
 
             return $this->sendResponse(
