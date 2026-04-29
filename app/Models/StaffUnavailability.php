@@ -25,6 +25,11 @@ class StaffUnavailability extends Model
         return $this->belongsTo(TeamMember::class, 'team_member_id');
     }
 
+    public function beautician()
+    {
+        return $this->belongsTo(TeamMember::class, 'team_member_id');
+    }
+
     /**
      * Get human readable type
      */

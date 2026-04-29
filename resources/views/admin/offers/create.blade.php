@@ -1,216 +1,181 @@
 @extends('admin.layouts.app')
-
-@section('header_style_content')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<style>
-    .form-section-title {
-        color: #1a237e;
-        font-weight: 800;
-        letter-spacing: 0.5px;
-        position: relative;
-        padding-left: 15px;
-        margin-bottom: 1.5rem;
-    }
-    .form-section-title::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 20px;
-        background: #1a237e;
-        border-radius: 10px;
-    }
-    .premium-card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-    .filepond--root {
-        margin-bottom: 0;
-    }
-</style>
-@endsection
-
 @section('content')
-    <div class="app-content content">
-        <div class="content-overlay"></div>
-        <div class="header-navbar-shadow"></div>
-        <div class="content-wrapper">
-            <div class="content-header row">
-                <div class="content-header-left col-md-9 col-12 mb-2">
-                    <h2 class="content-header-title float-start mb-0">Create New Offer</h2>
-                    <div class="breadcrumb-wrapper">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.offers.index') }}">Offers</a></li>
-                            <li class="breadcrumb-item active">Create</li>
-                        </ol>
+<div class="app-content content">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper">
+        <div class="content-header row">
+            <div class="content-header-left col-md-9 col-12 mb-2">
+                <div class="row breadcrumbs-top">
+                    <div class="col-12">
+                        <h2 class="content-header-title float-start mb-0">Add Offer</h2>
+                        <div class="breadcrumb-wrapper">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="{{ route('admin.dashboard') }}">{{ trans('admin_string.home') }}</a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a href="{{ route('admin.offers.index') }}">Offers</a>
+                                </li>
+                                <li class="breadcrumb-item active">Add Offer</li>
+                            </ol>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="content-body">
+            <section class="horizontal-wizard">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="addEditForm" enctype="multipart/form-data" data-parsley-validate="" role="form">
+                                    @csrf
+                                    <input type="hidden" name="edit_value" value="0">
+                                    <input type="hidden" id="form-method" value="add">
+                                    <div class="row row-sm">
 
-            <div class="content-body">
-                <form method="POST" enctype="multipart/form-data" data-parsley-validate="" id="addEditForm" role="form">
-                    @csrf
-                    <input type="hidden" name="edit_value" value="0">
-                    <input type="hidden" id="form-method" value="add">
-
-                    <div class="row">
-                        <!-- Left Side: Basic Info -->
-                        <div class="col-lg-8">
-                            <div class="card premium-card">
-                                <div class="card-body p-4">
-                                    <h5 class="form-section-title">General Information</h5>
-                                    
-                                    <div class="row g-3">
-                                        <div class="col-12">
+                                        <div class="col-md-6 mt-2">
                                             <div class="form-group">
-                                                <label class="form-label fw-bold">Offer Title</label>
-                                                <input type="text" class="form-control form-control-lg border-2" name="title"
-                                                    placeholder="e.g. Summer Special 50% Off" required>
+                                                <label>Offer Title</label>
+                                                <input type="text" name="title" class="form-control" placeholder="e.g. Summer Special 50% Off" required>
+                                                <div class="valid-feedback"></div>
                                             </div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-3 mt-2">
                                             <div class="form-group">
-                                                <label class="form-label fw-bold">Display Position</label>
-                                                <select name="position" class="form-select border-2" required>
+                                                <label>Display Position</label>
+                                                <select name="position" class="form-control" required>
                                                     <option value="top_header" selected>Top Header Slider</option>
                                                     <option value="footer">Footer Banner</option>
                                                     <option value="other">Other Page</option>
                                                 </select>
+                                                <div class="valid-feedback"></div>
                                             </div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-3 mt-2">
                                             <div class="form-group">
-                                                <label class="form-label fw-bold">Priority Order</label>
-                                                <input type="number" class="form-control border-2" name="priority" value="0">
+                                                <label>Priority Order</label>
+                                                <input type="number" name="priority" class="form-control" value="0">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 mt-2">
+                                            <div class="form-group">
+                                                <label>Redirect Link (Optional)</label>
+                                                <input type="url" name="link" class="form-control" placeholder="https://beautyden.com/promo">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mt-2">
+                                            <div class="form-group">
+                                                <label>Status</label>
+                                                <select name="status" class="form-control">
+                                                    <option value="1">Active</option>
+                                                    <option value="0">Inactive</option>
+                                                </select>
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mt-2">
+                                            <div class="form-group">
+                                                <label>Media Type</label>
+                                                <div class="mt-1">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="media_type" id="type_image" value="image" checked>
+                                                        <label class="form-check-label" for="type_image">Images</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="media_type" id="type_video" value="video">
+                                                        <label class="form-check-label" for="type_video">Video</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 mt-2" id="image-upload-wrapper">
+                                            <div class="form-group">
+                                                <label>Upload Multiple Images</label>
+                                                <input type="file" class="filepond-multiple" multiple data-allow-reorder="true">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 mt-2" id="video-upload-wrapper" style="display: none;">
+                                            <div class="form-group">
+                                                <label>Upload Single Video</label>
+                                                <input type="file" class="filepond-single">
+                                                <div class="valid-feedback"></div>
                                             </div>
                                         </div>
 
                                         <div class="col-12">
-                                            <div class="form-group">
-                                                <label class="form-label fw-bold">Redirect Link <small class="text-muted text-capitalize">(Optional)</small></label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text bg-light border-2 border-end-0"><i class="bi bi-link-45deg"></i></span>
-                                                    <input type="url" class="form-control border-2 border-start-0" name="link"
-                                                        placeholder="https://beautyden.com/offers/summer-special">
+                                            <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">
+                                                <div>
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                    <a href="{{ route('admin.offers.index') }}" class="btn btn-secondary">Cancel</a>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="card premium-card mt-3">
-                                <div class="card-body p-4">
-                                    <h5 class="form-section-title">Visibility Settings</h5>
-                                    <div class="row align-items-center">
-                                        <div class="col-md-6">
-                                            <p class="text-muted small mb-0">Switch off to keep this offer as a draft.</p>
-                                        </div>
-                                        <div class="col-md-6 text-md-end">
-                                            <div class="form-check form-switch d-inline-block">
-                                                <input class="form-check-input h4 mb-0" type="checkbox" name="status" value="1" checked id="statusSwitch">
-                                                <label class="form-check-label fw-bold ms-1" for="statusSwitch">Active Status</label>
-                                            </div>
-                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Side: Media -->
-                        <div class="col-lg-4">
-                            <div class="card premium-card">
-                                <div class="card-body p-4">
-                                    <h5 class="form-section-title">Media Assets</h5>
-                                    
-                                    <div class="mb-3">
-                                        <label class="form-label fw-bold d-block mb-1">Select Media Type</label>
-                                        <div class="btn-group w-100" role="group">
-                                            <input type="radio" class="btn-check" name="media_type" id="type_image" value="image" checked>
-                                            <label class="btn btn-outline-primary" for="type_image">
-                                                <i class="bi bi-images me-1"></i> Images
-                                            </label>
-
-                                            <input type="radio" class="btn-check" name="media_type" id="type_video" value="video">
-                                            <label class="btn btn-outline-primary" for="type_video">
-                                                <i class="bi bi-play-circle me-1"></i> Video
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div id="image-upload-wrapper">
-                                        <label class="form-label fw-bold small text-muted text-uppercase mb-2">Upload Multiple Images</label>
-                                        <input type="file" class="filepond-multiple" name="media[]" multiple data-allow-reorder="true">
-                                        <p class="text-muted x-small mt-1 mb-0"><i class="bi bi-info-circle me-1"></i> Recommended: 1200x600px for banners.</p>
-                                    </div>
-
-                                    <div id="video-upload-wrapper" style="display: none;">
-                                        <label class="form-label fw-bold small text-muted text-uppercase mb-2">Upload Single Video</label>
-                                        <input type="file" class="filepond-single" name="media">
-                                        <p class="text-muted x-small mt-1 mb-0"><i class="bi bi-info-circle me-1"></i> Max 20MB. MP4 format recommended.</p>
-                                    </div>
-
-                                    <div class="mt-4 pt-2 border-top">
-                                        <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm rounded-pill">
-                                            <i class="bi bi-check-circle me-2"></i> Create Offer
-                                        </button>
-                                        <a href="{{ route('admin.offers.index') }}" class="btn btn-outline-secondary w-100 rounded-pill mt-2">
-                                            Cancel
-                                        </a>
-                                    </div>
-                                </div>
+                                </form>
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </section>
         </div>
     </div>
+</div>
 @endsection
 
 @section('footer_script_content')
-    <script>
-        var form_url = 'offers/store';
-        var redirect_url = 'offers';
+<script>
+    var form_url = 'offers/store';
+    var redirect_url = 'offers';
+    var media_field_name = 'media[]';
+    var is_one_image_and_multiple_image_status = 'is_multiple_image';
+
+    $(document).ready(function() {
+        FilePond.registerPlugin(FilePondPluginImagePreview);
         
-        // Handle Media Type Toggle
+        let imagePond = FilePond.create(document.querySelector('.filepond-multiple'), {
+            allowMultiple: true,
+            instantUpload: false,
+            allowProcess: false,
+        });
+
+        let videoPond = FilePond.create(document.querySelector('.filepond-single'), {
+            allowMultiple: false,
+            instantUpload: false,
+            allowProcess: false,
+        });
+
+        // Initially pond is imagePond
+        pond = imagePond;
+
         $('input[name="media_type"]').on('change', function() {
             if ($(this).val() === 'video') {
                 $('#image-upload-wrapper').hide();
                 $('#video-upload-wrapper').show();
+                pond = videoPond;
+                media_field_name = 'media';
+                is_one_image_and_multiple_image_status = 'is_one_image';
             } else {
                 $('#image-upload-wrapper').show();
                 $('#video-upload-wrapper').hide();
+                pond = imagePond;
+                media_field_name = 'media[]';
+                is_one_image_and_multiple_image_status = 'is_multiple_image';
             }
         });
-
-        // Initialize FilePond
-        document.addEventListener('DOMContentLoaded', function() {
-            FilePond.registerPlugin(FilePondPluginImagePreview);
-            
-            // Multiple Images
-            FilePond.create(document.querySelector('.filepond-multiple'), {
-                allowMultiple: true,
-                instantUpload: false,
-                storeAsFile: true,
-                acceptedFileTypes: ['image/*'],
-                labelIdle: 'Drag & Drop your images or <span class="filepond--label-action">Browse</span>'
-            });
-
-            // Single Video
-            FilePond.create(document.querySelector('.filepond-single'), {
-                allowMultiple: false,
-                instantUpload: false,
-                storeAsFile: true,
-                acceptedFileTypes: ['video/*'],
-                labelIdle: 'Drag & Drop your video or <span class="filepond--label-action">Browse</span>'
-            });
-        });
-    </script>
+    });
+</script>
 @endsection

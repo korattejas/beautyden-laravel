@@ -181,6 +181,13 @@
                 </a>
             </li>
 
+            <li class="nav-item {{ Request::routeIs('admin.user.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.user.index') }}">
+                    <i data-feather="user-check"></i>
+                    <span class="menu-title text-truncate">Registered Users</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ Request::routeIs('admin.service.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.service.index') }}">
                     <i data-feather="shopping-bag"></i>

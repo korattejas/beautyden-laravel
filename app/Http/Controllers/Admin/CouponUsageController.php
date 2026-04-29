@@ -64,7 +64,14 @@ class CouponUsageController extends Controller
                                     <span class="text-muted small">' . $usage->created_at->format('h:i A') . '</span>
                                 </div>';
                     })
-                    ->rawColumns(['user_details', 'appointment_number', 'discount', 'used_at'])
+                    ->addColumn('action', function ($usage) {
+                        $action_array = [
+                            'is_simple_action' => 1,
+                            'delete_id' => $usage->id,
+                        ];
+                        return view('admin.render-view.datable-action', compact('action_array'))->render();
+                    })
+                    ->rawColumns(['user_details', 'appointment_number', 'discount', 'used_at', 'action'])
                     ->make(true);
             }
         } catch (\Exception $e) {

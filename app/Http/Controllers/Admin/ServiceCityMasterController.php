@@ -123,6 +123,11 @@ class ServiceCityMasterController extends Controller
 
             $data = $request->only(['city_id', 'category_id', 'sub_category_id', 'service_master_id', 'price', 'discount_price', 'app_discount_percentage', 'beautician_commission', 'is_available', 'status']);
 
+            // Set defaults for optional numeric fields
+            $data['discount_price']         = $data['discount_price'] ?? 0;
+            $data['app_discount_percentage']= $data['app_discount_percentage'] ?? 0;
+            $data['beautician_commission']  = $data['beautician_commission'] ?? 0;
+
             if ($id == 0) {
                 ServiceCityMaster::create($data);
                 $msg = "App Service City added successfully";
@@ -142,5 +147,22 @@ class ServiceCityMasterController extends Controller
     {
         ServiceCityMaster::find($id)->delete();
         return response()->json(['message' => "Deleted successfully"]);
+    }
+
+    /**
+     * Return ServiceMaster records filtered by category — used in create/edit AJAX
+     */
+    public function getServiceMastersByCategory(Request $request)
+    {
+        try {
+            $services = ServiceMaster::where('category_id', $request->category_id)
+                ->where('status', 1)
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get();
+            return response()->json($services);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $this->error_message], 500);
+        }
     }
 }

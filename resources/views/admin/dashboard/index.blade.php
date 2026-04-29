@@ -225,7 +225,7 @@
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="avatar bg-light-danger p-1"><i class="bi bi-person"></i></div>
                                         <div>
-                                            <div class="fw-bold small">{{ $leave->beautician->name }}</div>
+                                            <div class="fw-bold small">{{ $leave->beautician->name ?? 'N/A' }}</div>
                                             <span class="badge bg-light-danger text-danger" style="font-size: 0.6rem;">Status: Leave</span>
                                         </div>
                                     </div>

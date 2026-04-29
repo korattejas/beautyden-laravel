@@ -8,7 +8,7 @@
             <div class="content-header-left col-md-9 col-12 mb-2">
                 <div class="row breadcrumbs-top">
                     <div class="col-12">
-                        <h2 class="content-header-title float-start mb-0">Add App Service City Pricing</h2>
+                        <h2 class="content-header-title float-start mb-0">Edit App Service City Pricing</h2>
                         <div class="breadcrumb-wrapper">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item">
@@ -17,7 +17,7 @@
                                 <li class="breadcrumb-item">
                                     <a href="{{ route('admin.service-city-master.index') }}">App Service City Master</a>
                                 </li>
-                                <li class="breadcrumb-item active"><a href="#">Add App Pricing</a>
+                                <li class="breadcrumb-item active"><a href="#">Edit App Pricing</a>
                                 </li>
                             </ol>
                         </div>
@@ -34,8 +34,8 @@
                                 <div class="card-body">
                                     <form id="addEditForm" enctype="multipart/form-data" data-parsley-validate="" role="form">
                                         @csrf
-                                        <input type="hidden" name="edit_value" value="0">
-                                        <input type="hidden" id="form-method" value="add">
+                                        <input type="hidden" name="edit_value" value="{{ $data->id }}">
+                                        <input type="hidden" id="form-method" value="edit">
                                         <div class="row row-sm">
 
                                             <div class="col-md-6 mt-2">
@@ -44,7 +44,7 @@
                                                     <select name="city_id" class="form-control select2" required>
                                                         <option value="">Select City</option>
                                                         @foreach($cities as $city)
-                                                            <option value="{{ $city->id }}">{{ $city->name }}</option>
+                                                            <option value="{{ $city->id }}" {{ $data->city_id == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
                                                         @endforeach
                                                     </select>
                                                     <div class="valid-feedback"></div>
@@ -57,7 +57,7 @@
                                                     <select name="category_id" id="category_id" class="form-control select2" required>
                                                         <option value="">Select Category</option>
                                                         @foreach($categories as $cat)
-                                                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                                            <option value="{{ $cat->id }}" {{ $data->category_id == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                                                         @endforeach
                                                     </select>
                                                     <div class="valid-feedback"></div>
@@ -69,6 +69,9 @@
                                                     <label>Sub Category</label>
                                                     <select name="sub_category_id" id="sub_category_id" class="form-control select2">
                                                         <option value="">Select Sub Category</option>
+                                                        @foreach($subcategories as $sub)
+                                                            <option value="{{ $sub->id }}" {{ $data->sub_category_id == $sub->id ? 'selected' : '' }}>{{ $sub->name }}</option>
+                                                        @endforeach
                                                     </select>
                                                     <div class="valid-feedback"></div>
                                                 </div>
@@ -79,6 +82,9 @@
                                                     <label>Service (Master)</label>
                                                     <select name="service_master_id" id="service_master_id" class="form-control select2" required>
                                                         <option value="">Select Service</option>
+                                                        @foreach($services as $service)
+                                                            <option value="{{ $service->id }}" {{ $data->service_master_id == $service->id ? 'selected' : '' }}>{{ $service->name }}</option>
+                                                        @endforeach
                                                     </select>
                                                     <div class="valid-feedback"></div>
                                                 </div>
@@ -87,7 +93,7 @@
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Base Price (App)</label>
-                                                    <input type="number" name="price" class="form-control" placeholder="0.00" required>
+                                                    <input type="number" name="price" class="form-control" value="{{ $data->price }}" placeholder="0.00" required>
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
@@ -95,7 +101,7 @@
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Discount Price (App)</label>
-                                                    <input type="number" name="discount_price" class="form-control" placeholder="0.00">
+                                                    <input type="number" name="discount_price" class="form-control" value="{{ $data->discount_price }}" placeholder="0.00">
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
@@ -103,7 +109,7 @@
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>App Discount %</label>
-                                                    <input type="number" name="app_discount_percentage" class="form-control" placeholder="e.g. 10.00">
+                                                    <input type="number" name="app_discount_percentage" class="form-control" value="{{ $data->app_discount_percentage }}" placeholder="e.g. 10.00">
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
@@ -111,7 +117,7 @@
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
                                                     <label>Beautician Commission (₹)</label>
-                                                    <input type="number" name="beautician_commission" class="form-control" placeholder="e.g. 100.00">
+                                                    <input type="number" name="beautician_commission" class="form-control" value="{{ $data->beautician_commission }}" placeholder="e.g. 100.00">
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
@@ -120,8 +126,8 @@
                                                 <div class="form-group">
                                                     <label>Is Available in this city?</label>
                                                     <select name="is_available" class="form-control">
-                                                        <option value="1">Yes, Available</option>
-                                                        <option value="0">No, Disable for App</option>
+                                                        <option value="1" {{ $data->is_available == 1 ? 'selected' : '' }}>Yes, Available</option>
+                                                        <option value="0" {{ $data->is_available == 0 ? 'selected' : '' }}>No, Disable for App</option>
                                                     </select>
                                                     <div class="valid-feedback"></div>
                                                 </div>
@@ -131,8 +137,8 @@
                                                 <div class="form-group">
                                                     <label>Status</label>
                                                     <select name="status" class="form-control">
-                                                        <option value="1">Active</option>
-                                                        <option value="0">Inactive</option>
+                                                        <option value="1" {{ $data->status == 1 ? 'selected' : '' }}>Active</option>
+                                                        <option value="0" {{ $data->status == 0 ? 'selected' : '' }}>Inactive</option>
                                                     </select>
                                                     <div class="valid-feedback"></div>
                                                 </div>

@@ -17,7 +17,7 @@ use App\Models\ProductBrand;
 use App\Models\User;
 use App\Models\UserSubscription;
 use App\Models\RazorpayTransaction;
-use App\Models\StaffAttendance;
+use App\Models\StaffUnavailability;
 use App\Models\ServiceCombo;
 
 class DashboardController extends Controller
@@ -65,9 +65,10 @@ class DashboardController extends Controller
             $activeCombos = ServiceCombo::where('status', 1)->count();
 
             // Staff on leave today
-            $onLeaveToday = StaffAttendance::with('beautician')
-                ->whereDate('attendance_date', now())
-                ->where('status', 1) // 1 = Leave
+            $onLeaveToday = StaffUnavailability::with('beautician')
+                ->whereDate('start_date', '<=', now())
+                ->whereDate('end_date', '>=', now())
+                ->where('status', 1) // 1 = Active
                 ->get();
 
             $totalCity = City::where('status', 1)->count();
