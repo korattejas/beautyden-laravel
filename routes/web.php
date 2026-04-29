@@ -33,6 +33,7 @@ use App\Http\Controllers\Admin\ServiceComboController;
 use App\Http\Controllers\Admin\ServiceCityMasterController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\RazorpayTransactionController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ContractController;
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
