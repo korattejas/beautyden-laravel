@@ -54,12 +54,35 @@ class ServiceController extends Controller
                     'sc.name',
                     DB::raw('CONCAT("' . asset('uploads/service-subcategory') . '/", sc.icon) AS icon'),
                     'sc.description',
-                    'sc.is_popular'
+                    'sc.starting_at_price',
+                    'sc.is_popular',
+                    'sc.media_json'
                 )
                 ->where('sc.status', 1)
                 ->get()
                 ->map(function ($item) {
                     $item->is_popular = (int) $item->is_popular;
+                    
+                    // Format media_json with full URLs
+                    $media = $item->media_json ? json_decode($item->media_json, true) : ['images' => [], 'videos' => []];
+                    
+                    if (isset($media['images']) && is_array($media['images'])) {
+                        $media['images'] = array_map(function($img) {
+                            return asset('uploads/service-media/' . $img);
+                        }, $media['images']);
+                    } else {
+                        $media['images'] = [];
+                    }
+
+                    if (isset($media['videos']) && is_array($media['videos'])) {
+                        $media['videos'] = array_map(function($vid) {
+                            return asset('uploads/service-media/' . $vid);
+                        }, $media['videos']);
+                    } else {
+                        $media['videos'] = [];
+                    }
+
+                    $item->media_json = $media;
                     return $item;
                 })
                 ->groupBy('service_category_id');

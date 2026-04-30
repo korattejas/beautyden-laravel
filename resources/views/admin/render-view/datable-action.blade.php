@@ -8,7 +8,7 @@
             @if (isset($action_array['view_route']))
                 <a href="{{ $action_array['view_route'] }}" class="dropdown-item d-flex align-items-center py-50">
                     <i class="bi bi-eye-fill me-1 text-info"></i>
-                    <span>View Product</span>
+                    <span>{{ $action_array['view_label'] ?? 'View Product' }}</span>
                 </a>
             @endif
 

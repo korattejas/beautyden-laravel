@@ -678,7 +678,18 @@
             "id": 16,
             "name": "Waxing",
             "icon": "https://...",
-            "subcategories": [...]
+            "subcategories": [
+                {
+                    "id": 1,
+                    "name": "Facial",
+                    "icon": "https://...",
+                    "starting_at_price": "299.00",
+                    "media_json": {
+                        "images": ["https://.../img1.jpg", "https://.../img2.jpg"],
+                        "videos": ["https://.../vid1.mp4"]
+                    }
+                }
+            ]
         }
     ]
 }</code></pre>
@@ -797,7 +808,15 @@
         "banner_media": [{"url": "https://...", "type": "image"}],
         "before_after": ["https://...", "https://..."],
         "content_json": [...],
-        "price": "2000.00"
+        "price": "2000.00",
+        "subcategory": {
+            "id": 1,
+            "name": "Facial",
+            "media_json": {
+                "images": ["https://.../img1.jpg"],
+                "videos": ["https://.../vid1.mp4"]
+            }
+        }
     }
 }</code></pre>
         </section>

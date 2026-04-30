@@ -38,7 +38,7 @@ class CouponUsageController extends Controller
                             $wa_url = "https://wa.me/91" . $usage->user->mobile_number;
                             return '<div class="d-flex flex-column">
                                         <span class="fw-bold text-dark">' . $usage->user->name . '</span>
-                                        <a href="'.$wa_url.'" target="_blank" class="text-muted small d-flex align-items-center">
+                                        <a href="'.$wa_url.'" target="_blank">
                                             <i class="bi bi-whatsapp text-success me-25"></i>' . $usage->user->mobile_number . '
                                         </a>
                                     </div>';
@@ -59,7 +59,7 @@ class CouponUsageController extends Controller
                         return '<span class="fw-bold text-success" style="font-family: \'JetBrains Mono\', monospace;">₹' . number_format($usage->discount_amount, 2) . '</span>';
                     })
                     ->addColumn('used_at', function ($usage) {
-                        return '<div class="d-flex flex-column" style="line-height: 1.2;">
+                        return '<div class="d-flex flex-column">
                                     <span class="text-dark fw-bold">' . $usage->created_at->format('d-m-Y') . '</span>
                                     <span class="text-muted small">' . $usage->created_at->format('h:i A') . '</span>
                                 </div>';

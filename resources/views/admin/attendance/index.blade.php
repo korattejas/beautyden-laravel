@@ -185,12 +185,12 @@
                             <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                         @endforeach
                     </select>
-                    <button id="btn-refresh" class="btn btn-primary" style="height: 40px; border-radius: 8px;">
+                    <button id="btn-refresh" class="btn btn-primary">
                         <i class="bi bi-arrow-repeat"></i> Go
                     </button>
                 </div>
                 <div>
-                     <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addLeaveModal" style="border-radius: 10px; font-weight: 700;">
+                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLeaveModal">
                         <i class="bi bi-plus-lg"></i> Mark Manual Leave
                     </button>
                 </div>

@@ -64,6 +64,13 @@
                                                 </div>
                                             </div>
 
+                                             <div class="col-12 mb-2">
+                                                <div class="form-group">
+                                                    <label class="form-label fw-bold">{{ trans('admin_string.image') }}</label>
+                                                    <input type="file" class="filepond" name="icon" accept="image/*">
+                                                </div>
+                                            </div>
+
                                             <div class="col-md-6 mb-2">
                                                 <div class="form-group">
                                                     <label class="form-label fw-bold">{{ trans('admin_string.status') }}</label>
@@ -74,20 +81,12 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Modern Single Image Upload -->
-                                            <div class="col-12 mb-2">
-                                                <div class="form-group">
-                                                    <label class="form-label fw-bold">{{ trans('admin_string.image') }}</label>
-                                                    <input type="file" class="filepond" name="image" accept="image/*">
-                                                </div>
-                                            </div>
-
                                             <div class="col-12 mt-2 text-end">
                                                 <button type="submit" class="btn btn-primary px-3">
-                                                    <i class="bi bi-check-lg"></i> {{ trans('admin_string.submit') }}
+                                                    Submit
                                                 </button>
                                                 <a href="{{ route('admin.setting.index') }}" class="btn btn-secondary px-3">
-                                                    {{ trans('admin_string.cancel') }}
+                                                    Cancel
                                                 </a>
                                             </div>
                                         </div>
@@ -106,16 +105,7 @@
     <script>
         var form_url = 'setting/store';
         var redirect_url = 'setting';
-
-        $(function() {
-            FilePond.registerPlugin(FilePondPluginImagePreview);
-            FilePond.create(document.querySelector('.filepond'), {
-                allowMultiple: false,
-                allowImagePreview: true,
-                imagePreviewHeight: 150,
-                credits: false
-            });
-        });
+        var is_one_image_and_multiple_image_status = 'is_one_image';
     </script>
 @endsection
 

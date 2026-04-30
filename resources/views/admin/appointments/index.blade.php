@@ -1507,7 +1507,8 @@
         text += `• Use hygienic and original products only\n`;
         text += `• Maintain proper cleanliness and kit hygiene\n`;
         text += `• Do not share personal contact number with client\n`;
-        text += `• Follow all BeautyDen service guidelines\n\n`;
+        text += `• Follow all BeautyDen service guidelines\n`;
+        text += `• Please arrive at the customer's location on time as per the scheduled appointment\n\n`;
         
         text += `Best of luck for the service! 💖`;
 

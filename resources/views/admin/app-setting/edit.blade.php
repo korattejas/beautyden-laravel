@@ -60,6 +60,19 @@
                                             </div>
                                         </div>
 
+                                        <div class="col-12 mt-2">
+                                            <div class="form-group">
+                                                <label>{{ trans('admin_string.image') }}</label>
+                                                @if(!empty($setting->image))
+                                                    <div class="mb-2">
+                                                        <img src="{{ asset('uploads/app-settings/' . $setting->image) }}" alt="Current Setting Image" class="rounded shadow-sm border" style="width: 250px; height: auto;"/>
+                                                    </div>
+                                                @endif
+                                                <input type="file" class="filepond" name="icon" accept="image/*">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
                                         <div class="col-md-6 mt-2">
                                             <div class="form-group">
                                                 <label>{{ trans('admin_string.status') }}</label>
@@ -67,19 +80,6 @@
                                                     <option value="1" {{ $setting->status == '1' ? 'selected' : '' }}>Active</option>
                                                     <option value="0" {{ $setting->status == '0' ? 'selected' : '' }}>Inactive</option>
                                                 </select>
-                                                <div class="valid-feedback"></div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 mt-2">
-                                            <div class="form-group">
-                                                <label>{{ trans('admin_string.image') }}</label>
-                                                @if(!empty($setting->image))
-                                                    <div class="mb-2">
-                                                        <img src="{{ asset('uploads/app-settings/' . $setting->image) }}" alt="Current Setting Image" class="rounded shadow-sm border" style="max-width: 150px; height: auto;">
-                                                    </div>
-                                                @endif
-                                                <input type="file" class="filepond" name="image" accept="image/*">
                                                 <div class="valid-feedback"></div>
                                             </div>
                                         </div>
@@ -110,15 +110,5 @@
     var form_url = 'app-setting/store';
     var redirect_url = 'app-setting';
     var is_one_image_and_multiple_image_status = 'is_one_image';
-
-    $(function() {
-        FilePond.registerPlugin(FilePondPluginImagePreview);
-        FilePond.create(document.querySelector('.filepond'), {
-            allowMultiple: false,
-            allowImagePreview: true,
-            imagePreviewHeight: 150,
-            credits: false
-        });
-    });
 </script>
 @endsection

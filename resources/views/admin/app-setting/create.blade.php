@@ -60,6 +60,13 @@
                                             </div>
                                         </div>
 
+                                        <div class="col-12 mt-2">
+                                            <div class="form-group">
+                                                <input type="file" class="filepond" name="icon" accept="image/*">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
                                         <div class="col-md-6 mt-2">
                                             <div class="form-group">
                                                 <label>{{ trans('admin_string.status') }}</label>
@@ -67,14 +74,6 @@
                                                     <option value="1">Active</option>
                                                     <option value="0">Inactive</option>
                                                 </select>
-                                                <div class="valid-feedback"></div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 mt-2">
-                                            <div class="form-group">
-                                                <label>{{ trans('admin_string.image') }}</label>
-                                                <input type="file" class="filepond" name="image" accept="image/*">
                                                 <div class="valid-feedback"></div>
                                             </div>
                                         </div>
@@ -105,15 +104,5 @@
     var form_url = 'app-setting/store';
     var redirect_url = 'app-setting';
     var is_one_image_and_multiple_image_status = 'is_one_image';
-
-    $(function() {
-        FilePond.registerPlugin(FilePondPluginImagePreview);
-        FilePond.create(document.querySelector('.filepond'), {
-            allowMultiple: false,
-            allowImagePreview: true,
-            imagePreviewHeight: 150,
-            credits: false
-        });
-    });
 </script>
 @endsection

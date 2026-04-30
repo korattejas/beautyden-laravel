@@ -145,6 +145,13 @@ class ServiceMasterController extends Controller
             $service->category_name = $service->category->name ?? '';
             $service->sub_category_name = $service->subcategory->name ?? '';
 
+            if ($service->subcategory && $service->subcategory->media_json) {
+                $media = $service->subcategory->media_json;
+                $media['images'] = array_map(fn($img) => asset('uploads/service-media/' . $img), $media['images'] ?? []);
+                $media['videos'] = array_map(fn($vid) => asset('uploads/service-media/' . $vid), $media['videos'] ?? []);
+                $service->subcategory->media_json = $media;
+            }
+
             // Get specific price for city if provided
             if ($cityId) {
                 $cityService = ServiceCityMaster::where('service_master_id', $serviceId)

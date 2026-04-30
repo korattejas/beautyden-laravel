@@ -13,9 +13,15 @@ class ServiceSubcategory extends Model
         'service_category_id',
         'name',
         'icon',
+        'media_json',
         'description',
+        'starting_at_price',
         'is_popular',
         'status',
+    ];
+
+    protected $casts = [
+        'media_json' => 'array',
     ];
 
     /**

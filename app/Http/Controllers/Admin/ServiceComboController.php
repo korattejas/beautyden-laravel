@@ -96,7 +96,9 @@ class ServiceComboController extends Controller
                 'name' => 'required|string|max:255',
                 'services' => 'required|array|min:1',
                 'min_price' => 'required|numeric|min:0',
-                'image' => $id == 0 ? 'required|image' : 'nullable|image',
+                'icon' => $id == 0 ? 'required|image' : 'nullable|image',
+            ], [
+                'icon.required' => 'The image field is required.'
             ]);
 
             if ($validator->fails()) {
@@ -104,7 +106,18 @@ class ServiceComboController extends Controller
             }
 
             $imageName = null;
-            if ($request->hasFile('image')) {
+            if ($request->hasFile('icon')) {
+                $image = $request->file('icon');
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('uploads/combos'), $imageName);
+                
+                if ($id != 0) {
+                    $old = ServiceCombo::find($id);
+                    if ($old && $old->image && File::exists(public_path('uploads/combos/' . $old->image))) {
+                        File::delete(public_path('uploads/combos/' . $old->image));
+                    }
+                }
+            } elseif ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageName = time() . '_' . $image->getClientOriginalName();
                 $image->move(public_path('uploads/combos'), $imageName);

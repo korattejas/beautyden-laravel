@@ -13,7 +13,7 @@
                 </li>
             </ul>
         </div> --}}
-        <span style="color: white; font-weight: bold; font-size: 16px; display: flex; text-align: center; justify-content: space-between; align-content: space-between;align-items: center;">Trusted Beauty Service at Your Doorstep</span>
+        <span style="color: white; font-weight: bold; font-size: 16px; display: flex; text-align: center; justify-content: space-between; align-content: space-between;align-items: center;</span>
         <ul class="nav navbar-nav align-items-center ms-auto">
             <li class="nav-item dropdown dropdown-user">
                 <a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="#"

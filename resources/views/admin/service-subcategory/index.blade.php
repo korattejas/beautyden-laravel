@@ -78,6 +78,7 @@
                                                 <th>#</th>
                                                 <th>Category</th>
                                                 <th>Subcategory Name</th>
+                                                <th>Starting Price</th>
                                                 <th data-search="false">Icon</th>
                                                 <th>Status</th>
                                                 <th>Is Popular</th>
@@ -125,6 +126,10 @@
                 {
                     data: 'name',
                     name: 'name'
+                },
+                {
+                    data: 'starting_at_price',
+                    name: 'starting_at_price'
                 },
                 {
                     data: 'icon',

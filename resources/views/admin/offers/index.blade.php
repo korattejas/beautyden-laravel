@@ -176,28 +176,6 @@
         border-color: #ef4444;
     }
 
-    .header-btn {
-        padding: 0 24px !important;
-        font-weight: 700 !important;
-        border-radius: 12px !important;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        height: 48px;
-        background: linear-gradient(135deg, #1a237e 0%, #311b92 100%) !important;
-        border: none !important;
-        color: #fff !important;
-        box-shadow: 0 4px 15px rgba(26, 35, 126, 0.25) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        white-space: nowrap;
-        text-decoration: none !important;
-    }
-
-    .header-btn:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 8px 25px rgba(26, 35, 126, 0.4) !important;
-        color: #fff !important;
-    }
 
     /* Modal Animation */
     .modal.fade .modal-dialog {
@@ -230,7 +208,7 @@
                     </div>
                 </div>
                 <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
-                    <a href="{{ route('admin.offers.create') }}" class="header-btn ms-auto">
+                    <a href="{{ route('admin.offers.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-lg"></i> Add New Offer
                     </a>
                 </div>

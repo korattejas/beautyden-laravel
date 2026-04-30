@@ -4,8 +4,6 @@
     .service-view-header { background: linear-gradient(135deg, #1a237e 0%, #311b92 100%); color: white; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
     .service-view-header::after { content: ''; position: absolute; top: 0; right: 0; width: 400px; height: 100%; background: linear-gradient(to left, rgba(255, 255, 255, 0.1), transparent); transform: skewX(-25deg); pointer-events: none; }
     .badge-premium { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 0.5rem 1.2rem; border-radius: 50px; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.5px; }
-    .header-btn { backdrop-filter: blur(10px); transition: all 0.3s; border-radius: 10px; padding: 0.7rem 1.5rem; font-weight: 600; }
-    .header-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     .media-card { border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 16/9; background: #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     .media-card video, .media-card img { width: 100%; height: 100%; object-fit: cover; }
     .ba-card { border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
@@ -35,10 +33,10 @@
                         <p class="text-white-50 mb-0"><i data-feather="clock" class="me-1"></i> {{ $service->duration ?? 'Standard' }} | <i data-feather="tag" class="me-1"></i> {{ $service->price }} INR (Disc: {{ $service->discount_price ?? 0 }} INR)</p>
                     </div>
                     <div class="col-md-4 text-md-end">
-                        <a href="{{ route('admin.service-master.edit', encryptId($service->id)) }}" class="btn btn-light header-btn me-1">
+                        <a href="{{ route('admin.service-master.edit', encryptId($service->id)) }}" class="btn btn-light me-1">
                             <i data-feather="edit" class="me-50" style="width: 16px;"></i> Edit Service
                         </a>
-                        <a href="{{ route('admin.service-master.index') }}" class="btn btn-outline-light header-btn">
+                        <a href="{{ route('admin.service-master.index') }}" class="btn btn-outline-light">
                             <i data-feather="arrow-left" class="me-50" style="width: 16px;"></i> Back to List
                         </a>
                     </div>

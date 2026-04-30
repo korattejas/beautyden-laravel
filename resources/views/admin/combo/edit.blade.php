@@ -74,7 +74,7 @@
                                                             </div>
                                                         </div>
                                                     @endif
-                                                    <input type="file" name="image" class="filepond" accept="image/*">
+                                                    <input type="file" name="icon" class="filepond" accept="image/*">
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
@@ -146,17 +146,9 @@
 <script>
     var form_url = 'combo/store';
     var redirect_url = 'combo';
+    var is_one_image_and_multiple_image_status = 'is_one_image';
 
     $(document).ready(function() {
-        // FilePond
-        FilePond.registerPlugin(FilePondPluginImagePreview);
-        FilePond.create(document.querySelector('.filepond'), {
-            allowMultiple: false,
-            allowImagePreview: true,
-            imagePreviewHeight: 150,
-            credits: false
-        });
-
         // Select2
         $('.select2').select2({ placeholder: "Choose services...", width: '100%' });
 

@@ -126,6 +126,9 @@ class ServiceSubcategoryController extends Controller
                         }
                         return '';
                     })
+                    ->addColumn('starting_at_price', function ($sub) {
+                        return '₹' . number_format($sub->starting_at_price, 2);
+                    })
                     ->rawColumns(['action', 'icon', 'status', 'is_popular'])
                     ->make(true);
             }
@@ -144,7 +147,10 @@ class ServiceSubcategoryController extends Controller
             $validateArray = [
                 'service_category_id' => 'required|exists:service_categories,id',
                 'name' => 'required',
+                'starting_at_price' => 'required|numeric|min:0',
                 'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
+                'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
+                'gallery_videos.*' => 'nullable|mimes:mp4,mov,ogg,qt,webm|max:50000',
             ];
 
             $validateMessage = [
@@ -153,12 +159,60 @@ class ServiceSubcategoryController extends Controller
                 'name.required' => 'The subcategory name is required.',
                 'icon.image' => 'The file must be an image.',
                 'icon.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
+                'gallery_images.*.image' => 'Each gallery file must be an image.',
+                'gallery_videos.*.mimes' => 'Each video must be a valid video format.',
+                'gallery_videos.*.uploaded' => 'The video failed to upload. This usually happens if the file is too large for the server.',
+                'gallery_videos.*.max' => 'The video size cannot exceed 50MB.',
             ];
 
             $validator = Validator::make($request_all, $validateArray, $validateMessage);
             if ($validator->fails()) {
                 logValidationException($this->controller_name, $function_name, $validator);
                 return response()->json(['message' => $validator->errors()->first()], $this->validator_error_code);
+            }
+
+            $media_json = [
+                'images' => [],
+                'videos' => []
+            ];
+
+            if ($id != 0) {
+                $subcategory = ServiceSubcategory::where('id', $id)->first();
+                $media_json = $subcategory->media_json ?? $media_json;
+
+                // Handle Removed Media
+                if ($request->has('removed_media')) {
+                    foreach ($request->removed_media as $removed) {
+                        // Check in images
+                        if (($key = array_search($removed, $media_json['images'])) !== false) {
+                            unset($media_json['images'][$key]);
+                            $filePath = public_path('uploads/service-media/' . $removed);
+                            if (File::exists($filePath)) File::delete($filePath);
+                        }
+                        // Check in videos
+                        if (($key = array_search($removed, $media_json['videos'])) !== false) {
+                            unset($media_json['videos'][$key]);
+                            $filePath = public_path('uploads/service-media/' . $removed);
+                            if (File::exists($filePath)) File::delete($filePath);
+                        }
+                    }
+                    $media_json['images'] = array_values($media_json['images']);
+                    $media_json['videos'] = array_values($media_json['videos']);
+                }
+            }
+
+            // Upload New Images
+            if ($request->hasFile('gallery_images')) {
+                foreach ($request->file('gallery_images') as $image) {
+                    $media_json['images'][] = ImageUploadHelper::serviceMediaUpload($image);
+                }
+            }
+
+            // Upload New Videos
+            if ($request->hasFile('gallery_videos')) {
+                foreach ($request->file('gallery_videos') as $video) {
+                    $media_json['videos'][] = ImageUploadHelper::serviceMediaUpload($video);
+                }
             }
 
             if ($id == 0) {
@@ -169,8 +223,10 @@ class ServiceSubcategoryController extends Controller
                 ServiceSubcategory::create([
                     'service_category_id' => $request->service_category_id,
                     'name' => $request->name,
+                    'starting_at_price' => $request->starting_at_price,
                     'description' => $request->description,
                     'icon' => $icon ?? null,
+                    'media_json' => $media_json,
                     'is_popular' => (int) $request->is_popular,
                     'status' => (int) $request->status,
                 ]);
@@ -180,8 +236,6 @@ class ServiceSubcategoryController extends Controller
                     'message' => "Service subcategory added successfully"
                 ]);
             } else {
-                $subcategory = ServiceSubcategory::where('id', $id)->first();
-
                 if ($request->hasFile('icon')) {
                     $filePath = public_path('uploads/service-subcategory/' . $subcategory->icon);
 
@@ -196,8 +250,10 @@ class ServiceSubcategoryController extends Controller
                 $subcategory->update([
                     'service_category_id' => $request->service_category_id,
                     'name' => $request->name,
+                    'starting_at_price' => $request->starting_at_price,
                     'description' => $request->description,
                     'icon' => $icon,
+                    'media_json' => $media_json,
                     'is_popular' => (int) $request->is_popular,
                     'status' => (int) $request->status,
                 ]);
@@ -249,6 +305,16 @@ class ServiceSubcategoryController extends Controller
 
                 if (File::exists($filePath)) {
                     File::delete($filePath);
+                }
+
+                // Delete gallery media
+                if ($subcategory->media_json) {
+                    $media = $subcategory->media_json;
+                    $all_media = array_merge($media['images'] ?? [], $media['videos'] ?? []);
+                    foreach ($all_media as $item) {
+                        $mPath = public_path('uploads/service-media/' . $item);
+                        if (File::exists($mPath)) File::delete($mPath);
+                    }
                 }
 
                 $subcategory->delete();

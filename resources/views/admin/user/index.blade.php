@@ -22,22 +22,20 @@
             </div>
         </div>
         <div class="content-body">
-            <div class="card mb-3">
+            <div class="card mb-3 shadow-sm border-0">
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-3">
-                            <div class="form-group mb-0">
-                                <label class="form-label">Filter by Status</label>
-                                <select id="filter-status" class="form-control">
-                                    <option value="">All Status</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Suspended</option>
-                                </select>
-                            </div>
+                    <div class="d-flex align-items-end gap-1 flex-wrap">
+                        <div class="flex-grow-1" style="max-width: 300px;">
+                            <label class="form-label fw-bold">Filter by Status</label>
+                            <select id="filter-status" class="form-control">
+                                <option value="">All Status</option>
+                                <option value="1">Active</option>
+                                <option value="0">Suspended</option>
+                            </select>
                         </div>
-                        <div class="col-md-3 mt-2 mt-md-0">
-                            <button id="btn-apply-filters" class="btn btn-primary mt-md-2 w-100">Apply Filters</button>
-                        </div>
+                        <button id="btn-apply-filters" class="btn btn-primary px-3">
+                            <i class="bi bi-funnel me-25"></i> Apply Filters
+                        </button>
                     </div>
                 </div>
             </div>
@@ -99,10 +97,11 @@
                 data: 'name', 
                 name: 'name',
                 render: function(data, type, row) {
+                    let name = data || 'User';
                     return `<div class="d-flex align-items-center">
-                                <div class="avatar bg-light-primary me-1"><span class="avatar-content">${data.charAt(0)}</span></div>
+                                <div class="avatar bg-light-primary me-1"><span class="avatar-content">${name.charAt(0)}</span></div>
                                 <div class="d-flex flex-column">
-                                    <span class="user_name text-truncate fw-bold text-dark">${data}</span>
+                                    <span class="user_name text-truncate fw-bold text-dark">${name}</span>
                                     <small class="emp_post text-muted">ID: #${row.id}</small>
                                 </div>
                             </div>`;

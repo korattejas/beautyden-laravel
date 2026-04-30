@@ -74,11 +74,11 @@ class UserController extends Controller
                         return view('admin.render-view.datable-action', [
                             'action_array' => [
                                 'is_simple_action' => 1,
-                                'view_id' => $row->id,
+                                'view_label' => 'View Profile',
+                                'view_route' => route('admin.user.show', $row->id),
                                 'delete_id' => $row->id,
                                 'current_status' => $row->status,
                                 'hidden_id' => $row->id,
-                                'view_route' => route('admin.user.show', $row->id)
                             ]
                         ])->render();
                     })

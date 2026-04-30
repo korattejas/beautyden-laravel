@@ -131,7 +131,9 @@ class AppSettingController extends Controller
 
             if ($id == 0) {
                 $image = '';
-                if ($request->hasFile('image')) {
+                if ($request->hasFile('icon')) {
+                    $image = \App\Helpers\ImageUploadHelper::appSettingImageUpload($request->file('icon'));
+                } elseif ($request->hasFile('image')) {
                     $image = \App\Helpers\ImageUploadHelper::appSettingImageUpload($request->file('image'));
                 }
 
@@ -151,7 +153,15 @@ class AppSettingController extends Controller
                 $setting = AppSetting::find($id);
                 $image = $setting->image;
 
-                if ($request->hasFile('image')) {
+                if ($request->hasFile('icon')) {
+                    if (!empty($setting->image)) {
+                        $old_image_path = public_path('uploads/app-settings/' . $setting->image);
+                        if (file_exists($old_image_path)) {
+                            unlink($old_image_path);
+                        }
+                    }
+                    $image = \App\Helpers\ImageUploadHelper::appSettingImageUpload($request->file('icon'));
+                } elseif ($request->hasFile('image')) {
                     if (!empty($setting->image)) {
                         $old_image_path = public_path('uploads/app-settings/' . $setting->image);
                         if (file_exists($old_image_path)) {

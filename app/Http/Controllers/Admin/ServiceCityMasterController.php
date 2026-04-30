@@ -92,7 +92,7 @@ class ServiceCityMasterController extends Controller
     public function create()
     {
         $categories = ServiceCategory::where('status', 1)->get();
-        $cities = City::where('status', 1)->get();
+        $cities = City::get();
         return view('admin.service-city-master.create', compact('categories', 'cities'));
     }
 
@@ -102,7 +102,7 @@ class ServiceCityMasterController extends Controller
         $services = ServiceMaster::where('category_id', $data->category_id)->get();
         $categories = ServiceCategory::where('status', 1)->get();
         $subcategories = ServiceSubcategory::where('service_category_id', $data->category_id)->get();
-        $cities = City::where('status', 1)->get();
+        $cities = City::get();
         return view('admin.service-city-master.edit', compact('data', 'services', 'categories', 'subcategories', 'cities'));
     }
 

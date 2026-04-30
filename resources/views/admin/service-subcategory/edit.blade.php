@@ -62,6 +62,15 @@
 
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
+                                                    <label>Starting Price (₹)</label>
+                                                    <input type="number" step="0.01" class="form-control" name="starting_at_price"
+                                                        value="{{ old('starting_at_price', $subcategory->starting_at_price) }}"
+                                                        placeholder="0.00" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mt-2">
+                                                <div class="form-group">
                                                     <label>Icon</label>
                                                     @if(!empty($subcategory->icon))
                                                         <div class="mb-3">
@@ -78,6 +87,52 @@
                                                     <label>Description</label>
                                                     <textarea class="form-control" name="description"
                                                         rows="4">{{ old('description', $subcategory->description) }}</textarea>
+                                                </div>
+                                            </div>
+
+                                              <!-- Gallery Media -->
+                                            <div class="col-12 mt-2">
+                                                <div class="card border shadow-none">
+                                                    <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                                                        <h4 class="card-title">Gallery Media (Images & Videos)</h4>
+                                                        <div class="btn-group">
+                                                            <button type="button" class="btn btn-sm btn-outline-primary" id="add-image-row">+ Add Image</button>
+                                                            <button type="button" class="btn btn-sm btn-outline-info" id="add-video-row">+ Add Video</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body pt-2">
+                                                        <div id="media-container" class="row">
+                                                            @if(isset($subcategory->media_json['images']))
+                                                                @foreach($subcategory->media_json['images'] as $img)
+                                                                    <div class="col-md-3 mb-2 media-row">
+                                                                        <div class="border rounded p-1 position-relative">
+                                                                            <button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-25 remove-existing-media" data-name="{{ $img }}">
+                                                                                <i data-feather="x"></i>
+                                                                            </button>
+                                                                            <div class="text-center">
+                                                                                <img src="{{ asset('uploads/service-media/' . $img) }}" style="max-width: 100%; border-radius: 4px; max-height: 100px;">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            @endif
+                                                            @if(isset($subcategory->media_json['videos']))
+                                                                @foreach($subcategory->media_json['videos'] as $vid)
+                                                                    <div class="col-md-3 mb-2 media-row">
+                                                                        <div class="border rounded p-1 position-relative">
+                                                                            <button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-25 remove-existing-media" data-name="{{ $vid }}">
+                                                                                <i data-feather="x"></i>
+                                                                            </button>
+                                                                            <div class="text-center">
+                                                                                <video src="{{ asset('uploads/service-media/' . $vid) }}" style="max-width: 100%; border-radius: 4px; max-height: 100px;" controls></video>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            @endif
+                                                        </div>
+                                                        <div id="removed-media-container"></div>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -132,6 +187,71 @@
             placeholder: "Select an option",
             allowClear: true,
             width: '100%'
+        });
+
+        $(document).on('click', '#add-image-row', function() {
+            var html = `
+                <div class="col-md-3 mb-2 media-row animate__animated animate__fadeIn">
+                    <div class="border rounded p-1 position-relative">
+                        <button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-25 remove-media" style="z-index:10">
+                            <i data-feather="x"></i>
+                        </button>
+                        <div class="text-center mb-1">
+                            <i data-feather="image" class="text-primary" style="width: 48px; height: 48px;"></i>
+                        </div>
+                        <input type="file" name="gallery_images[]" class="form-control form-control-sm media-input" accept="image/*">
+                        <div class="preview-container mt-1 text-center" style="display:none"></div>
+                    </div>
+                </div>`;
+            $('#media-container').append(html);
+            feather.replace();
+        });
+
+        $(document).on('click', '#add-video-row', function() {
+            var html = `
+                <div class="col-md-3 mb-2 media-row animate__animated animate__fadeIn">
+                    <div class="border rounded p-1 position-relative">
+                        <button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-25 remove-media" style="z-index:10">
+                            <i data-feather="x"></i>
+                        </button>
+                        <div class="text-center mb-1">
+                            <i data-feather="video" class="text-info" style="width: 48px; height: 48px;"></i>
+                        </div>
+                        <input type="file" name="gallery_videos[]" class="form-control form-control-sm media-input" accept="video/*">
+                        <div class="preview-container mt-1 text-center" style="display:none"></div>
+                    </div>
+                </div>`;
+            $('#media-container').append(html);
+            feather.replace();
+        });
+
+        $(document).on('click', '.remove-media', function() {
+            $(this).closest('.media-row').remove();
+        });
+
+        $(document).on('click', '.remove-existing-media', function() {
+            var name = $(this).data('name');
+            $('#removed-media-container').append(`<input type="hidden" name="removed_media[]" value="${name}">`);
+            $(this).closest('.media-row').remove();
+        });
+
+        $(document).on('change', '.media-input', function() {
+            var input = this;
+            var container = $(this).siblings('.preview-container');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var html = '';
+                    if (input.accept.includes('image')) {
+                        html = `<img src="${e.target.result}" style="max-width: 100%; border-radius: 4px; max-height: 100px;">`;
+                    } else {
+                        html = `<video src="${e.target.result}" style="max-width: 100%; border-radius: 4px; max-height: 100px;" controls></video>`;
+                    }
+                    container.html(html).fadeIn();
+                    $(input).siblings('.text-center').hide();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
         });
     </script>
 @endsection

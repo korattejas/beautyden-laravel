@@ -214,31 +214,6 @@
         box-shadow: 0 4px 12px rgba(26, 35, 126, 0.1) !important;
     }
 
-    .header-btn {
-        padding: 0 24px !important;
-        font-weight: 700 !important;
-        border-radius: 12px !important;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        height: 48px;
-        background: linear-gradient(135deg, #1a237e 0%, #311b92 100%) !important;
-        border: none !important;
-        color: #fff !important;
-        box-shadow: 0 4px 15px rgba(26, 35, 126, 0.25) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        white-space: nowrap;
-    }
-
-    .header-btn:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 8px 25px rgba(26, 35, 126, 0.4) !important;
-        background: linear-gradient(135deg, #283593 0%, #4527a0 100%) !important;
-    }
-
-    .header-btn i {
-        font-size: 1.2rem;
-    }
 
     /* Pagination Styling */
     .pagination-wrapper {
@@ -703,11 +678,11 @@
                         <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
                         <input type="text" id="search-address" class="form-control" placeholder="Search address (15km)..." value="{{ request('address_search') }}">
                     </div>
-                    <a href="{{ route('admin.team.create') }}" class="btn btn-primary header-btn me-2 ms-1">
+                    <a href="{{ route('admin.team.create') }}" class="btn btn-primary me-2">
                         <i class="bi bi-plus-lg"></i> Add Member
                     </a>
                     <div class="btn-group">
-                        <button class="btn btn-outline-secondary dropdown-toggle header-btn" type="button" data-bs-toggle="dropdown"
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             <i class="bi bi-funnel"></i> Filter
                         </button>
