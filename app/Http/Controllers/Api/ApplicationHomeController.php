@@ -228,7 +228,10 @@ class ApplicationHomeController extends Controller
                     ->select(
                         'sci.combo_id',
                         'sm.id',
+                        'sm.id as service_id',
                         'sm.name',
+                        'sm.category_id',
+                        'sm.sub_category_id',
                         DB::raw('IFNULL(scm.price, sm.price) as price'),
                         DB::raw('IFNULL(scm.discount_price, sm.discount_price) as discount_price'),
                         'sm.duration',
@@ -238,7 +241,10 @@ class ApplicationHomeController extends Controller
                     $itemsQuery->select(
                         'sci.combo_id',
                         'sm.id',
+                        'sm.id as service_id',
                         'sm.name',
+                        'sm.category_id',
+                        'sm.sub_category_id',
                         'sm.price',
                         'sm.discount_price',
                         'sm.duration',
