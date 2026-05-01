@@ -78,7 +78,10 @@ class DashboardController extends Controller
                 'chartLabels'       => $chartLabels,
                 'chartData'         => $chartData,
                 'pendingReviews'    => CustomerReview::where('status', 0)->count(),
-                'onLeaveToday'      => StaffUnavailability::whereDate('date', date('Y-m-d'))->get(),
+                'onLeaveToday'      => StaffUnavailability::with('teamMember')
+                    ->whereDate('start_date', '<=', date('Y-m-d'))
+                    ->whereDate('end_date', '>=', date('Y-m-d'))
+                    ->get(),
             ]);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
