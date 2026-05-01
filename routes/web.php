@@ -65,6 +65,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('get-analytics-data', [DashboardController::class, 'getAnalyticsData'])->name('admin.dashboard.analytics');
         Route::get('export-analytics', [DashboardController::class, 'exportAnalytics'])->name('admin.dashboard.export-analytics');
+        Route::get('get-management-counts', [DashboardController::class, 'getManagementCounts'])->name('admin.dashboard.management-counts');
 
         /* Contract Signed Route */
         Route::get('contract-signed', [ContractSignedController::class, 'index'])->name('admin.contract-signed.index');

@@ -39,107 +39,44 @@ class DashboardController extends Controller
     {
         $function_name = 'index';
         try {
-            // Existing stats
-            $totalAppointments      = Appointment::count();
-            $totalAppointmentsPending   = Appointment::where('status', 1)->count(); 
-            $totalAppointmentsAssigned  = Appointment::where('status', 2)->count(); 
-            $totalAppointmentsCompleted = Appointment::where('status', 3)->count();
-            $totalAppointmentsRejected  = Appointment::where('status', 4)->count();
-            $totalContacts = ContactSubmission::count();
-            $totalServiceCategory = ServiceCategory::where('status', 1)->count();
-            $totalServices = Service::where('status', 1)->count();
-            $totalBlogs = Blog::where('status', 1)->count();
-            $totalBlogCategory = BlogCategory::where('status', 1)->count();
-            $totalTeamMember = TeamMember::where('status', 1)->count();
-            $totalHirings = Hiring::where('status', 1)->count();
-            $totalCustomerReviews = CustomerReview::where('status', 1)->count();
-            
-            // New Module Stats
-            $pendingReviews = CustomerReview::where('status', 0)->count();
-            $activeMemberships = UserSubscription::where('status', 1)
-                ->where('end_date', '>=', now())
-                ->count();
-            $totalRazorpayRevenue = RazorpayTransaction::where('status', 'captured')->sum('amount');
-            $newUsersToday = User::whereDate('created_at', now())->count();
-            $totalUsers = User::count();
-            $activeCombos = ServiceCombo::where('status', 1)->count();
+            // Vital stats for initial load (Current Month)
+            $startDate = now()->startOfMonth();
+            $endDate   = now()->endOfMonth();
 
-            // Staff on leave today
-            $onLeaveToday = StaffUnavailability::with('beautician')
-                ->whereDate('start_date', '<=', now())
-                ->whereDate('end_date', '>=', now())
-                ->where('status', 1) // 1 = Active
-                ->get();
-
-            $totalCity = City::where('status', 1)->count();
-            $totalProductBrand = ProductBrand::where('status', 1)->count();
-
-            // Total Revenue (Hybrid: Services + Memberships)
-            $totalRevenue = 0;
-            $completedAppointments = Appointment::where('status', 3)->get();
-            foreach ($completedAppointments as $app) {
-                $servicesData = $app->services_data;
-                $totalRevenue += (float)($servicesData['summary']['grand_total'] ?? 0);
-            }
+            // Minimal data for instant load
+            $totalRevenue = Appointment::where('status', 3)->get()->sum(function($app) {
+                return (float)($app->services_data['summary']['grand_total'] ?? 0);
+            });
             $totalRevenue += UserSubscription::sum('price_paid');
 
+            $activeMemberships = UserSubscription::where('status', 1)->count();
+            $totalUsers = User::count();
             $todayAppointments = Appointment::whereDate('appointment_date', date('Y-m-d'))->count();
 
-            // Charts
-            $startDate = now()->startOfMonth();
-            $endDate = now()->endOfMonth();
-            $totalDays = $startDate->daysInMonth;
-
-            $completedAppointmentData = Appointment::where('status', 3)
+            // Initial chart data (Completed Apps)
+            $chartDataRaw = Appointment::where('status', 3)
                 ->whereBetween('appointment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
                 ->selectRaw('appointment_date, count(*) as total')
                 ->groupBy('appointment_date')
-                ->orderBy('appointment_date', 'ASC')
                 ->get();
 
             $chartLabels = [];
             $chartData = [];
-            
+            $totalDays = $startDate->daysInMonth;
             for ($i = 0; $i < $totalDays; $i++) {
-                $currentDate = $startDate->copy()->addDays($i);
-                $dateString = $currentDate->format('Y-m-d');
-                $chartLabels[] = $currentDate->format('d M');
-                $found = $completedAppointmentData->firstWhere('appointment_date', $dateString);
+                $curr = $startDate->copy()->addDays($i);
+                $chartLabels[] = $curr->format('d M');
+                $found = $chartDataRaw->firstWhere('appointment_date', $curr->format('Y-m-d'));
                 $chartData[] = $found ? $found->total : 0;
             }
 
             return view('admin.dashboard.index', [
-                'totalAppointments'      => $totalAppointments,
-                'totalAppointmentsPending' => $totalAppointmentsPending,
-                'totalAppointmentsAssigned' => $totalAppointmentsAssigned,
-                'totalAppointmentsCompleted' => $totalAppointmentsCompleted,
-                'totalAppointmentsRejected' => $totalAppointmentsRejected,
-                'totalContacts'          => $totalContacts,
-                'totalServiceCategory'   => $totalServiceCategory,
-                'totalServices'          => $totalServices,
-                'totalBlogs'             => $totalBlogs,
-                'totalBlogCategory'      => $totalBlogCategory,
-                'totalTeamMember'        => $totalTeamMember,
-                'totalHirings'           => $totalHirings,
-                'totalCustomerReviews'   => $totalCustomerReviews,
-                'totalCity'              => $totalCity,
-                'totalProductBrand'      => $totalProductBrand,
-                'totalRevenue'           => $totalRevenue,
-                'todayAppointments'      => $todayAppointments,
-                'chartLabels'            => $chartLabels,
-                'chartData'              => $chartData,
-                
-                // New Module Data pass
-                'pendingReviews'         => $pendingReviews,
-                'activeMemberships'      => $activeMemberships,
-                'totalRazorpayRevenue'   => $totalRazorpayRevenue,
-                'newUsersToday'          => $newUsersToday,
-                'totalUsers'             => $totalUsers,
-                'activeCombos'           => $activeCombos,
-                'onLeaveToday'           => $onLeaveToday,
-
-                'returnPerformance'      => $this->getReturnPerformanceData(),
-                'todayHourlyData'        => $this->getTodayHourlyData(),
+                'totalRevenue'      => $totalRevenue,
+                'activeMemberships' => $activeMemberships,
+                'totalUsers'        => $totalUsers,
+                'todayAppointments' => $todayAppointments,
+                'chartLabels'       => $chartLabels,
+                'chartData'         => $chartData,
             ]);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
@@ -226,17 +163,36 @@ class DashboardController extends Controller
                 $dailyRevenue[] = ['date' => date('d/m/Y', strtotime($d)), 'revenue' => $v];
             }
 
-            // 2. Appointments Per Day
-            $dailyAppointments = Appointment::whereBetween('appointment_date', [$startDate, $endDate])
-                ->selectRaw('appointment_date, count(*) as total')
-                ->groupBy('appointment_date')
-                ->orderBy('appointment_date', 'DESC')
-                ->get()
-                ->map(function($item) {
-                    return ['date' => date('d/m/Y', strtotime($item->appointment_date)), 'appointments' => $item->total];
-                });
+            // 2. Appointments Status-wise Per Day
+            $dailyStats = [];
+            $allAppointmentsInRange = Appointment::whereBetween('appointment_date', [$startDate, $endDate])->get();
+            
+            // Group by date and status
+            $grouped = $allAppointmentsInRange->groupBy('appointment_date');
+            
+            $chartLabels = [];
+            $completedSeries = [];
+            $pendingSeries = [];
+            $assignedSeries = [];
+            $rejectedSeries = [];
 
-            $totalApptCount = Appointment::whereBetween('appointment_date', [$startDate, $endDate])->count();
+            // Generate range of dates
+            $period = new \DatePeriod(
+                new \DateTime($startDate),
+                new \DateInterval('P1D'),
+                (new \DateTime($endDate))->modify('+1 day')
+            );
+
+            foreach ($period as $date) {
+                $d = $date->format('Y-m-d');
+                $chartLabels[] = $date->format('d M');
+                
+                $dayAppts = $grouped->get($d, collect());
+                $completedSeries[] = $dayAppts->where('status', 3)->count();
+                $pendingSeries[]   = $dayAppts->where('status', 1)->count();
+                $assignedSeries[]  = $dayAppts->where('status', 2)->count();
+                $rejectedSeries[]  = $dayAppts->where('status', 4)->count();
+            }
 
             // 3. Top Staff by Services
             $staffServices = [];
@@ -268,6 +224,16 @@ class DashboardController extends Controller
                 }
             }
 
+            // Global stats for the range
+            $activeMemberships = UserSubscription::where('status', 1)
+                ->where('created_at', '>=', $startDate)
+                ->where('created_at', '<=', $endDate . ' 23:59:59')
+                ->count();
+            $totalUsersInRange = User::where('created_at', '>=', $startDate)
+                ->where('created_at', '<=', $endDate . ' 23:59:59')
+                ->count();
+            $totalApptsInRange = $allAppointmentsInRange->count();
+
             // Sort and take top performers
             usort($staffServices, fn($a, $b) => $b['services'] <=> $a['services']);
             usort($staffRevenue, fn($a, $b) => $b['revenue'] <=> $a['revenue']);
@@ -275,8 +241,21 @@ class DashboardController extends Controller
             return response()->json([
                 'daily_revenue' => array_slice($dailyRevenue, 0, 5),
                 'total_revenue' => $totalRevenue,
-                'daily_appointments' => $dailyAppointments->take(5),
-                'total_appointments' => $totalApptCount,
+                'chart' => [
+                    'labels' => $chartLabels,
+                    'series' => [
+                        ['name' => 'Completed', 'data' => $completedSeries],
+                        ['name' => 'Pending', 'data' => $pendingSeries],
+                        ['name' => 'Assigned', 'data' => $assignedSeries],
+                        ['name' => 'Rejected', 'data' => $rejectedSeries],
+                    ]
+                ],
+                'stats' => [
+                    'total_revenue' => number_format($totalRevenue, 0),
+                    'active_plans' => $activeMemberships,
+                    'total_users' => $totalUsersInRange,
+                    'total_appts' => $totalApptsInRange
+                ],
                 'top_staff_services' => array_slice($staffServices, 0, 5),
                 'top_staff_revenue' => array_slice($staffRevenue, 0, 5),
             ]);
@@ -344,5 +323,39 @@ class DashboardController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function getManagementCounts()
+    {
+        try {
+            $counts = [
+                'appointments' => Appointment::count(),
+                'team' => TeamMember::where('status', 1)->count(),
+                'attendance' => \App\Models\StaffUnavailability::count(),
+                'users' => User::count(),
+                'services' => Service::where('status', 1)->count(),
+                'advanced_catalog' => \App\Models\ServiceMaster::where('status', 1)->count(),
+                'essentials' => \App\Models\ServiceEssential::where('status', 1)->count(),
+                'categories' => \App\Models\ServiceCategory::where('status', 1)->count(),
+                'subcategories' => \App\Models\ServiceSubcategory::where('status', 1)->count(),
+                'cities' => \App\Models\City::where('status', 1)->count(),
+                'pricing_web' => \App\Models\ServiceCityPrice::count(),
+                'pricing_app' => \App\Models\ServiceCityMaster::count(),
+                'offers' => \App\Models\Offer::where('status', 1)->count(),
+                'coupons' => \App\Models\CouponCode::where('status', 1)->count(),
+                'memberships' => \App\Models\MembershipPlan::where('status', 1)->count(),
+                'combos' => \App\Models\ServiceCombo::where('status', 1)->count(),
+                'transactions' => \App\Models\RazorpayTransaction::where('status', 'captured')->count(),
+                'inquiries' => \App\Models\ContactSubmission::count(),
+                'notifications' => \App\Models\PushNotification::count(),
+                'reviews' => \App\Models\CustomerReview::where('status', 1)->count(),
+                'portfolio' => \App\Models\Portfolio::where('status', 1)->count(),
+                'blogs' => \App\Models\Blog::where('status', 1)->count(),
+            ];
+
+            return response()->json($counts);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

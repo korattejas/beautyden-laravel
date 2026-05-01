@@ -151,12 +151,16 @@
         right: 15px;
         background: #ef4444;
         color: #fff;
-        padding: 2px 10px;
+        padding: 2px 8px;
         border-radius: 50px;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 800;
-        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+        min-width: 25px;
+        text-align: center;
     }
+
+    .module-count i { font-size: 0.6rem; }
 
     /* Analytics Dashboard Styling */
     .analytics-container {
@@ -299,10 +303,14 @@
                         <h1>BeautyDen Dashboard ✨</h1>
                         <p>Your business overview at a glance.</p>
                     </div>
-                    <div class="mt-2 mt-md-0">
-                        <span class="badge px-4 py-1 fs-6 rounded-pill shadow-sm" style="background: #fff; color: #7367f0; border: 1px solid #7367f0;">
-                            <i class="bi bi-clock-history me-1"></i> Last updated: {{ now()->format('h:i A') }}
-                        </span>
+                    <div class="d-flex align-items-center gap-2 mt-2 mt-md-0 bg-white p-1 rounded-pill shadow-sm border">
+                        <span class="ps-3 fw-bold text-muted small">Range:</span>
+                        <input type="text" id="global_start_date" class="analytics-date-input border-0" style="width: 120px;" value="{{ now()->startOfMonth()->format('d-m-Y') }}">
+                        <span class="fw-bold text-muted">-</span>
+                        <input type="text" id="global_end_date" class="analytics-date-input border-0" style="width: 120px;" value="{{ now()->endOfMonth()->format('d-m-Y') }}">
+                        <button class="btn btn-primary rounded-pill px-3 py-1 me-1" id="btn-refresh-dashboard">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -335,7 +343,7 @@
                                 </div>
                                 <div>
                                     <p class="stat-label">Total Revenue</p>
-                                    <h2 class="stat-value">₹{{ number_format($totalRevenue, 0) }}</h2>
+                                    <h2 class="stat-value" id="stat-revenue">₹{{ number_format($totalRevenue, 0) }}</h2>
                                 </div>
                             </div>
                         </div>
@@ -348,9 +356,9 @@
                                 <div class="stat-avatar me-2" style="background: rgba(40, 199, 111, 0.1);">
                                     <i class="bi bi-gem fs-3" style="color: #28c76f;"></i>
                                 </div>
-                                <div>
+                                <div class="w-100">
                                     <p class="stat-label">Active Plans</p>
-                                    <h2 class="stat-value">{{ $activeMemberships }}</h2>
+                                    <h2 class="stat-value" id="stat-plans">{{ $activeMemberships }}</h2>
                                 </div>
                             </div>
                         </a>
@@ -363,9 +371,9 @@
                                 <div class="stat-avatar me-2" style="background: rgba(0, 207, 232, 0.1);">
                                     <i class="bi bi-people fs-3" style="color: #00cfe8;"></i>
                                 </div>
-                                <div>
+                                <div class="w-100">
                                     <p class="stat-label">Total Users</p>
-                                    <h2 class="stat-value">{{ $totalUsers }}</h2>
+                                    <h2 class="stat-value" id="stat-users">{{ $totalUsers }}</h2>
                                 </div>
                             </div>
                         </a>
@@ -378,9 +386,9 @@
                                 <div class="stat-avatar me-2" style="background: rgba(255, 159, 67, 0.1);">
                                     <i class="bi bi-calendar-event fs-3" style="color: #ff9f43;"></i>
                                 </div>
-                                <div>
-                                    <p class="stat-label">Today's Appt.</p>
-                                    <h2 class="stat-value">{{ $todayAppointments }}</h2>
+                                <div class="w-100">
+                                    <p class="stat-label">Total Appt.</p>
+                                    <h2 class="stat-value" id="stat-appts">{{ $todayAppointments }}</h2>
                                 </div>
                             </div>
                         </a>
@@ -432,37 +440,49 @@
                     </div>
                 </div>
 
-                <!-- Admin Modules Breakdown -->
-                <div class="dashboard-section">
-                    <div class="section-title">
+                <!-- Management Center (Full Modules) -->
+                @php
+                    $managementModules = [
+                        ['name' => 'Appointments', 'icon' => 'calendar', 'route' => 'admin.appointments.index', 'id' => 'appointments'],
+                        ['name' => 'Team Members', 'icon' => 'users', 'route' => 'admin.team.index', 'id' => 'team'],
+                        ['name' => 'Attendance', 'icon' => 'clock', 'route' => 'admin.attendance.index', 'id' => 'attendance'],
+                        ['name' => 'Users', 'icon' => 'user-check', 'route' => 'admin.user.index', 'id' => 'users'],
+                        ['name' => 'Services', 'icon' => 'shopping-bag', 'route' => 'admin.service.index', 'id' => 'services'],
+                        ['name' => 'Advanced Catalog', 'icon' => 'zap', 'route' => 'admin.service-master.index', 'id' => 'advanced_catalog'],
+                        ['name' => 'Master Essentials', 'icon' => 'grid', 'route' => 'admin.service-essential.index', 'id' => 'essentials'],
+                        ['name' => 'Categories', 'icon' => 'box', 'route' => 'admin.service-category.index', 'id' => 'categories'],
+                        ['name' => 'Sub Categories', 'icon' => 'layers', 'route' => 'admin.service-subcategory.index', 'id' => 'subcategories'],
+                        ['name' => 'City List', 'icon' => 'map-pin', 'route' => 'admin.city.index', 'id' => 'cities'],
+                        ['name' => 'Pricing (Web)', 'icon' => 'dollar-sign', 'route' => 'admin.service-city-price.index', 'id' => 'pricing_web'],
+                        ['name' => 'Pricing (App)', 'icon' => 'monitor', 'route' => 'admin.service-city-master.index', 'id' => 'pricing_app'],
+                        ['name' => 'Offers (Banners)', 'icon' => 'gift', 'route' => 'admin.offers.index', 'id' => 'offers'],
+                        ['name' => 'Coupon Codes', 'icon' => 'tag', 'route' => 'admin.coupon-codes.index', 'id' => 'coupons'],
+                        ['name' => 'Memberships', 'icon' => 'award', 'route' => 'admin.membership.index', 'id' => 'memberships'],
+                        ['name' => 'Combos', 'icon' => 'package', 'route' => 'admin.combo.index', 'id' => 'combos'],
+                        ['name' => 'Transactions', 'icon' => 'credit-card', 'route' => 'admin.razorpay.index', 'id' => 'transactions'],
+                        ['name' => 'Inquiries', 'icon' => 'mail', 'route' => 'admin.contact-submissions.index', 'id' => 'inquiries'],
+                        ['name' => 'Notifications', 'icon' => 'bell', 'route' => 'admin.notifications.index', 'id' => 'notifications'],
+                        ['name' => 'Reviews', 'icon' => 'star', 'route' => 'admin.reviews.index', 'id' => 'reviews'],
+                        ['name' => 'Portfolio', 'icon' => 'image', 'route' => 'admin.portfolio.index', 'id' => 'portfolio'],
+                        ['name' => 'Blogs', 'icon' => 'edit', 'route' => 'admin.blogs.index', 'id' => 'blogs'],
+                    ];
+                @endphp
+
+                <div class="dashboard-section mt-5">
+                    <div class="section-title d-flex justify-content-between align-items-center">
                         <h4>Management Center</h4>
+                        <span class="badge bg-soft-primary text-primary rounded-pill px-3">Full Control Hub</span>
                     </div>
                     <div class="row g-2">
-                        <div class="col-6 col-md-3">
-                            <a href="{{ route('admin.razorpay.index') }}" class="module-card-premium">
-                                <i class="bi bi-credit-card module-icon"></i>
-                                <span class="module-name">Transactions</span>
+                        @foreach($managementModules as $mod)
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <a href="{{ route($mod['route']) }}" class="module-card-premium">
+                                <span class="module-count" id="count-{{ $mod['id'] }}"><i class="bi bi-arrow-repeat spin"></i></span>
+                                <i class="bi bi-{{ $mod['icon'] }} module-icon"></i>
+                                <span class="module-name text-truncate">{{ $mod['name'] }}</span>
                             </a>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <a href="{{ route('admin.combo.index') }}" class="module-card-premium">
-                                <span class="module-count">{{ $activeCombos }}</span>
-                                <i class="bi bi-box-seam module-icon"></i>
-                                <span class="module-name">Combos</span>
-                            </a>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a href="{{ route('admin.notifications.index') }}" class="module-card-premium">
-                                <i class="bi bi-megaphone module-icon"></i>
-                                <span class="module-name">Push Center</span>
-                            </a>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a href="{{ route('admin.service-master.index') }}" class="module-card-premium">
-                                <i class="bi bi-scissors module-icon"></i>
-                                <span class="module-name">App Pricing</span>
-                            </a>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
@@ -473,16 +493,9 @@
                         <p class="text-muted fw-bold">Track your performance with detailed analytics.</p>
                     </div>
 
-                    <div class="analytics-filter-row">
-                        <span class="filter-label">Select Date Range:</span>
-                        <input type="text" id="report_start_date" class="analytics-date-input flatpickr-basic" value="{{ now()->startOfMonth()->format('d-m-Y') }}">
-                        <span class="fw-bold text-muted">-</span>
-                        <input type="text" id="report_end_date" class="analytics-date-input flatpickr-basic" value="{{ now()->endOfMonth()->format('d-m-Y') }}">
-                        
-                        <div class="form-check form-switch ms-3">
-                            <input class="form-check-input" type="checkbox" id="showGraphs" checked>
-                            <label class="form-check-label fw-bold small text-muted" for="showGraphs">Show Graphs</label>
-                        </div>
+                    <div class="analytics-filter-row d-none">
+                        <input type="text" id="report_start_date" value="{{ now()->startOfMonth()->format('d-m-Y') }}">
+                        <input type="text" id="report_end_date" value="{{ now()->endOfMonth()->format('d-m-Y') }}">
                     </div>
 
                     <div class="row g-3">
@@ -621,53 +634,99 @@
 @endsection
 
 @section('footer_script_content')
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const chartLabels = @json($chartLabels);
-        const chartData = @json($chartData);
+        let dailyChart = null;
 
-        const dailyOptions = {
-            series: [{ name: 'Bookings', data: chartData }],
-            chart: { type: 'area', height: 350, toolbar: { show: false }, zoom: { enabled: false } },
-            dataLabels: { enabled: false },
-            stroke: { curve: 'smooth', width: 4 },
-            xaxis: { categories: chartLabels, labels: { style: { colors: '#64748b' } } },
-            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1 } },
-            colors: ['#102365'],
-            tooltip: { theme: 'light' }
-        };
+        // Initialize Flatpickr explicitly for analytics dates
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr("#global_start_date", { dateFormat: "d-m-Y" });
+            flatpickr("#global_end_date", { dateFormat: "d-m-Y" });
+            
+            // Sync with hidden report inputs
+            $('#global_start_date, #global_end_date').on('change', function() {
+                $('#report_start_date').val($('#global_start_date').val());
+                $('#report_end_date').val($('#global_end_date').val());
+                refreshAnalytics();
+            });
+        }
 
-        const dailyChart = new ApexCharts(document.querySelector("#completed-appointments-chart"), dailyOptions);
-        dailyChart.render();
+        function initChart(labels, series) {
+            const chartElement = document.querySelector("#completed-appointments-chart");
+            if (!chartElement) return;
+
+            const options = {
+                series: series, // [ {name: 'Completed', data: [...]}, ... ]
+                chart: { 
+                    type: 'area', 
+                    height: 380, 
+                    stacked: false,
+                    toolbar: { show: true }, 
+                    zoom: { enabled: true } 
+                },
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 3 },
+                xaxis: { 
+                    categories: labels, 
+                    labels: { style: { colors: '#64748b', fontWeight: 600 } } 
+                },
+                fill: { 
+                    type: 'gradient', 
+                    gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } 
+                },
+                colors: ['#28c76f', '#ff9f43', '#7367f0', '#ea5455'], // Completed, Pending, Assigned, Rejected
+                tooltip: { theme: 'light', x: { show: true } },
+                legend: { position: 'top', horizontalAlign: 'left', fontWeight: 700 }
+            };
+
+            if (dailyChart) {
+                dailyChart.updateOptions(options);
+            } else {
+                dailyChart = new ApexCharts(chartElement, options);
+                dailyChart.render();
+            }
+        }
+
+        // Initial Data from PHP
+        const initialLabels = @json($chartLabels);
+        const initialData = @json($chartData);
+        initChart(initialLabels, [{ name: 'Completed', data: initialData }]);
 
         // Analytics Fetching Logic
         function refreshAnalytics() {
-            let start = $('#report_start_date').val();
-            let end = $('#report_end_date').val();
+            let start = $('#global_start_date').val();
+            let end = $('#global_end_date').val();
+
+            // Show loader if needed
+            $('#btn-refresh-dashboard i').addClass('fa-spin');
 
             $.ajax({
                 url: "{{ route('admin.dashboard.analytics') }}",
                 type: 'GET',
                 data: { start_date: start, end_date: end },
                 success: function(res) {
-                    // 1. Revenue
+                    $('#btn-refresh-dashboard i').removeClass('fa-spin');
+
+                    // Update Stat Cards
+                    $('#stat-revenue').text('₹' + res.stats.total_revenue);
+                    $('#stat-plans').text(res.stats.active_plans);
+                    $('#stat-users').text(res.stats.total_users);
+                    $('#stat-appts').text(res.stats.total_appts);
+
+                    // Update Chart
+                    initChart(res.chart.labels, res.chart.series);
+
+                    // 1. Revenue Table
                     let revHtml = '';
                     res.daily_revenue.forEach(item => {
                         revHtml += `<tr><td>${item.date}</td><td class="text-end">₹${parseFloat(item.revenue).toLocaleString()}</td></tr>`;
                     });
                     if(res.daily_revenue.length === 0) revHtml = '<tr><td colspan="2" class="text-center py-4 text-muted">No data found</td></tr>';
                     $('#revenue-report-body').html(revHtml);
-                    $('#total-revenue-val').text('₹' + parseFloat(res.total_revenue).toLocaleString());
+                    $('#total-revenue-val').text('₹' + res.stats.total_revenue);
 
-                    // 2. Appointments
-                    let apptHtml = '';
-                    res.daily_appointments.forEach(item => {
-                        apptHtml += `<tr><td>${item.date}</td><td class="text-end">${item.appointments}</td></tr>`;
-                    });
-                    if(res.daily_appointments.length === 0) apptHtml = '<tr><td colspan="2" class="text-center py-4 text-muted">No data found</td></tr>';
-                    $('#appt-report-body').html(apptHtml);
-                    $('#total-appt-val').text(res.total_appointments);
+                    // 2. Appointments (Not used anymore as we have chart series, but keeping body if needed)
+                    // ...
 
                     // 3. Staff Services
                     let ssHtml = '';
@@ -684,22 +743,40 @@
                     });
                     if(res.top_staff_revenue.length === 0) srHtml = '<tr><td colspan="2" class="text-center py-4 text-muted">No performers found</td></tr>';
                     $('#staff-revenue-body').html(srHtml);
+                },
+                error: function() {
+                    $('#btn-refresh-dashboard i').removeClass('fa-spin');
                 }
             });
         }
 
-        // Initial Load
-        refreshAnalytics();
-
-        // Trigger on change
-        $('#report_start_date, #report_end_date').on('change', function() {
+        // Trigger Refresh
+        $('#btn-refresh-dashboard').on('click', function() {
             refreshAnalytics();
         });
 
+        // Initial Load of full analytics
+        setTimeout(refreshAnalytics, 500);
+
+        // Fetch Management Counts Asynchronously
+        function fetchManagementCounts() {
+            $.ajax({
+                url: "{{ route('admin.dashboard.management-counts') }}",
+                type: 'GET',
+                success: function(res) {
+                    Object.keys(res).forEach(key => {
+                        $(`#count-${key}`).text(res[key]);
+                    });
+                }
+            });
+        }
+        
+        fetchManagementCounts();
+
         // Download functionality
         window.downloadReport = function(type) {
-            let start = $('#report_start_date').val();
-            let end = $('#report_end_date').val();
+            let start = $('#global_start_date').val();
+            let end = $('#global_end_date').val();
             let url = "{{ route('admin.dashboard.export-analytics') }}?type=" + type + "&start_date=" + start + "&end_date=" + end;
             window.location.href = url;
         }

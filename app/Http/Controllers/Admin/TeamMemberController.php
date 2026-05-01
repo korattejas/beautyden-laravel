@@ -537,6 +537,21 @@ class TeamMemberController extends Controller
                 $query->whereYear('appointment_date', $request->year);
             }
 
+            // Calculate totals for the filtered set (All pages)
+            $allFiltered = $query->get();
+            $totalOnline = 0;
+            $totalCash = 0;
+
+            foreach ($allFiltered as $app) {
+                $servicesData = json_decode($app->services_data, true);
+                $amt = (float)($servicesData['summary']['grand_total'] ?? 0);
+                if (($app->payment_type ?? 'cash') === 'online') {
+                    $totalOnline += $amt;
+                } else {
+                    $totalCash += $amt;
+                }
+            }
+
             $appointments = $query->orderBy('appointment_date', 'DESC')
                 ->orderBy('appointment_time', 'DESC')
                 ->paginate(20);
@@ -558,6 +573,9 @@ class TeamMemberController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $data,
+                'total_online' => '₹' . number_format($totalOnline, 0),
+                'total_cash' => '₹' . number_format($totalCash, 0),
+                'grand_total' => '₹' . number_format($totalOnline + $totalCash, 0),
                 'pagination' => (string) $appointments->links('pagination::bootstrap-5')
             ]);
         } catch (\Exception $e) {
@@ -602,18 +620,33 @@ class TeamMemberController extends Controller
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $columns);
 
+                $totalOnline = 0;
+                $totalCash = 0;
+
                 foreach ($appointments as $app) {
                     $servicesData = json_decode($app->services_data, true);
+                    $amt = (float)($servicesData['summary']['grand_total'] ?? 0);
+                    $ptype = $app->payment_type ?? 'cash';
+                    
+                    if ($ptype === 'online') $totalOnline += $amt;
+                    else $totalCash += $amt;
+
                     fputcsv($file, [
                         $app->order_number,
                         ($app->first_name ?? '') . ' ' . ($app->last_name ?? ''),
                         $app->phone,
                         $app->appointment_date,
                         $app->appointment_time,
-                        ($servicesData['summary']['grand_total'] ?? 0),
-                        $app->payment_type ?? 'cash'
+                        $amt,
+                        $ptype
                     ]);
                 }
+
+                // Add Summary Rows
+                fputcsv($file, []);
+                fputcsv($file, ['', '', '', '', '', 'Total Online', $totalOnline]);
+                fputcsv($file, ['', '', '', '', '', 'Total Cash', $totalCash]);
+                fputcsv($file, ['', '', '', '', '', 'Grand Total', $totalOnline + $totalCash]);
 
                 fclose($file);
             };

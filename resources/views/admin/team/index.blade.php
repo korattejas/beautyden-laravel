@@ -998,14 +998,14 @@
     <div id="c-reportModal" class="c-modal">
         <div class="c-modal-dialog" style="max-width: 850px;">
             <div class="c-modal-content">
-                <div class="c-modal-header">
-                    <h5 class="c-modal-title report-modal-header-title"><i class="bi bi-file-earmark-bar-graph"></i> Appointments Report</h5>
+                <div class="c-modal-header" style="background: linear-gradient(135deg, #1a237e 0%, #3f51b5 100%);">
+                    <h5 class="c-modal-title report-modal-header-title text-white"><i class="bi bi-file-earmark-bar-graph"></i> Appointments Report</h5>
                     <button class="c-close-btn" data-c-close-report>&times;</button>
                 </div>
                 <div class="c-modal-body" id="report-modal-body">
                     <!-- Report Filters -->
-                    <div class="report-filters mb-3 p-2 bg-light rounded shadow-sm border">
-                        <div class="row g-2 align-items-end">
+                    <div class="report-filters mb-3 p-3 bg-white rounded shadow-sm border">
+                        <div class="row g-2 align-items-end mb-3">
                             <div class="col-md-3">
                                 <label class="form-label small fw-bold">Specific Date</label>
                                 <input type="date" id="report-filter-date" class="form-control form-control-sm">
@@ -1025,7 +1025,7 @@
                                     <option value="">Year</option>
                                     @php $currentYear = date('Y'); @endphp
                                     @for ($y = $currentYear - 2; $y <= $currentYear + 1; $y++)
-                                        <option value="{{ $y }}" {{ $y == $currentYear ? 'selected' : '' }}>{{ $y }}</option>
+                                        <option value="{{ $y }}" {{ $y == 2026 ? 'selected' : '' }}>{{ $y }}</option>
                                     @endfor
                                 </select>
                             </div>
@@ -1036,6 +1036,28 @@
                                 <button type="button" class="btn btn-sm btn-success flex-grow-1" id="btn-download-report">
                                     <i class="bi bi-download"></i> Download
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Summary Section -->
+                        <div class="row g-2 text-center" id="report-summary-container">
+                            <div class="col-4">
+                                <div class="p-2 border rounded bg-soft-info" style="background: rgba(14, 165, 233, 0.05);">
+                                    <label class="d-block small fw-bold text-info text-uppercase" style="font-size:0.65rem;">Online</label>
+                                    <span class="fw-bold h6 mb-0 text-dark" id="summary-online">₹0</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 border rounded bg-soft-success" style="background: rgba(40, 199, 111, 0.05);">
+                                    <label class="d-block small fw-bold text-success text-uppercase" style="font-size:0.65rem;">Cash</label>
+                                    <span class="fw-bold h6 mb-0 text-dark" id="summary-cash">₹0</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 border rounded bg-soft-primary" style="background: rgba(26, 35, 126, 0.05);">
+                                    <label class="d-block small fw-bold text-primary text-uppercase" style="font-size:0.65rem;">Total</label>
+                                    <span class="fw-bold h6 mb-0 text-dark" id="summary-total">₹0</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1512,11 +1534,24 @@
             let month = $('#report-filter-month').val();
             let year = $('#report-filter-year').val();
             
+            // Show Loader
+            $("#report-table-container").html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Filtering report data...</p>
+                </div>
+            `);
+
             $.ajax({
                 url: `/admin/team/appointments-report/${id}?page=${page}&date=${date}&month=${month}&year=${year}`,
                 type: 'GET',
                 success: function(response) {
                     if (response.success) {
+                        // Update Summaries
+                        $('#summary-online').text(response.total_online || '₹0');
+                        $('#summary-cash').text(response.total_cash || '₹0');
+                        $('#summary-total').text(response.grand_total || '₹0');
+
                         let html = `
                             <table class="report-table">
                                 <thead>
