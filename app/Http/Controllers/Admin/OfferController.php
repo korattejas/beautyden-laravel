@@ -80,18 +80,20 @@ class OfferController extends Controller
 
             if ($id == 0) {
                 if ($request->media_type == 'image') {
-                    $validateArray['media'] = 'required|array';
-                    $validateArray['media.*'] = 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120';
+                    $validateArray['photos'] = 'required|array';
+                    $validateArray['photos.*'] = 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120';
                 } else {
-                    $validateArray['media'] = 'required|mimetypes:video/mp4,video/quicktime,video/x-realaudio,video/x-msvideo,video/x-ms-wmv|max:20480';
+                    $validateArray['icon'] = 'required|mimetypes:video/mp4,video/quicktime,video/x-realaudio,video/x-msvideo,video/x-ms-wmv|max:20480';
                 }
             } else {
-                if ($request->hasFile('media')) {
-                    if ($request->media_type == 'image') {
-                        $validateArray['media'] = 'array';
-                        $validateArray['media.*'] = 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120';
-                    } else {
-                        $validateArray['media'] = 'mimetypes:video/mp4,video/quicktime,video/x-realaudio,video/x-msvideo,video/x-ms-wmv|max:20480';
+                if ($request->media_type == 'image') {
+                    if ($request->hasFile('photos')) {
+                        $validateArray['photos'] = 'array';
+                        $validateArray['photos.*'] = 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120';
+                    }
+                } else {
+                    if ($request->hasFile('icon')) {
+                        $validateArray['icon'] = 'mimetypes:video/mp4,video/quicktime,video/x-realaudio,video/x-msvideo,video/x-ms-wmv|max:20480';
                     }
                 }
             }
@@ -114,13 +116,15 @@ class OfferController extends Controller
                 }
             }
 
-            if ($request->hasFile('media')) {
-                if ($request->media_type == 'image') {
-                    foreach ($request->file('media') as $photo) {
+            if ($request->media_type == 'image') {
+                if ($request->hasFile('photos')) {
+                    foreach ($request->file('photos') as $photo) {
                         $filename = ImageUploadHelper::OfferImageUpload($photo);
                         $storedMedia[] = $filename;
                     }
-                } else {
+                }
+            } else {
+                if ($request->hasFile('icon')) {
                     // For video, we might want to replace the old video if it's single
                     if ($id !== 0 && $offer->media_type == 'video' && !empty($offer->media)) {
                         foreach ($offer->media as $oldVid) {
@@ -129,7 +133,7 @@ class OfferController extends Controller
                         }
                         $storedMedia = [];
                     }
-                    $filename = ImageUploadHelper::OfferVideoUpload($request->file('media'));
+                    $filename = ImageUploadHelper::OfferVideoUpload($request->file('icon'));
                     $storedMedia = [$filename];
                 }
             }

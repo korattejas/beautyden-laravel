@@ -70,10 +70,9 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="card">
                             <div class="card-body">
-                                <form id="addEditForm" enctype="multipart/form-data" data-parsley-validate="" role="form">
+                                <form id="offerForm" enctype="multipart/form-data" data-parsley-validate="" role="form">
                                     @csrf
                                     <input type="hidden" name="edit_value" value="{{ $offer->id }}">
-                                    <input type="hidden" id="form-method" value="edit">
                                     <div class="row row-sm">
 
                                         <div class="col-md-6 mt-2">
@@ -200,41 +199,65 @@
 
 @section('footer_script_content')
 <script>
-    var form_url = 'offers/store';
-    var redirect_url = 'offers';
-    var media_field_name = '{{ $offer->media_type == 'image' ? 'media[]' : 'media' }}';
-    var is_one_image_and_multiple_image_status = '{{ $offer->media_type == 'image' ? 'is_multiple_image' : 'is_one_image' }}';
-
     $(document).ready(function() {
         FilePond.registerPlugin(FilePondPluginImagePreview);
         
-        let imagePond = FilePond.create(document.querySelector('.filepond-multiple'), {
+        const imagePond = FilePond.create(document.querySelector('.filepond-multiple'), {
             allowMultiple: true,
             instantUpload: false,
             allowProcess: false,
         });
 
-        let videoPond = FilePond.create(document.querySelector('.filepond-single'), {
+        const videoPond = FilePond.create(document.querySelector('.filepond-single'), {
             allowMultiple: false,
             instantUpload: false,
             allowProcess: false,
         });
 
-        pond = '{{ $offer->media_type == 'image' }}' == '1' ? imagePond : videoPond;
-
         $('input[name="media_type"]').on('change', function() {
             if ($(this).val() === 'video') {
                 $('#image-upload-wrapper').hide();
                 $('#video-upload-wrapper').show();
-                pond = videoPond;
-                media_field_name = 'media';
-                is_one_image_and_multiple_image_status = 'is_one_image';
             } else {
                 $('#image-upload-wrapper').show();
                 $('#video-upload-wrapper').hide();
-                pond = imagePond;
-                media_field_name = 'media[]';
-                is_one_image_and_multiple_image_status = 'is_multiple_image';
+            }
+        });
+
+        $('#offerForm').on('submit', function(e) {
+            e.preventDefault();
+            $(this).parsley().validate();
+            
+            if ($(this).parsley().isValid()) {
+                loaderView();
+                let formData = new FormData(this);
+                let mediaType = $('input[name="media_type"]:checked').val();
+
+                if (mediaType === 'image') {
+                    imagePond.getFiles().forEach((file) => {
+                        formData.append('photos[]', file.file);
+                    });
+                } else {
+                    if (videoPond.getFiles().length > 0) {
+                        formData.append('icon', videoPond.getFiles()[0].file);
+                    }
+                }
+
+                axios.post(APP_URL + '/offers/store', formData)
+                    .then(function(response) {
+                        notificationToast(response.data.message, 'success');
+                        setTimeout(function() {
+                            window.location.href = "{{ route('admin.offers.index') }}";
+                        }, 1000);
+                    })
+                    .catch(function(error) {
+                        loaderHide();
+                        let msg = "Something went wrong";
+                        if (error.response && error.response.data && error.response.data.message) {
+                            msg = error.response.data.message;
+                        }
+                        notificationToast(msg, 'warning');
+                    });
             }
         });
     });

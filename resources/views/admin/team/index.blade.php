@@ -1073,9 +1073,11 @@
 
 @section('footer_script_content')
     <script>
+        // Set datatable_url globally before datatable.js runs
+        datatable_url = '/getDataTeamMembers';
+
         $(document).ready(function() {
             // DataTable configuration
-            datatable_url = '/getDataTeamMembers';
             
             $.extend(true, $.fn.dataTable.defaults, {
                 columns: [
@@ -1113,6 +1115,7 @@
                     { data: 'is_popular', name: 'is_popular', orderable: false, searchable: false },
                     { data: 'action', name: 'action', orderable: false, searchable: false }
                 ],
+                serverSide: true,
                 order: [[0, 'desc']],
                 drawCallback: function() {
                     // Custom adjustments after draw
@@ -1708,4 +1711,5 @@
             }
         });
     </script>
+    <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
 @endsection
