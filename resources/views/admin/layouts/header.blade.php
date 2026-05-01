@@ -18,7 +18,7 @@
 
         <!-- Left Side Title -->
         <div class="navbar-title">
-            Trusted Beauty Service at Home
+            Home
         </div>
 
         <!-- Right Side User Dropdown -->
