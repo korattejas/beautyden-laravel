@@ -2,216 +2,401 @@
 
 @section('header_style_content')
 <style>
-    .profile-header {
-        background: linear-gradient(135deg, #102365 0%, #1a4a7a 100%);
-        padding: 60px 0; border-radius: 0 0 50px 50px; position: relative; margin-bottom: 40px;
+    :root {
+        --premium-blue: #1a237e;
+        --premium-gradient: linear-gradient(135deg, #1a237e 0%, #3f51b5 100%);
+        --soft-blue: rgba(26, 35, 126, 0.05);
     }
-    .profile-avatar-wrapper {
-        position: relative; width: 140px; height: 140px; margin: 0 auto;
-    }
-    .profile-avatar {
-        width: 100%; height: 100%; border-radius: 40px; object-fit: cover;
-        border: 4px solid rgba(255,255,255,0.2); box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    }
-    .user-meta { color: rgba(255,255,255,0.8); font-size: 0.9rem; }
-    .user-meta i { color: #00d2ff; }
+
+    .app-content { background: #f8fafc; min-height: 100vh; }
     
-    .stat-card {
-        border: none; border-radius: 24px; transition: all 0.3s ease;
-        background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-        height: 100%; overflow: hidden; position: relative; padding: 20px; text-align: center;
+    .profile-banner {
+        background: var(--premium-gradient);
+        height: 200px;
+        border-radius: 0 0 40px 40px;
+        position: relative;
+        margin-bottom: 80px;
     }
-    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
-    .stat-icon {
-        width: 50px; height: 50px; border-radius: 16px; margin: 0 auto 15px auto;
-        display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #f1f5f9; color: #1a4a7a;
+
+    .profile-header-card {
+        position: absolute;
+        top: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 1000px;
+        background: #fff;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 30px;
     }
-    .stat-card h3 { font-weight: 800; margin: 0; }
-    .stat-card p { color: #64748b; margin: 0; font-size: 0.9rem; }
-    
-    .section-title { font-weight: 800; color: #1e293b; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-    .table thead th { background: #f8fafc; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; border: none; }
+
+    .user-avatar-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 30px;
+        background: var(--soft-blue);
+        color: var(--premium-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: 800;
+        border: 4px solid #fff;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    }
+
+    .user-info-main h2 {
+        margin: 0;
+        font-weight: 800;
+        color: #1e293b;
+        font-size: 2.2rem;
+    }
+
+    .user-info-main p {
+        margin: 5px 0 0;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .status-badge-premium {
+        padding: 8px 20px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .stat-card-premium {
+        background: #fff;
+        border-radius: 24px;
+        padding: 25px;
+        height: 100%;
+        border: 1px solid #eef2f7;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card-premium:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+    }
+
+    .stat-icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e293b;
+        display: block;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .premium-table-card {
+        background: #fff;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid #eef2f7;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+    }
+
+    .premium-table thead th {
+        background: #f8fafc;
+        padding: 20px;
+        color: #475569;
+        font-weight: 800;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+    }
+
+    .premium-table tbody td {
+        padding: 20px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .section-header-premium {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .section-header-premium i {
+        font-size: 1.5rem;
+        color: var(--premium-blue);
+    }
+
+    .section-header-premium h4 {
+        margin: 0;
+        font-weight: 800;
+        color: #1e293b;
+    }
+
+    .address-card {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 16px;
+        border: 1px solid #eef2f7;
+        margin-bottom: 12px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .address-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--premium-blue);
+        flex-shrink: 0;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+        .profile-header-card { flex-direction: column; text-align: center; top: 50px; }
+        .profile-banner { height: 150px; margin-bottom: 200px; }
+    }
 </style>
 @endsection
 
 @section('content')
-<div class="app-content content" style="padding: 0;">
-    <div class="profile-header shadow-lg">
-        <div class="container-fluid px-5">
-                    <span class="badge {{ $user->status == 1 ? 'bg-success' : 'bg-danger' }} fs-5 px-3 py-2 rounded-pill shadow-sm">
-                        {{ $user->status == 1 ? 'Active Account' : 'Suspended' }}
+<div class="app-content content">
+    <div class="profile-banner shadow-sm">
+        <div class="profile-header-card">
+            <div class="user-avatar-large">
+                @php $initials = strtoupper(substr($user->first_name ?? 'U', 0, 1) . substr($user->last_name ?? '', 0, 1)); @endphp
+                {{ $initials }}
+            </div>
+            <div class="user-info-main flex-grow-1 text-start">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <h2>{{ ($user->first_name ?? 'Registered') . ' ' . ($user->last_name ?? 'User') }}</h2>
+                    <span class="status-badge-premium {{ $user->status == 1 ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' }}" style="background: {{ $user->status == 1 ? 'rgba(40, 199, 111, 0.1)' : 'rgba(234, 84, 85, 0.1)' }}">
+                        {{ $user->status == 1 ? 'Active Member' : 'Suspended' }}
                     </span>
                 </div>
+                <p><i class="bi bi-envelope-at me-2"></i>{{ $user->email ?? 'N/A' }} | <i class="bi bi-phone me-2"></i>{{ $user->mobile_number ?? 'N/A' }}</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ route('admin.user.index') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="container-fluid px-5 pb-5">
-        <div class="row mb-4">
+    <div class="container-fluid px-4">
+        <!-- Stats Row -->
+        <div class="row g-4 mb-5">
             <div class="col-md-3">
-                <div class="stats-card">
-                    <i class="bi bi-calendar-check"></i>
-                    <h3>{{ $total_appointments }}</h3>
-                    <p>Total Appointments</p>
+                <div class="stat-card-premium">
+                    <div class="stat-icon-box bg-soft-primary text-primary" style="background: rgba(26, 35, 126, 0.1)">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <span class="stat-value">{{ $total_appointments }}</span>
+                    <span class="stat-label">Total Appointments</span>
                 </div>
             </div>
-            <div class="col-md-3 mt-2 mt-md-0">
-                <div class="stats-card">
-                    <i class="bi bi-gem"></i>
-                    <h3>{{ $user->activeSubscription() ? 'YES' : 'NO' }}</h3>
-                    <p>Active Membership</p>
+            <div class="col-md-3">
+                <div class="stat-card-premium">
+                    <div class="stat-icon-box bg-soft-success text-success" style="background: rgba(40, 199, 111, 0.1)">
+                        <i class="bi bi-gem"></i>
+                    </div>
+                    <span class="stat-value">{{ $user->activeSubscription() ? 'ACTIVE' : 'NONE' }}</span>
+                    <span class="stat-label">Membership Status</span>
                 </div>
             </div>
-            <div class="col-md-3 mt-2 mt-md-0">
-                <div class="stats-card">
-                    <i class="bi bi-ticket-perforated"></i>
-                    <h3>{{ $total_coupons }}</h3>
-                    <p>Coupons Used</p>
+            <div class="col-md-3">
+                <div class="stat-card-premium">
+                    <div class="stat-icon-box bg-soft-warning text-warning" style="background: rgba(255, 159, 67, 0.1)">
+                        <i class="bi bi-ticket-perforated"></i>
+                    </div>
+                    <span class="stat-value">{{ $total_coupons }}</span>
+                    <span class="stat-label">Coupons Applied</span>
                 </div>
             </div>
-            <div class="col-md-3 mt-2 mt-md-0">
-                <div class="stats-card">
-                    <i class="bi bi-clock-history"></i>
-                    <h6>{{ $user->last_login_at ? \Carbon\Carbon::parse($user->last_login_at)->diffForHumans() : 'Never' }}</h6>
-                    <p>Last Activity</p>
+            <div class="col-md-3">
+                <div class="stat-card-premium">
+                    <div class="stat-icon-box bg-soft-info text-info" style="background: rgba(0, 207, 232, 0.1)">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <span class="stat-value" style="font-size: 1.2rem; padding: 6px 0;">{{ $user->last_login_at ? \Carbon\Carbon::parse($user->last_login_at)->diffForHumans() : 'Never' }}</span>
+                    <span class="stat-label">Last Activity</span>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-8">
-                <h4 class="section-title"><i class="bi bi-list-task"></i> Appointment History</h4>
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Date/Time</th>
-                                        <th>Order #</th>
-                                        <th>Status</th>
-                                        <th>Amount</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($appointments as $app)
-                                    <tr>
-                                        <td>
-                                            <div class="fw-bold">{{ $app->appointment_date }}</div>
-                                            <small class="text-muted">{{ $app->appointment_time }}</small>
-                                        </td>
-                                        <td class="fw-bold">#{{ $app->order_number }}</td>
-                                        <td>
-                                            @php
-                                                $badges = [1=>'bg-warning', 2=>'bg-info', 3=>'bg-success', 4=>'bg-danger'];
-                                                $texts = [1=>'Pending', 2=>'Assigned', 3=>'Completed', 4=>'Rejected'];
-                                            @endphp
-                                            <span class="badge {{ $badges[$app->status] ?? 'bg-secondary' }}">
-                                                {{ $texts[$app->status] ?? 'Unknown' }}
-                                            </span>
-                                        </td>
-                                        <td class="fw-bold text-success">₹{{ number_format($app->price, 2) }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill btn-view-appointment" data-id="{{ $app->id }}">
-                                                View Details
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr><td colspan="5" class="text-center py-4">No appointments found.</td></tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+        <div class="row g-4">
+            <!-- Left: Appointment History -->
+            <div class="col-lg-8">
+                <div class="section-header-premium">
+                    <i class="bi bi-journal-text"></i>
+                    <h4>Appointment History</h4>
+                </div>
+                <div class="premium-table-card shadow-sm">
+                    <div class="table-responsive">
+                        <table class="premium-table table w-100 mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Order Details</th>
+                                    <th>Status</th>
+                                    <th>Amount</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($appointments as $app)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-light rounded-3 p-2 text-center" style="min-width: 65px;">
+                                                <div class="small text-muted">{{ date('M', strtotime($app->appointment_date)) }}</div>
+                                                <div class="fs-5 fw-800">{{ date('d', strtotime($app->appointment_date)) }}</div>
+                                            </div>
+                                            <div>
+                                                <div class="fw-800 text-dark">#{{ $app->order_number }}</div>
+                                                <div class="small text-muted">{{ $app->appointment_time }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @php
+                                            $badges = [1=>'bg-warning', 2=>'bg-info', 3=>'bg-success', 4=>'bg-danger'];
+                                            $texts = [1=>'Pending', 2=>'Assigned', 3=>'Completed', 4=>'Rejected'];
+                                        @endphp
+                                        <span class="badge rounded-pill {{ $badges[$app->status] ?? 'bg-secondary' }}" style="padding: 6px 12px; font-weight: 700;">
+                                            {{ $texts[$app->status] ?? 'Unknown' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="fw-800 text-primary" style="font-size: 1.1rem;">₹{{ number_format($app->price, 2) }}</div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-soft-primary rounded-pill btn-view-appointment px-3" data-id="{{ $app->id }}" style="background: rgba(26, 35, 126, 0.08); color: var(--premium-blue); font-weight: 700; border: none;">
+                                            View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr><td colspan="4" class="text-center py-5 text-muted">No appointment records found for this user.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-4 mt-4 mt-md-0">
-                <h4 class="section-title"><i class="bi bi-shield-check"></i> Membership Details</h4>
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body">
-                        @if($active_plan = $user->activeSubscription())
-                            <div class="alert alert-success d-flex align-items-center rounded-3 border-0">
-                                <i class="bi bi-star-fill me-2 fs-4"></i>
+            <!-- Right: Membership & Addresses -->
+            <div class="col-lg-4">
+                <div class="section-header-premium">
+                    <i class="bi bi-shield-check"></i>
+                    <h4>Plan Details</h4>
+                </div>
+                <div class="premium-table-card p-4 mb-4">
+                    @if($active_plan = $user->activeSubscription())
+                        <div class="p-3 rounded-4 mb-3" style="background: linear-gradient(135deg, rgba(40, 199, 111, 0.1) 0%, rgba(40, 199, 111, 0.05) 100%); border: 1px solid rgba(40, 199, 111, 0.1);">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-success text-white rounded-3 p-2 shadow-sm">
+                                    <i class="bi bi-award fs-4"></i>
+                                </div>
                                 <div>
-                                    <h6 class="alert-heading mb-0 fw-bold">{{ $active_plan->plan->name }}</h6>
-                                    <small>Valid until {{ $active_plan->end_date }}</small>
+                                    <h6 class="mb-0 fw-800 text-dark">{{ $active_plan->plan->name }}</h6>
+                                    <span class="small text-success fw-700">Expires: {{ date('d M Y', strtotime($active_plan->end_date)) }}</span>
                                 </div>
                             </div>
-                            <div class="mt-2">
-                                <p class="mb-1 text-muted small"><i class="bi bi-calendar-event me-1"></i> Started: {{ $active_plan->start_date }}</p>
-                                <p class="mb-0 text-muted small"><i class="bi bi-cash-stack me-1"></i> Paid: ₹{{ $active_plan->price_paid }}</p>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="p-2 border rounded-3 bg-light">
+                                    <label class="d-block small text-muted">Started</label>
+                                    <span class="fw-700 small">{{ date('d M Y', strtotime($active_plan->start_date)) }}</span>
+                                </div>
                             </div>
-                        @else
-                            <div class="text-center py-3">
-                                <i class="bi bi-x-circle text-muted fs-1 opacity-25"></i>
-                                <p class="mt-2 text-muted small mb-0">No active membership plan.</p>
+                            <div class="col-6">
+                                <div class="p-2 border rounded-3 bg-light">
+                                    <label class="d-block small text-muted">Paid</label>
+                                    <span class="fw-700 small">₹{{ number_format($active_plan->price_paid, 0) }}</span>
+                                </div>
                             </div>
-                        @endif
-                    </div>
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <div class="bg-light rounded-circle d-inline-flex p-3 mb-3">
+                                <i class="bi bi-slash-circle text-muted fs-3"></i>
+                            </div>
+                            <p class="text-muted fw-600">No active subscription found.</p>
+                        </div>
+                    @endif
                 </div>
 
-                <h4 class="section-title"><i class="bi bi-geo-alt"></i> Saved Addresses</h4>
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-0">
-                        <ul class="list-group list-group-flush">
-                            @forelse($user->addresses as $addr)
-                            <li class="list-group-item border-0 py-3 {{ !$loop->last ? 'border-bottom' : '' }}">
-                                <span class="badge bg-light-primary text-primary mb-2">{{ ucfirst($addr->address_type ?? 'Home') }}</span>
-                                <p class="small mb-0 text-dark">{{ $addr->address }}, {{ $addr->area }}</p>
-                            </li>
-                            @empty
-                            <li class="list-group-item text-center text-muted py-4 border-0">No addresses saved.</li>
-                            @endforelse
-                        </ul>
-                    </div>
+                <div class="section-header-premium">
+                    <i class="bi bi-geo-alt"></i>
+                    <h4>Saved Locations</h4>
                 </div>
-                
-                <div class="mt-4">
-                    <a href="{{ route('admin.user.index') }}" class="btn btn-secondary w-100 rounded-pill">
-                        <i class="bi bi-arrow-left me-1"></i> Back to Users List
-                    </a>
+                <div class="premium-table-card p-4">
+                    @forelse($user->addresses as $addr)
+                        <div class="address-card">
+                            <div class="address-icon shadow-sm">
+                                <i class="bi bi-{{ $addr->address_type == 'home' ? 'house' : 'building' }}"></i>
+                            </div>
+                            <div>
+                                <span class="badge bg-soft-primary text-primary mb-1" style="font-size: 0.65rem; text-transform: uppercase;">{{ $addr->address_type ?? 'Home' }}</span>
+                                <p class="small text-dark mb-0 fw-600" style="line-height: 1.4;">{{ $addr->address }}, {{ $addr->area }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-4">
+                            <i class="bi bi-map text-muted fs-3 opacity-25"></i>
+                            <p class="small text-muted mb-0 mt-2">No addresses saved.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
 
-@section('header_style_content')
-<style>
-    .offcanvas-appointment { width: 550px !important; border-left: none; box-shadow: -20px 0 60px rgba(0,0,0,0.1); }
-    .detail-section { padding: 24px; border-bottom: 1px solid #f1f5f9; }
-    .detail-section:last-child { border-bottom: none; }
-    .detail-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; margin-bottom: 8px; display: block; }
-    .detail-value { font-size: 1.1rem; font-weight: 700; color: #1e293b; line-height: 1.4; }
-    .service-item { padding: 16px; background: #ffffff; border-radius: 16px; margin-bottom: 12px; border: 1px solid #f1f5f9; transition: all 0.2s; }
-    .service-item:hover { border-color: #7367f0; box-shadow: 0 4px 12px rgba(115,103,240,0.05); }
-    .summary-box-premium { background: #1e293b; color: white; border-radius: 24px; padding: 24px; position: relative; overflow: hidden; }
-    .summary-box-premium::before { content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%; }
-    .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1rem; opacity: 0.8; }
-    .summary-total { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; margin-top: 16px; font-weight: 800; font-size: 1.6rem; opacity: 1; color: #fff; }
-    .loader-wrapper { display: flex; align-items: center; justify-content: center; height: 100%; background: white; }
-    .section-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(115,103,240,0.1); color: #7367f0; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
-</style>
+<!-- Appointment Detail Offcanvas -->
+<div class="offcanvas offcanvas-end" style="width: 550px !important; border-left: none; box-shadow: -20px 0 60px rgba(0,0,0,0.1);" tabindex="-1" id="appointmentDetailOffcanvas">
+    <div class="offcanvas-header" style="background: var(--premium-gradient); color: #fff; padding: 25px;">
+        <h5 class="offcanvas-title fw-800" id="appointmentDetailOffcanvasLabel">
+            <i class="bi bi-calendar-event me-2"></i> Appointment Insights
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0" id="offcanvas-content">
+        <!-- Ajax Content -->
+    </div>
+</div>
+
 @endsection
 
 @section('footer_script_content')
-<!-- Appointment Detail Offcanvas -->
-<div class="offcanvas offcanvas-end offcanvas-appointment" tabindex="-1" id="appointmentDetailOffcanvas" aria-labelledby="appointmentDetailOffcanvasLabel">
-    <div class="offcanvas-header bg-light-primary border-bottom py-3">
-        <h5 class="offcanvas-title fw-bold" id="appointmentDetailOffcanvasLabel">
-            <i class="bi bi-calendar-event text-primary me-1"></i> Appointment Details
-        </h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body p-0" id="offcanvas-content">
-        <!-- Content will be loaded here -->
-    </div>
-</div>
-
 <script>
 $(document).ready(function() {
     $('.btn-view-appointment').on('click', function() {
@@ -220,12 +405,11 @@ $(document).ready(function() {
         const offcanvas = new bootstrap.Offcanvas(offcanvasElement);
         const contentArea = $('#offcanvas-content');
 
-        // Show loading state
         contentArea.html(`
-            <div class="loader-wrapper">
+            <div class="d-flex align-items-center justify-content-center h-100 py-5">
                 <div class="text-center">
-                    <div class="spinner-border text-primary mb-2" role="status"></div>
-                    <p class="text-muted small">Fetching appointment insights...</p>
+                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                    <p class="text-muted fw-600">Generating appointment details...</p>
                 </div>
             </div>
         `);
@@ -241,126 +425,87 @@ $(document).ready(function() {
                 let servicesHtml = '';
                 (data.services || []).forEach(service => {
                     servicesHtml += `
-                        <div class="service-item d-flex justify-content-between align-items-center">
+                        <div class="p-3 bg-white rounded-3 border mb-2 d-flex justify-content-between align-items-center">
                             <div>
-                                <div class="fw-bold small text-dark">${service.name}</div>
-                                <div class="text-muted" style="font-size: 0.65rem;">${service.qty || 1} x ₹${parseFloat(service.price).toFixed(2)}</div>
+                                <div class="fw-800 text-dark">${service.name}</div>
+                                <div class="text-muted small">${service.qty || 1} x ₹${parseFloat(service.price).toFixed(2)}</div>
                             </div>
-                            <div class="fw-bold text-dark">₹${(parseFloat(service.price) * (service.qty || 1)).toFixed(2)}</div>
+                            <div class="fw-800 text-primary">₹${(parseFloat(service.price) * (service.qty || 1)).toFixed(2)}</div>
                         </div>
                     `;
                 });
 
                 let teamHtml = '';
                 (data.team_members || []).forEach(member => {
-                    teamHtml += `<span class="badge bg-light-info text-info me-1 mb-1">${member}</span>`;
+                    teamHtml += `<span class="badge bg-soft-info text-info me-2 mb-2 p-2 px-3 rounded-pill fw-700">${member}</span>`;
                 });
 
                 const html = `
-                    <div class="p-0">
-                        <div class="detail-section d-flex justify-content-between align-items-center bg-light-primary border-0">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-4" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
                             <div>
-                                <span class="detail-label">Booking Reference</span>
-                                <div class="fw-bold fs-3 text-primary">${data.order_number}</div>
+                                <span class="text-muted small fw-800 text-uppercase letter-spacing-1">Order Number</span>
+                                <h4 class="mb-0 fw-800 text-primary">#${data.order_number}</h4>
                             </div>
-                            <div class="text-end">
-                                <span class="badge ${data.status == 3 ? 'bg-success' : (data.status == 4 ? 'bg-danger' : 'bg-warning')} px-3 py-1 rounded-pill shadow-sm fs-6">
-                                    ${data.status == 1 ? 'Pending' : (data.status == 2 ? 'Assigned' : (data.status == 3 ? 'Completed' : 'Rejected'))}
-                                </span>
-                            </div>
+                            <span class="badge rounded-pill ${data.status == 3 ? 'bg-success' : 'bg-warning'} px-4 py-2 fw-800 shadow-sm">
+                                ${data.status == 1 ? 'Pending' : (data.status == 2 ? 'Assigned' : (data.status == 3 ? 'Completed' : 'Rejected'))}
+                            </span>
                         </div>
 
-                        <div class="detail-section">
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="d-flex align-items-center mb-1">
-                                        <div class="section-icon"><i class="bi bi-calendar3"></i></div>
-                                        <span class="detail-label mb-0">Date</span>
-                                    </div>
-                                    <div class="detail-value ps-1">${data.appointment_date}</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <div class="p-3 rounded-4 border bg-white">
+                                    <label class="text-muted small d-block fw-700 mb-1">DATE</label>
+                                    <div class="fw-800 text-dark">${data.appointment_date}</div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="d-flex align-items-center mb-1">
-                                        <div class="section-icon"><i class="bi bi-clock"></i></div>
-                                        <span class="detail-label mb-0">Time</span>
-                                    </div>
-                                    <div class="detail-value ps-1">${data.appointment_time}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded-4 border bg-white">
+                                    <label class="text-muted small d-block fw-700 mb-1">TIME</label>
+                                    <div class="fw-800 text-dark">${data.appointment_time}</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="detail-section">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="section-icon"><i class="bi bi-geo-alt"></i></div>
-                                <span class="detail-label mb-0">Service Address</span>
-                            </div>
-                            <div class="detail-value ps-1" style="font-size: 1rem;">${data.service_address}</div>
+                        <div class="p-3 rounded-4 border bg-white mb-4">
+                            <label class="text-muted small d-block fw-700 mb-1">SERVICE ADDRESS</label>
+                            <div class="fw-700 text-dark" style="line-height: 1.6;">${data.service_address}</div>
                         </div>
 
-                        <div class="detail-section bg-light-secondary border-0">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="section-icon bg-white shadow-sm"><i class="bi bi-scissors text-secondary"></i></div>
-                                <h6 class="mb-0 fw-bolder">Services Rendered</h6>
-                            </div>
-                            ${servicesHtml}
-                        </div>
+                        <h6 class="fw-800 mb-3 text-dark text-uppercase letter-spacing-1" style="font-size: 0.75rem;">Services Booked</h6>
+                        ${servicesHtml}
 
-                        <div class="detail-section">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="section-icon"><i class="bi bi-people"></i></div>
-                                <span class="detail-label mb-0">Assigned Professionals</span>
-                            </div>
-                            <div class="ps-1 mt-2">${teamHtml || '<span class="text-muted small">No team members assigned yet.</span>'}</div>
-                        </div>
+                        <h6 class="fw-800 mt-4 mb-3 text-dark text-uppercase letter-spacing-1" style="font-size: 0.75rem;">Assigned Professional</h6>
+                        <div>${teamHtml || '<span class="text-muted">No professional assigned yet</span>'}</div>
 
-                        <div class="detail-section">
-                            <div class="summary-box-premium shadow-lg">
-                                <div class="summary-row">
-                                    <span>Subtotal Amount</span>
-                                    <span>₹${parseFloat(summ.sub_total || 0).toFixed(2)}</span>
-                                </div>
-                                ${summ.discount_amount > 0 ? `
-                                <div class="summary-row" style="color: #4ade80;">
-                                    <span>Offer Applied (${summ.discount_percent}%)</span>
+                        <div class="mt-5 p-4 rounded-4 text-white" style="background: #1e293b; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+                            <div class="d-flex justify-content-between mb-2 opacity-75">
+                                <span>Subtotal</span>
+                                <span>₹${parseFloat(summ.sub_total || 0).toFixed(2)}</span>
+                            </div>
+                             ${summ.discount_amount > 0 ? `
+                                <div class="d-flex justify-content-between mb-2 text-success fw-700">
+                                    <span>Discount (${summ.discount_percent}%)</span>
                                     <span>-₹${parseFloat(summ.discount_amount).toFixed(2)}</span>
                                 </div>
-                                ` : ''}
-                                <div class="summary-row">
-                                    <span>Travel & Logistics</span>
-                                    <span>₹${parseFloat(summ.travel_charges || 0).toFixed(2)}</span>
-                                </div>
-                                <div class="summary-row summary-total">
-                                    <span>Grand Total</span>
-                                    <span>₹${parseFloat(summ.grand_total || 0).toFixed(2)}</span>
-                                </div>
-                                
-                                <div class="mt-4 pt-2 d-flex justify-content-between align-items-center border-top border-white border-opacity-10">
-                                    <div>
-                                        <span class="detail-label text-white-50 mb-0">Method</span>
-                                        <div class="fw-bold">${data.payment_type ? data.payment_type.toUpperCase() : 'CASH'}</div>
-                                    </div>
-                                    <a href="/admin/appointments/${data.id}/pdf" class="btn btn-primary btn-lg shadow-sm px-4 rounded-3">
-                                        <i class="bi bi-file-earmark-pdf me-1"></i> Get Invoice
-                                    </a>
-                                </div>
+                            ` : ''}
+                            <div class="d-flex justify-content-between mb-4 opacity-75 border-bottom border-white border-opacity-10 pb-3">
+                                <span>Logistics Fee</span>
+                                <span>₹${parseFloat(summ.travel_charges || 0).toFixed(2)}</span>
                             </div>
-                        </div>
-                        
-                        <div class="p-4 text-center">
-                            <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i> Prices are inclusive of all taxes.</p>
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <span class="fs-5 fw-800">Grand Total</span>
+                                <span class="fs-2 fw-800">₹${parseFloat(summ.grand_total || 0).toFixed(2)}</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="/admin/appointments/${data.id}/pdf" class="btn btn-primary w-100 rounded-pill py-2 fw-800 shadow-sm">
+                                    <i class="bi bi-file-earmark-pdf me-2"></i> Download Invoice
+                                </a>
+                            </div>
                         </div>
                     </div>
                 `;
                 contentArea.html(html);
-            },
-            error: function() {
-                contentArea.html(`
-                    <div class="p-5 text-center">
-                        <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
-                        <p class="mt-2">Failed to load appointment data.</p>
-                        <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="offcanvas">Close</button>
-                    </div>
-                `);
             }
         });
     });

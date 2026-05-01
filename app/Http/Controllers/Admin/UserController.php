@@ -35,8 +35,9 @@ class UserController extends Controller
                 $q->withTrashed();
             }])->findOrFail($id);
 
-            // Fetch appointments linked to this user's phone or email
-            $appointments = Appointment::where('phone', $user->mobile_number)
+            // Fetch appointments linked to this user's ID primarily, with fallback to phone/email
+            $appointments = Appointment::where('user_id', $user->id)
+                ->orWhere('phone', $user->mobile_number)
                 ->orWhere('email', $user->email)
                 ->orderBy('appointment_date', 'desc')
                 ->get();
