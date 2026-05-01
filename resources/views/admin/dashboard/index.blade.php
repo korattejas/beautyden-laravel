@@ -149,11 +149,11 @@
         position: absolute;
         top: 15px;
         right: 15px;
-        background: #ef4444;
+        background: #7367f0;
         color: #fff;
-        padding: 2px 8px;
+        padding: 4px 8px;
         border-radius: 50px;
-        font-size: 0.7rem;
+        font-size: 0.9rem;
         font-weight: 800;
         box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
         min-width: 25px;
