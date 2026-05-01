@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\ImageUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceCombo;
 use App\Models\ServiceComboItem;
 use App\Models\ServiceMaster;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
-use Illuminate\Support\Facades\File;
 
 class ServiceComboController extends Controller
 {
@@ -106,28 +107,17 @@ class ServiceComboController extends Controller
             }
 
             $imageName = null;
-            if ($request->hasFile('icon')) {
-                $image = $request->file('icon');
-                $imageName = time() . '_' . $image->getClientOriginalName();
-                $image->move(public_path('uploads/combos'), $imageName);
-                
+            $uploadedFile = $request->file('icon') ?? $request->file('image');
+
+            if ($uploadedFile) {
+                // Delete old image if updating
                 if ($id != 0) {
                     $old = ServiceCombo::find($id);
                     if ($old && $old->image && File::exists(public_path('uploads/combos/' . $old->image))) {
                         File::delete(public_path('uploads/combos/' . $old->image));
                     }
                 }
-            } elseif ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageName = time() . '_' . $image->getClientOriginalName();
-                $image->move(public_path('uploads/combos'), $imageName);
-                
-                if ($id != 0) {
-                    $old = ServiceCombo::find($id);
-                    if ($old && $old->image && File::exists(public_path('uploads/combos/' . $old->image))) {
-                        File::delete(public_path('uploads/combos/' . $old->image));
-                    }
-                }
+                $imageName = ImageUploadHelper::comboImageUpload($uploadedFile);
             } elseif ($id != 0) {
                 $imageName = ServiceCombo::find($id)->image;
             }

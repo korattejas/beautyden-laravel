@@ -74,7 +74,15 @@ class ApplicationHomeController extends Controller
 
             // 2. Offers (Sliders/Banners)
             $offers = Offer::where('status', 1)
-                ->select('id', 'title', 'media', 'position', 'media_type', 'priority')
+                ->select(
+                    'id',
+                    'title',
+                    'media',
+                    'position',
+                    'media_type',
+                    'priority',
+                    'created_at'
+                )
                 ->orderBy('priority', 'asc')
                 ->get()
                 ->map(function ($offer) {
