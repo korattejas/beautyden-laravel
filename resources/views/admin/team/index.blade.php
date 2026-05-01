@@ -933,6 +933,36 @@
                         {{ $members->links('pagination::bootstrap-5') }}
                     </div>
                 @endif
+
+                <!-- DataTable Section -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm" style="border-radius: 16px; border: none; overflow: hidden;">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h4 class="card-title mb-0 fw-bold"><i class="bi bi-table me-2 text-primary"></i> Detailed Team List</h4>
+                            </div>
+                            <div class="card-datatable table-responsive px-2 pb-2">
+                                <table class="dt-column-search table table-hover" id="table-team-members">
+                                    <thead>
+                                        <tr>
+                                            <th data-search="false">#</th>
+                                            <th data-search="false">Photo</th>
+                                            <th>Name</th>
+                                            <th>Role</th>
+                                            <th>Phone</th>
+                                            <th>Experience</th>
+                                            <th>Address</th>
+                                            <th data-search="false">Status</th>
+                                            <th data-search="false">Popularity</th>
+                                            <th data-search="false">Action</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
     </div>
@@ -971,6 +1001,43 @@
                     <button class="c-close-btn" data-c-close-report>&times;</button>
                 </div>
                 <div class="c-modal-body" id="report-modal-body">
+                    <!-- Report Filters -->
+                    <div class="report-filters mb-3 p-2 bg-light rounded shadow-sm border">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Specific Date</label>
+                                <input type="date" id="report-filter-date" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold">Month</label>
+                                <select id="report-filter-month" class="form-select form-select-sm">
+                                    <option value="">All Months</option>
+                                    @for ($m = 1; $m <= 12; $m++)
+                                        <option value="{{ sprintf('%02d', $m) }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small fw-bold">Year</label>
+                                <select id="report-filter-year" class="form-select form-select-sm">
+                                    <option value="">Year</option>
+                                    @php $currentYear = date('Y'); @endphp
+                                    @for ($y = $currentYear - 2; $y <= $currentYear + 1; $y++)
+                                        <option value="{{ $y }}" {{ $y == $currentYear ? 'selected' : '' }}>{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-primary flex-grow-1" id="btn-filter-report">
+                                    <i class="bi bi-funnel"></i> Filter
+                                </button>
+                                <button type="button" class="btn btn-sm btn-success flex-grow-1" id="btn-download-report">
+                                    <i class="bi bi-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="report-table-container">
                         <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status"></div>
@@ -1006,6 +1073,73 @@
 
 @section('footer_script_content')
     <script>
+        $(document).ready(function() {
+            // DataTable configuration
+            datatable_url = '/getDataTeamMembers';
+            
+            $.extend(true, $.fn.dataTable.defaults, {
+                columns: [
+                    { 
+                        data: null, 
+                        name: 'id',
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    { 
+                        data: 'icon', 
+                        name: 'icon', 
+                        orderable: false, 
+                        searchable: false,
+                        render: function(data) {
+                            if (data) {
+                                return `<div class="avatar-wrapper"><div class="avatar shadow-sm" style="width:45px; height:45px; border-radius:10px; overflow:hidden; border:2px solid #fff;">${data}</div></div>`;
+                            }
+                            return '';
+                        }
+                    },
+                    { data: 'name', name: 'name' },
+                    { data: 'role', name: 'role' },
+                    { data: 'phone', name: 'phone' },
+                    { 
+                        data: 'experience_years', 
+                        name: 'experience_years',
+                        render: function(data) {
+                            return (data || 0) + ' Years';
+                        }
+                    },
+                    { data: 'address', name: 'address' },
+                    { data: 'status', name: 'status', orderable: false, searchable: false },
+                    { data: 'is_popular', name: 'is_popular', orderable: false, searchable: false },
+                    { data: 'action', name: 'action', orderable: false, searchable: false }
+                ],
+                order: [[0, 'desc']],
+                drawCallback: function() {
+                    // Custom adjustments after draw
+                    $('#table-team-members img').css({
+                        'width': '100%',
+                        'height': '100%',
+                        'object-fit': 'cover'
+                    });
+                }
+            });
+
+            // Update DataTable on filter change
+            $('#btn-apply-card-filters').on('click', function() {
+                if ($.fn.DataTable.isDataTable('#table-team-members')) {
+                    $('#table-team-members').DataTable().ajax.reload();
+                }
+            });
+
+            $('#btn-reset-card-filters').on('click', function() {
+                setTimeout(() => {
+                    if ($.fn.DataTable.isDataTable('#table-team-members')) {
+                        $('#table-team-members').DataTable().ajax.reload();
+                    }
+                }, 100);
+            });
+        });
+
         // Card Filtering Logic
         $(document).on('click', '#btn-apply-card-filters', function() {
             let search = $('#search-member').val();
@@ -1338,9 +1472,24 @@
             `);
         });
 
+        $(document).on('click', '#btn-filter-report', function() {
+            loadReport(currentReportId, 1);
+        });
+
+        $(document).on('click', '#btn-download-report', function() {
+            let date = $('#report-filter-date').val();
+            let month = $('#report-filter-month').val();
+            let year = $('#report-filter-year').val();
+            window.location.href = `/admin/team/appointments-report-download/${currentReportId}?date=${date}&month=${month}&year=${year}`;
+        });
+
         function loadReport(id, page) {
+            let date = $('#report-filter-date').val();
+            let month = $('#report-filter-month').val();
+            let year = $('#report-filter-year').val();
+            
             $.ajax({
-                url: `/admin/team/appointments-report/${id}?page=${page}`,
+                url: `/admin/team/appointments-report/${id}?page=${page}&date=${date}&month=${month}&year=${year}`,
                 type: 'GET',
                 success: function(response) {
                     if (response.success) {

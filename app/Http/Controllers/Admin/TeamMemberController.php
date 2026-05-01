@@ -523,10 +523,21 @@ class TeamMemberController extends Controller
     public function getAppointmentsReport(Request $request, $id)
     {
         try {
-            $appointments = DB::table('appointments')
+            $query = DB::table('appointments')
                 ->whereRaw("FIND_IN_SET(?, assigned_to)", [$id])
-                ->where('status', 3) // Completed
-                ->orderBy('appointment_date', 'DESC')
+                ->where('status', 3); // Completed
+
+            if ($request->filled('date')) {
+                $query->whereDate('appointment_date', $request->date);
+            }
+            if ($request->filled('month')) {
+                $query->whereMonth('appointment_date', $request->month);
+            }
+            if ($request->filled('year')) {
+                $query->whereYear('appointment_date', $request->year);
+            }
+
+            $appointments = $query->orderBy('appointment_date', 'DESC')
                 ->orderBy('appointment_time', 'DESC')
                 ->paginate(20);
 
@@ -551,6 +562,65 @@ class TeamMemberController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function downloadAppointmentsReport(Request $request, $id)
+    {
+        try {
+            $member = TeamMember::findOrFail($id);
+            $query = DB::table('appointments')
+                ->whereRaw("FIND_IN_SET(?, assigned_to)", [$id])
+                ->where('status', 3);
+
+            if ($request->filled('date')) {
+                $query->whereDate('appointment_date', $request->date);
+            }
+            if ($request->filled('month')) {
+                $query->whereMonth('appointment_date', $request->month);
+            }
+            if ($request->filled('year')) {
+                $query->whereYear('appointment_date', $request->year);
+            }
+
+            $appointments = $query->orderBy('appointment_date', 'DESC')
+                ->orderBy('appointment_time', 'DESC')
+                ->get();
+
+            $filename = "appointments_report_" . str_replace(' ', '_', strtolower($member->name)) . "_" . date('Ymd_His') . ".csv";
+            $headers = [
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=$filename",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            ];
+
+            $columns = ['Order Number', 'Customer Name', 'Phone', 'Date', 'Time', 'Total', 'Payment Type'];
+
+            $callback = function() use($appointments, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+
+                foreach ($appointments as $app) {
+                    $servicesData = json_decode($app->services_data, true);
+                    fputcsv($file, [
+                        $app->order_number,
+                        ($app->first_name ?? '') . ' ' . ($app->last_name ?? ''),
+                        $app->phone,
+                        $app->appointment_date,
+                        $app->appointment_time,
+                        ($servicesData['summary']['grand_total'] ?? 0),
+                        $app->payment_type ?? 'cash'
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 

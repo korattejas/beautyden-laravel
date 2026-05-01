@@ -16,126 +16,109 @@
 
     #beautyden-dashboard {
         padding: 1.5rem;
-        background: var(--mst-bg-gray);
+        background: #f8fafc;
         min-height: 100vh;
     }
 
     /* Welcome Header */
-    .dashboard-welcome {
-        margin-bottom: 2.5rem;
-    }
     .dashboard-welcome h1 {
         font-weight: 800;
-        color: var(--mst-indigo);
-        margin-bottom: 0.5rem;
-        font-size: 2rem;
+        color: #1e293b;
+        font-size: 2.2rem;
+        letter-spacing: -0.5px;
     }
     .dashboard-welcome p {
-        color: var(--mst-text-muted);
+        color: #64748b;
         font-size: 1.1rem;
     }
 
-    /* Primary Stats Grid */
-    .primary-stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 3rem;
-    }
-
-    .stat-card-luxury {
-        background: #fff;
-        border-radius: 24px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        text-decoration: none !important;
-        display: block;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stat-card-luxury:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        border-color: var(--mst-indigo);
-    }
-
-    .stat-card-luxury.card-revenue {
-        background: linear-gradient(135deg, #102365 0%, #1e3a8a 100%);
-        color: #fff;
+    /* Stat Cards */
+    .dashboard-stat-card {
         border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        overflow: hidden;
+        position: relative;
+        background: #fff;
+        transition: transform 0.3s ease;
     }
-
-    .stat-icon-wrapper {
+    .dashboard-stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .card-accent-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+    }
+    .stat-avatar {
+        border-radius: 12px;
         width: 56px;
         height: 56px;
-        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 1.5rem;
-        font-size: 1.5rem;
+        flex-shrink: 0;
     }
-
-    .card-revenue .stat-icon-wrapper { background: rgba(255, 255, 255, 0.15); color: #fff; }
-    .card-membership .stat-icon-wrapper { background: #f0fdf4; color: var(--mst-success); }
-    .card-users .stat-icon-wrapper { background: #eff6ff; color: var(--mst-info); }
-    .card-reviews .stat-icon-wrapper { background: #fff1f2; color: var(--mst-danger); }
-
-    .stat-value {
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin-bottom: 4px;
-        color: var(--mst-text-main);
-    }
-    .card-revenue .stat-value { color: #fff; }
-
     .stat-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--mst-text-muted);
+        color: #82868b;
+        font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
+        margin-bottom: 2px;
     }
-    .card-revenue .stat-label { color: rgba(255, 255, 255, 0.8); }
+    .stat-value {
+        color: #1e293b;
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 0;
+    }
 
-    /* Action Required Section */
-    .action-required-banner {
-        background: #fdf2f2;
-        border: 1px solid #fee2e2;
+    /* Module Section */
+    .dashboard-section { margin-top: 2rem; }
+    .section-title { margin-bottom: 1.5rem; }
+    .section-title h4 { font-weight: 800; color: #1e293b; }
+
+    .module-card-premium {
+        background: #fff;
+        padding: 20px;
         border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 2.5rem;
+        border: 1px solid #edf2f7;
+        text-decoration: none !important;
+        transition: all 0.3s ease;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     }
-    .action-text h5 { color: #991b1b; font-weight: 700; margin-bottom: 0.25rem; }
-    .action-text p { color: #b91c1c; margin: 0; font-size: 0.9rem; }
-
-    /* Module Sections */
-    .dashboard-section { margin-bottom: 3.5rem; }
-    .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; padding-left: 8px; }
-    .section-title i { font-size: 1.4rem; color: var(--mst-indigo); }
-    .section-title h4 { margin: 0; font-weight: 700; color: var(--mst-text-main); font-size: 1.25rem; }
-
-    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
-    .module-card-mini {
-        background: #fff; padding: 24px; border-radius: 20px; border: 1px solid #f1f5f9;
-        text-decoration: none !important; transition: 0.3s; text-align: center;
+    .module-card-premium:hover {
+        background: #fff;
+        border-color: #7367f0;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        transform: translateY(-3px);
     }
-    .module-card-mini:hover { background: var(--mst-indigo-light); border-color: var(--mst-indigo); transform: translateY(-3px); }
-    .module-icon-mini { font-size: 1.5rem; color: var(--mst-indigo); margin-bottom: 10px; }
-
-    .leave-card {
-        background: #fff; border-radius: 20px; border: 1px solid #f1f5f9; padding: 20px;
+    .module-icon {
+        font-size: 1.8rem;
+        color: #7367f0;
+        margin-bottom: 12px;
     }
-    .leave-item {
-        display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f8fafc;
+    .module-name {
+        font-weight: 700;
+        color: #475569;
+        font-size: 0.9rem;
     }
-    .leave-item:last-child { border: none; }
+    .module-count {
+        background: rgba(115, 103, 240, 0.1);
+        color: #7367f0;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
 
 </style>
 @endsection
@@ -161,55 +144,90 @@
 
                 <!-- Priority Action Alerts -->
                 @if($pendingReviews > 0)
-                <div class="action-required-banner">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon-wrapper bg-danger text-white mb-0" style="width: 48px; height: 48px; border-radius: 12px;">
-                            <i class="bi bi-exclamation-octagon"></i>
+                <div class="card mb-3 border-0 shadow-sm" style="border-radius: 16px; background: #fff5f5; overflow: hidden;">
+                    <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar p-1" style="background: rgba(220, 38, 38, 0.1); border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-exclamation-octagon text-danger fs-3"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold text-danger">Action Required: Pending Reviews</h6>
+                                <p class="mb-0 text-muted small">You have <strong>{{ $pendingReviews }}</strong> reviews waiting for approval.</p>
+                            </div>
                         </div>
-                        <div class="action-text">
-                            <h5>Pending Reviews Approval</h5>
-                            <p>You have <strong>{{ $pendingReviews }}</strong> new customer reviews waiting for your approval.</p>
-                        </div>
+                        <a href="{{ route('admin.reviews.index', ['status' => 0]) }}" class="btn btn-danger btn-sm rounded-pill px-4">Review Now</a>
                     </div>
-                    <a href="{{ route('admin.reviews.index', ['status' => 0]) }}" class="btn btn-danger btn-sm px-4 rounded-pill">Take Action</a>
                 </div>
                 @endif
 
-                <!-- Critical Vital Signs -->
-                <div class="primary-stats-grid">
-                    <div class="stat-card-luxury card-revenue">
-                        <div class="stat-icon-wrapper"><i class="bi bi-wallet2"></i></div>
-                        <div class="stat-value">₹{{ number_format($totalRevenue, 0) }}</div>
-                        <div class="stat-label">Total Revenue (App + Membership)</div>
-                        <small class="text-white-50 mt-2 d-block">Razorpay Online: ₹{{ number_format($totalRazorpayRevenue, 0) }}</small>
+                <!-- Vital Stats Grid -->
+                <div class="row g-2 mb-4">
+                    <div class="col-md-3">
+                        <div class="dashboard-stat-card h-100">
+                            <div class="card-accent-bar" style="background: #7367f0;"></div>
+                            <div class="card-body p-2 d-flex align-items-center">
+                                <div class="stat-avatar me-2" style="background: rgba(115, 103, 240, 0.1);">
+                                    <i class="bi bi-wallet2 fs-3" style="color: #7367f0;"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-label">Total Revenue</p>
+                                    <h2 class="stat-value">₹{{ number_format($totalRevenue, 0) }}</h2>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <a href="{{ route('admin.membership.index') }}" class="stat-card-luxury card-membership">
-                        <div class="stat-icon-wrapper"><i class="bi bi-gem"></i></div>
-                        <div class="stat-value">{{ $activeMemberships }}</div>
-                        <div class="stat-label">Active Memberships</div>
-                        <small class="text-muted mt-2 d-block">Premium Subscription Base</small>
-                    </a>
+                    <div class="col-md-3">
+                        <a href="{{ route('admin.membership.index') }}" class="dashboard-stat-card h-100 d-block text-decoration-none">
+                            <div class="card-accent-bar" style="background: #28c76f;"></div>
+                            <div class="card-body p-2 d-flex align-items-center">
+                                <div class="stat-avatar me-2" style="background: rgba(40, 199, 111, 0.1);">
+                                    <i class="bi bi-gem fs-3" style="color: #28c76f;"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-label">Active Plans</p>
+                                    <h2 class="stat-value">{{ $activeMemberships }}</h2>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
-                    <a href="{{ route('admin.user.index') }}" class="stat-card-luxury card-users">
-                        <div class="stat-icon-wrapper"><i class="bi bi-people"></i></div>
-                        <div class="stat-value">{{ $totalUsers }}</div>
-                        <div class="stat-label">Total Registered Users</div>
-                        <small class="text-success mt-2 d-block">+{{ $newUsersToday }} Joined Today</small>
-                    </a>
+                    <div class="col-md-3">
+                        <a href="{{ route('admin.user.index') }}" class="dashboard-stat-card h-100 d-block text-decoration-none">
+                            <div class="card-accent-bar" style="background: #00cfe8;"></div>
+                            <div class="card-body p-2 d-flex align-items-center">
+                                <div class="stat-avatar me-2" style="background: rgba(0, 207, 232, 0.1);">
+                                    <i class="bi bi-people fs-3" style="color: #00cfe8;"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-label">Total Users</p>
+                                    <h2 class="stat-value">{{ $totalUsers }}</h2>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
-                    <a href="{{ route('admin.appointments.index', ['date' => date('Y-m-d')]) }}" class="stat-card-luxury card-assigned">
-                        <div class="stat-icon-wrapper"><i class="bi bi-calendar-event"></i></div>
-                        <div class="stat-value">{{ $todayAppointments }}</div>
-                        <div class="stat-label">Today's Appointments</div>
-                        <small class="text-info mt-2 d-block">{{ $totalAppointmentsPending }} Approval Required</small>
-                    </a>
+                    <div class="col-md-3">
+                        <a href="{{ route('admin.appointments.index', ['date' => date('Y-m-d')]) }}" class="dashboard-stat-card h-100 d-block text-decoration-none">
+                            <div class="card-accent-bar" style="background: #ff9f43;"></div>
+                            <div class="card-body p-2 d-flex align-items-center">
+                                <div class="stat-avatar me-2" style="background: rgba(255, 159, 67, 0.1);">
+                                    <i class="bi bi-calendar-event fs-3" style="color: #ff9f43;"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-label">Today's Appt.</p>
+                                    <h2 class="stat-value">{{ $todayAppointments }}</h2>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
 
-                <div class="row">
+                <div class="row g-2">
                     <!-- Charts -->
                     <div class="col-lg-8">
-                        <div class="chart-container bg-white p-3 rounded-4 shadow-sm mb-4">
+                        <div class="dashboard-stat-card p-3 h-100">
+                            <div class="card-accent-bar" style="background: #7367f0;"></div>
                             <h5 class="fw-bold mb-3"><i class="bi bi-graph-up text-primary me-2"></i> Booking Trends</h5>
                             <div id="completed-appointments-chart"></div>
                         </div>
@@ -217,24 +235,29 @@
 
                     <!-- Staff Availability -->
                     <div class="col-lg-4">
-                        <div class="leave-card shadow-sm mb-4">
+                        <div class="dashboard-stat-card p-3 h-100">
+                            <div class="card-accent-bar" style="background: #ea5455;"></div>
                             <h5 class="fw-bold mb-3"><i class="bi bi-calendar2-x text-danger me-2"></i> Staff on Leave Today</h5>
-                            <div class="leave-list">
+                            <div class="leave-list mt-2">
                                 @forelse($onLeaveToday as $leave)
-                                <div class="leave-item">
+                                <div class="d-flex align-items-center justify-content-between py-1 border-bottom border-light">
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="avatar bg-light-danger p-1"><i class="bi bi-person"></i></div>
+                                        <div class="stat-avatar" style="background: rgba(234, 84, 85, 0.1); width: 40px; height: 40px;">
+                                            <i class="bi bi-person text-danger"></i>
+                                        </div>
                                         <div>
-                                            <div class="fw-bold small">{{ $leave->beautician->name ?? 'N/A' }}</div>
-                                            <span class="badge bg-light-danger text-danger" style="font-size: 0.6rem;">Status: Leave</span>
+                                            <div class="fw-bold small" style="color: #1e293b;">{{ $leave->beautician->name ?? 'N/A' }}</div>
+                                            <span class="badge bg-light-danger text-danger" style="font-size: 0.6rem; font-weight: 700;">ON LEAVE</span>
                                         </div>
                                     </div>
-                                    <span class="text-muted small">Full Day</span>
+                                    <span class="text-muted small fw-bold">Full Day</span>
                                 </div>
                                 @empty
                                 <div class="text-center py-4">
-                                    <i class="bi bi-check2-circle text-success fs-2"></i>
-                                    <p class="text-muted small mb-0">All staff members are available today.</p>
+                                    <div class="stat-avatar mx-auto mb-2" style="background: rgba(40, 199, 111, 0.1); width: 64px; height: 64px;">
+                                        <i class="bi bi-check2-circle text-success fs-1"></i>
+                                    </div>
+                                    <p class="text-muted small mb-0 fw-bold">All staff available today</p>
                                 </div>
                                 @endforelse
                             </div>
@@ -245,27 +268,34 @@
                 <!-- Admin Modules Breakdown -->
                 <div class="dashboard-section">
                     <div class="section-title">
-                        <i class="bi bi-grid-fill"></i>
-                        <h4>Operations & Intelligence</h4>
+                        <h4>Management Center</h4>
                     </div>
-                    <div class="module-grid">
-                        <a href="{{ route('admin.razorpay.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-credit-card"></i></div>
-                            <span class="module-name">Transactions</span>
-                        </a>
-                        <a href="{{ route('admin.combo.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-box-seam"></i></div>
-                            <span class="module-count">{{ $activeCombos }}</span>
-                            <span class="module-name">Combos</span>
-                        </a>
-                        <a href="{{ route('admin.notifications.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-megaphone"></i></div>
-                            <span class="module-name">Push Center</span>
-                        </a>
-                        <a href="{{ route('admin.service-master.index') }}" class="module-card-mini">
-                            <div class="module-icon-mini"><i class="bi bi-scissors"></i></div>
-                            <span class="module-name">App Pricing</span>
-                        </a>
+                    <div class="row g-2">
+                        <div class="col-6 col-md-3">
+                            <a href="{{ route('admin.razorpay.index') }}" class="module-card-premium">
+                                <i class="bi bi-credit-card module-icon"></i>
+                                <span class="module-name">Transactions</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="{{ route('admin.combo.index') }}" class="module-card-premium">
+                                <span class="module-count">{{ $activeCombos }}</span>
+                                <i class="bi bi-box-seam module-icon"></i>
+                                <span class="module-name">Combos</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="{{ route('admin.notifications.index') }}" class="module-card-premium">
+                                <i class="bi bi-megaphone module-icon"></i>
+                                <span class="module-name">Push Center</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="{{ route('admin.service-master.index') }}" class="module-card-premium">
+                                <i class="bi bi-scissors module-icon"></i>
+                                <span class="module-name">App Pricing</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
