@@ -331,9 +331,9 @@
         border-radius: 8px;
     }
     .report-table td {
-        padding: 18px;
-        font-size: 1rem; /* Increased from 1rem */
-        font-weight: 600;
+        padding: 20px 18px;
+        font-size: 1.05rem; 
+        font-weight: 700;
         color: var(--mst-text-main);
         background: #fff;
         border-top: 1px solid #f1f5f9;
@@ -345,9 +345,9 @@
     .report-table tr:hover td { background: #f8faff; }
     
     .report-total-text {
-        font-size: 1.3rem; /* Increased from 1.15rem */
+        font-size: 1.35rem; 
         font-weight: 800;
-        color: #059669;
+        color: #1a237e;
     }
 
     .report-modal-header-title {
@@ -469,8 +469,8 @@
     }
 
     .c-modal-dialog {
-        width: 90%;
-        max-width: 650px;
+        width: 95%;
+        max-width: 900px;
         position: relative;
     }
 
@@ -484,7 +484,7 @@
 
     .c-modal-header {
         padding: 1.25rem 1.5rem;
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        background: linear-gradient(135deg, #1a237e 0%, #3f51b5 100%);
         color: #fff;
         display: flex;
         align-items: center;
@@ -561,10 +561,18 @@
 
     .c-detail-card {
         background: #f8fafc;
-        padding: 12px 16px;
+        padding: 15px 20px;
         border-radius: 12px;
         height: 100%;
-        border: 1px solid #eff6ff;
+        border: 1px solid #eef2f7;
+        border-left: 4px solid #1a237e;
+        transition: all 0.2s ease;
+    }
+    
+    .c-detail-card:hover {
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transform: translateX(4px);
     }
 
     .c-detail-card label {
@@ -641,6 +649,7 @@
         .c-profile-section { flex-direction: column; text-align: center; }
     }
 
+    .fw-800 { font-weight: 800 !important; }
 </style>
 @endsection
 
@@ -1039,24 +1048,33 @@
                             </div>
                         </div>
 
-                        <!-- Summary Section -->
-                        <div class="row g-2 text-center" id="report-summary-container">
-                            <div class="col-4">
-                                <div class="p-2 border rounded bg-soft-info" style="background: rgba(14, 165, 233, 0.05);">
-                                    <label class="d-block small fw-bold text-info text-uppercase" style="font-size:0.65rem;">Online</label>
-                                    <span class="fw-bold h6 mb-0 text-dark" id="summary-online">₹0</span>
+                        <!-- Summary Section (Premium Large Cards) -->
+                        <div class="row g-3 text-center mb-4" id="report-summary-container">
+                            <div class="col-md-4">
+                                <div class="p-3 border-0 rounded-4 shadow-sm" style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(14, 165, 233, 0.05) 100%); border: 1px solid rgba(14, 165, 233, 0.1) !important;">
+                                    <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                                        <i class="bi bi-credit-card-2-front text-info fs-4"></i>
+                                        <label class="small fw-800 text-info text-uppercase mb-0" style="letter-spacing:1.5px; font-size:0.75rem;">Online Revenue</label>
+                                    </div>
+                                    <h3 class="fw-800 mb-0 text-dark" id="summary-online" style="font-size: 1.85rem;">₹0</h3>
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <div class="p-2 border rounded bg-soft-success" style="background: rgba(40, 199, 111, 0.05);">
-                                    <label class="d-block small fw-bold text-success text-uppercase" style="font-size:0.65rem;">Cash</label>
-                                    <span class="fw-bold h6 mb-0 text-dark" id="summary-cash">₹0</span>
+                            <div class="col-md-4">
+                                <div class="p-3 border-0 rounded-4 shadow-sm" style="background: linear-gradient(135deg, rgba(40, 199, 111, 0.1) 0%, rgba(40, 199, 111, 0.05) 100%); border: 1px solid rgba(40, 199, 111, 0.1) !important;">
+                                    <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                                        <i class="bi bi-cash-stack text-success fs-4"></i>
+                                        <label class="small fw-800 text-success text-uppercase mb-0" style="letter-spacing:1.5px; font-size:0.75rem;">Cash Revenue</label>
+                                    </div>
+                                    <h3 class="fw-800 mb-0 text-dark" id="summary-cash" style="font-size: 1.85rem;">₹0</h3>
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <div class="p-2 border rounded bg-soft-primary" style="background: rgba(26, 35, 126, 0.05);">
-                                    <label class="d-block small fw-bold text-primary text-uppercase" style="font-size:0.65rem;">Total</label>
-                                    <span class="fw-bold h6 mb-0 text-dark" id="summary-total">₹0</span>
+                            <div class="col-md-4">
+                                <div class="p-3 border-0 rounded-4 shadow-sm" style="background: linear-gradient(135deg, rgba(26, 35, 126, 0.1) 0%, rgba(26, 35, 126, 0.05) 100%); border: 1px solid rgba(26, 35, 126, 0.1) !important;">
+                                    <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+                                        <i class="bi bi-wallet2 text-primary fs-4"></i>
+                                        <label class="small fw-800 text-primary text-uppercase mb-0" style="letter-spacing:1.5px; font-size:0.75rem;">Total Business</label>
+                                    </div>
+                                    <h3 class="fw-800 mb-0 text-dark" id="summary-total" style="font-size: 1.85rem;">₹0</h3>
                                 </div>
                             </div>
                         </div>
@@ -1376,15 +1394,16 @@
                     }
 
                     let html = `
-                    <div class="c-profile-section">
+                    <div class="c-profile-section" style="background: linear-gradient(to right, #f8faff, #ffffff); padding: 25px; border-radius: 20px; border: 1px solid #eef2f7;">
                         ${avatarHtml}
                         <div class="c-profile-info">
+                            <span class="badge bg-soft-primary text-primary mb-2" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; font-weight:800;">Team Member</span>
                             <h4>${data.name ?? '-'}</h4>
-                            <p>${data.role ?? '-'}</p>
+                            <p class="text-primary" style="font-weight:700;"><i class="bi bi-briefcase"></i> ${data.role ?? '-'}</p>
                         </div>
                     </div>
 
-                    <div class="c-row">
+                    <div class="c-row mt-4">
                         <div class="c-col-6">
                             <div class="c-detail-card">
                                 <label><i class="bi bi-card-text"></i> ID Number</label>
@@ -1411,43 +1430,50 @@
                         </div>
                         <div class="c-col-6">
                             <div class="c-detail-card">
-                                <label><i class="bi bi-briefcase"></i> Experience</label>
+                                <label><i class="bi bi-clock-history"></i> Experience</label>
                                 <p>${data.experience_years ?? '-'} Years</p>
                             </div>
                         </div>
                         
-                        <div class="c-col-12">
+                        <div class="c-col-6">
                             <div class="c-detail-card">
-                                <label><i class="bi bi-info-circle"></i> Bio</label>
-                                <p>${data.bio ?? '-'}</p>
+                                <label><i class="bi bi-geo-alt"></i> Location</label>
+                                <p>${data.city ?? '-'}</p>
                             </div>
                         </div>
 
                         <div class="c-col-12">
                             <div class="c-detail-card">
-                                <label><i class="bi bi-stars"></i> Specialties</label>
-                                <p>${
+                                <label><i class="bi bi-info-circle"></i> Professional Bio</label>
+                                <p style="font-size:0.95rem; line-height:1.6; color:#475569;">${data.bio ?? 'No bio provided.'}</p>
+                            </div>
+                        </div>
+
+                        <div class="c-col-12">
+                            <div class="c-detail-card">
+                                <label><i class="bi bi-stars"></i> Core Specialties</label>
+                                <div class="mt-2">${
                                     data.specialties 
-                                    ? JSON.parse(data.specialties).map(item => `<span class="c-include-badge">${item}</span>`).join("") 
-                                    : '-'
-                                }</p>
+                                    ? JSON.parse(data.specialties).map(item => `<span class="c-include-badge" style="background:#f1f5f9; border:none; color:#1a237e;">${item}</span>`).join("") 
+                                    : '<span class="text-muted">None listed</span>'
+                                }</div>
                             </div>
                         </div>
 
                         <div class="c-col-12">
                             <div class="c-detail-card">
                                 <label><i class="bi bi-patch-check"></i> Certifications</label>
-                                <p>${
+                                <div class="mt-2">${
                                     data.certifications 
-                                    ? JSON.parse(data.certifications).map(item => `<span class="c-include-badge">${item}</span>`).join("") 
-                                    : '-'
-                                }</p>
+                                    ? JSON.parse(data.certifications).map(item => `<span class="c-include-badge" style="background:#f0fdf4; border:none; color:#166534;">${item}</span>`).join("") 
+                                    : '<span class="text-muted">None listed</span>'
+                                }</div>
                             </div>
                         </div>
 
                         <div class="c-col-12">
                             <div class="c-detail-card">
-                                <label><i class="bi bi-geo-alt"></i> Location Details</label>
+                                <label><i class="bi bi-geo"></i> Full Address</label>
                                 <p>${data.address ?? ''}${data.village ? ', ' + data.village : ''}${data.taluko ? ', ' + data.taluko : ''}${data.city ? ', ' + data.city : ''}${data.state ? ', ' + data.state : ''}</p>
                             </div>
                         </div>

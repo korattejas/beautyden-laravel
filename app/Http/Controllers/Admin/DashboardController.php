@@ -77,6 +77,7 @@ class DashboardController extends Controller
                 'todayAppointments' => $todayAppointments,
                 'chartLabels'       => $chartLabels,
                 'chartData'         => $chartData,
+                'pendingReviews'    => CustomerReview::where('status', 0)->count(),
             ]);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
