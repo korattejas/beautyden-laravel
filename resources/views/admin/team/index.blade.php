@@ -246,77 +246,73 @@
         color: var(--mst-primary);
     }
 
-    /* Summary Boxes */
-    .summary-stats-row {
-        margin-bottom: 2rem;
-        margin-top: 1rem;
-    }
-
-    .summary-box {
+    /* Premium Stat Cards (Appointment Style) */
+    .stat-filter-card {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        border: 2px solid transparent !important;
+        border-radius: 20px !important;
         background: #fff;
-        border-radius: var(--mst-radius);
-        padding: 1.25rem 1.5rem;
-        box-shadow: var(--mst-shadow);
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        border: 1px solid #eef2f7;
-        transition: transform 0.3s;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
     }
-
-    .summary-box:hover {
+    .stat-filter-card:hover {
         transform: translateY(-5px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.1) !important;
+        border-color: rgba(26, 35, 126, 0.2) !important;
     }
-
-    .summary-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-    }
-
-    .icon-active {
-        background: rgba(40, 199, 111, 0.1);
-        color: #28c76f;
-    }
-
-    .icon-inactive {
-        background: rgba(234, 84, 85, 0.1);
-        color: #ea5455;
+    .stat-filter-card.active-stat {
+        background-color: #f0f4ff !important;
+        border-color: var(--mst-primary) !important;
     }
 
     .summary-info h3 {
         margin: 0;
         font-weight: 800;
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         color: var(--mst-text-main);
         line-height: 1.2;
     }
 
-    .icon-return {
-        background: rgba(115, 103, 240, 0.1);
-        color: #7367f0;
-    }
-
-    .chart-container {
-        background: #fff;
-        border-radius: var(--mst-radius);
-        padding: 1.5rem;
-        box-shadow: var(--mst-shadow);
-        border: 1px solid #eef2f7;
-        margin-bottom: 2rem;
-    }
-
     .summary-info span {
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 700;
         color: var(--mst-text-muted);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
     }
+
+    /* Premium DataTable (Separate Rows) */
+    #table-team-members {
+        width: 100% !important;
+        border-spacing: 0 10px !important;
+        border-collapse: separate !important;
+    }
+    #table-team-members thead th {
+        border-bottom: 2px solid #ebe9f1 !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        padding: 12px 15px !important;
+        color: #5e5873;
+        background-color: #f8f8f8;
+    }
+    #table-team-members tbody tr {
+        transition: all 0.25s ease;
+        cursor: pointer;
+    }
+    #table-team-members tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(26, 35, 126, 0.1);
+        background-color: #fcfaff !important;
+    }
+    #table-team-members td {
+        padding: 15px !important;
+        vertical-align: middle !important;
+        border-top: none !important;
+        background: #fff;
+    }
+    #table-team-members tr td:first-child { border-radius: 12px 0 0 12px; }
+    #table-team-members tr td:last-child { border-radius: 0 12px 12px 0; }
 
     /* Report Table */
     .report-table {
@@ -770,38 +766,44 @@
                     </div>
                 @endif
 
-                <!-- Summary Stats -->
-                <div class="row summary-stats-row">
-                    <div class="col-md-3">
-                        <div class="summary-box">
-                            <div class="summary-icon icon-active">
-                                <i class="bi bi-person-check-fill"></i>
-                            </div>
-                            <div class="summary-info">
-                                <h3>{{ $active_count }}</h3>
-                                <span>Active Members</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="summary-box">
-                            <div class="summary-icon icon-inactive">
-                                <i class="bi bi-person-x-fill"></i>
-                            </div>
-                            <div class="summary-info">
-                                <h3>{{ $inactive_count }}</h3>
-                                <span>Inactive Members</span>
+                <!-- Summary Stats (Premium Style) -->
+                <div class="row g-2 mb-4">
+                    <div class="col-md-4">
+                        <div class="card stat-filter-card h-100 mb-0">
+                            <div class="card-body p-2 d-flex align-items-center">
+                                <div class="avatar p-1 me-2" style="background: rgba(40, 199, 111, 0.1); border-radius: 15px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-person-check-fill" style="font-size: 1.8rem; color: #28c76f;"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <h3>{{ $active_count }}</h3>
+                                    <span>Active Members</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="summary-box">
-                            <div class="summary-icon icon-return">
-                                <i class="bi bi-person-heart"></i>
+                    <div class="col-md-4">
+                        <div class="card stat-filter-card h-100 mb-0">
+                            <div class="card-body p-2 d-flex align-items-center">
+                                <div class="avatar p-1 me-2" style="background: rgba(234, 84, 85, 0.1); border-radius: 15px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-person-x-fill" style="font-size: 1.8rem; color: #ea5455;"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <h3>{{ $inactive_count }}</h3>
+                                    <span>Inactive Members</span>
+                                </div>
                             </div>
-                            <div class="summary-info">
-                                <h3>{{ $total_return_customers }}</h3>
-                                <span>Return Customers</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stat-filter-card h-100 mb-0">
+                            <div class="card-body p-2 d-flex align-items-center">
+                                <div class="avatar p-1 me-2" style="background: rgba(115, 103, 240, 0.1); border-radius: 15px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-person-heart" style="font-size: 1.8rem; color: #7367f0;"></i>
+                                </div>
+                                <div class="summary-info">
+                                    <h3>{{ $total_return_customers }}</h3>
+                                    <span>Return Customers</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1140,6 +1142,25 @@
                         $('#table-team-members').DataTable().ajax.reload();
                     }
                 }, 100);
+            });
+
+            // Row click to open view modal (Premium Appointment Style)
+            $('#table-team-members tbody').on('click', 'tr', function (e) {
+                // Don't trigger if clicking on action items or buttons
+                if ($(e.target).closest('.dropdown, button, a, .status-change, .priority-status-change').length) {
+                    return;
+                }
+                
+                let viewBtn = $(this).find('.btn-view');
+                if (viewBtn.length) {
+                    viewBtn.click();
+                } else {
+                    // Fallback: If btn-view is not found (e.g. inside a dropdown), find by data-id
+                    let data = $('#table-team-members').DataTable().row(this).data();
+                    if (data && data.id) {
+                        $('.btn-view[data-id="' + data.id + '"]').first().click();
+                    }
+                }
             });
         });
 

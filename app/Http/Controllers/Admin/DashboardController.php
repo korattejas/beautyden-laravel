@@ -200,4 +200,149 @@ class DashboardController extends Controller
 
         return ['labels' => $labels, 'data' => $data];
     }
+
+    public function getAnalyticsData(\Illuminate\Http\Request $request)
+    {
+        try {
+            $startDate = $request->start_date ? date('Y-m-d', strtotime($request->start_date)) : now()->startOfMonth()->format('Y-m-d');
+            $endDate   = $request->end_date ? date('Y-m-d', strtotime($request->end_date)) : now()->endOfMonth()->format('Y-m-d');
+
+            // 1. Daily Revenue
+            $dailyRevenue = [];
+            $revenueQuery = Appointment::where('status', 3)
+                ->whereBetween('appointment_date', [$startDate, $endDate])
+                ->get();
+
+            $totalRevenue = 0;
+            $revByDate = [];
+            foreach ($revenueQuery as $app) {
+                $servicesData = $app->services_data;
+                $val = (float)($servicesData['summary']['grand_total'] ?? 0);
+                $date = $app->appointment_date;
+                $revByDate[$date] = ($revByDate[$date] ?? 0) + $val;
+                $totalRevenue += $val;
+            }
+            foreach ($revByDate as $d => $v) {
+                $dailyRevenue[] = ['date' => date('d/m/Y', strtotime($d)), 'revenue' => $v];
+            }
+
+            // 2. Appointments Per Day
+            $dailyAppointments = Appointment::whereBetween('appointment_date', [$startDate, $endDate])
+                ->selectRaw('appointment_date, count(*) as total')
+                ->groupBy('appointment_date')
+                ->orderBy('appointment_date', 'DESC')
+                ->get()
+                ->map(function($item) {
+                    return ['date' => date('d/m/Y', strtotime($item->appointment_date)), 'appointments' => $item->total];
+                });
+
+            $totalApptCount = Appointment::whereBetween('appointment_date', [$startDate, $endDate])->count();
+
+            // 3. Top Staff by Services
+            $staffServices = [];
+            $staffRevenue = [];
+            $allStaff = TeamMember::where('status', 1)->get();
+            
+            foreach($allStaff as $staff) {
+                $id = $staff->id;
+                $apptQuery = Appointment::where('status', 3)
+                    ->whereBetween('appointment_date', [$startDate, $endDate])
+                    ->whereRaw("FIND_IN_SET(?, assigned_to)", [$id])
+                    ->get();
+                
+                $sRev = 0;
+                foreach($apptQuery as $a) {
+                    $sRev += (float)($a->services_data['summary']['grand_total'] ?? 0);
+                }
+
+                if ($apptQuery->count() > 0) {
+                    $staffServices[] = [
+                        'staff' => $staff->name,
+                        'services' => $apptQuery->count(),
+                        'revenue' => $sRev
+                    ];
+                    $staffRevenue[] = [
+                        'staff' => $staff->name,
+                        'revenue' => $sRev
+                    ];
+                }
+            }
+
+            // Sort and take top performers
+            usort($staffServices, fn($a, $b) => $b['services'] <=> $a['services']);
+            usort($staffRevenue, fn($a, $b) => $b['revenue'] <=> $a['revenue']);
+
+            return response()->json([
+                'daily_revenue' => array_slice($dailyRevenue, 0, 5),
+                'total_revenue' => $totalRevenue,
+                'daily_appointments' => $dailyAppointments->take(5),
+                'total_appointments' => $totalApptCount,
+                'top_staff_services' => array_slice($staffServices, 0, 5),
+                'top_staff_revenue' => array_slice($staffRevenue, 0, 5),
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function exportAnalytics(\Illuminate\Http\Request $request)
+    {
+        $type = $request->type ?? 'revenue';
+        $startDate = $request->start_date ? date('Y-m-d', strtotime($request->start_date)) : now()->startOfMonth()->format('Y-m-d');
+        $endDate   = $request->end_date ? date('Y-m-d', strtotime($request->end_date)) : now()->endOfMonth()->format('Y-m-d');
+
+        $fileName = "report_{$type}_{$startDate}_to_{$endDate}.csv";
+        
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use ($type, $startDate, $endDate) {
+            $file = fopen('php://output', 'w');
+
+            if ($type === 'revenue') {
+                fputcsv($file, ['Date', 'Revenue (INR)']);
+                $apps = Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
+                $revByDate = [];
+                foreach ($apps as $app) {
+                    $revByDate[$app->appointment_date] = ($revByDate[$app->appointment_date] ?? 0) + (float)($app->services_data['summary']['grand_total'] ?? 0);
+                }
+                foreach ($revByDate as $date => $val) {
+                    fputcsv($file, [$date, $val]);
+                }
+            } elseif ($type === 'appointments') {
+                fputcsv($file, ['Date', 'Total Appointments']);
+                $data = Appointment::whereBetween('appointment_date', [$startDate, $endDate])
+                    ->selectRaw('appointment_date, count(*) as total')
+                    ->groupBy('appointment_date')
+                    ->get();
+                foreach ($data as $row) {
+                    fputcsv($file, [$row->appointment_date, $row->total]);
+                }
+            } else {
+                fputcsv($file, ['Staff Name', 'Total Services', 'Total Revenue']);
+                $staff = TeamMember::where('status', 1)->get();
+                foreach ($staff as $s) {
+                    $apps = Appointment::where('status', 3)
+                        ->whereBetween('appointment_date', [$startDate, $endDate])
+                        ->whereRaw("FIND_IN_SET(?, assigned_to)", [$s->id])
+                        ->get();
+                    $rev = 0;
+                    foreach ($apps as $a) { $rev += (float)($a->services_data['summary']['grand_total'] ?? 0); }
+                    if ($apps->count() > 0) {
+                        fputcsv($file, [$s->name, $apps->count(), $rev]);
+                    }
+                }
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

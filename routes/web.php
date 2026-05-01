@@ -63,6 +63,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['middleware' => [AdminCheck::class]], function () {
         Route::get('logout', [LoginController::class, 'logout'])->name('admin.logout');
         Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+        Route::get('get-analytics-data', [DashboardController::class, 'getAnalyticsData'])->name('admin.dashboard.analytics');
+        Route::get('export-analytics', [DashboardController::class, 'exportAnalytics'])->name('admin.dashboard.export-analytics');
 
         /* Contract Signed Route */
         Route::get('contract-signed', [ContractSignedController::class, 'index'])->name('admin.contract-signed.index');

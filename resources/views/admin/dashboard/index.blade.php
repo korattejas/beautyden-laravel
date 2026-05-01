@@ -15,7 +15,7 @@
     }
 
     #beautyden-dashboard {
-        padding: 1.5rem;
+        padding: 2rem;
         background: #f8fafc;
         min-height: 100vh;
     }
@@ -24,68 +24,88 @@
     .dashboard-welcome h1 {
         font-weight: 800;
         color: #1e293b;
-        font-size: 2.2rem;
-        letter-spacing: -0.5px;
+        font-size: 2.5rem;
+        letter-spacing: -1px;
+        margin-bottom: 8px;
     }
     .dashboard-welcome p {
         color: #64748b;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
+        font-weight: 500;
     }
 
-    /* Stat Cards */
+    /* Premium Stat Cards */
     .dashboard-stat-card {
         border: none;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.04);
         overflow: hidden;
         position: relative;
         background: #fff;
-        transition: transform 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #f1f5f9;
     }
     .dashboard-stat-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
     }
     .card-accent-bar {
         position: absolute;
         top: 0;
         left: 0;
-        width: 4px;
+        width: 6px;
         height: 100%;
+        border-radius: 0 4px 4px 0;
     }
     .stat-avatar {
-        border-radius: 12px;
-        width: 56px;
-        height: 56px;
+        border-radius: 18px;
+        width: 64px;
+        height: 64px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     .stat-label {
-        color: #82868b;
-        font-size: 0.75rem;
-        font-weight: 700;
+        color: #64748b;
+        font-size: 0.95rem;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 2px;
+        letter-spacing: 1.2px;
+        margin-bottom: 4px;
     }
     .stat-value {
-        color: #1e293b;
-        font-size: 1.6rem;
-        font-weight: 800;
+        color: #0f172a;
+        font-size: 1.8rem;
+        font-weight: 900;
         margin-bottom: 0;
+        letter-spacing: -0.5px;
     }
 
     /* Module Section */
-    .dashboard-section { margin-top: 2rem; }
+    .dashboard-section { margin-top: 3rem; }
     .section-title { margin-bottom: 1.5rem; }
-    .section-title h4 { font-weight: 800; color: #1e293b; }
+    .section-title h4 { 
+        font-weight: 800; 
+        color: #1e293b; 
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .section-title h4::after {
+        content: "";
+        flex: 1;
+        height: 2px;
+        background: #f1f5f9;
+    }
 
     .module-card-premium {
         background: #fff;
-        padding: 20px;
-        border-radius: 16px;
-        border: 1px solid #edf2f7;
+        padding: 24px;
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
         text-decoration: none !important;
         transition: all 0.3s ease;
         display: flex;
@@ -93,31 +113,175 @@
         align-items: center;
         justify-content: center;
         box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        position: relative;
     }
     .module-card-premium:hover {
         background: #fff;
         border-color: #7367f0;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(115, 103, 240, 0.1);
+        transform: translateY(-5px);
     }
     .module-icon {
-        font-size: 1.8rem;
+        font-size: 2.2rem;
         color: #7367f0;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
+        background: #f5f3ff;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+    }
+    .module-card-premium:hover .module-icon {
+        background: #7367f0;
+        color: #fff;
+        transform: scale(1.1);
     }
     .module-name {
-        font-weight: 700;
-        color: #475569;
-        font-size: 0.9rem;
+        font-weight: 800;
+        color: #334155;
+        font-size: 1rem;
+        text-align: center;
     }
     .module-count {
-        background: rgba(115, 103, 240, 0.1);
-        color: #7367f0;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #ef4444;
+        color: #fff;
         padding: 2px 10px;
         border-radius: 50px;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 800;
-        margin-bottom: 5px;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Analytics Dashboard Styling */
+    .analytics-container {
+        margin-top: 3rem;
+        background: #fff;
+        border-radius: 30px;
+        padding: 30px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.04);
+        border: 1px solid #f1f5f9;
+    }
+
+    .analytics-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .analytics-header h2 {
+        font-weight: 900;
+        font-size: 2.4rem;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .analytics-header h2 span {
+        color: #7367f0;
+    }
+
+    .analytics-filter-row {
+        background: #f8fafc;
+        padding: 15px 25px;
+        border-radius: 20px;
+        margin-bottom: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        border: 1px solid #edf2f7;
+    }
+
+    .filter-label {
+        font-weight: 700;
+        color: #475569;
+        font-size: 0.95rem;
+    }
+
+    .analytics-date-input {
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        padding: 8px 15px;
+        font-weight: 600;
+        color: #1e293b;
+        width: 150px;
+        text-align: center;
+    }
+
+    .report-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        height: 100%;
+        border: 1px solid #f1f5f9;
+    }
+
+    .report-card-header {
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #fff;
+        font-weight: 800;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+    }
+
+    .header-green { background: #28c76f; }
+    .header-orange { background: #ff9f43; }
+    .header-blue { background: #7367f0; }
+    .header-purple { background: #9d50bb; }
+
+    .download-icon {
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity 0.3s;
+    }
+    .download-icon:hover { opacity: 1; }
+
+    .report-table-mini {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .report-table-mini thead th {
+        background: #f8fafc;
+        padding: 10px 20px;
+        text-align: left;
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: #64748b;
+        text-transform: uppercase;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .report-table-mini tbody td {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1e293b;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+    .report-table-mini tbody tr:last-child td { border-bottom: none; }
+
+    .report-total-row {
+        background: #fdfdfd;
+        border-top: 2px dashed #f1f5f9;
+    }
+
+    .report-total-row td {
+        padding: 15px 20px !important;
+        font-weight: 900 !important;
+        font-size: 1.1rem !important;
+        color: #0f172a !important;
     }
 
 </style>
@@ -130,14 +294,14 @@
             <section id="beautyden-dashboard">
                 
                 <!-- Welcome Header -->
-                <div class="dashboard-welcome d-flex justify-content-between align-items-end">
+                <div class="dashboard-welcome d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
                     <div>
                         <h1>BeautyDen Dashboard ✨</h1>
-                        <p>Real-time insights for your beauty empire.</p>
+                        <p>Your business overview at a glance.</p>
                     </div>
-                    <div class="text-end">
-                        <span class="badge bg-light-primary text-primary px-3 py-1 fs-6 rounded-pill">
-                            <i class="bi bi-clock"></i> Last updated: {{ now()->format('h:i A') }}
+                    <div class="mt-2 mt-md-0">
+                        <span class="badge px-4 py-1 fs-6 rounded-pill shadow-sm" style="background: #fff; color: #7367f0; border: 1px solid #7367f0;">
+                            <i class="bi bi-clock-history me-1"></i> Last updated: {{ now()->format('h:i A') }}
                         </span>
                     </div>
                 </div>
@@ -240,24 +404,27 @@
                             <h5 class="fw-bold mb-3"><i class="bi bi-calendar2-x text-danger me-2"></i> Staff on Leave Today</h5>
                             <div class="leave-list mt-2">
                                 @forelse($onLeaveToday as $leave)
-                                <div class="d-flex align-items-center justify-content-between py-1 border-bottom border-light">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="stat-avatar" style="background: rgba(234, 84, 85, 0.1); width: 40px; height: 40px;">
-                                            <i class="bi bi-person text-danger"></i>
+                                <div class="d-flex align-items-center justify-content-between p-2 mb-2" style="background: #fff5f5; border-radius: 12px; border: 1px solid #fee2e2;">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="stat-avatar shadow-sm" style="background: #fff; width: 48px; height: 48px; border-radius: 12px;">
+                                            <i class="bi bi-person-fill text-danger fs-4"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold small" style="color: #1e293b;">{{ $leave->beautician->name ?? 'N/A' }}</div>
-                                            <span class="badge bg-light-danger text-danger" style="font-size: 0.6rem; font-weight: 700;">ON LEAVE</span>
+                                            <div class="fw-bold" style="color: #1e293b; font-size: 0.95rem;">{{ $leave->beautician->name ?? 'N/A' }}</div>
+                                            <span class="badge rounded-pill bg-danger shadow-sm" style="font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;">ON LEAVE</span>
                                         </div>
                                     </div>
-                                    <span class="text-muted small fw-bold">Full Day</span>
+                                    <div class="text-end">
+                                        <span class="text-muted small fw-bold d-block">Full Day</span>
+                                    </div>
                                 </div>
                                 @empty
-                                <div class="text-center py-4">
-                                    <div class="stat-avatar mx-auto mb-2" style="background: rgba(40, 199, 111, 0.1); width: 64px; height: 64px;">
-                                        <i class="bi bi-check2-circle text-success fs-1"></i>
+                                <div class="text-center py-4 px-2" style="background: #f0fdf4; border-radius: 16px; border: 1px dashed #28c76f;">
+                                    <div class="stat-avatar mx-auto mb-3 shadow-sm" style="background: #fff; width: 64px; height: 64px; border-radius: 20px;">
+                                        <i class="bi bi-check-lg text-success fs-1"></i>
                                     </div>
-                                    <p class="text-muted small mb-0 fw-bold">All staff available today</p>
+                                    <h6 class="fw-bold text-success mb-1">Perfect Availability!</h6>
+                                    <p class="text-muted small mb-0 fw-bold">All staff members are on duty today.</p>
                                 </div>
                                 @endforelse
                             </div>
@@ -299,6 +466,154 @@
                     </div>
                 </div>
 
+                <!-- Gain Insights Section (Analytics) -->
+                <section class="analytics-container">
+                    <div class="analytics-header">
+                        <h2>Gain <span>Insights</span> & Grow Your Business!</h2>
+                        <p class="text-muted fw-bold">Track your performance with detailed analytics.</p>
+                    </div>
+
+                    <div class="analytics-filter-row">
+                        <span class="filter-label">Select Date Range:</span>
+                        <input type="text" id="report_start_date" class="analytics-date-input flatpickr-basic" value="{{ now()->startOfMonth()->format('d-m-Y') }}">
+                        <span class="fw-bold text-muted">-</span>
+                        <input type="text" id="report_end_date" class="analytics-date-input flatpickr-basic" value="{{ now()->endOfMonth()->format('d-m-Y') }}">
+                        
+                        <div class="form-check form-switch ms-3">
+                            <input class="form-check-input" type="checkbox" id="showGraphs" checked>
+                            <label class="form-check-label fw-bold small text-muted" for="showGraphs">Show Graphs</label>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- Daily Revenue -->
+                        <div class="col-md-6">
+                            <div class="report-card">
+                                <div class="report-card-header header-green">
+                                    <span>Daily Revenue</span>
+                                    <i class="bi bi-download download-icon" onclick="downloadReport('revenue')"></i>
+                                </div>
+                                <table class="report-table-mini">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th class="text-end">Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="revenue-report-body">
+                                        <!-- Dynamic Content -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="report-total-row">
+                                            <td>Total</td>
+                                            <td class="text-end" id="total-revenue-val">₹0</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Appointments Per Day -->
+                        <div class="col-md-6">
+                            <div class="report-card">
+                                <div class="report-card-header header-orange">
+                                    <span>Appointments Per Day</span>
+                                    <i class="bi bi-download download-icon" onclick="downloadReport('appointments')"></i>
+                                </div>
+                                <table class="report-table-mini">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th class="text-end">Appointments</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="appt-report-body">
+                                        <!-- Dynamic Content -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="report-total-row">
+                                            <td>Total</td>
+                                            <td class="text-end" id="total-appt-val">0</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Top Staff by Services -->
+                        <div class="col-md-6">
+                            <div class="report-card">
+                                <div class="report-card-header header-blue">
+                                    <span>Top Staff by Services</span>
+                                    <i class="bi bi-download download-icon" onclick="downloadReport('staff_services')"></i>
+                                </div>
+                                <table class="report-table-mini">
+                                    <thead>
+                                        <tr>
+                                            <th>Staff</th>
+                                            <th class="text-center">Services</th>
+                                            <th class="text-end">Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="staff-services-body">
+                                        <!-- Dynamic Content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Top Staff by Revenue -->
+                        <div class="col-md-6">
+                            <div class="report-card">
+                                <div class="report-card-header header-purple">
+                                    <span>Top Staff by Revenue</span>
+                                    <i class="bi bi-download download-icon" onclick="downloadReport('staff_revenue')"></i>
+                                </div>
+                                <table class="report-table-mini">
+                                    <thead>
+                                        <tr>
+                                            <th>Staff</th>
+                                            <th class="text-end">Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="staff-revenue-body">
+                                        <!-- Dynamic Content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4 pt-4 border-top">
+                        <div class="col-12 d-flex justify-content-center gap-4">
+                            <div class="text-center">
+                                <div class="stat-avatar mx-auto mb-2" style="background: #f0f4ff; color: #7367f0; width: 50px; height: 50px;">
+                                    <i class="bi bi-bar-chart-line fs-4"></i>
+                                </div>
+                                <p class="small fw-bold text-muted mb-0">Sales Reports</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-avatar mx-auto mb-2" style="background: #f0fdf4; color: #28c76f; width: 50px; height: 50px;">
+                                    <i class="bi bi-people fs-4"></i>
+                                </div>
+                                <p class="small fw-bold text-muted mb-0">Top Performers</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-avatar mx-auto mb-2" style="background: #fff7ed; color: #ff9f43; width: 50px; height: 50px;">
+                                    <i class="bi bi-lightbulb fs-4"></i>
+                                </div>
+                                <p class="small fw-bold text-muted mb-0">Service Insights</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-avatar mx-auto mb-2" style="background: #fdf2ff; color: #9d50bb; width: 50px; height: 50px;">
+                                    <i class="bi bi-wallet2 fs-4"></i>
+                                </div>
+                                <p class="small fw-bold text-muted mb-0">Revenue Tracking</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </section>
         </div>
     </div>
@@ -325,6 +640,69 @@
 
         const dailyChart = new ApexCharts(document.querySelector("#completed-appointments-chart"), dailyOptions);
         dailyChart.render();
+
+        // Analytics Fetching Logic
+        function refreshAnalytics() {
+            let start = $('#report_start_date').val();
+            let end = $('#report_end_date').val();
+
+            $.ajax({
+                url: "{{ route('admin.dashboard.analytics') }}",
+                type: 'GET',
+                data: { start_date: start, end_date: end },
+                success: function(res) {
+                    // 1. Revenue
+                    let revHtml = '';
+                    res.daily_revenue.forEach(item => {
+                        revHtml += `<tr><td>${item.date}</td><td class="text-end">₹${parseFloat(item.revenue).toLocaleString()}</td></tr>`;
+                    });
+                    if(res.daily_revenue.length === 0) revHtml = '<tr><td colspan="2" class="text-center py-4 text-muted">No data found</td></tr>';
+                    $('#revenue-report-body').html(revHtml);
+                    $('#total-revenue-val').text('₹' + parseFloat(res.total_revenue).toLocaleString());
+
+                    // 2. Appointments
+                    let apptHtml = '';
+                    res.daily_appointments.forEach(item => {
+                        apptHtml += `<tr><td>${item.date}</td><td class="text-end">${item.appointments}</td></tr>`;
+                    });
+                    if(res.daily_appointments.length === 0) apptHtml = '<tr><td colspan="2" class="text-center py-4 text-muted">No data found</td></tr>';
+                    $('#appt-report-body').html(apptHtml);
+                    $('#total-appt-val').text(res.total_appointments);
+
+                    // 3. Staff Services
+                    let ssHtml = '';
+                    res.top_staff_services.forEach(item => {
+                        ssHtml += `<tr><td>${item.staff}</td><td class="text-center">${item.services}</td><td class="text-end">₹${parseFloat(item.revenue).toLocaleString()}</td></tr>`;
+                    });
+                    if(res.top_staff_services.length === 0) ssHtml = '<tr><td colspan="3" class="text-center py-4 text-muted">No performers found</td></tr>';
+                    $('#staff-services-body').html(ssHtml);
+
+                    // 4. Staff Revenue
+                    let srHtml = '';
+                    res.top_staff_revenue.forEach(item => {
+                        srHtml += `<tr><td>${item.staff}</td><td class="text-end">₹${parseFloat(item.revenue).toLocaleString()}</td></tr>`;
+                    });
+                    if(res.top_staff_revenue.length === 0) srHtml = '<tr><td colspan="2" class="text-center py-4 text-muted">No performers found</td></tr>';
+                    $('#staff-revenue-body').html(srHtml);
+                }
+            });
+        }
+
+        // Initial Load
+        refreshAnalytics();
+
+        // Trigger on change
+        $('#report_start_date, #report_end_date').on('change', function() {
+            refreshAnalytics();
+        });
+
+        // Download functionality
+        window.downloadReport = function(type) {
+            let start = $('#report_start_date').val();
+            let end = $('#report_end_date').val();
+            let url = "{{ route('admin.dashboard.export-analytics') }}?type=" + type + "&start_date=" + start + "&end_date=" + end;
+            window.location.href = url;
+        }
     });
 </script>
 @endsection
