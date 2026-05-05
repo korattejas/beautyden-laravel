@@ -678,12 +678,16 @@
             "id": 16,
             "name": "Waxing",
             "icon": "https://...",
+            "description": "Smooth, soft & hair-free skin...",
+            "is_popular": "1",
             "subcategories": [
                 {
                     "id": 1,
                     "name": "Facial",
                     "icon": "https://...",
+                    "description": "Professional facial treatments...",
                     "starting_at_price": "299.00",
+                    "is_popular": 1,
                     "media_json": {
                         "images": ["https://.../img1.jpg", "https://.../img2.jpg"],
                         "videos": ["https://.../vid1.mp4"]
@@ -712,7 +716,7 @@
                     <tr>
                         <td>city_id</td>
                         <td>Integer</td>
-                        <td>Optional. Filter by city price/availability</td>
+                        <td>Required. Filter by city price/availability</td>
                     </tr>
                     <tr>
                         <td>category_id</td>
@@ -757,12 +761,19 @@
         "data": [
             {
                 "id": 3,
+                "category_id": 16,
+                "sub_category_id": 1,
+                "category_name": "Waxing",
+                "sub_category_name": "Facial",
                 "name": "Brazilian Full Face Wax",
+                "skin_type": "All Skin Types",
                 "price": "2000.00",
                 "discount_price": "20.00",
-                "icon": "https://...",
+                "duration": "45 min",
                 "rating": "4.80",
-                "reviews": 200
+                "reviews": 200,
+                "icon": "https://...",
+                "is_popular": 1
             }
         ],
         "total": 1
@@ -792,7 +803,7 @@
                     <tr>
                         <td>city_id</td>
                         <td>Integer</td>
-                        <td>Optional. For city-specific pricing</td>
+                        <td>Required. For city-specific pricing</td>
                     </tr>
                 </tbody>
             </table>
@@ -804,11 +815,50 @@
     "message": "Service details retrieved successfully",
     "data": {
         "id": 3,
+        "category_id": 16,
+        "sub_category_id": 1,
         "name": "Brazilian Full Face Wax",
+        "skin_type": "All Skin Types",
+        "price": "2000.00",
+        "discount_price": "1800.00",
+        "duration": "45 min",
+        "rating": "4.80",
+        "reviews": 200,
+        "icon": "https://...",
         "banner_media": [{"url": "https://...", "type": "image"}],
         "before_after": ["https://...", "https://..."],
-        "content_json": [...],
-        "price": "2000.00",
+        "content_json": [
+            {
+                "type": "ritual",
+                "title": "Service Steps",
+                "steps": [
+                    {
+                        "title": "Preparation",
+                        "desc": "Cleaning the skin...",
+                        "image": "https://..."
+                    }
+                ]
+            },
+            {
+                "type": "overview",
+                "essential_ids": ["7"],
+                "essentials": [
+                    {
+                        "id": 7,
+                        "title": "Hygienic Thread",
+                        "type": "Safety",
+                        "icon": "https://..."
+                    }
+                ]
+            }
+        ],
+        "category_name": "Waxing",
+        "sub_category_name": "Facial",
+        "category": {
+            "id": 16,
+            "name": "Waxing",
+            "icon": "..."
+        },
         "subcategory": {
             "id": 1,
             "name": "Facial",

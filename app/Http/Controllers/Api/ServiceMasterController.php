@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceMaster;
 use App\Models\ServiceCityMaster;
+use App\Models\ServiceEssential;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
@@ -31,7 +32,11 @@ class ServiceMasterController extends Controller
         $function_name = 'getServiceMasters';
 
         try {
-            $cityId = $request->city_id ?? null;
+            $cityId = $request->city_id;
+
+            if (!$cityId) {
+                return $this->sendError('City ID is required.', $this->validation_error_status);
+            }
 
             $query = DB::table('service_city_masters as scm')
                 ->join('service_masters as sm', 'scm.service_master_id', '=', 'sm.id')
@@ -57,9 +62,7 @@ class ServiceMasterController extends Controller
                 ->where('scm.status', 1)
                 ->where('sm.status', 1);
 
-            if ($cityId) {
-                $query->where('scm.city_id', $cityId);
-            }
+            $query->where('scm.city_id', $cityId);
 
             if ($request->filled('search')) {
                 $search = $request->search;
@@ -129,8 +132,8 @@ class ServiceMasterController extends Controller
             $serviceId = $request->service_id;
             $cityId = $request->city_id;
 
-            if (!$serviceId) {
-                return $this->sendError('Service ID is required.', $this->validation_error_status);
+            if (!$serviceId || !$cityId) {
+                return $this->sendError('Service ID and City ID are required.', $this->validation_error_status);
             }
 
             $service = ServiceMaster::with(['category', 'subcategory'])
@@ -201,6 +204,21 @@ class ServiceMasterController extends Controller
                                 $item['image'] = asset('uploads/service/' . $item['image']);
                             }
                         }
+                    }
+
+                    if (isset($section['type']) && $section['type'] === 'overview' && isset($section['essential_ids'])) {
+                        $essentialIds = $section['essential_ids'];
+                        $section['essentials'] = ServiceEssential::whereIn('id', (array)$essentialIds)
+                            ->where('status', 1)
+                            ->get()
+                            ->map(function ($essential) {
+                                return [
+                                    'id' => $essential->id,
+                                    'title' => $essential->title,
+                                    'type' => $essential->type,
+                                    'icon' => $essential->icon ? asset('uploads/essential/' . $essential->icon) : null,
+                                ];
+                            });
                     }
                 }
                 $service->content_json = $sections;

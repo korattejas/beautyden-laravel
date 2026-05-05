@@ -30,7 +30,6 @@ class ServiceController extends Controller
         $function_name = 'getServiceCategory';
 
         try {
-
             $categories = DB::table('service_categories as c')
                 ->select(
                     'c.id',
