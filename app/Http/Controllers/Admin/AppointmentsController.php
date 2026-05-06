@@ -37,8 +37,8 @@ class AppointmentsController extends Controller
             $teamMembers = TeamMember::where('status', 1)->get();
             $cities = City::select('id', 'name')->get();
 
-            $month = $request->month ?? 'all';
-            $year = $request->year ?? 'all';
+            $month = $request->has('month') ? $request->month : date('m');
+            $year = $request->has('year') ? $request->year : date('Y');
 
             $query = Appointment::query();
             if ($month != 'all') {
@@ -666,8 +666,8 @@ class AppointmentsController extends Controller
     public function export(Request $request)
     {
         try {
-            $month = $request->month ?? 'all';
-            $year = $request->year ?? 'all';
+            $month = $request->has('month') ? $request->month : date('m');
+            $year = $request->has('year') ? $request->year : date('Y');
 
             $fileName = 'Appointments_Report_';
             if ($month != 'all') {
