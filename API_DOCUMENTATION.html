@@ -236,7 +236,9 @@
         <a href="#home" class="nav-item">Home Content</a>
         <a href="#feedback" class="nav-item">Feedback & Reviews</a>
         <a href="#config" class="nav-item">App Settings</a>
+        <a href="#testing" class="nav-item">Testing Utilities</a>
     </div>
+
 
     <div class="main-content">
         <header>
@@ -1176,7 +1178,58 @@
 }</code></pre>
         </section>
 
+        <section id="testing">
+            <h2><i class="bi bi-bug text-primary"></i> 13. Testing Utilities</h2>
+            <h3>Send Test Notification</h3>
+            <p>Sends a real-time push notification using Firebase HTTP v1 API. Use this to verify FCM integration on the mobile app.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /Test/V1/customer/sendTestNotification
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>fcm_token</td>
+                        <td>String</td>
+                        <td>Required. Target device FCM token</td>
+                    </tr>
+                    <tr>
+                        <td>title</td>
+                        <td>String</td>
+                        <td>Required. Notification Title</td>
+                    </tr>
+                    <tr>
+                        <td>body</td>
+                        <td>String</td>
+                        <td>Required. Notification Body</td>
+                    </tr>
+                    <tr>
+                        <td>data</td>
+                        <td>Object</td>
+                        <td>Optional. Custom key-value pairs (Payload)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Notification sent successfully using FCM v1.",
+    "data": {
+        "name": "projects/beautyden-b8b8a/messages/0:1715056..."
+    }
+}</code></pre>
+        </section>
+
         <p style="text-align: center; color: var(--text-light); margin: 60px 0;">
+
             &copy; 2026 Beautyden. For any API issues, contact the Backend Team.
         </p>
     </div>

@@ -30,6 +30,8 @@ use App\Http\Controllers\Api\ApplicationHomeController;
 use App\Http\Controllers\Api\ReviewApiController;
 use App\Http\Controllers\Api\ServiceMasterController;
 use App\Http\Controllers\Api\AppSettingController;
+use App\Http\Controllers\Api\NotificationController;
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -43,6 +45,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
     Route::prefix('V1/customer')->group(function () {
         Route::post('sendOtpOnMobileNumber', [AuthenticationController::class, 'sendOtpOnMobileNumber']);
         Route::post('verifyOtpOnMobileNumber', [AuthenticationController::class, 'verifyOtpOnMobileNumber']);
+        Route::post('sendTestNotification', [NotificationController::class, 'sendTestNotification']);
     });
 });
 
@@ -137,6 +140,7 @@ Route::middleware([])->group(function () {
     Route::prefix('Test/V1/customer')->group(function () {
         Route::post('sendOtpOnMobileNumber', [AuthenticationController::class, 'sendOtpOnMobileNumber']);
         Route::post('verifyOtpOnMobileNumber', [AuthenticationController::class, 'verifyOtpOnMobileNumber']);
+        Route::post('sendTestNotification', [NotificationController::class, 'sendTestNotification']);
     });
 });
 
@@ -186,5 +190,6 @@ Route::middleware([])->group(function () {
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
+
     });
 });
