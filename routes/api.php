@@ -157,6 +157,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
         Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
+        Route::post('getServiceSearchData', [ApplicationHomeController::class, 'getServiceSearchData']);
         Route::get('offerBanner', [OfferController::class, 'getOffers']);
         Route::get('listCoupons', [CouponController::class, 'listCoupons']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
