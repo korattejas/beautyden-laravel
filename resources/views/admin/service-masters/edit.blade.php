@@ -112,6 +112,10 @@
                                     <div class="col-6 mb-1"><label class="form-label">Rating</label><input type="number" step="0.1" name="rating" class="form-control" value="{{ $service->rating }}"></div>
                                     <div class="col-6 mb-1"><label class="form-label">Reviews</label><input type="number" name="reviews" class="form-control" value="{{ $service->reviews }}"></div>
                                 </div>
+                                <div class="mb-1">
+                                    <label class="form-label">Search Keywords / Short Description</label>
+                                    <textarea name="description" class="form-control" rows="2" placeholder="Brief info for meta data...">{{ $service->description }}</textarea>
+                                </div>
 
                             </div>
                         </div>
