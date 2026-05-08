@@ -700,6 +700,78 @@
     ]
 }</code></pre>
 
+            <h3>Browse & Search Data (Search Home)</h3>
+            <p>Universal endpoint for category browsing, sub-category exploration, and free-text service searching. Implements a 3-step drill-down: Category &rarr; Sub-Category &rarr; Services.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/getServiceSearchData
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. Prices/Availability will be based on this city.</td>
+                    </tr>
+                    <tr>
+                        <td>search</td>
+                        <td>String</td>
+                        <td>Optional. Search services by name/description.</td>
+                    </tr>
+                    <tr>
+                        <td>category_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Set this to get <strong>Sub-Categories</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td>sub_category_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Set this to get <strong>Services</strong>.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="note" style="margin: 10px 0; background: #fef2f2; border-left-color: #ef4444; padding: 15px; border-radius: 8px;">
+                <i class="bi bi-exclamation-triangle-fill text-danger"></i> <strong>Business Logic:</strong><br>
+                • <strong>Initial Load:</strong> If only <code>city_id</code> is sent, it returns all top-level Categories.<br>
+                • <strong>City Check:</strong> If city is "Coming Soon" (status != 0), it returns <code>is_coming_soon: true</code>.<br>
+                • <strong>Navigation:</strong> Every response includes the <code>categories</code> array to allow quick switching/filtering in UI.
+            </div>
+
+            <div class="response-title"><i class="bi bi-code-square"></i> Response Example (Initial View)</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Data retrieved successfully.",
+    "data": {
+        "categories": [ ... all categories for navigation bar ... ],
+        "type": "categories",
+        "results": [ ... all active categories to display in grid ... ]
+    }
+}</code></pre>
+
+            <div class="response-title"><i class="bi bi-code-square"></i> Response Example (Category Clicked)</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Data retrieved successfully.",
+    "data": {
+        "categories": [ ... ],
+        "type": "subcategories",
+        "results": [ ... list of sub-categories for the selected category ... ]
+    }
+}</code></pre>
+
+
             <h3>Search Services (Master)</h3>
             <p>Search and filter all available services globally or by city.</p>
             <div class="endpoint-wrapper">
@@ -1073,7 +1145,29 @@
                 <span class="badge post">POST</span> /V1/customer/homePageData
                 <span class="badge auth">Token Required</span>
             </div>
-            <p>Aggregated endpoint returning Sliders, Categories, Popular Services, and User context.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. The city context for the entire home screen.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Aggregated endpoint returning Sliders, Popular Categories, and User context. <strong>Requires city_id to show content.</strong></p>
+
+            <div class="note" style="margin: 10px 0; background: #fffbeb; border-left-color: #f59e0b; padding: 15px; border-radius: 8px;">
+                <i class="bi bi-geo-alt-fill text-warning"></i> <strong>City Handling:</strong><br>
+                If the provided <code>city_id</code> is marked as "Coming Soon" (status 1), the API returns a response with <code>"is_coming_soon": true</code> and no other home data.
+            </div>
+
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
 <code>{

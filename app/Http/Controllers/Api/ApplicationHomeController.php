@@ -31,9 +31,39 @@ class ApplicationHomeController extends Controller
     {
         $function_name = 'getHomePageData';
 
+        // 1. Validate: city_id is required
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'city_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError(
+                'City not found. Please select a city to continue.',
+                $this->validation_error_status
+            );
+        }
+
         try {
             $cityId = $request->input('city_id');
-            $search = $request->input('search');
+
+            // 2. Check City Status (Active vs Coming Soon)
+            $city = DB::table('cities')->where('id', $cityId)->first();
+            
+            if (!$city) {
+                return $this->sendError('City not found.', 404);
+            }
+
+            // status 0 = Active, status 1 = Coming Soon
+            if ($city->status != 0) {
+                return $this->sendResponse(
+                    [
+                        'is_coming_soon' => true,
+                        'city_name' => $city->name
+                    ],
+                    "Coming soon! We are not available in $city->name yet, but we will start our services here very soon.",
+                    $this->success_status
+                );
+            }
 
             // 1. User Details & Subscription
             $user = auth('user')->user();
@@ -113,6 +143,7 @@ class ApplicationHomeController extends Controller
                     'is_popular'
                 )
                 ->where('status', 1)
+                ->where('is_popular', 1)
                 ->orderByDesc('is_popular')
                 ->get();
 
@@ -151,14 +182,7 @@ class ApplicationHomeController extends Controller
                 );
             }
 
-            // For search results
-            $services = [];
-            if (!empty($search)) {
-                $services = (clone $servicesQuery)->where(function($q) use ($search) {
-                    $q->where('s.name', 'like', "%$search%")
-                      ->orWhere('s.description', 'like', "%$search%");
-                })->get();
-            }
+
 
             // Group trending services by category for tabs
             $trendingServices = (clone $servicesQuery)
@@ -267,12 +291,12 @@ class ApplicationHomeController extends Controller
                 });
             }
 
-            // 8. Others
-            $productBrands = DB::table('product_brands')
-                ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/product-brand') . '/", icon) AS icon'))
-                ->where('status', 1)
-                ->orderBy('name', 'ASC')
-                ->get();
+            // // 8. Others
+            // $productBrands = DB::table('product_brands')
+            //     ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/product-brand') . '/", icon) AS icon'))
+            //     ->where('status', 1)
+            //     ->orderBy('name', 'ASC')
+            //     ->get();
 
             $cities = DB::table('cities')
                 ->select('id', 'name', 'status')
@@ -300,11 +324,11 @@ class ApplicationHomeController extends Controller
                 'coupons' => $coupons,
                 'membership_plans' => $membershipPlans,
                 'categories' => $categories,
-                'search_results' => $services,
+
                 'trending_services' => $trendingData,
                 'reviews' => $reviews,
                 'combos' => $combos,
-                'brands' => $productBrands,
+                // 'brands' => $productBrands,
                 'active_cities' => $activeCities,
                 'coming_soon_cities' => $comingSoonCities,
             ];
@@ -322,6 +346,111 @@ class ApplicationHomeController extends Controller
                 $this->common_error_message,
                 $this->exception_status
             );
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    //  Search / Browse API
+    //  GET params (all optional):
+    //    city_id         – price from service_city_masters when set
+    //    search          – free-text → returns matching services
+    //    category_id     – returns sub-categories of that category
+    //    sub_category_id – returns services of that sub-category
+    //  Default (no param)  → returns all active categories
+    // ═══════════════════════════════════════════════════════════════════════
+    public function getServiceSearchData(Request $request): JsonResponse
+    {
+        $function_name = 'getServiceSearchData';
+
+        // 1. Validate: city_id is required
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'city_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError(
+                'City not found. Please select a city to continue.',
+                $this->validation_error_status
+            );
+        }
+
+        try {
+            $cityId        = $request->input('city_id');
+            $categoryId    = $request->input('category_id');
+            $subCategoryId = $request->input('sub_category_id');
+            $search        = trim($request->input('search', ''));
+
+            // 2. Check City Status
+            $city = DB::table('cities')->where('id', $cityId)->first();
+            if (!$city) {
+                return $this->sendError('City not found.', 404);
+            }
+            if ($city->status != 0) {
+                return $this->sendResponse(['is_coming_soon' => true, 'city_name' => $city->name], "Coming soon in $city->name!", $this->success_status);
+            }
+
+            // 3. Always fetch All Categories (Status 1) for the top navigation/filter
+            $allCategories = DB::table('service_categories')
+                ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'))
+                ->where('status', 1)
+                ->orderBy('name')
+                ->get();
+
+            // 4. Helper: Services Query
+            $buildServicesQuery = function (\Illuminate\Database\Query\Builder $q) use ($cityId) {
+                $q->join('service_city_masters as scm', function ($join) use ($cityId) {
+                    $join->on('scm.service_master_id', '=', 's.id')
+                         ->where('scm.city_id', '=', $cityId)
+                         ->where('scm.status', '=', 1);
+                })
+                ->select(
+                    's.id', 's.name', 's.category_id', 's.sub_category_id',
+                    'scm.price as base_price', 'scm.discount_price',
+                    's.duration', 's.rating', 's.reviews', 's.description',
+                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon')
+                );
+                return $q;
+            };
+
+            $responseType = 'categories';
+            $responseData = $allCategories;
+
+            // 5. Logic based on input
+            if ($search !== '') {
+                $q = DB::table('service_masters as s')->where('s.status', 1)
+                    ->where(function ($q) use ($search) {
+                        $q->where('s.name', 'like', "%$search%")->orWhere('s.description', 'like', "%$search%");
+                    });
+                $buildServicesQuery($q);
+                $responseData = $q->get();
+                $responseType = 'services';
+            } 
+            elseif ($subCategoryId) {
+                $q = DB::table('service_masters as s')->where('s.status', 1)->where('s.sub_category_id', $subCategoryId);
+                $buildServicesQuery($q);
+                $responseData = $q->get();
+                $responseType = 'services';
+            } 
+            elseif ($categoryId) {
+                $responseData = DB::table('service_subcategories')
+                    ->select('id', 'name', 'service_category_id as category_id', DB::raw('CONCAT("' . asset('uploads/service-subcategory') . '/", icon) AS icon'))
+                    ->where('service_category_id', $categoryId)->where('status', 1)->orderBy('name')->get();
+                $responseType = 'subcategories';
+            }
+
+            return $this->sendResponse(
+                [
+                    'categories' => $allCategories, // Always include categories for UI navigation
+                    'type'       => $responseType,
+                    'results'    => $responseData
+                ],
+                'Data retrieved successfully.',
+                $this->success_status
+            );
+
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
 }
