@@ -75,7 +75,16 @@ class ApplicationHomeController extends Controller
                 ]);
 
                 $addresses = $user->addresses()
-                    ->select('id', 'user_id', 'address', 'latitude', 'longitude', 'type', 'is_default')
+                    ->select(
+                        'id',
+                        'user_id',
+                        DB::raw($user->city_id . ' as city_id'),
+                        'address',
+                        'latitude',
+                        'longitude',
+                        'type',
+                        'is_default'
+                    )
                     ->orderBy('is_default', 'desc')
                     ->orderBy('id', 'desc')
                     ->get();
@@ -262,6 +271,7 @@ class ApplicationHomeController extends Controller
                         'sm.id',
                         'sm.id as service_id',
                         'sm.name',
+                        'sm.description',
                         'sm.category_id',
                         'sm.sub_category_id',
                         DB::raw('IFNULL(scm.price, sm.price) as price'),
