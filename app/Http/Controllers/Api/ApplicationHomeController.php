@@ -90,13 +90,13 @@ class ApplicationHomeController extends Controller
                     ->get();
 
                 // Check active Elite subscription
-                $subscription = DB::table('user_subscriptions as us')
-                    ->join('membership_plans as mp', 'us.plan_id', '=', 'mp.id')
-                    ->where('us.user_id', $user->id)
-                    ->where('us.status', 1)
-                    ->where('us.end_date', '>=', now())
-                    ->select('us.id', 'us.plan_id', 'us.end_date', 'mp.name as plan_name')
-                    ->first();
+                // $subscription = DB::table('user_subscriptions as us')
+                //     ->join('membership_plans as mp', 'us.plan_id', '=', 'mp.id')
+                //     ->where('us.user_id', $user->id)
+                //     ->where('us.status', 1)
+                //     ->where('us.end_date', '>=', now())
+                //     ->select('us.id', 'us.plan_id', 'us.end_date', 'mp.name as plan_name')
+                //     ->first();
 
                 $userData = [
                     'id' => (int) $user->id,
@@ -107,7 +107,7 @@ class ApplicationHomeController extends Controller
                     'address' => $user->address,
                     'active_address' => $addresses->where('is_default', 1)->first(),
                     'addresses' => $addresses,
-                    'active_subscription' => $subscription
+                    // 'active_subscription' => $subscription
                 ];
             }
 
@@ -137,10 +137,10 @@ class ApplicationHomeController extends Controller
                 });
 
             // 3. Membership Plans
-            $membershipPlans = DB::table('membership_plans')
-                ->select('id', 'name', 'description', 'price', 'discount_percentage', 'duration_months')
-                ->where('status', 1)
-                ->get();
+            // $membershipPlans = DB::table('membership_plans')
+            //     ->select('id', 'name', 'description', 'price', 'discount_percentage', 'duration_months')
+            //     ->where('status', 1)
+            //     ->get();
 
             // 4. Category List (Service Categories)
             $categories = DB::table('service_categories')
@@ -216,7 +216,7 @@ class ApplicationHomeController extends Controller
                 ->select('r.id', 'r.customer_name', 'r.rating', 'r.review', 'r.review_date', 'r.appointment_id')
                 ->where('r.status', 1)
                 ->orderByDesc('r.is_popular')
-                ->limit(6)
+                ->limit(10)
                 ->get();
 
             $appointmentIds = $reviews->pluck('appointment_id')->filter()->unique()->toArray();
