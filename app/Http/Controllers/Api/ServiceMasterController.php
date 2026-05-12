@@ -227,6 +227,34 @@ class ServiceMasterController extends Controller
             $service->is_popular = (int) $service->is_popular;
             $service->status = (int) $service->status;
 
+            // Get related popular services in the same category
+            $relatedServices = DB::table('service_city_masters as scm')
+                ->join('service_masters as sm', 'scm.service_master_id', '=', 'sm.id')
+                ->select(
+                    'sm.id',
+                    'sm.name',
+                    'scm.price',
+                    'scm.discount_price',
+                    'sm.duration',
+                    'sm.rating',
+                    'sm.reviews',
+                    DB::raw('CONCAT("' . asset('uploads/service') . '/", sm.icon) AS icon'),
+                    'sm.is_popular'
+                )
+                ->where('sm.category_id', $service->category_id)
+                ->where('sm.id', '!=', $serviceId)
+                ->where('sm.is_popular', 1)
+                ->where('sm.status', 1)
+                ->where('scm.city_id', $cityId)
+                ->where('scm.status', 1)
+                ->get()
+                ->map(function ($item) {
+                    $item->is_popular = (int) $item->is_popular;
+                    return $item;
+                });
+
+            $service->related_services = $relatedServices;
+
             return $this->sendResponse(
                 $service,
                 'Service details retrieved successfully',
