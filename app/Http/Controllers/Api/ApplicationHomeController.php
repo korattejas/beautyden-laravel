@@ -332,7 +332,7 @@ class ApplicationHomeController extends Controller
                 'user' => $userData,
                 'offers' => $offers,
                 'coupons' => $coupons,
-                'membership_plans' => $membershipPlans,
+                // 'membership_plans' => $membershipPlans,
                 'categories' => $categories,
 
                 'trending_services' => $trendingData,
