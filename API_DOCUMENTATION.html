@@ -236,6 +236,7 @@
         <a href="#home" class="nav-item">Home Content</a>
         <a href="#feedback" class="nav-item">Feedback & Reviews</a>
         <a href="#config" class="nav-item">App Settings</a>
+        <a href="#beautician" class="nav-item">Beautician Portal</a>
         <a href="#testing" class="nav-item">Testing Utilities</a>
     </div>
 
@@ -1271,9 +1272,245 @@
     ]
 }</code></pre>
         </section>
+        <section id="beautician">
+            <h2><i class="bi bi-scissors text-primary"></i> 13. Beautician Portal</h2>
+
+            <div class="note" style="margin: 10px 0; background: #fff3cd; border-left-color: #ffc107; padding: 15px; border-radius: 8px;">
+                <i class="bi bi-exclamation-triangle-fill text-warning"></i> <strong>Auth Note:</strong> All Beautician APIs (except Login) require the JWT token in the Authorization header.
+            </div>
+
+            <h3>13.1 Send Login OTP / Registration Check</h3>
+            <p>Checks if the beautician exists and sends OTP. If not found, informs the app to show the registration form.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/sendLoginOtp
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>mobile_number</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. Beautician's mobile number.</td>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td>String</td>
+                        <td>Required only for Registration.</td>
+                    </tr>
+                    <tr>
+                        <td>dob</td>
+                        <td>Date</td>
+                        <td>Required only for Registration. (YYYY-MM-DD)</td>
+                    </tr>
+                    <tr>
+                        <td>bio</td>
+                        <td>String</td>
+                        <td>Required only for Registration.</td>
+                    </tr>
+                    <tr>
+                        <td>experience_years</td>
+                        <td>Numeric</td>
+                        <td>Required only for Registration.</td>
+                    </tr>
+                    <tr>
+                        <td>address</td>
+                        <td>String</td>
+                        <td>Required only for Registration.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="note" style="margin: 10px 0; background: #e0f2fe; border-left-color: #0ea5e9; padding: 15px; border-radius: 8px;">
+                <i class="bi bi-info-circle-fill text-info"></i> <strong>Flutter Flow:</strong><br>
+                1. Call this API with only <code>mobile_number</code>.<br>
+                2. If <code>is_exists: false</code>, show registration form and call this API again with all fields.<br>
+                3. If <code>is_exists: true</code>, move to OTP verification screen.
+            </div>
+
+            <div class="response-title"><i class="bi bi-code-square"></i> Response: Not Registered</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Beautician not found. Please register.",
+    "data": {
+        "is_exists": false
+    }
+}</code></pre>
+
+            <div class="response-title"><i class="bi bi-code-square"></i> Response: Success (OTP Sent)</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "OTP sent successfully via WhatsApp.",
+    "data": {
+        "is_exists": true,
+        "mobile_number": "9876543210",
+        "message": "OTP sent successfully via WhatsApp."
+    }
+}</code></pre>
+
+            <h3>13.2 Verify Login OTP</h3>
+            <p>Validates the OTP and returns the Beautician access token.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/verifyLoginOtp
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>mobile_number</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td>otp</td>
+                        <td>Numeric</td>
+                        <td><strong>Required</strong>. 6-digit OTP.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Login successful.",
+    "data": {
+        "token": "eyJ0eXAiOiJKV1Qi...",
+        "beautician": {
+            "id": 1,
+            "name": "Beauty Expert",
+            "mobile_number": "9876543210",
+            "role": 2,
+            "status": 1
+        }
+    }
+}</code></pre>
+
+            <h3>13.3 Dashboard Stats</h3>
+            <p>Fetches performance metrics for the logged-in beautician.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/beautician/dashboard
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Dashboard data fetched successfully.",
+    "data": {
+        "beautician_name": "Tejas",
+        "total_completed": 5,
+        "monthly_completed": 2,
+        "pending_appointments": 3,
+        "total_appointments": 10,
+        "todays_appointments": 1
+    }
+}</code></pre>
+
+            <h3>13.4 Get Appointments</h3>
+            <p>Retrieves list of assigned appointments with optional filtering.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/getAppointments
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>date</td>
+                        <td>Date</td>
+                        <td>Optional. YYYY-MM-DD</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td>Integer</td>
+                        <td>Optional. 1=Pending, 2=Assigned, 3=Completed, 4=Cancelled</td>
+                    </tr>
+                    <tr>
+                        <td>month</td>
+                        <td>Integer</td>
+                        <td>Optional. 1-12</td>
+                    </tr>
+                    <tr>
+                        <td>year</td>
+                        <td>Integer</td>
+                        <td>Optional. e.g., 2026</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>13.5 Appointment Update Status</h3>
+            <p>Updates the status of a specific appointment.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/appointmentUpdateStatus
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. (1=Pending, 2=Assigned, 3=Completed, 4=Rejected)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>13.6 Get Profile</h3>
+            <p>Retrieves detailed profile information for the beautician.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/beautician/getProfile
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Profile fetched successfully.",
+    "data": {
+        "id": 1,
+        "name": "Tejas",
+        "phone": "6352755075",
+        "experience": "5",
+        "bio": "Expert in hair styling...",
+        "address": "Ahmedabad",
+        "photo": "https://...",
+        "specialties": ["Hair", "Makeup"],
+        "certifications": ["Gold Medalist"]
+    }
+}</code></pre>
+        </section>
+
 
         <section id="testing">
-            <h2><i class="bi bi-bug text-primary"></i> 13. Testing Utilities</h2>
+            <h2><i class="bi bi-bug text-primary"></i> 14. Testing Utilities</h2>
             <h3>Send Test Notification</h3>
             <p>Sends a real-time push notification using Firebase HTTP v1 API. Use this to verify FCM integration on the mobile app.</p>
             <div class="endpoint-wrapper">

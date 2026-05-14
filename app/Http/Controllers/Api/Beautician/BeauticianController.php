@@ -49,41 +49,81 @@ class BeauticianController extends Controller
             }
 
             $mobile_number = $request->mobile_number;
-            
-            // Check if this mobile exists in TeamMember table
+
             $teamMember = TeamMember::where('phone', $mobile_number)
                 ->orWhere('phone', 'like', '%' . substr($mobile_number, -10))
                 ->first();
 
-            if (!$teamMember) {
-                return $this->sendError('This mobile number is not registered as a Beautician.', 404);
+            if (!$teamMember && !$request->has('name')) {
+                return $this->sendResponse(['is_exists' => false], 'Beautician not found. Please register.', $this->success_status);
             }
 
             $otp = rand(100000, 999999);
-            $expiry = now()->addMinutes(10);
+            $otpExpirationTime = (int) config('custom.otp_expiration_time');
+            $expiry = now()->addSeconds($otpExpirationTime);
 
-            $user = User::where('mobile_number', $mobile_number)->first();
-            if ($user) {
-                $user->update([
-                    'otp' => $otp,
-                    'otp_expiration_at' => $expiry,
-                    'role' => 3, // Ensure role is beautician
+            if (!$teamMember) {
+                $regValidator = Validator::make($request->all(), [
+                    'name' => 'required|string|max:255',
+                    'dob' => 'required|date',
+                    'bio' => 'required|string',
+                    'experience_years' => 'required|numeric',
+                    'address' => 'required|string',
                 ]);
+
+                if ($regValidator->fails()) {
+                    return $this->sendError($regValidator->errors()->first(), $this->validation_error_status);
+                }
+
+                $teamMember = TeamMember::create([
+                    'name' => $request->name,
+                    'phone' => $mobile_number,
+                    'dob' => $request->dob,
+                    'bio' => $request->bio,
+                    'experience_years' => $request->experience_years,
+                    'address' => $request->address,
+                    'status' => 0,
+                ]);
+
+                $user = User::updateOrCreate(
+                    ['mobile_number' => $mobile_number],
+                    [
+                        'name' => $request->name,
+                        'dob' => $request->dob,
+                        'address' => $request->address,
+                        'role' => 2,
+                        'status' => 1,
+                        'otp' => $otp,
+                        'otp_expiration_at' => $expiry,
+                    ]
+                );
             } else {
-                $user = User::create([
-                    'name' => $teamMember->name,
-                    'mobile_number' => $mobile_number,
-                    'otp' => $otp,
-                    'otp_expiration_at' => $expiry,
-                    'role' => 3, // Beautician role
-                    'status' => 1,
-                ]);
+                $user = User::where('mobile_number', $mobile_number)->first();
+                if ($user) {
+                    $user->update([
+                        'otp' => $otp,
+                        'otp_expiration_at' => $expiry,
+                        'role' => 2,
+                    ]);
+                } else {
+                    $user = User::create([
+                        'name' => $teamMember->name,
+                        'mobile_number' => $mobile_number,
+                        'dob' => $teamMember->dob,
+                        'address' => $teamMember->address,
+                        'otp' => $otp,
+                        'otp_expiration_at' => $expiry,
+                        'role' => 2,
+                        'status' => 1,
+                    ]);
+                }
             }
 
             // Send OTP via WhatsApp using Helper
             $this->sendWhatsAppOtp($mobile_number, $teamMember->name, $otp);
 
             $data = [
+                'is_exists' => true,
                 'mobile_number' => $mobile_number,
                 'message' => 'OTP sent successfully via WhatsApp.'
             ];

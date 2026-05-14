@@ -118,8 +118,6 @@ Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(func
         Route::post('getAppointmentDetails', [BeauticianController::class, 'getAppointmentDetails']);
         Route::post('appointmentUpdateStatus', [BeauticianController::class, 'appointmentUpdateStatus']);
         Route::post('getProfile', [BeauticianController::class, 'getProfile']);
-
-        // Attendance / Availability
         Route::get('getAvailability', [AttendanceApiController::class, 'index']);
         Route::post('markLeave', [AttendanceApiController::class, 'store']);
         Route::post('cancelLeave', [AttendanceApiController::class, 'destroy']);
