@@ -28,6 +28,8 @@
     .action-btn { background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
     .action-btn:hover { background: #fff; transform: scale(1.1); }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
 
 
 <div class="app-content content">
@@ -158,7 +160,7 @@
                     <div class="col-xl-7">
                         <div class="card shadow-sm border-0 bg-light bg-opacity-25" style="min-height: 800px;">
                             <div class="card-header d-flex justify-content-between align-items-center bg-white border-bottom">
-                                <h4 class="card-title text-primary"><i data-feather="layout" class="me-1"></i>Dynamic Page Components</h4>
+                                <h4 class="card-title text-primary"><i data-feather="layout" class="me-1"></i>Dynamic Page Components <small class="text-muted" style="font-size: 10px;">(Drag to Reorder)</small></h4>
                                 <div class="dropdown">
                                     <button class="btn btn-primary btn-sm dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown">+ Add Section</button>
                                     <div class="dropdown-menu dropdown-menu-end shadow-lg">
@@ -167,7 +169,8 @@
                                         <a class="dropdown-item add-section" href="javascript:void(0)" data-type="procedure"><i data-feather="refresh-cw" class="me-50"></i> Procedure (Carousel)</a>
                                         <a class="dropdown-item add-section" href="javascript:void(0)" data-type="expert"><i data-feather="user-check" class="me-50"></i> Expert Profile</a>
                                         <a class="dropdown-item add-section" href="javascript:void(0)" data-type="protocol"><i data-feather="shield" class="me-50"></i> Hygiene Protocols</a>
-                                        <a class="dropdown-item add-section" href="javascript:void(0)" data-type="list"><i data-feather="list" class="me-50"></i> Information List</a>
+                                        <a class="dropdown-item add-section" href="javascript:void(0)" data-type="aftercare"><i data-feather="heart" class="me-50"></i> Aftercare Tips</a>
+                                        <a class="dropdown-item add-section" href="javascript:void(0)" data-type="note"><i data-feather="alert-circle" class="me-50"></i> Please Note</a>
                                     </div>
                                 </div>
                             </div>
@@ -252,7 +255,31 @@
         </div>
     </div>
 
-    <!-- List -->
+    <!-- Aftercare Tips -->
+    <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="aftercare">
+        <input type="hidden" name="sections[INDEX][type]" value="aftercare">
+        <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo"><i data-feather="heart" class="me-50"></i> Aftercare Tips</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
+        <div class="card-body py-1 bg-white">
+            <input type="text" name="sections[INDEX][title]" class="form-control mb-1 fw-bold" placeholder="List Heading (e.g. Post-Facial Care)">
+            <div class="points-container">
+                <div class="input-group mb-1"><span class="input-group-text"><i data-feather="check"></i></span><input type="text" name="sections[INDEX][points][]" class="form-control"><button type="button" class="btn btn-outline-indigo add-point">+</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Please Note -->
+    <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="note">
+        <input type="hidden" name="sections[INDEX][type]" value="note">
+        <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo"><i data-feather="alert-circle" class="me-50"></i> Please Note</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
+        <div class="card-body py-1 bg-white">
+            <input type="text" name="sections[INDEX][title]" class="form-control mb-1 fw-bold" placeholder="List Heading (e.g. Important Instructions)">
+            <div class="points-container">
+                <div class="input-group mb-1"><span class="input-group-text"><i data-feather="check"></i></span><input type="text" name="sections[INDEX][points][]" class="form-control"><button type="button" class="btn btn-outline-indigo add-point">+</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- List (Keep for compatibility) -->
     <div class="section-block card mb-2 border shadow-none overflow-hidden" data-type="list">
         <input type="hidden" name="sections[INDEX][type]" value="list">
         <div class="section-header d-flex justify-content-between align-items-center"><h5 class="mb-0 fw-bold text-indigo">Information List</h5><button type="button" class="btn btn-icon btn-flat-danger btn-sm remove-section"><i data-feather="trash-2"></i></button></div>
@@ -351,6 +378,38 @@
         var bannerIndex = 1;
         $('.select2').select2({ width: '100%' });
 
+        // Initialize Sortable
+        var el = document.getElementById('sections-container');
+        var sortable = Sortable.create(el, {
+            animation: 150,
+            handle: '.section-header', // Drag by header
+            ghostClass: 'bg-light',
+            onEnd: function() {
+                reindexSections();
+            }
+        });
+
+        function reindexSections() {
+            $('#sections-container .section-block').each(function(index) {
+                $(this).find('input, select, textarea').each(function() {
+                    let name = $(this).attr('name');
+                    if (name) {
+                        let newName = name.replace(/sections\[\d+\]/, 'sections[' + index + ']');
+                        $(this).attr('name', newName);
+                    }
+                });
+                $(this).find('.add-step, .add-protocol-item').each(function() {
+                    let prefix = $(this).attr('data-prefix');
+                    if (prefix) {
+                        let newPrefix = prefix.replace(/sections\[\d+\]/, 'sections[' + index + ']');
+                        $(this).attr('data-prefix', newPrefix);
+                    }
+                });
+            });
+            // Update global sectionIndex to avoid collisions if needed
+            sectionIndex = $('#sections-container .section-block').length;
+        }
+
         $('.add-banner').click(function() {
             $('#banner-media-container').append('<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><div class="placeholder-content"><i data-feather="upload-cloud" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload File</p></div><input type="file" name="banner['+bannerIndex+'][file]" onchange="handlePreview(this)"></div><div class="preview-container"></div></div>');
             bannerIndex++; feather.replace();
@@ -367,7 +426,9 @@
             var html = $('#templates [data-type="'+type+'"]').clone();
             $('#sections-container').append(html[0].outerHTML.replace(/INDEX/g, sectionIndex));
             $('#sections-container .select2-dynamic').last().select2({ width: '100%' });
-            sectionIndex++; feather.replace();
+            sectionIndex++; 
+            feather.replace();
+            reindexSections();
         });
 
         $(document).on('click', '.add-step', function() {
@@ -391,7 +452,11 @@
         });
 
         $(document).on('click', '.remove-row', function() { $(this).closest('.step-card, .banner-media-row, .ba-row, .col-6, .input-group').remove(); });
-        $(document).on('click', '.remove-section', function() { $(this).closest('.section-block').remove(); if(!$('.section-block').length) $('.empty-msg').show(); });
+        $(document).on('click', '.remove-section', function() { 
+            $(this).closest('.section-block').remove(); 
+            if(!$('.section-block').length) $('.empty-msg').show(); 
+            reindexSections();
+        });
 
         $('#category_id').on('change', function() {
             var id = $(this).val();

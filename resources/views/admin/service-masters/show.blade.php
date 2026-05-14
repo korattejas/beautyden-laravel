@@ -164,14 +164,21 @@
                                         </div>
                                     </div>
 
-                                @elseif($type == 'list' && !empty($section['points']))
-                                    <div class="section-preview">
-                                        <h5 class="mb-1">{{ $section['title'] ?? 'Information' }}</h5>
+                                 @elseif(($type == 'list' || $type == 'aftercare' || $type == 'note') && !empty($section['points']))
+                                    @php
+                                        $icon = "arrow-right";
+                                        $color = "primary";
+                                        $borderClass = "";
+                                        if($type == 'aftercare') { $icon = "heart"; $color = "danger"; $borderClass = "border-danger"; }
+                                        if($type == 'note') { $icon = "alert-circle"; $color = "warning"; $borderClass = "border-warning"; }
+                                    @endphp
+                                    <div class="section-preview {{ $borderClass }}">
+                                        <h5 class="mb-1 text-{{ $color }}">{{ $section['title'] ?? ($type == 'aftercare' ? 'Aftercare Tips' : ($type == 'note' ? 'Please Note' : 'Information')) }}</h5>
                                         <div class="row">
                                             @foreach($section['points'] as $p)
                                                 <div class="col-md-6">
                                                     <div class="d-flex mb-1 align-items-start">
-                                                        <i data-feather="arrow-right" class="text-primary me-1" style="width: 15px; margin-top: 3px;"></i>
+                                                        <i data-feather="{{ $icon }}" class="text-{{ $color }} me-1" style="width: 15px; margin-top: 3px;"></i>
                                                         <span class="small">{{ $p }}</span>
                                                     </div>
                                                 </div>

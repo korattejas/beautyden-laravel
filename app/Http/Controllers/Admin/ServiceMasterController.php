@@ -220,7 +220,7 @@ class ServiceMasterController extends Controller
                         $processed_section['image'] = $img;
                         $processed_section['points'] = array_values(array_filter($section['points'] ?? []));
                     }
-                    elseif ($type == 'list') {
+                    elseif ($type == 'list' || $type == 'aftercare' || $type == 'note') {
                         $processed_section['title'] = $section['title'] ?? '';
                         $processed_section['points'] = array_values(array_filter($section['points'] ?? []));
                     }
