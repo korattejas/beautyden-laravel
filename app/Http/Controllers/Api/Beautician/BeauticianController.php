@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Http;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\Service;
 use Twilio\Rest\Client as TwilioClient;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\BeauticianSettlement;
 
 class BeauticianController extends Controller
 {
@@ -284,7 +287,8 @@ class BeauticianController extends Controller
                 return $this->sendResponse($data, 'Profile under review.', $this->success_status);
             }
 
-            $query = Appointment::whereRaw("FIND_IN_SET(?, assigned_to)", [$teamMember->id]);
+            $baseQuery = Appointment::whereRaw("FIND_IN_SET(?, assigned_to)", [$teamMember->id]);
+            $query = clone $baseQuery;
 
             // Filtering logic
             $filter = $request->get('filter', 'last_30_days');
@@ -335,20 +339,39 @@ class BeauticianController extends Controller
             }
 
             $totalCompleted = (clone $query)->where('status', 3)->count();
+            
+            $completedAppointments = (clone $query)->where('status', 3)->get();
+            $totalRevenue = $completedAppointments->sum(function($appointment) {
+                return (float) ($appointment->services_data['summary']['grand_total'] ?? 0);
+            });
+
             $pendingAppointments = (clone $query)->whereIn('status', [1, 2])->count();
             $totalAppointments = (clone $query)->count();
-            $todaysAppointments = (clone $query)->whereDate('appointment_date', Carbon::today())->count();
+
+            $todayAppointmentsCount = (clone $baseQuery)->whereDate('appointment_date', Carbon::today())->count();
+            $tomorrowAppointmentsCount = (clone $baseQuery)->whereDate('appointment_date', Carbon::tomorrow())->count();
+
+            $repeatCustomersCount = (clone $baseQuery)
+                ->select('phone')
+                ->groupBy('phone')
+                ->havingRaw('COUNT(id) > 1')
+                ->get()
+                ->count();
 
             $data = [
                 'beautician_name' => $teamMember->name,
                 'is_approved' => true,
                 'filter_applied' => $filter,
                 'total_completed' => $totalCompleted,
+                'total_revenue' => round($totalRevenue, 2),
                 'pending_appointments' => $pendingAppointments,
                 'total_appointments' => $totalAppointments,
-                'todays_appointments' => $todaysAppointments,
+                'today_appointments_count' => $todayAppointmentsCount,
+                'tomorrow_appointments_count' => $tomorrowAppointmentsCount,
+                'repeat_customers_count' => $repeatCustomersCount,
                 'start_date' => $startDate ? $startDate->toDateString() : null,
                 'end_date' => $endDate->toDateString(),
+                'settlement' => BeauticianSettlement::where('team_member_id', $teamMember->id)->first(),
             ];
 
             return $this->sendResponse($data, 'Dashboard data fetched successfully.', $this->success_status);
@@ -405,17 +428,74 @@ class BeauticianController extends Controller
                     'id' => $appointment->id,
                     'order_number' => $appointment->order_number,
                     'client_name' => $appointment->first_name . ' ' . $appointment->last_name,
-                    'phone' => $appointment->phone,
                     'appointment_date' => $appointment->appointment_date,
                     'appointment_time' => $appointment->appointment_time,
                     'address' => $appointment->service_address,
                     'city' => $appointment->city_name,
                     'status' => $appointment->status,
-                    'total_amount' => $appointment->price,
+                    'total_amount' => $appointment->services_data['summary']['grand_total'] ?? $appointment->price,
+                    'company_amount' => $appointment->company_amount,
+                    'payment_type' => $appointment->payment_type,
                 ];
             });
 
             return $this->sendResponse($formattedAppointments, 'Appointments fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    /**
+     * Export Appointments (Excel/PDF)
+     */
+    public function exportAppointments(Request $request)
+    {
+        $function_name = 'exportAppointments';
+        try {
+            $teamMember = $this->getTeamMember($request);
+            if (!$teamMember) {
+                return $this->sendError('Beautician profile not found.', 404);
+            }
+
+            if ($teamMember->status != 1) {
+                return $this->sendError('Your profile is under review.', 403);
+            }
+
+            $query = Appointment::whereRaw("FIND_IN_SET(?, assigned_to)", [$teamMember->id])
+                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select('appointments.*', 'ct.name as city_name')
+                ->orderBy('appointment_date', 'desc');
+
+            // Apply filters
+            if ($request->filled('date')) {
+                $query->whereDate('appointment_date', $request->date);
+            }
+            if ($request->filled('status')) {
+                $query->where('appointments.status', $request->status);
+            }
+            if ($request->filled('month') && $request->month != 'all') {
+                $query->whereMonth('appointment_date', $request->month);
+            }
+            if ($request->filled('year') && $request->year != 'all') {
+                $query->whereYear('appointment_date', $request->year);
+            }
+
+            $appointments = $query->get();
+            $type = $request->get('type', 'excel'); // excel or pdf
+
+            if ($type == 'pdf') {
+                $pdf = Pdf::loadView('admin.appointments.export', compact('appointments'));
+                return $pdf->download('appointments_report_' . time() . '.pdf');
+            } else {
+                return Excel::download(new class($appointments) implements \Maatwebsite\Excel\Concerns\FromView {
+                    private $appointments;
+                    public function __construct($appointments) { $this->appointments = $appointments; }
+                    public function view(): \Illuminate\Contracts\View\View {
+                        return view('admin.appointments.export', ['appointments' => $this->appointments]);
+                    }
+                }, 'appointments_report_' . time() . '.xlsx');
+            }
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
@@ -467,8 +547,6 @@ class BeauticianController extends Controller
                 'order_number' => $appointment->order_number,
                 'client_details' => [
                     'name' => $appointment->first_name . ' ' . $appointment->last_name,
-                    'phone' => $appointment->phone,
-                    'email' => $appointment->email,
                 ],
                 'appointment_details' => [
                     'date' => $appointment->appointment_date,
@@ -479,10 +557,76 @@ class BeauticianController extends Controller
                 ],
                 'services' => $services,
                 'summary' => $appointment->services_data['summary'] ?? null,
+                'company_amount' => $appointment->company_amount,
                 'status' => $appointment->status,
+                'payment_type' => $appointment->payment_type,
             ];
 
             return $this->sendResponse($data, 'Appointment details fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    /**
+     * Get Repeat Customer Appointments
+     */
+    public function getRepeatCustomers(Request $request): JsonResponse
+    {
+        $function_name = 'getRepeatCustomers';
+        try {
+            $teamMember = $this->getTeamMember($request);
+            if (!$teamMember) {
+                return $this->sendError('Beautician profile not found.', 404);
+            }
+
+            if ($teamMember->status != 1) {
+                return $this->sendError('Your profile is under review.', 403);
+            }
+
+            // Identify phones that have more than 1 appointment assigned to this beautician
+            $repeatPhones = Appointment::whereRaw("FIND_IN_SET(?, assigned_to)", [$teamMember->id])
+                ->select('phone')
+                ->groupBy('phone')
+                ->havingRaw('COUNT(id) > 1')
+                ->pluck('phone');
+
+            // Fetch all appointments associated with these repeat phone numbers
+            $appointments = Appointment::whereRaw("FIND_IN_SET(?, assigned_to)", [$teamMember->id])
+                ->whereIn('phone', $repeatPhones)
+                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select('appointments.*', 'ct.name as city_name')
+                ->orderBy('appointment_date', 'desc')
+                ->get();
+
+            $data = $appointments->map(function ($appointment) {
+                $services = [];
+                if (isset($appointment->services_data['services'])) {
+                    $services = $appointment->services_data['services'];
+                }
+
+                return [
+                    'id' => $appointment->id,
+                    'order_number' => $appointment->order_number,
+                    'client_details' => [
+                        'name' => $appointment->first_name . ' ' . $appointment->last_name,
+                    ],
+                    'appointment_details' => [
+                        'date' => $appointment->appointment_date,
+                        'time' => $appointment->appointment_time,
+                        'address' => $appointment->service_address,
+                        'city' => $appointment->city_name,
+                        'notes' => $appointment->special_notes,
+                    ],
+                    'services' => $services,
+                    'summary' => $appointment->services_data['summary'] ?? null,
+                    'status' => $appointment->status,
+                    'payment_type' => $appointment->payment_type,
+                ];
+            });
+
+            return $this->sendResponse($data, 'Repeat customer appointments fetched successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
@@ -529,6 +673,74 @@ class BeauticianController extends Controller
     }
 
     /**
+     * Update Beautician Profile
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $function_name = 'updateProfile';
+        try {
+            $teamMember = $this->getTeamMember($request);
+            if (!$teamMember) {
+                return $this->sendError('Beautician profile not found.', 404);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'nullable|string|max:255',
+                'dob' => 'nullable|date',
+                'blood_group' => 'nullable|string|max:10',
+                'role' => 'nullable|string|max:255',
+                'experience_years' => 'nullable|numeric',
+                'specialties' => 'nullable|string',
+                'bio' => 'nullable|string',
+                'certifications' => 'nullable|string',
+                'state' => 'nullable|string',
+                'city' => 'nullable|string',
+                'taluko' => 'nullable|string',
+                'village' => 'nullable|string',
+                'address' => 'nullable|string',
+                'icon' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $updateData = $request->only([
+                'name', 'dob', 'blood_group', 'role', 'experience_years',
+                'specialties', 'bio', 'certifications', 'state', 'city',
+                'taluko', 'village', 'address'
+            ]);
+
+            if ($request->hasFile('icon')) {
+                // Delete old icon if exists
+                if ($teamMember->icon && file_exists(public_path('uploads/team-member/' . $teamMember->icon))) {
+                    @unlink(public_path('uploads/team-member/' . $teamMember->icon));
+                }
+
+                $image = $request->file('icon');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/team-member/'), $imageName);
+                $updateData['icon'] = $imageName;
+            }
+
+            $teamMember->update($updateData);
+
+            // Also update User table name if provided
+            if ($request->filled('name')) {
+                $user = auth()->guard('user')->user();
+                if ($user) {
+                    $user->update(['name' => $request->name]);
+                }
+            }
+
+            return $this->sendResponse($teamMember, 'Profile updated successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    /**
      * Get Beautician Profile
      */
     public function getProfile(Request $request): JsonResponse
@@ -544,13 +756,20 @@ class BeauticianController extends Controller
                 'id' => $teamMember->id,
                 'name' => $teamMember->name,
                 'phone' => $teamMember->phone,
+                'dob' => $teamMember->dob,
+                'blood_group' => $teamMember->blood_group,
                 'role' => $teamMember->role,
-                'experience' => $teamMember->experience_years,
+                'experience_years' => $teamMember->experience_years,
                 'bio' => $teamMember->bio,
+                'state' => $teamMember->state,
+                'city' => $teamMember->city,
+                'taluko' => $teamMember->taluko,
+                'village' => $teamMember->village,
                 'address' => $teamMember->address,
                 'photo' => $teamMember->icon ? asset('uploads/team-member/' . $teamMember->icon) : null,
-                'specialties' => $teamMember->specialties ? json_decode($teamMember->specialties, true) : [],
-                'certifications' => $teamMember->certifications ? json_decode($teamMember->certifications, true) : [],
+                'specialties' => $teamMember->specialties,
+                'certifications' => $teamMember->certifications,
+                'status' => $teamMember->status,
             ];
 
             return $this->sendResponse($data, 'Profile fetched successfully.', $this->success_status);

@@ -1448,9 +1448,12 @@
         "is_approved": true,
         "filter_applied": "last_30_days",
         "total_completed": 5,
+        "total_revenue": 1250.50,
         "pending_appointments": 3,
         "total_appointments": 10,
-        "todays_appointments": 1,
+        "today_appointments_count": 1,
+        "tomorrow_appointments_count": 2,
+        "repeat_customers_count": 5,
         "start_date": "2026-04-14",
         "end_date": "2026-05-14"
     }
@@ -1469,7 +1472,37 @@
     }
 }</code></pre>
 
-            <h3>13.4 Get Appointments</h3>
+            <h3>13.4 Get Repeat Customer Appointments</h3>
+            <p>Returns a list of all appointments for clients who have booked more than once with this beautician.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/getRepeatCustomers
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>[
+    {
+        "id": 1,
+        "order_number": "ORD-12345",
+        "client_details": {
+            "name": "John Doe",
+            "phone": "9876543210"
+        },
+        "appointment_details": {
+            "date": "2026-05-14",
+            "time": "10:00 AM",
+            "address": "123, Street Name",
+            "city": "Ahmedabad",
+            "notes": "Please be on time"
+        },
+        "services": [...],
+        "summary": "...",
+        "status": 3,
+        "payment_type": "cod"
+    }
+]</code></pre>
+
+            <h3>13.5 Get Appointments</h3>
             <p>Retrieves list of assigned appointments with optional filtering.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/beautician/getAppointments
@@ -1506,8 +1539,93 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>[
+    {
+        "id": 1,
+        "order_number": "ORD-12345",
+        "client_name": "John Doe",
+        "appointment_date": "2026-05-14",
+        "appointment_time": "10:00 AM",
+        "address": "123, Street Name",
+        "city": "Ahmedabad",
+        "status": 3,
+        "total_amount": "699.00",
+        "payment_type": "cod"
+    }
+]</code></pre>
 
-            <h3>13.5 Appointment Update Status</h3>
+            <h3>13.6 Export Appointments</h3>
+            <p>Generates a downloadable Excel or PDF report of assigned appointments. Supports same filters as Get Appointments.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/exportAppointments
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>type</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. "excel" or "pdf"</td>
+                    </tr>
+                    <tr><td>date</td><td>Date</td><td>Optional. YYYY-MM-DD</td></tr>
+                    <tr><td>status</td><td>Integer</td><td>Optional. 1=Pending, 2=Assigned, 3=Completed, 4=Cancelled</td></tr>
+                    <tr><td>month</td><td>Integer</td><td>Optional. 1-12</td></tr>
+                    <tr><td>year</td><td>Integer</td><td>Optional. e.g., 2026</td></tr>
+                </tbody>
+            </table>
+            <p><strong>Note:</strong> This endpoint returns the file directly as a binary download.</p>
+
+            <h3>13.7 Get Appointment Details</h3>
+            <p>Fetches full details of a specific appointment.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/getAppointmentDetails
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Appointment details fetched successfully.",
+    "data": {
+        "id": 1,
+        "order_number": "ORD-12345",
+        "client_details": {
+            "name": "John Doe"
+        },
+        "appointment_details": {
+            "date": "2026-05-14",
+            "time": "10:00 AM",
+            "address": "123, Street Name",
+            "city": "Ahmedabad",
+            "notes": "..."
+        },
+        "services": [...],
+        "summary": {...},
+        "status": 3,
+        "payment_type": "cod"
+    }
+}</code></pre>
+
+            <h3>13.8 Appointment Update Status</h3>
             <p>Updates the status of a specific appointment.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/beautician/appointmentUpdateStatus
@@ -1528,10 +1646,10 @@
                 </tbody>
             </table>
 
-            <h3>13.6 Get Profile</h3>
+            <h3>13.9 Get Profile</h3>
             <p>Retrieves detailed profile information for the beautician.</p>
             <div class="endpoint-wrapper">
-                <span class="badge get">GET</span> /V1/beautician/getProfile
+                <span class="badge get">GET/POST</span> /V1/beautician/getProfile
                 <span class="badge auth">Token Required</span>
             </div>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -1544,14 +1662,54 @@
         "id": 1,
         "name": "Tejas",
         "phone": "6352755075",
-        "experience": "5",
+        "dob": "1995-05-10",
+        "blood_group": "O+",
+        "role": "Beautician",
+        "experience_years": "5",
         "bio": "Expert in hair styling...",
-        "address": "Ahmedabad",
+        "state": "Gujarat",
+        "city": "Ahmedabad",
+        "taluko": "Ahmedabad",
+        "village": "Ahmedabad",
+        "address": "123, Street Name",
         "photo": "https://...",
-        "specialties": ["Hair", "Makeup"],
-        "certifications": ["Gold Medalist"]
+        "specialties": null,
+        "certifications": null,
+        "status": 1
     }
 }</code></pre>
+
+            <h3>13.10 Update Profile</h3>
+            <p>Updates beautician profile details. Supports multipart/form-data for image upload.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/updateProfile
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>name</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>dob</td><td>Date</td><td>Optional (YYYY-MM-DD)</td></tr>
+                    <tr><td>blood_group</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>role</td><td>String</td><td>Optional (Description)</td></tr>
+                    <tr><td>experience_years</td><td>Numeric</td><td>Optional</td></tr>
+                    <tr><td>bio</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>address</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>city</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>state</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>taluko</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>village</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>specialties</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>certifications</td><td>String</td><td>Optional</td></tr>
+                    <tr><td>icon</td><td>File</td><td>Optional. Image file (jpeg, png, jpg, webp)</td></tr>
+                </tbody>
+            </table>
         </section>
 
 

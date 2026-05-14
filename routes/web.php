@@ -34,6 +34,7 @@ use App\Http\Controllers\Admin\ServiceCityMasterController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\RazorpayTransactionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\SettlementController;
 use App\Http\Controllers\ContractController;
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
@@ -376,5 +377,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('razorpay', [RazorpayTransactionController::class, 'index'])->name('admin.razorpay.index');
         Route::get('getDataRazorpay', [RazorpayTransactionController::class, 'getData'])->name('getDataRazorpay');
         Route::get('razorpay/{id}', [RazorpayTransactionController::class, 'show'])->name('admin.razorpay.show');
+
+        /* Settlement Routes */
+        Route::get('settlements', [SettlementController::class, 'index'])->name('admin.settlement.index');
+        Route::post('settlements/update', [SettlementController::class, 'update'])->name('admin.settlement.update');
     });
 });
