@@ -274,24 +274,81 @@ class BeauticianController extends Controller
                 return $this->sendError('Beautician profile not found.', 404);
             }
 
+            // Check if beautician is approved (status 1)
+            if ($teamMember->status != 1) {
+                $data = [
+                    'beautician_name' => $teamMember->name,
+                    'is_approved' => false,
+                    'message' => 'Your profile is currently under review. Your dashboard and appointment details will be visible once the administrator approves your account.'
+                ];
+                return $this->sendResponse($data, 'Profile under review.', $this->success_status);
+            }
+
             $query = Appointment::whereRaw("FIND_IN_SET(?, assigned_to)", [$teamMember->id]);
 
+            // Filtering logic
+            $filter = $request->get('filter', 'last_30_days');
+            $startDate = null;
+            $endDate = Carbon::now();
+
+            switch ($filter) {
+                case 'today':
+                    $startDate = Carbon::today();
+                    $endDate = Carbon::today();
+                    break;
+                case 'yesterday':
+                    $startDate = Carbon::yesterday();
+                    $endDate = Carbon::yesterday();
+                    break;
+                case 'last_7_days':
+                    $startDate = Carbon::now()->subDays(7);
+                    break;
+                case 'last_30_days':
+                    $startDate = Carbon::now()->subDays(30);
+                    break;
+                case 'last_3_months':
+                    $startDate = Carbon::now()->subMonths(3);
+                    break;
+                case 'last_6_months':
+                    $startDate = Carbon::now()->subMonths(6);
+                    break;
+                case 'last_1_year':
+                    $startDate = Carbon::now()->subYear();
+                    break;
+                case 'all':
+                    $startDate = null;
+                    break;
+                case 'custom':
+                    if ($request->filled('start_date') && $request->filled('end_date')) {
+                        $startDate = Carbon::parse($request->start_date);
+                        $endDate = Carbon::parse($request->end_date);
+                    }
+                    break;
+                default:
+                    $startDate = Carbon::now()->subDays(30);
+                    $filter = 'last_30_days';
+                    break;
+            }
+
+            if ($startDate) {
+                $query->whereBetween('appointment_date', [$startDate->toDateString(), $endDate->toDateString()]);
+            }
+
             $totalCompleted = (clone $query)->where('status', 3)->count();
-            $monthlyCompleted = (clone $query)->where('status', 3)
-                ->whereMonth('appointment_date', Carbon::now()->month)
-                ->whereYear('appointment_date', Carbon::now()->year)
-                ->count();
             $pendingAppointments = (clone $query)->whereIn('status', [1, 2])->count();
             $totalAppointments = (clone $query)->count();
             $todaysAppointments = (clone $query)->whereDate('appointment_date', Carbon::today())->count();
 
             $data = [
                 'beautician_name' => $teamMember->name,
+                'is_approved' => true,
+                'filter_applied' => $filter,
                 'total_completed' => $totalCompleted,
-                'monthly_completed' => $monthlyCompleted,
                 'pending_appointments' => $pendingAppointments,
                 'total_appointments' => $totalAppointments,
                 'todays_appointments' => $todaysAppointments,
+                'start_date' => $startDate ? $startDate->toDateString() : null,
+                'end_date' => $endDate->toDateString(),
             ];
 
             return $this->sendResponse($data, 'Dashboard data fetched successfully.', $this->success_status);
@@ -311,6 +368,10 @@ class BeauticianController extends Controller
             $teamMember = $this->getTeamMember($request);
             if (!$teamMember) {
                 return $this->sendError('Beautician profile not found.', 404);
+            }
+
+            if ($teamMember->status != 1) {
+                return $this->sendError('Your profile is under review. Appointment details will be available once approved.', 403);
             }
 
             $query = Appointment::whereRaw("FIND_IN_SET(?, assigned_to)", [$teamMember->id])
@@ -379,6 +440,10 @@ class BeauticianController extends Controller
             $teamMember = $this->getTeamMember($request);
             if (!$teamMember) {
                 return $this->sendError('Beautician profile not found.', 404);
+            }
+
+            if ($teamMember->status != 1) {
+                return $this->sendError('Your profile is under review. Appointment details will be available once approved.', 403);
             }
 
             $appointment = Appointment::whereRaw("FIND_IN_SET(?, assigned_to)", [$teamMember->id])

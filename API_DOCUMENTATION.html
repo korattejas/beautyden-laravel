@@ -1404,10 +1404,40 @@
             <h3>13.3 Dashboard Stats</h3>
             <p>Fetches performance metrics for the logged-in beautician.</p>
             <div class="endpoint-wrapper">
-                <span class="badge get">GET</span> /V1/beautician/dashboard
+                <span class="badge get">POST</span> /V1/beautician/dashboard
                 <span class="badge auth">Token Required</span>
             </div>
-            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>filter</td>
+                        <td>String</td>
+                        <td>Optional. Options: <code>today</code>, <code>yesterday</code>, <code>last_7_days</code>, <code>last_30_days</code> (default), <code>last_3_months</code>, <code>last_6_months</code>, <code>last_1_year</code>, <code>all</code>, <code>custom</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>start_date</td>
+                        <td>Date</td>
+                        <td>Required if filter is <code>custom</code>. (YYYY-MM-DD)</td>
+                    </tr>
+                    <tr>
+                        <td>end_date</td>
+                        <td>Date</td>
+                        <td>Required if filter is <code>custom</code>. (YYYY-MM-DD)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="note" style="margin: 10px 0; background: #fef2f2; border-left-color: #ef4444; padding: 15px; border-radius: 8px;">
+                <i class="bi bi-shield-lock-fill text-danger"></i> <strong>Approval Check:</strong> If <code>is_approved: false</code>, the beautician should see a "Profile Under Review" screen instead of the dashboard stats.
+            </div>
+
+            <div class="response-title"><i class="bi bi-code-square"></i> Response: Approved (Full Data)</div>
             <pre>
 <code>{
     "code": 200,
@@ -1415,11 +1445,27 @@
     "message": "Dashboard data fetched successfully.",
     "data": {
         "beautician_name": "Tejas",
+        "is_approved": true,
+        "filter_applied": "last_30_days",
         "total_completed": 5,
-        "monthly_completed": 2,
         "pending_appointments": 3,
         "total_appointments": 10,
-        "todays_appointments": 1
+        "todays_appointments": 1,
+        "start_date": "2026-04-14",
+        "end_date": "2026-05-14"
+    }
+}</code></pre>
+
+            <div class="response-title"><i class="bi bi-code-square"></i> Response: Pending Review</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Profile under review.",
+    "data": {
+        "beautician_name": "Tejas",
+        "is_approved": false,
+        "message": "Your profile is currently under review..."
     }
 }</code></pre>
 
