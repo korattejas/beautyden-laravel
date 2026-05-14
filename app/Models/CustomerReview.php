@@ -26,6 +26,11 @@ class CustomerReview extends Model
         'status',
     ];
 
+    protected $casts = [
+        'photos' => 'array',
+        'review_date' => 'date',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

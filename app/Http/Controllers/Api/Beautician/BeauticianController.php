@@ -542,6 +542,15 @@ class BeauticianController extends Controller
                 $services = $appointment->services_data['services'];
             }
 
+            // Fetch associated review
+            $review = \App\Models\CustomerReview::where('appointment_id', $appointment->id)->first();
+            if ($review) {
+                $photos = is_array($review->photos) ? $review->photos : [];
+                $review->photos = array_map(function($photo) {
+                    return asset('uploads/review/photos/' . $photo);
+                }, $photos);
+            }
+
             $data = [
                 'id' => $appointment->id,
                 'order_number' => $appointment->order_number,
@@ -560,6 +569,7 @@ class BeauticianController extends Controller
                 'company_amount' => $appointment->company_amount,
                 'status' => $appointment->status,
                 'payment_type' => $appointment->payment_type,
+                'review' => $review,
             ];
 
             return $this->sendResponse($data, 'Appointment details fetched successfully.', $this->success_status);

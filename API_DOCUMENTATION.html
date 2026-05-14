@@ -1228,10 +1228,42 @@
         <section id="feedback">
             <h2><i class="bi bi-chat-left-dots text-primary"></i> 11. Feedback & Reviews</h2>
             <h3>Submit Review</h3>
+            <p>Submits a review for a completed appointment. All reviews are saved with a pending status (0) and require admin approval before becoming public.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customer/submitReview
                 <span class="badge auth">Token Required</span>
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. ID of the completed appointment.</td>
+                    </tr>
+                    <tr>
+                        <td>rating</td>
+                        <td>Numeric</td>
+                        <td><strong>Required</strong>. Rating from 1 to 5.</td>
+                    </tr>
+                    <tr>
+                        <td>review</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. Customer's feedback text.</td>
+                    </tr>
+                    <tr>
+                        <td>photos[]</td>
+                        <td>File[]</td>
+                        <td>Optional. Multiple images (jpeg, png, jpg, webp, max 2MB each).</td>
+                    </tr>
+                </tbody>
+            </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
 <code>{
@@ -1239,10 +1271,102 @@
     "status": true,
     "message": "Review submitted successfully. It will be visible after admin approval.",
     "data": {
-        "id": 1,
+        "id": 15,
+        "user_id": 4,
+        "appointment_id": "101",
+        "category_id": 16,
+        "service_id": 42,
         "customer_name": "Tejas",
-        "rating": 5,
-        "review": "Excellent service!"
+        "rating": "5",
+        "review": "Excellent service!",
+        "review_date": "2026-05-14",
+        "photos": ["1715690000_65535.jpg"],
+        "status": 0
+    }
+}</code></pre>
+        </section>
+
+        <section>
+            <h3>Get Customer Reviews</h3>
+            <p>Retrieves a paginated list of approved customer reviews. Can be filtered by category (service_id), rating, and content type.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customerReview
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>service_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter by Category ID (Note: uses field name service_id for category filtering).</td>
+                    </tr>
+                    <tr>
+                        <td>rating</td>
+                        <td>Numeric</td>
+                        <td>Optional. Filter by minimum rating (e.g., 4).</td>
+                    </tr>
+                    <tr>
+                        <td>with_photos</td>
+                        <td>Boolean</td>
+                        <td>Optional. If true, only returns reviews with photos.</td>
+                    </tr>
+                    <tr>
+                        <td>with_video</td>
+                        <td>Boolean</td>
+                        <td>Optional. If true, only returns reviews with videos.</td>
+                    </tr>
+                    <tr>
+                        <td>search</td>
+                        <td>String</td>
+                        <td>Optional. Search in name, review text, or date.</td>
+                    </tr>
+                    <tr>
+                        <td>per_page</td>
+                        <td>Integer</td>
+                        <td>Optional. Default: 9.</td>
+                    </tr>
+                    <tr>
+                        <td>page</td>
+                        <td>Integer</td>
+                        <td>Optional. Default: 1.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Customer reviews retrieved successfully",
+    "data": {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 1,
+                "category_id": 16,
+                "service_id": 42,
+                "service_name": "Full Arm Waxing",
+                "customer_name": "Anjali",
+                "customer_photo": "https://.../customer.jpg",
+                "rating": "5.0",
+                "review": "Very professional and clean.",
+                "review_date": "2026-05-10",
+                "helpful_count": 5,
+                "video": null,
+                "is_popular": 1,
+                "photos": [
+                    "https://.../review_photo1.jpg"
+                ]
+            }
+        ],
+        "total": 25,
+        "per_page": 9
     }
 }</code></pre>
         </section>
@@ -1621,7 +1745,13 @@
         "services": [...],
         "summary": {...},
         "status": 3,
-        "payment_type": "cod"
+        "payment_type": "cod",
+        "review": {
+            "id": 15,
+            "rating": "5.0",
+            "review": "Excellent service!",
+            "photos": ["https://.../photo.jpg"]
+        }
     }
 }</code></pre>
 

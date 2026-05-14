@@ -28,34 +28,45 @@ class ReviewApiController extends Controller
     {
         $function_name = 'submitReview';
         try {
-            $user = Auth::guard('user')->user();
+            $user = auth('user')->user();
             if (!$user) {
                 return $this->sendError('Unauthorized', 401);
             }
 
             $validator = Validator::make($request->all(), [
-                'service_id' => 'required|exists:service_masters,id',
+                'appointment_id' => 'required|exists:appointments,id',
                 'rating' => 'required|numeric|min:1|max:5',
                 'review' => 'required|string',
-                'appointment_id' => 'nullable|exists:appointments,id',
+                'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             ]);
 
             if ($validator->fails()) {
                 return $this->sendError($validator->errors()->first(), $this->validator_error_code);
             }
 
-            // Get Category ID from Service
-            $service = ServiceMaster::find($request->service_id);
+            // Get Appointment details
+            $appointment = \App\Models\Appointment::find($request->appointment_id);
+
+            // Handle multiple photos
+            $photoNames = [];
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $image) {
+                    $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('uploads/review/photos/'), $imageName);
+                    $photoNames[] = $imageName;
+                }
+            }
 
             $review = CustomerReview::create([
                 'user_id' => $user->id,
                 'appointment_id' => $request->appointment_id,
-                'category_id' => $service->category_id,
-                'service_id' => $request->service_id,
+                'category_id' => $appointment->service_category_id ?? 0,
+                'service_id' => $appointment->service_id ?? 0,
                 'customer_name' => $user->name,
                 'rating' => $request->rating,
                 'review' => $request->review,
-                'review_date' => now(),
+                'review_date' => now()->toDateString(),
+                'photos' => $photoNames,
                 'status' => 0, // Pending by default
             ]);
 
