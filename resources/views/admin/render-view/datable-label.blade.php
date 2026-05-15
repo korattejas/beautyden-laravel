@@ -31,11 +31,11 @@
         isset($status_array['current_is_new_priority_status']) &&
         $status_array['current_is_new_priority_status'] == '1' &&
         $status_array['current_status'] == '4')
-    <span class="badge badge-glow bg-success">New Image</span>
+    <span class="badge badge-glow bg-success">New</span>
 @elseif(
     $status_array['is_simple_active'] == 1 &&
         isset($status_array['current_is_new_priority_status']) &&
         $status_array['current_is_new_priority_status'] == '0' &&
         $status_array['current_status'] == '4')
-    <span class="badge badge-glow bg-dark">Old Image</span>
+    <span class="badge badge-glow bg-dark">No</span>
 @endif

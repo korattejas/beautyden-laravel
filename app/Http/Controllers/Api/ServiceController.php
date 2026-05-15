@@ -36,7 +36,8 @@ class ServiceController extends Controller
                     'c.name',
                     DB::raw('CONCAT("' . asset('uploads/service-category') . '/", c.icon) AS icon'),
                     'c.description',
-                    'c.is_popular'
+                    'c.is_popular',
+                    'c.is_new'
                 )
                 ->where('c.status', 1)
                 ->orderByDesc('c.is_popular')
@@ -88,6 +89,7 @@ class ServiceController extends Controller
 
             $categories->transform(function ($category) use ($subCategories) {
                 $category->is_popular = (int) $category->is_popular;
+                $category->is_new = (int) $category->is_new;
                 $category->subcategories = $subCategories[$category->id] ?? collect();
                 return $category;
             });

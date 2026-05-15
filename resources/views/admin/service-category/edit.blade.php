@@ -104,6 +104,20 @@
                                                 </div>
                                             </div>
 
+                                            <div class="col-12 mt-2">
+                                                <div class="form-group">
+                                                    <label>Is New</label>
+                                                    <select id="is_new" name="is_new" class="form-control" required>
+                                                        <option value="">Is New</option>
+                                                        <option value="1" @if($category->is_new == '1') selected @endif>
+                                                            New</option>
+                                                        <option value="0" @if($category->is_new == '0') selected @endif>
+                                                            No</option>
+                                                    </select>
+                                                    <div class="valid-feedback"></div>
+                                                </div>
+                                            </div>
+
                                             <div class="col-12">
                                                 <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">
                                                     <div>

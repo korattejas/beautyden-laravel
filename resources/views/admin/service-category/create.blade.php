@@ -89,6 +89,18 @@
                                                 </div>
                                             </div>
 
+                                            <div class="col-12 mt-2">
+                                                <div class="form-group">
+                                                    <label>Is New</label>
+                                                    <select id="is_new" name="is_new" class="form-control" required>
+                                                        <option value="">Is New</option>
+                                                        <option value="1">New</option>
+                                                        <option value="0" selected>No</option>
+                                                    </select>
+                                                    <div class="valid-feedback"></div>
+                                                </div>
+                                            </div>
+
                                             <div class="col-12">
                                                 <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">
                                                     <div>

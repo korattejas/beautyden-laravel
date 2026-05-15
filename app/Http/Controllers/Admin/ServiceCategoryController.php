@@ -77,6 +77,10 @@ class ServiceCategoryController extends Controller
                     $categories->where('service_categories.is_popular', $request->popular);
                 }
 
+                if ($request->is_new !== null && $request->is_new !== '') {
+                    $categories->where('service_categories.is_new', $request->is_new);
+                }
+
                 if ($request->created_date) {
                     $categories->whereDate('service_categories.created_at', $request->created_date);
                 }
@@ -101,6 +105,16 @@ class ServiceCategoryController extends Controller
                             'status_array' => $status_array
                         ])->render();
                     })
+                    ->addColumn('is_new', function ($categories) {
+                        $status_array = [
+                            'is_simple_active' => 1,
+                            'current_status' => 4,
+                            'current_is_new_priority_status' => $categories->is_new
+                        ];
+                        return view('admin.render-view.datable-label', [
+                            'status_array' => $status_array
+                        ])->render();
+                    })
                     ->addColumn('action', function ($categories) {
                         $action_array = [
                             'is_simple_action' => 1,
@@ -108,6 +122,7 @@ class ServiceCategoryController extends Controller
                             'delete_id' => $categories->id,
                             'current_status' => $categories->status,
                             'current_is_popular_priority_status' => $categories->is_popular,
+                            'current_is_new_status' => $categories->is_new,
                             'hidden_id' => $categories->id,
                         ];
                         return view('admin.render-view.datable-action', [
@@ -122,7 +137,7 @@ class ServiceCategoryController extends Controller
                         return '';
                     })
 
-                    ->rawColumns(['action', 'icon', 'status', 'is_popular'])
+                    ->rawColumns(['action', 'icon', 'status', 'is_popular', 'is_new'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -170,6 +185,7 @@ class ServiceCategoryController extends Controller
                     'description' => $request->description,
                     'icon' => $icon ?? null,
                     'is_popular' => (int) $request->is_popular,
+                    'is_new' => (int) $request->is_new,
                     'status' => (int) $request->status,
                 ]);
 
@@ -196,6 +212,7 @@ class ServiceCategoryController extends Controller
                     'description' => $request->description,
                     'icon' => $icon,
                     'is_popular' => (int) $request->is_popular,
+                    'is_new' => (int) $request->is_new,
                     'status' => (int) $request->status,
                 ]);
                 return response()->json([
@@ -228,6 +245,20 @@ class ServiceCategoryController extends Controller
             ServiceCategory::where('id', $id)->update(['is_popular' => $status]);
             return response()->json([
                 'message' => trans('admin_string.msg_priority_status_change')
+            ]);
+        } catch (\Exception $e) {
+            logger()->error("$function_name: " . $e->getMessage());
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
+    public function changeIsNewStatus($id, $status)
+    {
+        $function_name = 'changeIsNewStatus';
+        try {
+            ServiceCategory::where('id', $id)->update(['is_new' => $status]);
+            return response()->json([
+                'message' => trans('admin_string.msg_status_change')
             ]);
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());

@@ -14,6 +14,7 @@ class ServiceCategory extends Model
         'description',
         'icon',
         'is_popular',
+        'is_new',
         'status',
     ];
 

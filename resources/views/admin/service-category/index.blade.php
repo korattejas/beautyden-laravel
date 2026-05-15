@@ -48,6 +48,14 @@
                                 </select>
                             </div>
                             <div class="mb-2">
+                                <label class="form-label">Is New</label>
+                                <select id="filter-is-new" class="form-select">
+                                    <option value="">All</option>
+                                    <option value="1">New</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
                                 <label class="form-label">Created Date</label>
                                 <input type="date" id="filter-created-date" class="form-control">
                             </div>
@@ -78,6 +86,7 @@
                                                 <th data-search="false">Icon</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-stuff="High Priority,Low Priority">Is Popular</th>
+                                                <th data-stuff="New,No">Is New</th>
                                                 <th data-search="false">Action</th>
 
                                             </tr>
@@ -130,6 +139,10 @@
                 {
                     data: 'is_popular',
                     name: 'is_popular'
+                },
+                {
+                    data: 'is_new',
+                    name: 'is_new'
                 },
                 {
                     data: 'action',

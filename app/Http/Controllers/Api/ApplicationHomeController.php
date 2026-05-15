@@ -149,7 +149,8 @@ class ApplicationHomeController extends Controller
                     'name', 
                     DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'), 
                     'description', 
-                    'is_popular'
+                    'is_popular',
+                    'is_new'
                 )
                 ->where('status', 1)
                 ->where('is_popular', 1)
@@ -401,7 +402,7 @@ class ApplicationHomeController extends Controller
 
             // 3. Always fetch All Categories (Status 1) for the top navigation/filter
             $allCategories = DB::table('service_categories')
-                ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'))
+                ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'), 'is_new')
                 ->where('status', 1)
                 ->orderBy('name')
                 ->get();

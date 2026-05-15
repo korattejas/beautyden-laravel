@@ -84,6 +84,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('getDataServiceCategory', [ServiceCategoryController::class, 'getDataServiceCategory'])->name('getDataServiceCategory');
         Route::get('service-category/status/{id}/{status}', [ServiceCategoryController::class, 'changeStatus']);
         Route::get('service-category/priority-status/{id}/{status}', [ServiceCategoryController::class, 'changePriorityStatus']);
+        Route::get('service-category/old-new-image-priority-status/{id}/{status}', [ServiceCategoryController::class, 'changeIsNewStatus']);
 
         /* Services Subcategory Route */
         Route::get('service-subcategory', [ServiceSubcategoryController::class, 'index'])->name('admin.service-subcategory.index');

@@ -71,6 +71,7 @@ $(function () {
                     d.filter_type = $('#filter-type').val() || '';
                     d.month = $('#global-month-filter').val() || '';
                     d.year = $('#global-year-filter').val() || '';
+                    d.is_new = $('#filter-is-new').val();
                 }
             },
             orderCellsTop: true,
@@ -102,6 +103,7 @@ $(function () {
             $('#filter-appointment-time').val('');
             $('#filter-city').val('');
             $('#filter-signed-date').val('');
+            $('#filter-is-new').val('');
             dt_filter.ajax.reload();
         });
     }
