@@ -10,7 +10,9 @@ use App\Http\Controllers\Api\HiringController;
 use App\Http\Controllers\Api\HomeCounterController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ProductBrandController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\FaqsController;
+
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\ContactSubmissionsController;
 use App\Http\Controllers\Api\AppointmentsController;
@@ -74,7 +76,11 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
+        Route::get('productCategory', [ProductController::class, 'getProductCategories']);
+        Route::post('products', [ProductController::class, 'getProducts']);
+        Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
     });
+
 });
 
 Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
@@ -124,6 +130,9 @@ Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(func
         Route::get('getAvailability', [AttendanceApiController::class, 'index']);
         Route::post('markLeave', [AttendanceApiController::class, 'store']);
         Route::post('cancelLeave', [AttendanceApiController::class, 'destroy']);
+        Route::get('productCategory', [ProductController::class, 'getProductCategories']);
+        Route::post('products', [ProductController::class, 'getProducts']);
+        Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
     });
 });
 
@@ -170,6 +179,9 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
+        Route::get('productCategory', [ProductController::class, 'getProductCategories']);
+        Route::post('products', [ProductController::class, 'getProducts']);
+        Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
     });
 });
 

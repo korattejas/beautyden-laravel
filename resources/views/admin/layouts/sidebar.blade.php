@@ -128,8 +128,31 @@
     .main-menu-content:hover::-webkit-scrollbar-thumb {
         background: #cbd5e1;
     }
-</style>
 
+    /* Toggle Switch Style */
+    .sidebar-toggle {
+        display: flex;
+        background: #f1f5f9;
+        border-radius: 10px;
+        padding: 4px;
+        margin-bottom: 1rem;
+    }
+    .sidebar-toggle button {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 8px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #64748b;
+        transition: all 0.3s;
+    }
+    .sidebar-toggle button.active {
+        background: #ffffff;
+        color: #6366f1;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
 </style>
 
 <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
@@ -147,8 +170,16 @@
 
     <div class="shadow-bottom"></div>
     <div class="main-menu-content">
+        
+        <!-- Toggle Switch -->
+        <div class="sidebar-toggle">
+            <button id="show-services" class="active">Services</button>
+            <button id="show-products">Products</button>
+        </div>
+
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
 
+            <!-- Common / Dashboard -->
             <li class=" nav-item {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.dashboard') }}">
                     <i data-feather="grid"></i>
@@ -156,98 +187,152 @@
                 </a>
             </li>
 
-            <li class=" navigation-header">
-                <span>Management</span>
-            </li>
+            <!-- SERVICES MENU -->
+            <div class="services-menu-section">
+                <li class=" navigation-header">
+                    <span>Service Management</span>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.appointments.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.appointments.index') }}">
-                    <i data-feather="calendar"></i>
-                    <span class="menu-title text-truncate">Appointments</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.appointments.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.appointments.index') }}">
+                        <i data-feather="calendar"></i>
+                        <span class="menu-title text-truncate">Appointments</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.team.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.team.index') }}">
-                    <i data-feather="users"></i>
-                    <span class="menu-title text-truncate">Team Members</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.team.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.team.index') }}">
+                        <i data-feather="users"></i>
+                        <span class="menu-title text-truncate">Team Members</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.attendance.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.attendance.index') }}">
-                    <i data-feather="clock"></i>
-                    <span class="menu-title text-truncate">Attendance</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.attendance.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.attendance.index') }}">
+                        <i data-feather="clock"></i>
+                        <span class="menu-title text-truncate">Attendance</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.user.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.user.index') }}">
-                    <i data-feather="user-check"></i>
-                    <span class="menu-title text-truncate">Registered Users</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.user.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.user.index') }}">
+                        <i data-feather="user-check"></i>
+                        <span class="menu-title text-truncate">Registered Users</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.service.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.service.index') }}">
-                    <i data-feather="shopping-bag"></i>
-                    <span class="menu-title text-truncate">Service Catalog</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.service.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.service.index') }}">
+                        <i data-feather="shopping-bag"></i>
+                        <span class="menu-title text-truncate">Service Catalog</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.service-master.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.service-master.index') }}">
-                    <i data-feather="zap"></i>
-                    <span class="menu-title text-truncate">Advanced Catalog</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.service-master.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.service-master.index') }}">
+                        <i data-feather="zap"></i>
+                        <span class="menu-title text-truncate">Advanced Catalog</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.service-essential.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.service-essential.index') }}">
-                    <i data-feather="grid"></i>
-                    <span class="menu-title text-truncate">Master Essentials</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.service-essential.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.service-essential.index') }}">
+                        <i data-feather="grid"></i>
+                        <span class="menu-title text-truncate">Master Essentials</span>
+                    </a>
+                </li>
 
-            <li class=" navigation-header">
-                <span>Configuration</span>
-            </li>
+                <li class=" navigation-header">
+                    <span>Service Config</span>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.service-category.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.service-category.index') }}">
-                    <i data-feather="box"></i>
-                    <span class="menu-title text-truncate">Categories</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.service-category.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.service-category.index') }}">
+                        <i data-feather="box"></i>
+                        <span class="menu-title text-truncate">Categories</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.service-subcategory.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.service-subcategory.index') }}">
-                    <i data-feather="layers"></i>
-                    <span class="menu-title text-truncate">Sub Categories</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.service-subcategory.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.service-subcategory.index') }}">
+                        <i data-feather="layers"></i>
+                        <span class="menu-title text-truncate">Sub Categories</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.city.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.city.index') }}">
-                    <i data-feather="map-pin"></i>
-                    <span class="menu-title text-truncate">City List</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.city.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.city.index') }}">
+                        <i data-feather="map-pin"></i>
+                        <span class="menu-title text-truncate">City List</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.service-city-price.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.service-city-price.index') }}">
-                    <i data-feather="dollar-sign"></i>
-                    <span class="menu-title text-truncate">Service Pricing (Web)</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.service-city-price.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.service-city-price.index') }}">
+                        <i data-feather="dollar-sign"></i>
+                        <span class="menu-title text-truncate">Service Pricing (Web)</span>
+                    </a>
+                </li>
 
-            <li class="nav-item {{ Request::routeIs('admin.service-city-master.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.service-city-master.index') }}">
-                    <i data-feather="monitor"></i>
-                    <span class="menu-title text-truncate">Service Pricing (App)</span>
-                </a>
-            </li>
+                <li class="nav-item {{ Request::routeIs('admin.service-city-master.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.service-city-master.index') }}">
+                        <i data-feather="monitor"></i>
+                        <span class="menu-title text-truncate">Service Pricing (App)</span>
+                    </a>
+                </li>
+            </div>
 
+            <!-- PRODUCTS MENU -->
+            <div class="products-menu-section" style="display: none;">
+                <li class=" navigation-header">
+                    <span>Product Management</span>
+                </li>
+
+                <li class="nav-item {{ Request::routeIs('admin.product-item.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.product-item.index') }}">
+                        <i data-feather="shopping-bag"></i>
+                        <span class="menu-title text-truncate">Products</span>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ Request::routeIs('admin.product-brand.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.product-brand.index') }}">
+                        <i data-feather="tag"></i>
+                        <span class="menu-title text-truncate">Brands</span>
+                    </a>
+                </li>
+
+                <li class=" navigation-header">
+                    <span>Product Config</span>
+                </li>
+
+                <li class="nav-item {{ Request::routeIs('admin.product-category.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.product-category.index') }}">
+                        <i data-feather="box"></i>
+                        <span class="menu-title text-truncate">Categories</span>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ Request::routeIs('admin.product-subcategory.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.product-subcategory.index') }}">
+                        <i data-feather="layers"></i>
+                        <span class="menu-title text-truncate">Sub Categories</span>
+                    </a>
+                </li>
+
+                <li class=" navigation-header">
+                    <span>Sales</span>
+                </li>
+
+                <li class="nav-item {{ Request::routeIs('admin.product-order.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.product-order.index') }}">
+                        <i data-feather="file-text"></i>
+                        <span class="menu-title text-truncate">Product Orders</span>
+                    </a>
+                </li>
+            </div>
+
+            <!-- COMMON SYSTEM MENUS -->
             <li class=" navigation-header">
                 <span>Promotions</span>
             </li>
@@ -375,3 +460,27 @@
     </div>
 </div>
 
+<!-- JS to handle Toggle -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#show-services').click(function() {
+            $(this).addClass('active');
+            $('#show-products').removeClass('active');
+            $('.services-menu-section').show();
+            $('.products-menu-section').hide();
+        });
+
+        $('#show-products').click(function() {
+            $(this).addClass('active');
+            $('#show-services').removeClass('active');
+            $('.services-menu-section').hide();
+            $('.products-menu-section').show();
+        });
+
+        // Auto-select based on current URL
+        if (window.location.href.indexOf('product') > -1) {
+            $('#show-products').click();
+        }
+    });
+</script>

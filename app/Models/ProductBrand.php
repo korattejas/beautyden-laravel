@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductBrand extends Model
 {
-    protected $fillable = [
-        
-        'name',
-        'description',
-        'icon',
-        'status',
-    ];
+    use HasFactory;
+
+    protected $fillable = ['name', 'logo', 'status'];
 }

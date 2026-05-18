@@ -35,7 +35,13 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\RazorpayTransactionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SettlementController;
+use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\ProductSubCategoryController;
+use App\Http\Controllers\Admin\ProductItemController;
+use App\Http\Controllers\Admin\ProductOrderController;
 use App\Http\Controllers\ContractController;
+
+
 use App\Http\Middleware\AdminCheck;
 use Illuminate\Support\Facades\Route;
 use Rap2hpoutre\LaravelLogViewer\LogViewerController;
@@ -104,6 +110,41 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('product-brand/edit/{id}', [ProductBrandController::class, 'edit'])->name('admin.product-brand.edit');
         Route::get('getDataProductBrand', [ProductBrandController::class, 'getDataProductBrand'])->name('getDataProductBrand');
         Route::get('product-brand/status/{id}/{status}', [ProductBrandController::class, 'changeStatus']);
+
+        /* Product Category Route */
+        Route::get('product-category', [ProductCategoryController::class, 'index'])->name('admin.product-category.index');
+        Route::get('product-category/create', [ProductCategoryController::class, 'create'])->name('admin.product-category.create');
+        Route::post('product-category/store', [ProductCategoryController::class, 'store']);
+        Route::delete('product-category/{id}', [ProductCategoryController::class, 'destroy']);
+        Route::get('product-category/edit/{id}', [ProductCategoryController::class, 'edit'])->name('admin.product-category.edit');
+        Route::get('getDataProductCategory', [ProductCategoryController::class, 'getDataProductCategory'])->name('getDataProductCategory');
+        Route::get('product-category/status/{id}/{status}', [ProductCategoryController::class, 'changeStatus']);
+
+        /* Product Subcategory Route */
+        Route::get('product-subcategory', [ProductSubCategoryController::class, 'index'])->name('admin.product-subcategory.index');
+        Route::get('product-subcategory/create', [ProductSubCategoryController::class, 'create'])->name('admin.product-subcategory.create');
+        Route::post('product-subcategory/store', [ProductSubCategoryController::class, 'store']);
+        Route::delete('product-subcategory/{id}', [ProductSubCategoryController::class, 'destroy']);
+        Route::get('product-subcategory/edit/{id}', [ProductSubCategoryController::class, 'edit'])->name('admin.product-subcategory.edit');
+        Route::get('getDataProductSubCategory', [ProductSubCategoryController::class, 'getDataProductSubCategory'])->name('getDataProductSubCategory');
+        Route::get('product-subcategory/status/{id}/{status}', [ProductSubCategoryController::class, 'changeStatus']);
+
+        /* Product Item Route */
+        Route::get('product-item', [ProductItemController::class, 'index'])->name('admin.product-item.index');
+        Route::get('product-item/create', [ProductItemController::class, 'create'])->name('admin.product-item.create');
+        Route::post('product-item/store', [ProductItemController::class, 'store']);
+        Route::delete('product-item/{id}', [ProductItemController::class, 'destroy']);
+        Route::get('product-item/edit/{id}', [ProductItemController::class, 'edit'])->name('admin.product-item.edit');
+        Route::get('product-item/show/{id}', [ProductItemController::class, 'show'])->name('admin.product-item.show');
+        Route::get('getDataProductItem', [ProductItemController::class, 'getDataProductItem'])->name('getDataProductItem');
+        Route::get('product-item/status/{id}/{status}', [ProductItemController::class, 'changeStatus']);
+        Route::get('product-item/get-subcategories/{categoryId}', [ProductItemController::class, 'getSubcategories']);
+
+        /* Product Order Route */
+        Route::get('product-order', [ProductOrderController::class, 'index'])->name('admin.product-order.index');
+        Route::get('getDataProductOrder', [ProductOrderController::class, 'getDataProductOrder'])->name('admin.product-order.data');
+
+
 
          /* Portfoio */
         Route::get('portfolio', [PortfolioController::class, 'index'])->name('admin.portfolio.index');
