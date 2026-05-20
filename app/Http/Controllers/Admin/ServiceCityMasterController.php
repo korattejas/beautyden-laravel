@@ -8,6 +8,8 @@ use App\Models\ServiceMaster;
 use App\Models\City;
 use App\Models\ServiceCategory;
 use App\Models\ServiceSubcategory;
+use App\Models\ServiceCityVariantPrice;
+use App\Models\ServiceMasterVariant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
@@ -103,7 +105,10 @@ class ServiceCityMasterController extends Controller
         $categories = ServiceCategory::where('status', 1)->get();
         $subcategories = ServiceSubcategory::where('service_category_id', $data->category_id)->get();
         $cities = City::get();
-        return view('admin.service-city-master.edit', compact('data', 'services', 'categories', 'subcategories', 'cities'));
+        $variantPrices = \App\Models\ServiceCityVariantPrice::where('city_id', $data->city_id)
+            ->where('service_master_id', $data->service_master_id)
+            ->get()->keyBy('variant_id');
+        return view('admin.service-city-master.edit', compact('data', 'services', 'categories', 'subcategories', 'cities', 'variantPrices'));
     }
 
     public function store(Request $request)
@@ -114,8 +119,16 @@ class ServiceCityMasterController extends Controller
                 'city_id' => 'required',
                 'category_id' => 'required',
                 'service_master_id' => 'required',
-                'price' => 'required|numeric',
             ]);
+
+            // If variants exist, bypass the main price required validation
+            if ($request->has_variants == 1) {
+                $data['price'] = 0;
+            } else {
+                if (!$request->price) {
+                     return response()->json(['message' => 'Price is required'], $this->validator_error_code);
+                }
+            }
 
             if ($validator->fails()) {
                 return response()->json(['message' => $validator->errors()->first()], $this->validator_error_code);
@@ -129,11 +142,38 @@ class ServiceCityMasterController extends Controller
             $data['beautician_commission']  = $data['beautician_commission'] ?? 0;
 
             if ($id == 0) {
-                ServiceCityMaster::create($data);
+                $cityMaster = ServiceCityMaster::create($data);
                 $msg = "App Service City added successfully";
             } else {
-                ServiceCityMaster::find($id)->update($data);
+                $cityMaster = ServiceCityMaster::find($id);
+                $cityMaster->update($data);
                 $msg = "App Service City updated successfully";
+            }
+
+            // Handle Variant Prices
+            if ($request->has_variants == 1 && $request->variants) {
+                ServiceCityVariantPrice::where('city_id', $request->city_id)
+                    ->where('service_master_id', $request->service_master_id)
+                    ->delete();
+                
+                foreach ($request->variants as $var_id => $var_data) {
+                    if (isset($var_data['price']) && $var_data['price'] !== null) {
+                        ServiceCityVariantPrice::create([
+                            'city_id' => $request->city_id,
+                            'service_master_id' => $request->service_master_id,
+                            'variant_id' => $var_id,
+                            'price' => $var_data['price'],
+                            'discount_price' => $var_data['discount_price'] ?? 0,
+                        ]);
+                    }
+                }
+            } else {
+                // If it no longer has variants or doesn't have any, clean up old variant prices just in case
+                if (isset($request->city_id) && isset($request->service_master_id)) {
+                     ServiceCityVariantPrice::where('city_id', $request->city_id)
+                        ->where('service_master_id', $request->service_master_id)
+                        ->delete();
+                }
             }
 
             return response()->json(['success' => true, 'message' => $msg]);
@@ -157,10 +197,20 @@ class ServiceCityMasterController extends Controller
         try {
             $services = ServiceMaster::where('category_id', $request->category_id)
                 ->where('status', 1)
-                ->select('id', 'name')
+                ->select('id', 'name', 'has_variants')
                 ->orderBy('name')
                 ->get();
             return response()->json($services);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $this->error_message], 500);
+        }
+    }
+
+    public function getServiceVariants($serviceId)
+    {
+        try {
+            $variants = ServiceMasterVariant::where('service_master_id', $serviceId)->get();
+            return response()->json($variants);
         } catch (\Exception $e) {
             return response()->json(['error' => $this->error_message], 500);
         }

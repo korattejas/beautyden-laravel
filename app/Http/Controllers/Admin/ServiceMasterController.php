@@ -7,6 +7,7 @@ use App\Models\ServiceMaster;
 use App\Models\ServiceCategory;
 use App\Models\ServiceSubcategory;
 use App\Models\ServiceEssential;
+use App\Models\ServiceMasterVariant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
@@ -260,11 +261,13 @@ class ServiceMasterController extends Controller
                 'before_after'        => $before_after,
                 'content_json'        => $content_builder,
                 'is_popular'          => (int) $request->is_popular,
+                'has_variants'        => (int) $request->has_variants,
                 'status'              => (int) $request->status,
             ];
 
             if ($id == 0) {
-                ServiceMaster::create($data);
+                $created_service = ServiceMaster::create($data);
+                $service_id = $created_service->id;
                 $msg = "Service catalog created successfully";
             } else {
                 // Orphaned file cleanup
@@ -319,7 +322,25 @@ class ServiceMasterController extends Controller
                 }
 
                 ServiceMaster::where('id', $id)->update($data);
+                $service_id = $id;
                 $msg = "Service catalog updated successfully";
+            }
+
+            // Handle Variants
+            if ($request->has_variants == 1 && $request->variants) {
+                ServiceMasterVariant::where('service_master_id', $service_id)->delete();
+                foreach ($request->variants as $variant) {
+                    if (!empty($variant['name'])) {
+                        ServiceMasterVariant::create([
+                            'service_master_id' => $service_id,
+                            'name' => $variant['name'],
+                            'price' => $variant['price'] ?? 0,
+                            'duration' => $variant['duration'] ?? null,
+                        ]);
+                    }
+                }
+            } else {
+                ServiceMasterVariant::where('service_master_id', $service_id)->delete();
             }
 
             return response()->json(['success' => true, 'message' => $msg]);

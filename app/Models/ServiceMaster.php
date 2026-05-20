@@ -25,6 +25,7 @@ class ServiceMaster extends Model
         'before_after',   // Before/After pairs
         'content_json',   // Dynamic sections
         'is_popular',
+        'has_variants',
         'status',
     ];
 
@@ -42,5 +43,10 @@ class ServiceMaster extends Model
     public function subcategory()
     {
         return $this->belongsTo(ServiceSubcategory::class, 'sub_category_id');
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ServiceMasterVariant::class, 'service_master_id');
     }
 }

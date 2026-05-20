@@ -90,19 +90,34 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 mt-2">
-                                                <div class="form-group">
-                                                    <label>Base Price (App)</label>
-                                                    <input type="number" name="price" class="form-control" value="{{ $data->price }}" placeholder="0.00" required>
-                                                    <div class="valid-feedback"></div>
+                                            <input type="hidden" name="has_variants" id="has_variants" value="{{ $data->service->has_variants ?? 0 }}">
+                                            
+                                            <div class="col-12" id="variants_container_wrapper" style="display: {{ ($data->service->has_variants ?? 0) ? 'block' : 'none' }};">
+                                                <div class="card bg-light mt-2 border">
+                                                    <div class="card-body">
+                                                        <h5 class="fw-bold text-primary mb-2">Service Variants Pricing</h5>
+                                                        <div id="variants_container"></div>
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 mt-2">
-                                                <div class="form-group">
-                                                    <label>Discount Price (App)</label>
-                                                    <input type="number" name="discount_price" class="form-control" value="{{ $data->discount_price }}" placeholder="0.00">
-                                                    <div class="valid-feedback"></div>
+                                            <div class="col-12" id="normal_price_wrapper" style="display: {{ ($data->service->has_variants ?? 0) ? 'none' : 'block' }};">
+                                                <div class="row">
+                                                    <div class="col-md-6 mt-2">
+                                                        <div class="form-group">
+                                                            <label>Base Price (App)</label>
+                                                            <input type="number" name="price" class="form-control" value="{{ $data->price }}" placeholder="0.00">
+                                                            <div class="valid-feedback"></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6 mt-2">
+                                                        <div class="form-group">
+                                                            <label>Discount Price (App)</label>
+                                                            <input type="number" name="discount_price" class="form-control" value="{{ $data->discount_price }}" placeholder="0.00">
+                                                            <div class="valid-feedback"></div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -204,7 +219,7 @@
                 success: function(response) {
                     $serviceSelect.empty().append('<option value="">Select Service</option>');
                     $.each(response, function(key, service) {
-                        $serviceSelect.append('<option value="' + service.id + '">' + service.name + '</option>');
+                        $serviceSelect.append('<option value="' + service.id + '" data-has_variants="' + (service.has_variants||0) + '">' + service.name + '</option>');
                     });
                 }
             });
@@ -212,6 +227,53 @@
             $('#service_master_id').empty().append('<option value="">Select Service</option>');
         }
     });
+
+    var currentVariantPrices = @json($variantPrices);
+
+    function loadVariants(serviceId) {
+        if(!serviceId) return;
+        $('#variants_container').html('<p>Loading variants...</p>');
+        $.ajax({
+            url: "{{ url('admin/service-city-master/get-service-variants') }}/" + serviceId,
+            type: 'GET',
+            success: function(variants) {
+                var vHtml = '<div class="row">';
+                $.each(variants, function(i, v) {
+                    var price = currentVariantPrices[v.id] ? currentVariantPrices[v.id].price : '';
+                    var dPrice = currentVariantPrices[v.id] ? currentVariantPrices[v.id].discount_price : '';
+                    vHtml += '<div class="col-md-6 mb-2">';
+                    vHtml += '<label class="fw-bold text-dark">'+v.name+' Price (₹)</label>';
+                    vHtml += '<input type="number" name="variants['+v.id+'][price]" class="form-control" placeholder="Base Price" value="'+price+'" required>';
+                    vHtml += '<input type="number" name="variants['+v.id+'][discount_price]" class="form-control mt-1" placeholder="Discount Price" value="'+dPrice+'">';
+                    vHtml += '</div>';
+                });
+                vHtml += '</div>';
+                $('#variants_container').html(vHtml);
+            }
+        });
+    }
+
+    $('#service_master_id').on('change', function() {
+        var has_variants = $(this).find(':selected').data('has_variants') || 0;
+        $('#has_variants').val(has_variants);
+        var serviceId = $(this).val();
+
+        if(has_variants == 1 && serviceId) {
+            $('#normal_price_wrapper').hide();
+            $('#variants_container_wrapper').show();
+            loadVariants(serviceId);
+        } else {
+            $('#normal_price_wrapper').show();
+            $('#variants_container_wrapper').hide();
+            $('#variants_container').empty();
+        }
+    });
+
+    // Trigger on load if variants exist
+    if($('#has_variants').val() == 1) {
+        loadVariants($('#service_master_id').val());
+    }
+
 </script>
 @endsection
 

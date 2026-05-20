@@ -57,7 +57,8 @@ class ServiceMasterController extends Controller
                     'sm.reviews',
                     'sm.description',
                     DB::raw('CONCAT("' . asset('uploads/service') . '/", sm.icon) AS icon'),
-                    'sm.is_popular'
+                    'sm.is_popular',
+                    'sm.has_variants'
                 )
                 ->where('scm.status', 1)
                 ->where('sm.status', 1);
@@ -102,6 +103,7 @@ class ServiceMasterController extends Controller
                 ->paginate($perPage, ['*'], 'page', $page)
                 ->through(function ($service) {
                     $service->is_popular = (int) $service->is_popular;
+                    $service->has_variants = (int) $service->has_variants;
                     return $service;
                 });
 
@@ -136,7 +138,7 @@ class ServiceMasterController extends Controller
                 return $this->sendError('Service ID and City ID are required.', $this->validation_error_status);
             }
 
-            $service = ServiceMaster::with(['category', 'subcategory'])
+            $service = ServiceMaster::with(['category', 'subcategory', 'variants'])
                 ->where('id', $serviceId)
                 ->where('status', 1)
                 ->first();
@@ -166,6 +168,25 @@ class ServiceMasterController extends Controller
                     $service->price = $cityService->price;
                     $service->discount_price = $cityService->discount_price;
                 }
+
+                if ($service->has_variants == 1 && $service->variants) {
+                    $variantPrices = \App\Models\ServiceCityVariantPrice::where('service_master_id', $serviceId)
+                        ->where('city_id', $cityId)
+                        ->get()->keyBy('variant_id');
+                    
+                    foreach ($service->variants as $variant) {
+                        if (isset($variantPrices[$variant->id])) {
+                            $variant->price = $variantPrices[$variant->id]->price;
+                            $variant->discount_price = $variantPrices[$variant->id]->discount_price;
+                        } else {
+                            $variant->discount_price = 0; // Default if not found
+                        }
+                    }
+                }
+            }
+
+            if ($service->has_variants == 0) {
+                unset($service->variants);
             }
 
             // Format image/media URLs
@@ -225,6 +246,7 @@ class ServiceMasterController extends Controller
             }
 
             $service->is_popular = (int) $service->is_popular;
+            $service->has_variants = (int) $service->has_variants;
             $service->status = (int) $service->status;
 
             // Get related popular services in the same category

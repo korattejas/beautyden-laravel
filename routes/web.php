@@ -408,6 +408,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('service-city-master/{id}', [ServiceCityMasterController::class, 'destroy'])->name('admin.service-city-master.destroy');
         Route::get('service-city-master/subcategories/{categoryId}', [ServiceCityMasterController::class, 'getSubcategories']);
         Route::get('service-city-master/get-services-by-category', [ServiceCityMasterController::class, 'getServiceMastersByCategory'])->name('admin.service-city-master.services-by-category');
+        Route::get('service-city-master/get-service-variants/{serviceId}', [ServiceCityMasterController::class, 'getServiceVariants']);
 
         /* Notification Routes */
         Route::get('notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');

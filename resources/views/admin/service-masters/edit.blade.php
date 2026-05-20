@@ -96,12 +96,24 @@
                                     </select>
                                 </div>
                                 <div class="row">
-                                    <div class="col-6 mb-1"><label class="form-label">Global Default Price</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="price" class="form-control" value="{{ $service->price }}"></div></div>
-                                    <div class="col-6 mb-1"><label class="form-label">Global Discounted Price</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="discount_price" class="form-control" value="{{ $service->discount_price }}"></div></div>
+                                    <div class="col-12 mb-1">
+                                        <div class="form-check form-switch mt-50 p-1 border rounded bg-light">
+                                            <input class="form-check-input ms-0 me-1" type="checkbox" name="has_variants" value="1" id="has_variants" {{ $service->has_variants ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold text-primary" for="has_variants">Does this service have variants? (e.g., O3, Raaga)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="global-price-section" style="{{ $service->has_variants ? 'display:none;' : '' }}">
+                                    <div class="row">
+                                        <div class="col-6 mb-1"><label class="form-label">Global Default Price</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="price" class="form-control" id="global_price" value="{{ $service->price }}"></div></div>
+                                        <div class="col-6 mb-1"><label class="form-label">Global Discounted Price</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" name="discount_price" class="form-control" value="{{ $service->discount_price }}"></div></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12 mb-1"><label class="form-label">Duration</label><div class="input-group"><span class="input-group-text"><i data-feather="clock"></i></span><input type="text" name="duration" class="form-control" value="{{ $service->duration }}"></div></div>
+                                    </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-4 mb-1"><label class="form-label">Duration</label><div class="input-group"><span class="input-group-text"><i data-feather="clock"></i></span><input type="text" name="duration" class="form-control" value="{{ $service->duration }}"></div></div>
-                                    <div class="col-md-4 mb-1"><label class="form-label">Status</label><select name="status" class="form-select"><option value="1" {{ $service->status == 1 ? 'selected' : '' }}>Active</option><option value="0" {{ $service->status == 0 ? 'selected' : '' }}>Inactive</option></select></div>
+                                    <div class="col-md-6 mb-1"><label class="form-label">Status</label><select name="status" class="form-select"><option value="1" {{ $service->status == 1 ? 'selected' : '' }}>Active</option><option value="0" {{ $service->status == 0 ? 'selected' : '' }}>Inactive</option></select></div>
                                     <div class="col-md-4 mb-1">
                                         <label class="form-label">Popularity</label>
                                         <div class="form-check form-switch mt-50">
@@ -119,6 +131,25 @@
                                     <textarea name="description" class="form-control" rows="2" placeholder="Brief info for meta data...">{{ $service->description }}</textarea>
                                 </div>
 
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm border-0" id="variants-section" style="{{ $service->has_variants ? '' : 'display: none;' }}">
+                            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                                <h4 class="card-title text-primary">Service Variants</h4>
+                                <button type="button" class="btn btn-sm btn-outline-primary add-variant">+ Add Variant</button>
+                            </div>
+                            <div class="card-body pt-2" id="variants-container">
+                                @foreach($service->variants ?? [] as $vIdx => $variant)
+                                    <div class="variant-row border p-1 mb-1 rounded bg-light position-relative">
+                                        <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-1"><label class="form-label small">Variant Name (e.g. O3, Raaga)</label><input type="text" name="variants[{{$vIdx}}][name]" class="form-control form-control-sm" value="{{ $variant->name }}" required></div>
+                                            <div class="col-md-6 mb-1"><label class="form-label small">Price (₹)</label><input type="number" name="variants[{{$vIdx}}][price]" class="form-control form-control-sm" value="{{ $variant->price }}" required></div>
+                                            <div class="col-md-6 mb-1"><label class="form-label small">Duration</label><input type="text" name="variants[{{$vIdx}}][duration]" class="form-control form-control-sm" value="{{ $variant->duration }}"></div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
 
@@ -567,6 +598,33 @@
                 data.forEach(function(i) { html += '<option value="'+i.id+'">'+i.name+'</option>'; });
                 $('#sub_category_id').html(html);
             });
+        });
+
+        // Variants Logic
+        $('#has_variants').change(function() {
+            if($(this).is(':checked')) {
+                $('#global-price-section').slideUp();
+                $('#variants-section').slideDown();
+                if($('#variants-container').children().length === 0) {
+                    $('.add-variant').trigger('click');
+                }
+            } else {
+                $('#global-price-section').slideDown();
+                $('#variants-section').slideUp();
+            }
+        });
+
+        var variantIndex = {{ count($service->variants ?? []) }};
+        $('.add-variant').click(function() {
+            var html = '<div class="variant-row border p-1 mb-1 rounded bg-light position-relative">';
+            html += '<button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>';
+            html += '<div class="row">';
+            html += '<div class="col-md-12 mb-1"><label class="form-label small">Variant Name (e.g. O3, Raaga)</label><input type="text" name="variants['+variantIndex+'][name]" class="form-control form-control-sm" required></div>';
+            html += '<div class="col-md-6 mb-1"><label class="form-label small">Price (₹)</label><input type="number" name="variants['+variantIndex+'][price]" class="form-control form-control-sm" required></div>';
+            html += '<div class="col-md-6 mb-1"><label class="form-label small">Duration</label><input type="text" name="variants['+variantIndex+'][duration]" class="form-control form-control-sm" placeholder="e.g. 30 Min"></div>';
+            html += '</div></div>';
+            $('#variants-container').append(html);
+            variantIndex++;
         });
     });
 </script>
