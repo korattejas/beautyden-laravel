@@ -1840,6 +1840,251 @@
                     <tr><td>icon</td><td>File</td><td>Optional. Image file (jpeg, png, jpg, webp)</td></tr>
                 </tbody>
             </table>
+
+            <h3>13.11 Get Availability</h3>
+            <p>Fetches the list of leave/unavailability records for the beautician.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/beautician/getAvailability
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>month</td><td>Integer</td><td>Optional. 1-12</td></tr>
+                    <tr><td>year</td><td>Integer</td><td>Optional. e.g., 2026</td></tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Attendance data fetched successfully.",
+    "data": [
+        {
+            "id": 1,
+            "start_date": "2026-06-01",
+            "end_date": "2026-06-02",
+            "type": 1,
+            "type_text": "Sick Leave",
+            "reason": "Feeling unwell"
+        }
+    ]
+}</code></pre>
+
+            <h3>13.12 Mark Leave</h3>
+            <p>Submits a leave/unavailability request for the beautician.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/markLeave
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>start_date</td><td>Date</td><td><strong>Required</strong>. YYYY-MM-DD</td></tr>
+                    <tr><td>end_date</td><td>Date</td><td><strong>Required</strong>. YYYY-MM-DD (must be after or equal to start_date)</td></tr>
+                    <tr><td>type</td><td>Integer</td><td><strong>Required</strong>. Options: 1, 2, 3, 4 (e.g., 1=Sick Leave, etc.)</td></tr>
+                    <tr><td>reason</td><td>String</td><td>Optional. Max 500 characters</td></tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Leave marked successfully.",
+    "data": {
+        "team_member_id": 1,
+        "start_date": "2026-06-01",
+        "end_date": "2026-06-02",
+        "type": 1,
+        "reason": "Feeling unwell",
+        "status": 1,
+        "id": 2
+    }
+}</code></pre>
+
+            <h3>13.13 Cancel Leave</h3>
+            <p>Deletes an existing leave/unavailability record.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/cancelLeave
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>id</td><td>Integer</td><td><strong>Required</strong>. ID of the leave record to cancel.</td></tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Leave cancelled successfully.",
+    "data": null
+}</code></pre>
+
+            <h3>13.14 Get Product Categories</h3>
+            <p>Fetches the list of active product categories along with their subcategories.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/beautician/productCategory
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Product categories retrieved successfully",
+    "data": [
+        {
+            "id": 1,
+            "name": "Skincare",
+            "image": "https://.../category.png",
+            "is_featured": 1,
+            "is_new": 0,
+            "subcategories": [
+                {
+                    "id": 2,
+                    "category_id": 1,
+                    "name": "Face Wash",
+                    "is_featured": 1,
+                    "is_new": 1
+                }
+            ]
+        }
+    ]
+}</code></pre>
+
+            <h3>13.15 Get Products</h3>
+            <p>Fetches products available for the client app with optional filtering and pagination.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/products
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>category_id</td><td>Integer</td><td>Optional. Filter by category.</td></tr>
+                    <tr><td>sub_category_id</td><td>Integer</td><td>Optional. Filter by subcategory.</td></tr>
+                    <tr><td>brand_id</td><td>Integer</td><td>Optional. Filter by brand.</td></tr>
+                    <tr><td>is_featured</td><td>Integer</td><td>Optional. Filter featured products (1/0).</td></tr>
+                    <tr><td>is_new</td><td>Integer</td><td>Optional. Filter new products (1/0).</td></tr>
+                    <tr><td>search</td><td>String</td><td>Optional. Search by product name, description, or brand.</td></tr>
+                    <tr><td>per_page</td><td>Integer</td><td>Optional. Default: 20</td></tr>
+                    <tr><td>page</td><td>Integer</td><td>Optional. Default: 1</td></tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Products retrieved successfully",
+    "data": {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 10,
+                "name": "Glow Serum",
+                "brand_id": 2,
+                "brand_name": "L'Oreal",
+                "category_id": 1,
+                "category_name": "Skincare",
+                "sub_category_id": 3,
+                "price": "500.00",
+                "discount_percentage": 10,
+                "sale_price": "450.00",
+                "sku": "GLW-SRM-1",
+                "stock_quantity": 50,
+                "is_featured": 1,
+                "is_new": 1,
+                "short_description": "Enhances skin glow.",
+                "main_image": "https://.../product.jpg"
+            }
+        ],
+        "total": 1,
+        "per_page": 20
+    }
+}</code></pre>
+
+            <h3>13.16 Get Product Details</h3>
+            <p>Retrieves detailed information of a specific product including media and variants.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/beautician/productDetails/{id}
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Product details retrieved successfully",
+    "data": {
+        "id": 10,
+        "name": "Glow Serum",
+        "brand_id": 2,
+        "category_id": 1,
+        "sub_category_id": 3,
+        "price": "500.00",
+        "discount_percentage": 10,
+        "sku": "GLW-SRM-1",
+        "stock_quantity": 50,
+        "is_featured": 1,
+        "is_new": 1,
+        "short_description": "Enhances skin glow.",
+        "description": "&lt;p&gt;Detailed description here&lt;/p&gt;",
+        "content_json": [
+            {"key": "Ingredients", "value": "Vitamin C, Aloe Vera"}
+        ],
+        "status": 1,
+        "brand_name": "L'Oreal",
+        "category_name": "Skincare",
+        "sale_price": "450.00",
+        "media": [
+            {
+                "id": 25,
+                "type": "image",
+                "file_path": "https://.../product.jpg",
+                "is_main": 1
+            }
+        ],
+        "variants": [
+            {
+                "id": 5,
+                "variant_name": "50ml",
+                "price": "500.00",
+                "discount_percentage": 10,
+                "stock_quantity": 30
+            }
+        ]
+    }
+}</code></pre>
         </section>
 
 
