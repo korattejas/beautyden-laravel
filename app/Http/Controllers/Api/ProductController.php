@@ -36,6 +36,7 @@ class ProductController extends Controller
                     'c.id',
                     'c.name',
                     DB::raw('CONCAT("' . asset('uploads/product-category') . '/", c.image) AS image'),
+                    DB::raw('IF(c.image LIKE "%.mp4" OR c.image LIKE "%.mov" OR c.image LIKE "%.avi" OR c.image LIKE "%.wmv", "video", "image") AS image_type'),
                     'c.is_featured',
                     'c.is_new'
                 )

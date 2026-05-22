@@ -157,15 +157,21 @@ class ServiceCityMasterController extends Controller
                     ->delete();
                 
                 foreach ($request->variants as $var_id => $var_data) {
-                    if (isset($var_data['price']) && $var_data['price'] !== null) {
-                        ServiceCityVariantPrice::create([
-                            'city_id' => $request->city_id,
-                            'service_master_id' => $request->service_master_id,
-                            'variant_id' => $var_id,
-                            'price' => $var_data['price'],
-                            'discount_price' => $var_data['discount_price'] ?? 0,
-                        ]);
+                    $is_available = isset($var_data['is_available']) ? 1 : 0;
+                    
+                    // Only require price if it's available
+                    if ($is_available && (!isset($var_data['price']) || $var_data['price'] === null || $var_data['price'] === '')) {
+                        continue; // Skip if available but no price
                     }
+
+                    ServiceCityVariantPrice::create([
+                        'city_id' => $request->city_id,
+                        'service_master_id' => $request->service_master_id,
+                        'variant_id' => $var_id,
+                        'price' => $var_data['price'] ?? 0,
+                        'discount_price' => $var_data['discount_price'] ?? 0,
+                        'is_available' => $is_available
+                    ]);
                 }
             } else {
                 // If it no longer has variants or doesn't have any, clean up old variant prices just in case

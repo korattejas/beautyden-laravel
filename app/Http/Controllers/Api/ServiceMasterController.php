@@ -57,6 +57,7 @@ class ServiceMasterController extends Controller
                     'sm.reviews',
                     'sm.description',
                     DB::raw('CONCAT("' . asset('uploads/service') . '/", sm.icon) AS icon'),
+                    DB::raw('IF(sm.icon LIKE "%.mp4" OR sm.icon LIKE "%.mov" OR sm.icon LIKE "%.avi" OR sm.icon LIKE "%.wmv", "video", "image") AS icon_type'),
                     'sm.is_popular',
                     'sm.has_variants'
                 )
@@ -174,34 +175,52 @@ class ServiceMasterController extends Controller
                         ->where('city_id', $cityId)
                         ->get()->keyBy('variant_id');
                     
+                    $availableVariants = [];
                     foreach ($service->variants as $variant) {
                         if (isset($variantPrices[$variant->id])) {
+                            // Check if variant is available for this city
+                            if ($variantPrices[$variant->id]->is_available == 0) {
+                                continue; // Skip this variant
+                            }
                             $variant->price = $variantPrices[$variant->id]->price;
                             $variant->discount_price = $variantPrices[$variant->id]->discount_price;
                         } else {
                             $variant->discount_price = 0; // Default if not found
                         }
+                        $availableVariants[] = $variant;
                     }
+                    $service->variants = $availableVariants;
                 }
             }
 
-            if ($service->has_variants == 0) {
+            if ($service->has_variants == 0 || empty($service->variants)) {
                 unset($service->variants);
+                $service->has_variants = 0;
             }
 
             // Format image/media URLs
+            $ext = strtolower(pathinfo($service->icon, PATHINFO_EXTENSION));
+            $service->icon_type = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
             $service->icon = asset('uploads/service/' . $service->icon);
             
             if ($service->banner_media) {
                 $service->banner_media = collect($service->banner_media)->map(function ($media) {
-                    $media['url'] = asset('uploads/service/' . $media['url']);
+                    $media['url'] = asset('uploads/service-media/' . $media['url']);
+                    if (!isset($media['type'])) {
+                        $ext = strtolower(pathinfo($media['url'], PATHINFO_EXTENSION));
+                        $media['type'] = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
+                    }
                     return $media;
                 });
             }
 
             if ($service->before_after) {
                 $service->before_after = collect($service->before_after)->map(function ($image) {
-                    return asset('uploads/service/' . $image);
+                    $ext = strtolower(pathinfo($image, PATHINFO_EXTENSION));
+                    return [
+                        'url' => asset('uploads/service-media/' . $image),
+                        'type' => in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image'
+                    ];
                 });
             }
 
@@ -211,18 +230,24 @@ class ServiceMasterController extends Controller
                 foreach ($sections as &$section) {
                     if (isset($section['steps'])) {
                         foreach ($section['steps'] as &$step) {
-                            if (isset($step['image'])) {
-                                $step['image'] = asset('uploads/service/' . $step['image']);
+                            if (isset($step['image']) && !empty($step['image'])) {
+                                $ext = strtolower(pathinfo($step['image'], PATHINFO_EXTENSION));
+                                $step['image_type'] = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
+                                $step['image'] = asset('uploads/service-content/' . $step['image']);
                             }
                         }
                     }
-                    if (isset($section['image'])) {
-                        $section['image'] = asset('uploads/service/' . $section['image']);
+                    if (isset($section['image']) && !empty($section['image'])) {
+                        $ext = strtolower(pathinfo($section['image'], PATHINFO_EXTENSION));
+                        $section['image_type'] = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
+                        $section['image'] = asset('uploads/service-content/' . $section['image']);
                     }
                     if (isset($section['items'])) {
                         foreach ($section['items'] as &$item) {
-                            if (isset($item['image'])) {
-                                $item['image'] = asset('uploads/service/' . $item['image']);
+                            if (isset($item['image']) && !empty($item['image'])) {
+                                $ext = strtolower(pathinfo($item['image'], PATHINFO_EXTENSION));
+                                $item['image_type'] = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
+                                $item['image'] = asset('uploads/service-content/' . $item['image']);
                             }
                         }
                     }
@@ -261,6 +286,7 @@ class ServiceMasterController extends Controller
                     'sm.rating',
                     'sm.reviews',
                     DB::raw('CONCAT("' . asset('uploads/service') . '/", sm.icon) AS icon'),
+                    DB::raw('IF(sm.icon LIKE "%.mp4" OR sm.icon LIKE "%.mov" OR sm.icon LIKE "%.avi" OR sm.icon LIKE "%.wmv", "video", "image") AS icon_type'),
                     'sm.is_popular'
                 )
                 ->where('sm.category_id', $service->category_id)

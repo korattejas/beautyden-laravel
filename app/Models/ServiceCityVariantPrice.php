@@ -12,5 +12,6 @@ class ServiceCityVariantPrice extends Model
         'variant_id',
         'price',
         'discount_price',
+        'is_available',
     ];
 }

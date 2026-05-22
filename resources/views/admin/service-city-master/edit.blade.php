@@ -239,12 +239,23 @@
             success: function(variants) {
                 var vHtml = '<div class="row">';
                 $.each(variants, function(i, v) {
+                    var isAvailable = currentVariantPrices[v.id] ? currentVariantPrices[v.id].is_available : 1;
                     var price = currentVariantPrices[v.id] ? currentVariantPrices[v.id].price : '';
                     var dPrice = currentVariantPrices[v.id] ? currentVariantPrices[v.id].discount_price : '';
-                    vHtml += '<div class="col-md-6 mb-2">';
+                    
+                    var checked = isAvailable == 1 ? 'checked' : '';
+                    var display = isAvailable == 1 ? 'block' : 'none';
+                    var req = isAvailable == 1 ? 'required' : '';
+
+                    vHtml += '<div class="col-md-6 mb-2 border p-2 rounded">';
+                    vHtml += '<div class="d-flex justify-content-between align-items-center mb-1">';
                     vHtml += '<label class="fw-bold text-dark">'+v.name+' Price (₹)</label>';
-                    vHtml += '<input type="number" name="variants['+v.id+'][price]" class="form-control" placeholder="Base Price" value="'+price+'" required>';
+                    vHtml += '<div class="form-check form-switch"><input class="form-check-input variant-status-toggle" type="checkbox" name="variants['+v.id+'][is_available]" value="1" '+checked+' data-target="variant_inputs_'+v.id+'"><label class="form-check-label">Available</label></div>';
+                    vHtml += '</div>';
+                    vHtml += '<div id="variant_inputs_'+v.id+'" style="display: '+display+';">';
+                    vHtml += '<input type="number" name="variants['+v.id+'][price]" class="form-control variant-price-input" placeholder="Base Price" value="'+price+'" '+req+'>';
                     vHtml += '<input type="number" name="variants['+v.id+'][discount_price]" class="form-control mt-1" placeholder="Discount Price" value="'+dPrice+'">';
+                    vHtml += '</div>';
                     vHtml += '</div>';
                 });
                 vHtml += '</div>';
@@ -273,6 +284,18 @@
     if($('#has_variants').val() == 1) {
         loadVariants($('#service_master_id').val());
     }
+
+    $(document).on('change', '.variant-status-toggle', function() {
+        var targetId = $(this).data('target');
+        var $target = $('#' + targetId);
+        if ($(this).is(':checked')) {
+            $target.slideDown();
+            $target.find('.variant-price-input').prop('required', true);
+        } else {
+            $target.slideUp();
+            $target.find('.variant-price-input').prop('required', false);
+        }
+    });
 
 </script>
 @endsection

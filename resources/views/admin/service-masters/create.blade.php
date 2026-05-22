@@ -473,7 +473,7 @@
             feather.replace();
         });
 
-        $(document).on('click', '.remove-row', function() { $(this).closest('.step-card, .banner-media-row, .ba-row, .col-6, .input-group').remove(); });
+        $(document).on('click', '.remove-row', function() { $(this).closest('.step-card, .banner-media-row, .ba-row, .col-6, .input-group, .variant-row').remove(); });
         $(document).on('click', '.remove-section', function() { 
             $(this).closest('.section-block').remove(); 
             if(!$('.section-block').length) $('.empty-msg').show(); 

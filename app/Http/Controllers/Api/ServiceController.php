@@ -35,6 +35,7 @@ class ServiceController extends Controller
                     'c.id',
                     'c.name',
                     DB::raw('CONCAT("' . asset('uploads/service-category') . '/", c.icon) AS icon'),
+                    DB::raw('IF(c.icon LIKE "%.mp4" OR c.icon LIKE "%.mov" OR c.icon LIKE "%.avi" OR c.icon LIKE "%.wmv", "video", "image") AS icon_type'),
                     'c.description',
                     'c.is_popular',
                     'c.is_new'
@@ -53,6 +54,7 @@ class ServiceController extends Controller
                     'sc.service_category_id',
                     'sc.name',
                     DB::raw('CONCAT("' . asset('uploads/service-subcategory') . '/", sc.icon) AS icon'),
+                    DB::raw('IF(sc.icon LIKE "%.mp4" OR sc.icon LIKE "%.mov" OR sc.icon LIKE "%.avi" OR sc.icon LIKE "%.wmv", "video", "image") AS icon_type'),
                     'sc.description',
                     'sc.starting_at_price',
                     'sc.is_popular',
@@ -68,7 +70,11 @@ class ServiceController extends Controller
                     
                     if (isset($media['images']) && is_array($media['images'])) {
                         $media['images'] = array_map(function($img) {
-                            return asset('uploads/service-media/' . $img);
+                            $ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
+                            return [
+                                'url' => asset('uploads/service-media/' . $img),
+                                'type' => in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image'
+                            ];
                         }, $media['images']);
                     } else {
                         $media['images'] = [];
@@ -76,7 +82,11 @@ class ServiceController extends Controller
 
                     if (isset($media['videos']) && is_array($media['videos'])) {
                         $media['videos'] = array_map(function($vid) {
-                            return asset('uploads/service-media/' . $vid);
+                            $ext = strtolower(pathinfo($vid, PATHINFO_EXTENSION));
+                            return [
+                                'url' => asset('uploads/service-media/' . $vid),
+                                'type' => in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image'
+                            ];
                         }, $media['videos']);
                     } else {
                         $media['videos'] = [];
@@ -166,6 +176,7 @@ class ServiceController extends Controller
                         's.description',
                         's.includes',
                         DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
+                        DB::raw('IF(s.icon LIKE "%.mp4" OR s.icon LIKE "%.mov" OR s.icon LIKE "%.avi" OR s.icon LIKE "%.wmv", "video", "image") AS icon_type'),
                         's.is_popular'
                     )
                     ->where('scp.status', 1);
@@ -188,6 +199,7 @@ class ServiceController extends Controller
                         's.description',
                         's.includes',
                         DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
+                        DB::raw('IF(s.icon LIKE "%.mp4" OR s.icon LIKE "%.mov" OR s.icon LIKE "%.avi" OR s.icon LIKE "%.wmv", "video", "image") AS icon_type'),
                         's.is_popular'
                     )
                     ->where('s.status', 1);

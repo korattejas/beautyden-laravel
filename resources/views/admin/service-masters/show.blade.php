@@ -57,6 +57,29 @@
                         </div>
                     </div>
 
+                    <!-- Service Variants Card -->
+                    @if($service->has_variants && count($service->variants ?? []) > 0)
+                        <div class="card mb-2 shadow-sm border-0">
+                            <div class="card-header border-bottom"><h4 class="card-title text-primary"><i data-feather="layers" class="me-50"></i> Service Variants</h4></div>
+                            <div class="card-body pt-2">
+                                <ul class="list-group list-group-flush">
+                                    @foreach($service->variants as $variant)
+                                        <li class="list-group-item px-0">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="fw-bold text-dark">{{ $variant->name }}</div>
+                                                <div class="text-muted small"><i data-feather="clock" style="width: 12px"></i> {{ $variant->duration ?? 'Standard' }}</div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-50">
+                                                <span class="small">Price:</span>
+                                                <span class="fw-bold text-success">₹{{ $variant->price }}</span>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Banner Media Section -->
                     <h5 class="mb-1 text-primary fw-bold">Banner Media ({{ count($service->banner_media ?? []) }})</h5>
                     @foreach($service->banner_media ?? [] as $media)

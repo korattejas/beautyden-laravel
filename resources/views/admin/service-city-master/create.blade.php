@@ -238,10 +238,15 @@
                 success: function(variants) {
                     var vHtml = '<div class="row">';
                     $.each(variants, function(i, v) {
-                        vHtml += '<div class="col-md-6 mb-2">';
+                        vHtml += '<div class="col-md-6 mb-2 border p-2 rounded">';
+                        vHtml += '<div class="d-flex justify-content-between align-items-center mb-1">';
                         vHtml += '<label class="fw-bold text-dark">'+v.name+' Price (₹)</label>';
-                        vHtml += '<input type="number" name="variants['+v.id+'][price]" class="form-control" placeholder="Base Price" required>';
+                        vHtml += '<div class="form-check form-switch"><input class="form-check-input variant-status-toggle" type="checkbox" name="variants['+v.id+'][is_available]" value="1" checked data-target="variant_inputs_'+v.id+'"><label class="form-check-label">Available</label></div>';
+                        vHtml += '</div>';
+                        vHtml += '<div id="variant_inputs_'+v.id+'">';
+                        vHtml += '<input type="number" name="variants['+v.id+'][price]" class="form-control variant-price-input" placeholder="Base Price" required>';
                         vHtml += '<input type="number" name="variants['+v.id+'][discount_price]" class="form-control mt-1" placeholder="Discount Price">';
+                        vHtml += '</div>';
                         vHtml += '</div>';
                     });
                     vHtml += '</div>';
@@ -252,6 +257,18 @@
             $('#normal_price_wrapper').show();
             $('#variants_container_wrapper').hide();
             $('#variants_container').empty();
+        }
+    });
+
+    $(document).on('change', '.variant-status-toggle', function() {
+        var targetId = $(this).data('target');
+        var $target = $('#' + targetId);
+        if ($(this).is(':checked')) {
+            $target.slideDown();
+            $target.find('.variant-price-input').prop('required', true);
+        } else {
+            $target.slideUp();
+            $target.find('.variant-price-input').prop('required', false);
         }
     });
 </script>
