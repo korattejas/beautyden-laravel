@@ -889,28 +889,62 @@
     "status": true,
     "message": "Service details retrieved successfully",
     "data": {
-        "id": 3,
-        "category_id": 16,
-        "sub_category_id": 1,
-        "name": "Brazilian Full Face Wax",
-        "skin_type": "All Skin Types",
-        "price": "2000.00",
-        "discount_price": "1800.00",
-        "duration": "45 min",
-        "rating": "4.80",
-        "reviews": 200,
-        "icon": "https://...",
-        "banner_media": [{"url": "https://...", "type": "image"}],
-        "before_after": ["https://...", "https://..."],
-        "content_json": [
+        "page_layout": [
             {
-                "type": "ritual",
-                "title": "Service Steps",
-                "steps": [
+                "type": "service_info_section",
+                "data": {
+                    "id": 3,
+                    "name": "Brazilian Full Face Wax",
+                    "price": "2000.00",
+                    "discount_price": "1800.00",
+                    "duration": "45 min",
+                    "rating": "4.80",
+                    "reviews": 200,
+                    "icon": "https://...",
+                    "icon_type": "image",
+                    "category_name": "Waxing",
+                    "sub_category_name": "Facial",
+                    "is_popular": 1,
+                    "status": 1,
+                    "has_variants": 0,
+                    "variants": []
+                }
+            },
+            {
+                "type": "filter_section",
+                "data": {
+                    "skin_types": [
+                        "All",
+                        "Oily Skin",
+                        "Dry Skin"
+                    ],
+                    "price_filters": [
+                        {
+                            "label": "Low to High",
+                            "value": "low_to_high"
+                        },
+                        {
+                            "label": "High to Low",
+                            "value": "high_to_low"
+                        }
+                    ],
+                    "categories": [
+                        "All",
+                        "Basic Facial",
+                        "Premium Facial"
+                    ],
+                    "service_names": [
+                        "O3+ Facial",
+                        "Lotus Facial"
+                    ]
+                }
+            },
+            {
+                "type": "banner_section",
+                "data": [
                     {
-                        "title": "Preparation",
-                        "desc": "Cleaning the skin...",
-                        "image": "https://..."
+                        "url": "https://...",
+                        "type": "image"
                     }
                 ]
             },
@@ -925,23 +959,42 @@
                         "icon": "https://..."
                     }
                 ]
+            },
+            {
+                "type": "ritual",
+                "title": "Service Steps",
+                "steps": [
+                    {
+                        "title": "Preparation",
+                        "desc": "Cleaning the skin...",
+                        "image": "https://..."
+                    }
+                ]
+            },
+            {
+                "type": "before_after_section",
+                "data": [
+                    {
+                        "url": "https://...",
+                        "type": "image"
+                    }
+                ]
+            },
+            {
+                "type": "related_services_section",
+                "data": [
+                    {
+                        "id": 10,
+                        "name": "Threading",
+                        "price": "50.00",
+                        "discount_price": "40.00",
+                        "duration": "15 min",
+                        "icon": "https://...",
+                        "icon_type": "image"
+                    }
+                ]
             }
-        ],
-        "category_name": "Waxing",
-        "sub_category_name": "Facial",
-        "category": {
-            "id": 16,
-            "name": "Waxing",
-            "icon": "..."
-        },
-        "subcategory": {
-            "id": 1,
-            "name": "Facial",
-            "media_json": {
-                "images": ["https://.../img1.jpg"],
-                "videos": ["https://.../vid1.mp4"]
-            }
-        }
+        ]
     }
 }</code></pre>
         </section>
