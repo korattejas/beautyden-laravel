@@ -96,7 +96,7 @@
                 { data: 'is_popular', name: 'is_popular' },
                 { data: 'action', name: 'action', orderable: false },
             ],
-            order: [[0, 'DESC']],
+            order: [[2, 'ASC'], [3, 'ASC']],
         });
     </script>
     <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
