@@ -72,7 +72,7 @@ class OfferController extends Controller
 
             $validateArray = [
                 'title' => 'required|string|max:255',
-                'position' => 'required|in:top_header,footer,other',
+                'position' => 'required|in:top_header,footer,other,reels',
                 'media_type' => 'required|in:image,video',
                 'link' => 'nullable|string|max:255',
                 'priority' => 'nullable|integer',

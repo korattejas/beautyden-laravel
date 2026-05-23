@@ -50,6 +50,7 @@
                                                     <option value="top_header" selected>Top Header Slider</option>
                                                     <option value="footer">Footer Banner</option>
                                                     <option value="other">Other Page</option>
+                                                    <option value="reels">Reels</option>
                                                 </select>
                                                 <div class="valid-feedback"></div>
                                             </div>

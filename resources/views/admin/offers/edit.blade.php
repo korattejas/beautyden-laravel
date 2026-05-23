@@ -90,6 +90,7 @@
                                                     <option value="top_header" {{ $offer->position == 'top_header' ? 'selected' : '' }}>Top Header Slider</option>
                                                     <option value="footer" {{ $offer->position == 'footer' ? 'selected' : '' }}>Footer Banner</option>
                                                     <option value="other" {{ $offer->position == 'other' ? 'selected' : '' }}>Other Page</option>
+                                                    <option value="reels" {{ $offer->position == 'reels' ? 'selected' : '' }}>Reels</option>
                                                 </select>
                                                 <div class="valid-feedback"></div>
                                             </div>
