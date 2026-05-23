@@ -192,6 +192,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('service-master/edit/{id}', [ServiceMasterController::class, 'edit'])->name('admin.service-master.edit');
         Route::get('service-master/show/{id}', [ServiceMasterController::class, 'show'])->name('admin.service-master.show');
         Route::get('getDataServiceMaster', [ServiceMasterController::class, 'getDataServiceMaster'])->name('getDataServiceMaster');
+        Route::get('service-master/export-excel', [ServiceMasterController::class, 'exportExcel'])->name('admin.service-master.export.excel');
         Route::get('service-master/status/{id}/{status}', [ServiceMasterController::class, 'changeStatus']);
         Route::get('service-master/get-subcategories/{categoryId}', [ServiceMasterController::class, 'getSubcategories']);
 

@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 use App\Helpers\ImageUploadHelper;
 use Illuminate\Support\Facades\File;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ServiceMasterExport;
 
 class ServiceMasterController extends Controller
 {
@@ -405,5 +407,10 @@ class ServiceMasterController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $this->error_message], 500);
         }
+    }
+
+    public function exportExcel()
+    {
+        return Excel::download(new ServiceMasterExport, 'service_masters.xlsx');
     }
 }
