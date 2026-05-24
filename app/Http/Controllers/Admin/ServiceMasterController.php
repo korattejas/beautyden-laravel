@@ -159,30 +159,20 @@ class ServiceMasterController extends Controller
                     $file_url = $item['old_file'] ?? null;
                     $type = $item['old_type'] ?? 'image';
                     $is_scroll_banner_image = isset($item['is_scroll_banner_image']) ? 1 : 0;
-                    $description = $item['description'] ?? null;
 
-                    if ($is_scroll_banner_image == 1) {
-                        if ($request->hasFile("banner.$key.file")) {
-                            if ($file_url) File::delete(public_path('uploads/service-media/' . $file_url));
-                            $file = $request->file("banner.$key.file");
-                            $file_url = ImageUploadHelper::serviceMediaUpload($file);
-                            $extension = strtolower($file->getClientOriginalExtension());
-                            $type = in_array($extension, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
-                        }
-                    } else {
-                        // If it's a description banner, we clear file url
+                    if ($request->hasFile("banner.$key.file")) {
                         if ($file_url) File::delete(public_path('uploads/service-media/' . $file_url));
-                        $file_url = null;
-                        $type = 'description';
+                        $file = $request->file("banner.$key.file");
+                        $file_url = ImageUploadHelper::serviceMediaUpload($file);
+                        $extension = strtolower($file->getClientOriginalExtension());
+                        $type = in_array($extension, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
                     }
 
-                    // Only save if either file_url exists OR it's a description banner with description
-                    if ($file_url || ($is_scroll_banner_image == 0 && !empty($description))) {
+                    if ($file_url) {
                         $banner_media[] = [
                             'url' => $file_url,
                             'type' => $type,
-                            'is_scroll_banner_image' => $is_scroll_banner_image,
-                            'description' => $description
+                            'is_scroll_banner_image' => $is_scroll_banner_image
                         ];
                     }
                 }
