@@ -160,26 +160,46 @@
                             </div>
                             <div class="card-body pt-2" id="banner-media-container">
                                 @foreach($service->banner_media ?? [] as $key => $media)
+                                    @php 
+                                        $isScroll = isset($media['is_scroll_banner_image']) ? $media['is_scroll_banner_image'] : 1; 
+                                        $desc = $media['description'] ?? '';
+                                    @endphp
                                     <div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative">
                                         <button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>
-                                        <input type="hidden" name="banner[{{ $key }}][old_file]" value="{{ $media['url'] }}">
-                                        <input type="hidden" name="banner[{{ $key }}][old_type]" value="{{ $media['type'] }}">
-                                        <div class="premium-file-input has-preview">
-                                            <div class="placeholder-content" style="display:none">
-                                                <i data-feather="upload-cloud" class="text-primary mb-1"></i>
-                                                <p class="mb-0 fw-bold small">Change Media</p>
+                                        <input type="hidden" name="banner[{{ $key }}][old_file]" value="{{ $media['url'] ?? '' }}">
+                                        <input type="hidden" name="banner[{{ $key }}][old_type]" value="{{ $media['type'] ?? '' }}">
+                                        
+                                        <div class="d-flex justify-content-end mb-1 pe-4">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input banner-type-toggle" type="checkbox" name="banner[{{ $key }}][is_scroll_banner_image]" value="1" {{ $isScroll ? 'checked' : '' }}>
+                                                <label class="form-check-label small fw-bold">Is Scroll Banner Image?</label>
                                             </div>
-                                            <input type="file" name="banner[{{ $key }}][file]" onchange="handlePreview(this)">
                                         </div>
-                                        <div class="preview-container">
-                                            <div class="preview-actions">
-                                                <button type="button" class="action-btn text-primary view-full" data-url="{{ asset('uploads/service-media/' . $media['url']) }}"><i data-feather="maximize" style="width:14px"></i></button>
+
+                                        <div class="banner-image-section" style="{{ $isScroll ? '' : 'display: none;' }}">
+                                            <div class="premium-file-input {{ !empty($media['url']) ? 'has-preview' : '' }}">
+                                                <div class="placeholder-content" style="{{ !empty($media['url']) ? 'display:none' : '' }}">
+                                                    <i data-feather="upload-cloud" class="text-primary mb-1"></i>
+                                                    <p class="mb-0 fw-bold small">Change Media</p>
+                                                </div>
+                                                <input type="file" name="banner[{{ $key }}][file]" onchange="handlePreview(this)">
                                             </div>
-                                            @if($media['type'] == 'image')
-                                                <img src="{{ asset('uploads/service-media/' . $media['url']) }}" class="preview-media">
-                                            @else
-                                                <div class="mb-1">🎥 Video: {{ $media['url'] }}</div>
-                                            @endif
+                                            <div class="preview-container">
+                                                @if(!empty($media['url']))
+                                                    <div class="preview-actions">
+                                                        <button type="button" class="action-btn text-primary view-full" data-url="{{ asset('uploads/service-media/' . $media['url']) }}"><i data-feather="maximize" style="width:14px"></i></button>
+                                                    </div>
+                                                    @if($media['type'] == 'image')
+                                                        <img src="{{ asset('uploads/service-media/' . $media['url']) }}" class="preview-media">
+                                                    @else
+                                                        <div class="mb-1">🎥 Video: {{ $media['url'] }}</div>
+                                                    @endif
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <div class="banner-desc-section" style="{{ !$isScroll ? '' : 'display: none;' }}">
+                                            <textarea name="banner[{{ $key }}][description]" class="form-control" rows="3" placeholder="Enter Description Banner...">{{ $desc }}</textarea>
                                         </div>
                                     </div>
                                 @endforeach
@@ -547,8 +567,24 @@
         }
 
         $('.add-banner').click(function() {
-            $('#banner-media-container').append('<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button><div class="premium-file-input"><div class="placeholder-content"><i data-feather="upload-cloud" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload File</p></div><input type="file" name="banner['+bannerIndex+'][file]" onchange="handlePreview(this)"></div><div class="preview-container"></div></div>');
+            var html = '<div class="banner-media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative animate__animated animate__fadeIn"><button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>';
+            html += '<div class="d-flex justify-content-end mb-1 pe-4"><div class="form-check form-switch"><input class="form-check-input banner-type-toggle" type="checkbox" name="banner['+bannerIndex+'][is_scroll_banner_image]" value="1" checked><label class="form-check-label small fw-bold">Is Scroll Banner Image?</label></div></div>';
+            html += '<div class="banner-image-section"><div class="premium-file-input"><div class="placeholder-content"><i data-feather="upload-cloud" class="text-primary mb-1"></i><p class="mb-0 fw-bold small">Upload File</p></div><input type="file" name="banner['+bannerIndex+'][file]" onchange="handlePreview(this)"></div><div class="preview-container"></div></div>';
+            html += '<div class="banner-desc-section" style="display: none;"><textarea name="banner['+bannerIndex+'][description]" class="form-control" rows="3" placeholder="Enter Description Banner..."></textarea></div>';
+            html += '</div>';
+            $('#banner-media-container').append(html);
             bannerIndex++; feather.replace();
+        });
+
+        $(document).on('change', '.banner-type-toggle', function() {
+            var row = $(this).closest('.banner-media-row');
+            if($(this).is(':checked')) {
+                row.find('.banner-image-section').slideDown();
+                row.find('.banner-desc-section').slideUp();
+            } else {
+                row.find('.banner-image-section').slideUp();
+                row.find('.banner-desc-section').slideDown();
+            }
         });
 
         $('.add-ba').click(function() {

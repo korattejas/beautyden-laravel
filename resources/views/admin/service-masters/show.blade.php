@@ -83,14 +83,26 @@
                     <!-- Banner Media Section -->
                     <h5 class="mb-1 text-primary fw-bold">Banner Media ({{ count($service->banner_media ?? []) }})</h5>
                     @foreach($service->banner_media ?? [] as $media)
-                        <div class="media-card mb-2">
-                            @if($media['type'] == 'image')
-                                <img src="{{ asset('uploads/service-media/' . $media['url']) }}" alt="Banner">
-                            @else
-                                <video controls><source src="{{ asset('uploads/service-media/' . $media['url']) }}" type="video/mp4"></video>
-                            @endif
-                            <div class="ba-tag">{{ $media['type'] }}</div>
-                        </div>
+                        @php 
+                            $isScroll = isset($media['is_scroll_banner_image']) ? $media['is_scroll_banner_image'] : 1; 
+                        @endphp
+                        @if($isScroll)
+                            <div class="media-card mb-2">
+                                @if($media['type'] == 'image')
+                                    <img src="{{ asset('uploads/service-media/' . $media['url']) }}" alt="Banner">
+                                @elseif($media['type'] == 'video')
+                                    <video controls><source src="{{ asset('uploads/service-media/' . $media['url']) }}" type="video/mp4"></video>
+                                @endif
+                                <div class="ba-tag">{{ ucfirst($media['type']) }}</div>
+                            </div>
+                        @else
+                            <div class="card mb-2 shadow-sm border border-primary bg-light">
+                                <div class="card-body p-1">
+                                    <span class="badge bg-primary mb-1">Description Banner</span>
+                                    <p class="mb-0 small text-dark fw-bold">{{ $media['description'] ?? '' }}</p>
+                                </div>
+                            </div>
+                        @endif
                     @endforeach
 
                     <!-- Before After -->
