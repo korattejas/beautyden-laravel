@@ -527,8 +527,12 @@ class TeamMemberController extends Controller
                 ->whereRaw("FIND_IN_SET(?, assigned_to)", [$id])
                 ->where('status', 3); // Completed
 
-            if ($request->filled('date')) {
-                $query->whereDate('appointment_date', $request->date);
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween('appointment_date', [$request->start_date, $request->end_date]);
+            } elseif ($request->filled('start_date')) {
+                $query->whereDate('appointment_date', '>=', $request->start_date);
+            } elseif ($request->filled('end_date')) {
+                $query->whereDate('appointment_date', '<=', $request->end_date);
             }
             if ($request->filled('month')) {
                 $query->whereMonth('appointment_date', $request->month);
@@ -591,8 +595,12 @@ class TeamMemberController extends Controller
                 ->whereRaw("FIND_IN_SET(?, assigned_to)", [$id])
                 ->where('status', 3);
 
-            if ($request->filled('date')) {
-                $query->whereDate('appointment_date', $request->date);
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween('appointment_date', [$request->start_date, $request->end_date]);
+            } elseif ($request->filled('start_date')) {
+                $query->whereDate('appointment_date', '>=', $request->start_date);
+            } elseif ($request->filled('end_date')) {
+                $query->whereDate('appointment_date', '<=', $request->end_date);
             }
             if ($request->filled('month')) {
                 $query->whereMonth('appointment_date', $request->month);

@@ -210,6 +210,7 @@ class ServiceMasterController extends Controller
                         $ext = strtolower(pathinfo($media['url'], PATHINFO_EXTENSION));
                         $media['type'] = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
                     }
+                    $media['is_scroll_banner_image'] = isset($media['is_scroll_banner_image']) ? (int) $media['is_scroll_banner_image'] : 0;
                     return $media;
                 });
             }
@@ -491,6 +492,7 @@ class ServiceMasterController extends Controller
                         $ext = strtolower(pathinfo($media['url'], PATHINFO_EXTENSION));
                         $media['type'] = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
                     }
+                    $media['is_scroll_banner_image'] = isset($media['is_scroll_banner_image']) ? (int) $media['is_scroll_banner_image'] : 0;
                     return $media;
                 });
             }

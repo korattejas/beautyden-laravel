@@ -1016,13 +1016,17 @@
                     <div class="report-filters mb-3 p-3 bg-white rounded shadow-sm border">
                         <div class="row g-2 align-items-end mb-3">
                             <div class="col-md-3">
-                                <label class="form-label small fw-bold">Specific Date</label>
-                                <input type="date" id="report-filter-date" class="form-control form-control-sm">
+                                <label class="form-label small fw-bold">Start Date</label>
+                                <input type="date" id="report-filter-start-date" class="form-control form-control-sm">
                             </div>
                             <div class="col-md-3">
+                                <label class="form-label small fw-bold">End Date</label>
+                                <input type="date" id="report-filter-end-date" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-2">
                                 <label class="form-label small fw-bold">Month</label>
                                 <select id="report-filter-month" class="form-select form-select-sm">
-                                    <option value="">All Months</option>
+                                    <option value="">Month</option>
                                     @for ($m = 1; $m <= 12; $m++)
                                         <option value="{{ sprintf('%02d', $m) }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
                                     @endfor
@@ -1038,12 +1042,12 @@
                                     @endfor
                                 </select>
                             </div>
-                            <div class="col-md-4 d-flex gap-2">
-                                <button type="button" class="btn btn-sm btn-primary flex-grow-1" id="btn-filter-report">
-                                    <i class="bi bi-funnel"></i> Filter
+                            <div class="col-md-2 d-flex gap-1">
+                                <button type="button" class="btn btn-sm btn-primary flex-grow-1" id="btn-filter-report" title="Filter">
+                                    <i class="bi bi-funnel"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-success flex-grow-1" id="btn-download-report">
-                                    <i class="bi bi-download"></i> Download
+                                <button type="button" class="btn btn-sm btn-success flex-grow-1" id="btn-download-report" title="Download">
+                                    <i class="bi bi-download"></i>
                                 </button>
                             </div>
                         </div>
@@ -1549,14 +1553,16 @@
         });
 
         $(document).on('click', '#btn-download-report', function() {
-            let date = $('#report-filter-date').val();
+            let start_date = $('#report-filter-start-date').val();
+            let end_date = $('#report-filter-end-date').val();
             let month = $('#report-filter-month').val();
             let year = $('#report-filter-year').val();
-            window.location.href = `/admin/team/appointments-report-download/${currentReportId}?date=${date}&month=${month}&year=${year}`;
+            window.location.href = `/admin/team/appointments-report-download/${currentReportId}?start_date=${start_date}&end_date=${end_date}&month=${month}&year=${year}`;
         });
 
         function loadReport(id, page) {
-            let date = $('#report-filter-date').val();
+            let start_date = $('#report-filter-start-date').val();
+            let end_date = $('#report-filter-end-date').val();
             let month = $('#report-filter-month').val();
             let year = $('#report-filter-year').val();
             
@@ -1569,7 +1575,7 @@
             `);
 
             $.ajax({
-                url: `/admin/team/appointments-report/${id}?page=${page}&date=${date}&month=${month}&year=${year}`,
+                url: `/admin/team/appointments-report/${id}?page=${page}&start_date=${start_date}&end_date=${end_date}&month=${month}&year=${year}`,
                 type: 'GET',
                 success: function(response) {
                     if (response.success) {
