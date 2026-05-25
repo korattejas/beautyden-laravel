@@ -155,6 +155,23 @@
     }
 </style>
 
+@php
+    $admin = Auth::guard('admin')->user();
+    $isSuperAdmin = empty($admin->role_id);
+    
+    $userPermissions = [];
+    if (!$isSuperAdmin && $admin->role && $admin->role->permissions) {
+        $userPermissions = json_decode($admin->role->permissions, true) ?? [];
+    }
+
+    if (!function_exists('hasMenuAccess')) {
+        function hasMenuAccess($module, $isSuperAdmin, $userPermissions) {
+            if ($isSuperAdmin) return true;
+            return in_array($module, $userPermissions);
+        }
+    }
+@endphp
+
 <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row">
@@ -189,52 +206,56 @@
 
             <!-- SERVICES MENU -->
             <div class="services-menu-section">
+                
+                @if(hasMenuAccess('appointments', $isSuperAdmin, $userPermissions) || hasMenuAccess('team_members', $isSuperAdmin, $userPermissions) || hasMenuAccess('service_catalog', $isSuperAdmin, $userPermissions))
                 <li class=" navigation-header">
                     <span>Service Management</span>
                 </li>
+                @endif
 
+                @if(hasMenuAccess('appointments', $isSuperAdmin, $userPermissions))
                 <li class="nav-item {{ Request::routeIs('admin.appointments.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.appointments.index') }}">
                         <i data-feather="calendar"></i>
                         <span class="menu-title text-truncate">Appointments</span>
                     </a>
                 </li>
+                @endif
 
+                @if(hasMenuAccess('team_members', $isSuperAdmin, $userPermissions))
                 <li class="nav-item {{ Request::routeIs('admin.team.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.team.index') }}">
                         <i data-feather="users"></i>
                         <span class="menu-title text-truncate">Team Members</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.attendance.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.attendance.index') }}">
                         <i data-feather="clock"></i>
                         <span class="menu-title text-truncate">Attendance</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.user.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.user.index') }}">
                         <i data-feather="user-check"></i>
                         <span class="menu-title text-truncate">Registered Users</span>
                     </a>
                 </li>
+                @endif
 
+                @if(hasMenuAccess('service_catalog', $isSuperAdmin, $userPermissions))
                 <li class="nav-item {{ Request::routeIs('admin.service.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.service.index') }}">
                         <i data-feather="shopping-bag"></i>
                         <span class="menu-title text-truncate">Service Catalog</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.service-master.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.service-master.index') }}">
                         <i data-feather="zap"></i>
                         <span class="menu-title text-truncate">Advanced Catalog</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.service-essential.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.service-essential.index') }}">
                         <i data-feather="grid"></i>
@@ -245,85 +266,75 @@
                 <li class=" navigation-header">
                     <span>Service Config</span>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.service-category.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.service-category.index') }}">
                         <i data-feather="box"></i>
                         <span class="menu-title text-truncate">Categories</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.service-subcategory.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.service-subcategory.index') }}">
                         <i data-feather="layers"></i>
                         <span class="menu-title text-truncate">Sub Categories</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.city.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.city.index') }}">
                         <i data-feather="map-pin"></i>
                         <span class="menu-title text-truncate">City List</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.service-city-price.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.service-city-price.index') }}">
                         <i data-feather="dollar-sign"></i>
                         <span class="menu-title text-truncate">Service Pricing (Web)</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.service-city-master.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.service-city-master.index') }}">
                         <i data-feather="monitor"></i>
                         <span class="menu-title text-truncate">Service Pricing (App)</span>
                     </a>
                 </li>
+                @endif
             </div>
 
             <!-- PRODUCTS MENU -->
+            @if(hasMenuAccess('products', $isSuperAdmin, $userPermissions))
             <div class="products-menu-section" style="display: none;">
                 <li class=" navigation-header">
                     <span>Product Management</span>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.product-item.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.product-item.index') }}">
                         <i data-feather="shopping-bag"></i>
                         <span class="menu-title text-truncate">Products</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.product-brand.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.product-brand.index') }}">
                         <i data-feather="tag"></i>
                         <span class="menu-title text-truncate">Brands</span>
                     </a>
                 </li>
-
                 <li class=" navigation-header">
                     <span>Product Config</span>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.product-category.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.product-category.index') }}">
                         <i data-feather="box"></i>
                         <span class="menu-title text-truncate">Categories</span>
                     </a>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.product-subcategory.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.product-subcategory.index') }}">
                         <i data-feather="layers"></i>
                         <span class="menu-title text-truncate">Sub Categories</span>
                     </a>
                 </li>
-
                 <li class=" navigation-header">
                     <span>Sales</span>
                 </li>
-
                 <li class="nav-item {{ Request::routeIs('admin.product-order.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.product-order.index') }}">
                         <i data-feather="file-text"></i>
@@ -331,51 +342,49 @@
                     </a>
                 </li>
             </div>
+            @endif
 
             <!-- COMMON SYSTEM MENUS -->
+            @if(hasMenuAccess('offers', $isSuperAdmin, $userPermissions))
             <li class=" navigation-header">
                 <span>Promotions</span>
             </li>
-
             <li class="nav-item {{ Request::routeIs('admin.offers.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.offers.index') }}">
                     <i data-feather="gift"></i>
                     <span class="menu-title text-truncate">Offers (Banners)</span>
                 </a>
             </li>
-
             <li class="nav-item {{ Request::routeIs('admin.coupon-codes.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.coupon-codes.index') }}">
                     <i data-feather="tag"></i>
                     <span class="menu-title text-truncate">Coupon Codes</span>
                 </a>
             </li>
-
             <li class="nav-item {{ Request::routeIs('admin.coupon-usage.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.coupon-usage.index') }}">
                     <i data-feather="file-text"></i>
                     <span class="menu-title text-truncate">Coupon Usage Logs</span>
                 </a>
             </li>
-
             <li class="nav-item {{ Request::routeIs('admin.membership.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.membership.index') }}">
                     <i data-feather="award"></i>
                     <span class="menu-title text-truncate">Memberships</span>
                 </a>
             </li>
-
             <li class="nav-item {{ Request::routeIs('admin.combo.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.combo.index') }}">
                     <i data-feather="package"></i>
                     <span class="menu-title text-truncate">Service Combos</span>
                 </a>
             </li>
+            @endif
 
+            @if(hasMenuAccess('settings', $isSuperAdmin, $userPermissions))
             <li class=" navigation-header">
                 <span>Finance</span>
             </li>
-
             <li class="nav-item {{ Request::routeIs('admin.razorpay.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.razorpay.index') }}">
                     <i data-feather="credit-card"></i>
@@ -388,67 +397,92 @@
                     <span class="menu-title text-truncate">Settlements</span>
                 </a>
             </li>
+            @endif
 
+            @if(hasMenuAccess('contact_submissions', $isSuperAdmin, $userPermissions) || hasMenuAccess('reviews', $isSuperAdmin, $userPermissions))
             <li class=" navigation-header">
                 <span>Communication</span>
             </li>
+            @endif
 
+            @if(hasMenuAccess('contact_submissions', $isSuperAdmin, $userPermissions))
             <li class="nav-item {{ Request::routeIs('admin.contact-submissions.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.contact-submissions.index') }}">
                     <i data-feather="mail"></i>
                     <span class="menu-title text-truncate">Inquiries</span>
                 </a>
             </li>
-
             <li class="nav-item {{ Request::routeIs('admin.notifications.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.notifications.index') }}">
                     <i data-feather="bell"></i>
                     <span class="menu-title text-truncate">Push Notifications</span>
                 </a>
             </li>
+            @endif
 
+            @if(hasMenuAccess('reviews', $isSuperAdmin, $userPermissions))
             <li class="nav-item {{ Request::routeIs('admin.reviews.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.reviews.index') }}">
                     <i data-feather="star"></i>
                     <span class="menu-title text-truncate">Reviews</span>
                 </a>
             </li>
+            @endif
 
+            @if(hasMenuAccess('blogs', $isSuperAdmin, $userPermissions))
             <li class=" navigation-header">
                 <span>Content</span>
             </li>
-
             <li class="nav-item {{ Request::routeIs('admin.portfolio.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.portfolio.index') }}">
                     <i data-feather="image"></i>
                     <span class="menu-title text-truncate">Portfolio</span>
                 </a>
             </li>
-
             <li class="nav-item {{ Request::routeIs('admin.blogs.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.blogs.index') }}">
                     <i data-feather="edit"></i>
                     <span class="menu-title text-truncate">Blog Posts</span>
                 </a>
             </li>
+            @endif
 
             <li class=" navigation-header">
                 <span>System</span>
             </li>
-
+            
+            @if(hasMenuAccess('settings', $isSuperAdmin, $userPermissions))
             <li class="nav-item {{ Request::routeIs('admin.app-setting.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.app-setting.index') }}">
                     <i data-feather="smartphone"></i>
                     <span class="menu-title text-truncate">App Settings</span>
                 </a>
             </li>
+            @endif
 
+            @if($isSuperAdmin)
+            <li class="nav-item {{ Request::routeIs('admin.roles.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.roles.index') }}">
+                    <i data-feather="shield"></i>
+                    <span class="menu-title text-truncate">Roles & Access</span>
+                </a>
+            </li>
+            <li class="nav-item {{ Request::routeIs('admin.admin-staff.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.admin-staff.index') }}">
+                    <i data-feather="users"></i>
+                    <span class="menu-title text-truncate">Admin Staff</span>
+                </a>
+            </li>
+            @endif
+
+            @if(hasMenuAccess('settings', $isSuperAdmin, $userPermissions))
             <li class="nav-item {{ Request::routeIs('admin.setting.index') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.setting.index') }}">
                     <i data-feather="settings"></i>
                     <span class="menu-title text-truncate">Settings</span>
                 </a>
             </li>
+            @endif
 
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="{{ route('admin.logout') }}">

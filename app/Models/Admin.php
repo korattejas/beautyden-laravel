@@ -21,5 +21,11 @@ class Admin extends Authenticatable
         'email',
         'password',
         'status',
+        'role_id',
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
 }

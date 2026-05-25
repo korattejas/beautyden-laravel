@@ -425,5 +425,22 @@ Route::group(['prefix' => 'admin'], function () {
         /* Settlement Routes */
         Route::get('settlements', [SettlementController::class, 'index'])->name('admin.settlement.index');
         Route::post('settlements/update', [SettlementController::class, 'update'])->name('admin.settlement.update');
+
+        /* Roles Routes */
+        Route::get('roles', [\App\Http\Controllers\Admin\RoleController::class, 'index'])->name('admin.roles.index');
+        Route::get('getDataRoles', [\App\Http\Controllers\Admin\RoleController::class, 'getDataRoles'])->name('admin.roles.data');
+        Route::get('roles/create', [\App\Http\Controllers\Admin\RoleController::class, 'create'])->name('admin.roles.create');
+        Route::post('roles/store', [\App\Http\Controllers\Admin\RoleController::class, 'store'])->name('admin.roles.store');
+        Route::get('roles/edit/{id}', [\App\Http\Controllers\Admin\RoleController::class, 'edit'])->name('admin.roles.edit');
+        Route::delete('roles/{id}', [\App\Http\Controllers\Admin\RoleController::class, 'destroy'])->name('admin.roles.destroy');
+
+        /* Admin Staff Routes */
+        Route::get('admin-staff', [\App\Http\Controllers\Admin\AdminStaffController::class, 'index'])->name('admin.admin-staff.index');
+        Route::get('getDataAdminStaff', [\App\Http\Controllers\Admin\AdminStaffController::class, 'getDataAdminStaff'])->name('admin.admin-staff.data');
+        Route::get('admin-staff/create', [\App\Http\Controllers\Admin\AdminStaffController::class, 'create'])->name('admin.admin-staff.create');
+        Route::post('admin-staff/store', [\App\Http\Controllers\Admin\AdminStaffController::class, 'store'])->name('admin.admin-staff.store');
+        Route::get('admin-staff/edit/{id}', [\App\Http\Controllers\Admin\AdminStaffController::class, 'edit'])->name('admin.admin-staff.edit');
+        Route::get('admin-staff/status/{id}/{status}', [\App\Http\Controllers\Admin\AdminStaffController::class, 'changeStatus']);
+        Route::delete('admin-staff/{id}', [\App\Http\Controllers\Admin\AdminStaffController::class, 'destroy'])->name('admin.admin-staff.destroy');
     });
 });

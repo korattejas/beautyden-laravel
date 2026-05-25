@@ -35,7 +35,7 @@
                         <span class="user-name fw-bolder">
                             {{ Auth::guard('admin')->user()->name }}
                         </span>
-                        <span class="user-status">Admin</span>
+                        <span class="user-status">{{ Auth::guard('admin')->user()->role ? Auth::guard('admin')->user()->role->name : 'Super Admin' }}</span>
                     </div>
 
                     <span class="avatar">
