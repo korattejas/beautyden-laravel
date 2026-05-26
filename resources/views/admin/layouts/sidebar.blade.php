@@ -181,15 +181,6 @@
     }
 @endphp
 
-<script>
-    console.log("DEBUG INFO:", {
-        role_id: @json($admin->role_id),
-        isSuperAdmin: @json($isSuperAdmin),
-        role_name: @json($admin->role ? $admin->role->name : null),
-        permissions: @json($userPermissions)
-    });
-</script>
-
 <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row">
@@ -215,12 +206,14 @@
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
 
             <!-- Common / Dashboard -->
+            @if(hasMenuAccess('dashboard', $isSuperAdmin, $userPermissions))
             <li class=" nav-item {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}">
                 <a class="d-flex align-items-center" href="{{ route('admin.dashboard') }}">
                     <i data-feather="grid"></i>
                     <span class="menu-title text-truncate">Dashboard</span>
                 </a>
             </li>
+            @endif
 
             <!-- SERVICES MENU -->
             <div class="services-menu-section">
