@@ -161,7 +161,13 @@
     
     $userPermissions = [];
     if (!$isSuperAdmin && $admin->role && $admin->role->permissions) {
-        $userPermissions = json_decode($admin->role->permissions, true) ?? [];
+        $userPermissions = is_array($admin->role->permissions) ? $admin->role->permissions : (json_decode($admin->role->permissions, true) ?? []);
+        if (is_string($userPermissions)) {
+            $userPermissions = json_decode($userPermissions, true) ?? [];
+        }
+        if (!is_array($userPermissions)) {
+            $userPermissions = [];
+        }
     }
 
     if (!function_exists('hasMenuAccess')) {

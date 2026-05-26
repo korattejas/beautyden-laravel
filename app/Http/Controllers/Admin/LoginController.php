@@ -40,7 +40,7 @@ class LoginController extends Controller
     {
         $function_name = 'loginCheck';
         try {
-            if (auth()->guard('admin')->attempt(['email' => $request->login_email, 'password' => $request->login_password, 'status' => "1"])) {
+            if (auth()->guard('admin')->attempt(['email' => $request->login_email, 'password' => $request->login_password, 'status' => 1])) {
                 if (Auth::guard('admin')->user()->status == '1') {
                     return response()->json([
                         'message' => trans('admin_string.login_success'),

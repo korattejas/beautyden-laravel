@@ -1,5 +1,11 @@
 @extends('admin.layouts.app')
-
+@section('header_style_content')
+<style>
+   .badge-light-success{
+        color: #000 !important;
+   }
+</style>
+@endsection
 @section('content')
     <div class="app-content content">
         <div class="content-overlay"></div>
