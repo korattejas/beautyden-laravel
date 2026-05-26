@@ -181,6 +181,15 @@
     }
 @endphp
 
+<script>
+    console.log("DEBUG INFO:", {
+        role_id: @json($admin->role_id),
+        isSuperAdmin: @json($isSuperAdmin),
+        role_name: @json($admin->role ? $admin->role->name : null),
+        permissions: @json($userPermissions)
+    });
+</script>
+
 <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
     <div class="navbar-header">
         <ul class="nav navbar-nav flex-row">
