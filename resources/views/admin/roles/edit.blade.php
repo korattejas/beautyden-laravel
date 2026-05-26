@@ -14,7 +14,13 @@
         'contact_submissions' => 'Contact Submissions',
         'settings' => 'Settings (App, Masters)'
     ];
-    $rolePermissions = json_decode($role->permissions, true) ?? [];
+    $rolePermissions = is_array($role->permissions) ? $role->permissions : (json_decode($role->permissions, true) ?? []);
+    if (is_string($rolePermissions)) {
+        $rolePermissions = json_decode($rolePermissions, true) ?? [];
+    }
+    if (!is_array($rolePermissions)) {
+        $rolePermissions = [];
+    }
 @endphp
 <div class="app-content content">
     <div class="content-overlay"></div>

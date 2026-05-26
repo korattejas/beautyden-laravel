@@ -63,7 +63,13 @@ class RoleController extends Controller
 
                 return DataTables::of($roles)
                     ->addColumn('permissions', function ($role) {
-                        $perms = json_decode($role->permissions, true) ?? [];
+                        $perms = json_decode($role->permissions, true);
+                        if (is_string($perms)) {
+                            $perms = json_decode($perms, true);
+                        }
+                        if (!is_array($perms)) {
+                            $perms = [];
+                        }
                         $badges = '';
                         foreach ($perms as $p) {
                             $badges .= '<span class="badge badge-light-success me-50">'.ucfirst(str_replace('_', ' ', $p)).'</span>';
