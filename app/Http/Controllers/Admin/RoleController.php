@@ -116,7 +116,7 @@ class RoleController extends Controller
         try {
             $data = [
                 'name' => $request->name,
-                'permissions' => $request->permissions ? json_encode($request->permissions) : json_encode([]),
+                'permissions' => $request->permissions ?: [],
             ];
 
             if ($id == 0) {

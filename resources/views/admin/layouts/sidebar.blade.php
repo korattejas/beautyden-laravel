@@ -161,13 +161,16 @@
     
     $userPermissions = [];
     if (!$isSuperAdmin && $admin->role && $admin->role->permissions) {
-        $userPermissions = is_array($admin->role->permissions) ? $admin->role->permissions : (json_decode($admin->role->permissions, true) ?? []);
-        if (is_string($userPermissions)) {
-            $userPermissions = json_decode($userPermissions, true) ?? [];
+        $perms = $admin->role->permissions;
+        // Keep decoding as long as it's a string
+        while(is_string($perms)) {
+            $decoded = json_decode($perms, true);
+            if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+                break; // Stop if it's not valid JSON
+            }
+            $perms = $decoded;
         }
-        if (!is_array($userPermissions)) {
-            $userPermissions = [];
-        }
+        $userPermissions = is_array($perms) ? $perms : [];
     }
 
     if (!function_exists('hasMenuAccess')) {
