@@ -541,6 +541,7 @@
             html += '<button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>';
             html += '<div class="row g-1">';
             html += '<div class="col-md-12 mb-1"><label class="form-label small fw-bold">Variant Name (e.g. O3, Raaga)</label><input type="text" name="variants['+variantIndex+'][name]" class="form-control form-control-sm" required></div>';
+            html += '<div class="col-md-12 mb-1"><label class="form-label small">Description</label><textarea name="variants['+variantIndex+'][description]" class="form-control form-control-sm" rows="2" placeholder="Short description of this variant..."></textarea></div>';
             html += '<div class="col-md-6 mb-1"><label class="form-label small">Price (₹)</label><div class="input-group input-group-sm"><span class="input-group-text">₹</span><input type="number" name="variants['+variantIndex+'][price]" class="form-control" required></div></div>';
             html += '<div class="col-md-6 mb-1"><label class="form-label small">Discount %</label><div class="input-group input-group-sm"><input type="number" step="0.01" name="variants['+variantIndex+'][discount_percentage]" class="form-control" placeholder="e.g. 10"><span class="input-group-text">%</span></div></div>';
             html += '<div class="col-md-6 mb-1"><label class="form-label small">Duration</label><input type="text" name="variants['+variantIndex+'][duration]" class="form-control form-control-sm" placeholder="e.g. 30 Min"></div>';

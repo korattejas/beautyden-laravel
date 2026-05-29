@@ -76,6 +76,9 @@
                                             @endif
                                             <div>
                                                 <div class="fw-bold text-dark">{{ $variant->name }}</div>
+                                                @if($variant->description)
+                                                    <div class="text-muted small mt-1">{{ $variant->description }}</div>
+                                                @endif
                                                 @if($variant->duration)
                                                     <div class="text-muted small"><i data-feather="clock" style="width:11px"></i> {{ $variant->duration }}</div>
                                                 @endif

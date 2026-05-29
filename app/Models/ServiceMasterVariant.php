@@ -9,6 +9,7 @@ class ServiceMasterVariant extends Model
     protected $fillable = [
         'service_master_id',
         'name',
+        'description',
         'price',
         'duration',
         'rating',

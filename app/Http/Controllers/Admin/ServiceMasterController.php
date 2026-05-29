@@ -362,6 +362,7 @@ class ServiceMasterController extends Controller
                         ServiceMasterVariant::create([
                             'service_master_id'   => $service_id,
                             'name'                => $variant['name'],
+                            'description'         => $variant['description'] ?? null,
                             'price'               => $variant['price'] ?? 0,
                             'duration'            => $variant['duration'] ?? null,
                             'rating'              => $variant['rating'] ?? 0,

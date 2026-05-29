@@ -194,6 +194,7 @@ class ServiceMasterController extends Controller
                             : null;
 
                         // Ensure numeric types
+                        $variant->description         = $variant->description ?? null;
                         $variant->rating             = (float) ($variant->rating ?? 0);
                         $variant->reviews            = (int)   ($variant->reviews ?? 0);
                         $variant->discount_percentage = $variant->discount_percentage
@@ -489,6 +490,7 @@ class ServiceMasterController extends Controller
                             : null;
 
                         // Ensure numeric types
+                        $variant->description         = $variant->description ?? null;
                         $variant->rating             = (float) ($variant->rating ?? 0);
                         $variant->reviews            = (int)   ($variant->reviews ?? 0);
                         $variant->discount_percentage = $variant->discount_percentage
