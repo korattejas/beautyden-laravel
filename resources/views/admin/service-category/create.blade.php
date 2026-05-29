@@ -38,7 +38,20 @@
                                         <input type="hidden" name="edit_value" value="0">
                                         <input type="hidden" id="form-method" value="add">
                                         <div class="row row-sm">
-                                            <div class="col-12">
+                                            <div class="col-12 mt-2">
+                                                <div class="form-group">
+                                                    <label>Service Type <span class="text-danger">*</span></label>
+                                                    <select name="service_type_id" class="form-control" required>
+                                                        <option value="">Select Service Type</option>
+                                                        @foreach($serviceTypes as $type)
+                                                            <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <div class="valid-feedback"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Name</label>
                                                     <input type="text" class="form-control" name="name"

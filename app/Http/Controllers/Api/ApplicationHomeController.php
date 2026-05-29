@@ -142,6 +142,12 @@ class ApplicationHomeController extends Controller
             //     ->where('status', 1)
             //     ->get();
 
+            // 3. Service Types (New Feature)
+            $serviceTypes = \App\Models\ServiceType::where('status', 1)
+                ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/service-types') . '/", icon) AS icon'), 'description', 'is_popular', 'is_new')
+                ->orderByDesc('is_popular')
+                ->get();
+
             // 4. Category List (Service Categories)
             $categories = DB::table('service_categories')
                 ->select(
@@ -333,7 +339,7 @@ class ApplicationHomeController extends Controller
                 'user' => $userData,
                 'offers' => $offers,
                 'coupons' => $coupons,
-                // 'membership_plans' => $membershipPlans,
+                'service_types' => $serviceTypes,
                 'categories' => $categories,
 
                 'trending_services' => $trendingData,

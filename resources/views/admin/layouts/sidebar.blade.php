@@ -277,6 +277,12 @@
                 <li class=" navigation-header">
                     <span>Service Config</span>
                 </li>
+                <li class="nav-item {{ Request::routeIs('admin.service-type.index') ? 'active' : '' }}">
+                    <a class="d-flex align-items-center" href="{{ route('admin.service-type.index') }}">
+                        <i data-feather="list"></i>
+                        <span class="menu-title text-truncate">Service Types</span>
+                    </a>
+                </li>
                 <li class="nav-item {{ Request::routeIs('admin.service-category.index') ? 'active' : '' }}">
                     <a class="d-flex align-items-center" href="{{ route('admin.service-category.index') }}">
                         <i data-feather="box"></i>

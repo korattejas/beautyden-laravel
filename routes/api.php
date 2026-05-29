@@ -72,6 +72,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
         Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('serviceType', [ServiceController::class, 'getServiceType']);
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
@@ -175,6 +176,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
         Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('serviceType', [ServiceController::class, 'getServiceType']);
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);

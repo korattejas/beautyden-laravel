@@ -10,6 +10,7 @@ class ServiceCategory extends Model
     use HasFactory;
 
     protected $fillable = [
+        'service_type_id',
         'name',
         'description',
         'icon',

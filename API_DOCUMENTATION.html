@@ -663,6 +663,30 @@
 
         <section id="services">
             <h2><i class="bi bi-stars text-primary"></i> 6. Services & Categories</h2>
+
+            <h3>List Service Types</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/customer/serviceType
+            </div>
+            <p>Returns all active service types (e.g., Regular Services, Bridal). Available without token.</p>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Service Types retrieved successfully.",
+    "data": [
+        {
+            "id": 1,
+            "name": "Regular Services",
+            "icon": "https://...",
+            "description": null,
+            "is_popular": 1,
+            "is_new": 0
+        }
+    ]
+}</code></pre>
+
             <h3>List Categories</h3>
             <div class="endpoint-wrapper">
                 <span class="badge get">GET</span> /V1/customer/serviceCategory
@@ -670,6 +694,22 @@
             </div>
             <p>Returns all active service categories with their subcategories. (Also available as public GET
                 /V1/serviceCategory for website)</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>service_type_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter categories by Service Type ID.</td>
+                    </tr>
+                </tbody>
+            </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
 <code>{
@@ -679,6 +719,7 @@
     "data": [
         {
             "id": 16,
+            "service_type_id": 1,
             "name": "Waxing",
             "icon": "https://...",
             "description": "Smooth, soft & hair-free skin...",
@@ -702,7 +743,8 @@
 }</code></pre>
 
             <h3>Browse & Search Data (Search Home)</h3>
-            <p>Universal endpoint for category browsing, sub-category exploration, and free-text service searching. Implements a 3-step drill-down: Category &rarr; Sub-Category &rarr; Services.</p>
+            <p>Universal endpoint for category browsing, sub-category exploration, and free-text service searching.
+                Implements a 3-step drill-down: Category &rarr; Sub-Category &rarr; Services.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customer/getServiceSearchData
                 <span class="badge auth">Token Required</span>
@@ -739,11 +781,15 @@
                 </tbody>
             </table>
 
-            <div class="note" style="margin: 10px 0; background: #fef2f2; border-left-color: #ef4444; padding: 15px; border-radius: 8px;">
+            <div class="note"
+                style="margin: 10px 0; background: #fef2f2; border-left-color: #ef4444; padding: 15px; border-radius: 8px;">
                 <i class="bi bi-exclamation-triangle-fill text-danger"></i> <strong>Business Logic:</strong><br>
-                • <strong>Initial Load:</strong> If only <code>city_id</code> is sent, it returns all top-level Categories.<br>
-                • <strong>City Check:</strong> If city is "Coming Soon" (status != 0), it returns <code>is_coming_soon: true</code>.<br>
-                • <strong>Navigation:</strong> Every response includes the <code>categories</code> array to allow quick switching/filtering in UI.
+                • <strong>Initial Load:</strong> If only <code>city_id</code> is sent, it returns all top-level
+                Categories.<br>
+                • <strong>City Check:</strong> If city is "Coming Soon" (status != 0), it returns
+                <code>is_coming_soon: true</code>.<br>
+                • <strong>Navigation:</strong> Every response includes the <code>categories</code> array to allow quick
+                switching/filtering in UI.
             </div>
 
             <div class="response-title"><i class="bi bi-code-square"></i> Response Example (Initial View)</div>
@@ -1215,11 +1261,14 @@
                     </tr>
                 </tbody>
             </table>
-            <p>Aggregated endpoint returning Sliders, Popular Categories, and User context. <strong>Requires city_id to show content.</strong></p>
+            <p>Aggregated endpoint returning Sliders, Popular Categories, and User context. <strong>Requires city_id to
+                    show content.</strong></p>
 
-            <div class="note" style="margin: 10px 0; background: #fffbeb; border-left-color: #f59e0b; padding: 15px; border-radius: 8px;">
+            <div class="note"
+                style="margin: 10px 0; background: #fffbeb; border-left-color: #f59e0b; padding: 15px; border-radius: 8px;">
                 <i class="bi bi-geo-alt-fill text-warning"></i> <strong>City Handling:</strong><br>
-                If the provided <code>city_id</code> is marked as "Coming Soon" (status 1), the API returns a response with <code>"is_coming_soon": true</code> and no other home data.
+                If the provided <code>city_id</code> is marked as "Coming Soon" (status 1), the API returns a response
+                with <code>"is_coming_soon": true</code> and no other home data.
             </div>
 
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -1243,6 +1292,16 @@
         },
         "offers": [ ... ],
         "search_results": [ ... ],
+        "service_types": [
+            {
+                "id": 1,
+                "name": "Regular Services",
+                "icon": "https://.../icon.png",
+                "description": null,
+                "is_popular": 1,
+                "is_new": 0
+            }
+        ],
         "membership_plans": [
             { "id": 1, "name": "Elite Monthly", "price": "999.00" }
         ],
@@ -1281,7 +1340,8 @@
         <section id="feedback">
             <h2><i class="bi bi-chat-left-dots text-primary"></i> 11. Feedback & Reviews</h2>
             <h3>Submit Review</h3>
-            <p>Submits a review for a completed appointment. All reviews are saved with a pending status (0) and require admin approval before becoming public.</p>
+            <p>Submits a review for a completed appointment. All reviews are saved with a pending status (0) and require
+                admin approval before becoming public.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customer/submitReview
                 <span class="badge auth">Token Required</span>
@@ -1341,7 +1401,8 @@
 
         <section>
             <h3>Get Customer Reviews</h3>
-            <p>Retrieves a paginated list of approved customer reviews. Can be filtered by category (service_id), rating, and content type.</p>
+            <p>Retrieves a paginated list of approved customer reviews. Can be filtered by category (service_id),
+                rating, and content type.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customerReview
             </div>
@@ -1357,7 +1418,8 @@
                     <tr>
                         <td>service_id</td>
                         <td>Integer</td>
-                        <td>Optional. Filter by Category ID (Note: uses field name service_id for category filtering).</td>
+                        <td>Optional. Filter by Category ID (Note: uses field name service_id for category filtering).
+                        </td>
                     </tr>
                     <tr>
                         <td>rating</td>
@@ -1452,12 +1514,15 @@
         <section id="beautician">
             <h2><i class="bi bi-scissors text-primary"></i> 13. Beautician Portal</h2>
 
-            <div class="note" style="margin: 10px 0; background: #fff3cd; border-left-color: #ffc107; padding: 15px; border-radius: 8px;">
-                <i class="bi bi-exclamation-triangle-fill text-warning"></i> <strong>Auth Note:</strong> All Beautician APIs (except Login) require the JWT token in the Authorization header.
+            <div class="note"
+                style="margin: 10px 0; background: #fff3cd; border-left-color: #ffc107; padding: 15px; border-radius: 8px;">
+                <i class="bi bi-exclamation-triangle-fill text-warning"></i> <strong>Auth Note:</strong> All Beautician
+                APIs (except Login) require the JWT token in the Authorization header.
             </div>
 
             <h3>13.1 Send Login OTP / Registration Check</h3>
-            <p>Checks if the beautician exists and sends OTP. If not found, informs the app to show the registration form.</p>
+            <p>Checks if the beautician exists and sends OTP. If not found, informs the app to show the registration
+                form.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/beautician/sendLoginOtp
             </div>
@@ -1503,7 +1568,8 @@
                 </tbody>
             </table>
 
-            <div class="note" style="margin: 10px 0; background: #e0f2fe; border-left-color: #0ea5e9; padding: 15px; border-radius: 8px;">
+            <div class="note"
+                style="margin: 10px 0; background: #e0f2fe; border-left-color: #0ea5e9; padding: 15px; border-radius: 8px;">
                 <i class="bi bi-info-circle-fill text-info"></i> <strong>Flutter Flow:</strong><br>
                 1. Call this API with only <code>mobile_number</code>.<br>
                 2. If <code>is_exists: false</code>, show registration form and call this API again with all fields.<br>
@@ -1596,7 +1662,10 @@
                     <tr>
                         <td>filter</td>
                         <td>String</td>
-                        <td>Optional. Options: <code>today</code>, <code>yesterday</code>, <code>last_7_days</code>, <code>last_30_days</code> (default), <code>last_3_months</code>, <code>last_6_months</code>, <code>last_1_year</code>, <code>all</code>, <code>custom</code>.</td>
+                        <td>Optional. Options: <code>today</code>, <code>yesterday</code>, <code>last_7_days</code>,
+                            <code>last_30_days</code> (default), <code>last_3_months</code>, <code>last_6_months</code>,
+                            <code>last_1_year</code>, <code>all</code>, <code>custom</code>.
+                        </td>
                     </tr>
                     <tr>
                         <td>start_date</td>
@@ -1610,8 +1679,11 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="note" style="margin: 10px 0; background: #fef2f2; border-left-color: #ef4444; padding: 15px; border-radius: 8px;">
-                <i class="bi bi-shield-lock-fill text-danger"></i> <strong>Approval Check:</strong> If <code>is_approved: false</code>, the beautician should see a "Profile Under Review" screen instead of the dashboard stats.
+            <div class="note"
+                style="margin: 10px 0; background: #fef2f2; border-left-color: #ef4444; padding: 15px; border-radius: 8px;">
+                <i class="bi bi-shield-lock-fill text-danger"></i> <strong>Approval Check:</strong> If
+                <code>is_approved: false</code>, the beautician should see a "Profile Under Review" screen instead of
+                the dashboard stats.
             </div>
 
             <div class="response-title"><i class="bi bi-code-square"></i> Response: Approved (Full Data)</div>
@@ -1734,7 +1806,8 @@
 ]</code></pre>
 
             <h3>13.6 Export Appointments</h3>
-            <p>Generates a downloadable Excel or PDF report of assigned appointments. Supports same filters as Get Appointments.</p>
+            <p>Generates a downloadable Excel or PDF report of assigned appointments. Supports same filters as Get
+                Appointments.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/beautician/exportAppointments
                 <span class="badge auth">Token Required</span>
@@ -1753,10 +1826,26 @@
                         <td>String</td>
                         <td><strong>Required</strong>. "excel" or "pdf"</td>
                     </tr>
-                    <tr><td>date</td><td>Date</td><td>Optional. YYYY-MM-DD</td></tr>
-                    <tr><td>status</td><td>Integer</td><td>Optional. 1=Pending, 2=Assigned, 3=Completed, 4=Cancelled</td></tr>
-                    <tr><td>month</td><td>Integer</td><td>Optional. 1-12</td></tr>
-                    <tr><td>year</td><td>Integer</td><td>Optional. e.g., 2026</td></tr>
+                    <tr>
+                        <td>date</td>
+                        <td>Date</td>
+                        <td>Optional. YYYY-MM-DD</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td>Integer</td>
+                        <td>Optional. 1=Pending, 2=Assigned, 3=Completed, 4=Cancelled</td>
+                    </tr>
+                    <tr>
+                        <td>month</td>
+                        <td>Integer</td>
+                        <td>Optional. 1-12</td>
+                    </tr>
+                    <tr>
+                        <td>year</td>
+                        <td>Integer</td>
+                        <td>Optional. e.g., 2026</td>
+                    </tr>
                 </tbody>
             </table>
             <p><strong>Note:</strong> This endpoint returns the file directly as a binary download.</p>
@@ -1877,20 +1966,76 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>name</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>dob</td><td>Date</td><td>Optional (YYYY-MM-DD)</td></tr>
-                    <tr><td>blood_group</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>role</td><td>String</td><td>Optional (Description)</td></tr>
-                    <tr><td>experience_years</td><td>Numeric</td><td>Optional</td></tr>
-                    <tr><td>bio</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>address</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>city</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>state</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>taluko</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>village</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>specialties</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>certifications</td><td>String</td><td>Optional</td></tr>
-                    <tr><td>icon</td><td>File</td><td>Optional. Image file (jpeg, png, jpg, webp)</td></tr>
+                    <tr>
+                        <td>name</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>dob</td>
+                        <td>Date</td>
+                        <td>Optional (YYYY-MM-DD)</td>
+                    </tr>
+                    <tr>
+                        <td>blood_group</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>role</td>
+                        <td>String</td>
+                        <td>Optional (Description)</td>
+                    </tr>
+                    <tr>
+                        <td>experience_years</td>
+                        <td>Numeric</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>bio</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>address</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>city</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>state</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>taluko</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>village</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>specialties</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>certifications</td>
+                        <td>String</td>
+                        <td>Optional</td>
+                    </tr>
+                    <tr>
+                        <td>icon</td>
+                        <td>File</td>
+                        <td>Optional. Image file (jpeg, png, jpg, webp)</td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -1909,8 +2054,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>month</td><td>Integer</td><td>Optional. 1-12</td></tr>
-                    <tr><td>year</td><td>Integer</td><td>Optional. e.g., 2026</td></tr>
+                    <tr>
+                        <td>month</td>
+                        <td>Integer</td>
+                        <td>Optional. 1-12</td>
+                    </tr>
+                    <tr>
+                        <td>year</td>
+                        <td>Integer</td>
+                        <td>Optional. e.g., 2026</td>
+                    </tr>
                 </tbody>
             </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -1946,10 +2099,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>start_date</td><td>Date</td><td><strong>Required</strong>. YYYY-MM-DD</td></tr>
-                    <tr><td>end_date</td><td>Date</td><td><strong>Required</strong>. YYYY-MM-DD (must be after or equal to start_date)</td></tr>
-                    <tr><td>type</td><td>Integer</td><td><strong>Required</strong>. Options: 1, 2, 3, 4 (e.g., 1=Sick Leave, etc.)</td></tr>
-                    <tr><td>reason</td><td>String</td><td>Optional. Max 500 characters</td></tr>
+                    <tr>
+                        <td>start_date</td>
+                        <td>Date</td>
+                        <td><strong>Required</strong>. YYYY-MM-DD</td>
+                    </tr>
+                    <tr>
+                        <td>end_date</td>
+                        <td>Date</td>
+                        <td><strong>Required</strong>. YYYY-MM-DD (must be after or equal to start_date)</td>
+                    </tr>
+                    <tr>
+                        <td>type</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. Options: 1, 2, 3, 4 (e.g., 1=Sick Leave, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td>reason</td>
+                        <td>String</td>
+                        <td>Optional. Max 500 characters</td>
+                    </tr>
                 </tbody>
             </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -1984,7 +2153,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>id</td><td>Integer</td><td><strong>Required</strong>. ID of the leave record to cancel.</td></tr>
+                    <tr>
+                        <td>id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. ID of the leave record to cancel.</td>
+                    </tr>
                 </tbody>
             </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -2043,14 +2216,46 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>category_id</td><td>Integer</td><td>Optional. Filter by category.</td></tr>
-                    <tr><td>sub_category_id</td><td>Integer</td><td>Optional. Filter by subcategory.</td></tr>
-                    <tr><td>brand_id</td><td>Integer</td><td>Optional. Filter by brand.</td></tr>
-                    <tr><td>is_featured</td><td>Integer</td><td>Optional. Filter featured products (1/0).</td></tr>
-                    <tr><td>is_new</td><td>Integer</td><td>Optional. Filter new products (1/0).</td></tr>
-                    <tr><td>search</td><td>String</td><td>Optional. Search by product name, description, or brand.</td></tr>
-                    <tr><td>per_page</td><td>Integer</td><td>Optional. Default: 20</td></tr>
-                    <tr><td>page</td><td>Integer</td><td>Optional. Default: 1</td></tr>
+                    <tr>
+                        <td>category_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter by category.</td>
+                    </tr>
+                    <tr>
+                        <td>sub_category_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter by subcategory.</td>
+                    </tr>
+                    <tr>
+                        <td>brand_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter by brand.</td>
+                    </tr>
+                    <tr>
+                        <td>is_featured</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter featured products (1/0).</td>
+                    </tr>
+                    <tr>
+                        <td>is_new</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter new products (1/0).</td>
+                    </tr>
+                    <tr>
+                        <td>search</td>
+                        <td>String</td>
+                        <td>Optional. Search by product name, description, or brand.</td>
+                    </tr>
+                    <tr>
+                        <td>per_page</td>
+                        <td>Integer</td>
+                        <td>Optional. Default: 20</td>
+                    </tr>
+                    <tr>
+                        <td>page</td>
+                        <td>Integer</td>
+                        <td>Optional. Default: 1</td>
+                    </tr>
                 </tbody>
             </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -2144,7 +2349,8 @@
         <section id="testing">
             <h2><i class="bi bi-bug text-primary"></i> 14. Testing Utilities</h2>
             <h3>Send Test Notification</h3>
-            <p>Sends a real-time push notification using Firebase HTTP v1 API. Use this to verify FCM integration on the mobile app.</p>
+            <p>Sends a real-time push notification using Firebase HTTP v1 API. Use this to verify FCM integration on the
+                mobile app.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /Test/V1/customer/sendTestNotification
             </div>

@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\PoliciesController;
 use App\Http\Controllers\Admin\ProductBrandController;
 use App\Http\Controllers\Admin\PortfolioController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
+use App\Http\Controllers\Admin\ServiceTypeController;
 use App\Http\Controllers\Admin\ServiceSubcategoryController;
 use App\Http\Controllers\Admin\ServiceCityPriceController;
 use App\Http\Controllers\Admin\ServiceController;
@@ -79,6 +80,17 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('getDataContracts', [ContractSignedController::class, 'getDataContracts'])->name('getDataContracts');
         Route::delete('contract-signed/{id}', [ContractSignedController::class, 'destroy']);
         Route::get('contract-signed/status/{id}/{status}', [ContractSignedController::class, 'changeStatus']);
+
+        /* Services Type Route */
+        Route::get('service-type', [ServiceTypeController::class, 'index'])->name('admin.service-type.index');
+        Route::get('service-type/create', [ServiceTypeController::class, 'create'])->name('admin.service-type.create');
+        Route::post('service-type/store', [ServiceTypeController::class, 'store']);
+        Route::delete('service-type/{id}', [ServiceTypeController::class, 'destroy']);
+        Route::get('service-type/edit/{id}', [ServiceTypeController::class, 'edit'])->name('admin.service-type.edit');
+        Route::get('getDataServiceType', [ServiceTypeController::class, 'getDataServiceType'])->name('getDataServiceType');
+        Route::get('service-type/status/{id}/{status}', [ServiceTypeController::class, 'changeStatus']);
+        Route::get('service-type/priority-status/{id}/{status}', [ServiceTypeController::class, 'changePriorityStatus']);
+        Route::get('service-type/old-new-image-priority-status/{id}/{status}', [ServiceTypeController::class, 'changeIsNewStatus']);
 
 
         /* Services Category Route */

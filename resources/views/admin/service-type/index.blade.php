@@ -8,13 +8,13 @@
                 <div class="content-header-left col-md-9 col-12 mb-2">
                     <div class="row breadcrumbs-top">
                         <div class="col-12">
-                            <h2 class="content-header-title float-start mb-0">Service Category</h2>
+                            <h2 class="content-header-title float-start mb-0">Service Type</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item">
                                         <a href="{{ route('admin.dashboard') }}">Home</a>
                                     </li>
-                                    <li class="breadcrumb-item active"><a href="#">Service Category</a>
+                                    <li class="breadcrumb-item active"><a href="#">Service Type</a>
                                     </li>
                                 </ol>
                             </div>
@@ -22,8 +22,8 @@
                     </div>
                 </div>
                 <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
-                    <a href="{{ route('admin.service-category.create') }}" class="btn btn-primary">
-                        Add Service Category
+                    <a href="{{ route('admin.service-type.create') }}" class="btn btn-primary">
+                        Add Service Type
                     </a>
                     <div class="btn-group">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -83,7 +83,6 @@
                                             <tr>
                                                 <th>Id</th>
                                                 <th>Name</th>
-                                                <th>Service Type</th>
                                                 <th data-search="false">Icon</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-stuff="High Priority,Low Priority">Is Popular</th>
@@ -105,11 +104,11 @@
 @endsection
 @section('footer_script_content')
     <script>
-        const sweetalert_delete_title = "Delete Category?";
-        const sweetalert_change_status = "Change Status of Category";
-        const sweetalert_change_priority_status = "Change Priority Status of Category";
-        const form_url = '/service-category';
-        datatable_url = '/getDataServiceCategory';
+        const sweetalert_delete_title = "Delete Type?";
+        const sweetalert_change_status = "Change Status of Type";
+        const sweetalert_change_priority_status = "Change Priority Status of Type";
+        const form_url = '/service-type';
+        datatable_url = '/getDataServiceType';
 
         $.extend(true, $.fn.dataTable.defaults, {
             pageLength: 100,
@@ -128,10 +127,7 @@
                     data: 'name',
                     name: 'name'
                 },
-                {
-                    data: 'service_type_name',
-                    name: 'service_types.name'
-                },
+
                 {
                     data: 'icon',
                     name: 'icon',

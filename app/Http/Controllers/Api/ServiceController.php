@@ -25,7 +25,36 @@ class ServiceController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
-    public function getServiceCategory(): JsonResponse
+    public function getServiceType(): JsonResponse
+    {
+        $function_name = 'getServiceType';
+
+        try {
+            $types = DB::table('service_types')
+                ->select(
+                    'id',
+                    'name',
+                    DB::raw('CONCAT("' . asset('uploads/service-types') . '/", icon) AS icon'),
+                    'description',
+                    'is_popular',
+                    'is_new'
+                )
+                ->where('status', 1)
+                ->orderByDesc('is_popular')
+                ->get();
+
+            if ($types->isEmpty()) {
+                return $this->sendError('No service types found.', $this->backend_error_status);
+            }
+
+            return $this->sendResponse($types, 'Service Types retrieved successfully.');
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function getServiceCategory(Request $request): JsonResponse
     {
         $function_name = 'getServiceCategory';
 
@@ -33,6 +62,7 @@ class ServiceController extends Controller
             $categories = DB::table('service_categories as c')
                 ->select(
                     'c.id',
+                    'c.service_type_id',
                     'c.name',
                     DB::raw('CONCAT("' . asset('uploads/service-category') . '/", c.icon) AS icon'),
                     DB::raw('IF(c.icon LIKE "%.mp4" OR c.icon LIKE "%.mov" OR c.icon LIKE "%.avi" OR c.icon LIKE "%.wmv", "video", "image") AS icon_type'),
@@ -40,9 +70,13 @@ class ServiceController extends Controller
                     'c.is_popular',
                     'c.is_new'
                 )
-                ->where('c.status', 1)
-                ->orderByDesc('c.is_popular')
-                ->get();
+                ->where('c.status', 1);
+
+            if ($request->filled('service_type_id')) {
+                $categories->where('c.service_type_id', $request->service_type_id);
+            }
+
+            $categories = $categories->orderByDesc('c.is_popular')->get();
 
             if ($categories->isEmpty()) {
                 return $this->sendError('No category found.', $this->backend_error_status);

@@ -8,17 +8,17 @@
             <div class="content-header-left col-md-9 col-12 mb-2">
                 <div class="row breadcrumbs-top">
                     <div class="col-12">
-                        <h2 class="content-header-title float-start mb-0">Edit Service Category</h2>
+                        <h2 class="content-header-title float-start mb-0">Add Service Type</h2>
                         <div class="breadcrumb-wrapper">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item">
                                     <a href="{{ route('admin.dashboard') }}">{{trans('admin_string.home')}}</a>
                                 </li>
                                  <li class="breadcrumb-item">
-                                    <a href="{{ route('admin.service-category.index') }}">Service Category</a>
+                                    <a href="{{ route('admin.service-type.index') }}">Service Type</a>
                                 </li>
                                 <li class="breadcrumb-item active"><a
-                                        href="#">Edit Service Category</a>
+                                        href="#">Add Service Type</a>
                                 </li>
                             </ol>
                         </div>
@@ -33,56 +33,35 @@
                         <div class="col-lg-12 col-md-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <form method="POST" data-parsley-validate="" id="addEditForm" role="form">
+                                    <form method="POST" enctype="multipart/form-data" data-parsley-validate="" id="addEditForm" role="form">
                                         @csrf
-                                        <input type="hidden" name="edit_value" value="{{$category->id}}">
-                                        <input type="hidden" id="form-method" value="edit">
+                                        <input type="hidden" name="edit_value" value="0">
+                                        <input type="hidden" id="form-method" value="add">
                                         <div class="row row-sm">
 
-                                            <div class="col-12 mt-2">
-                                                <div class="form-group">
-                                                    <label>Service Type <span class="text-danger">*</span></label>
-                                                    <select name="service_type_id" class="form-control" required>
-                                                        <option value="">Select Service Type</option>
-                                                        @foreach($serviceTypes as $type)
-                                                            <option value="{{ $type->id }}" {{ $category->service_type_id == $type->id ? 'selected' : '' }}>
-                                                                {{ $type->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                    <div class="valid-feedback"></div>
-                                                </div>
-                                            </div>
 
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
-                                                    <label>{{trans('admin_string.name')}}</label>
+                                                    <label>Name</label>
                                                     <input type="text" class="form-control" name="name"
-                                                        value="{{$category->name}}"
-                                                        placeholder="{{trans('admin_string.name')}}" required>
+                                                        placeholder="Name" required>
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
 
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
-                                                    <label>Image</label>
-                                                    @if(isset($category->icon) && !empty($category->icon))
-                                                        <div class="mb-3">
-                                                            <img src="{{ asset('uploads/service-category/' . $category->icon) }}"
-                                                                alt="Category Image" style="width: 250px; height: auto;" />
-                                                        </div>
-                                                    @endif
-                                                    <input type="file" class="form-control filepond" name="icon">
+                                                    <label>Icon</label>
+                                                    <input type="file" class="filepond" name="icon">
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="col-12 mt-2">
                                                 <div class="form-group">
                                                     <label>Description</label>
                                                     <textarea class="form-control" name="description" rows="4"
-                                                        placeholder="{{trans('admin_string.description')}}">{{($category->description ?? '')}}</textarea>
+                                                        placeholder="Description"></textarea>
 
                                                     <div class="valid-feedback"></div>
                                                 </div>
@@ -92,12 +71,9 @@
                                                 <div class="form-group">
                                                     <label>Status</label>
                                                     <select id="status" name="status" class="form-control" required>
-                                                        <option value="">{{trans('admin_string.select_status')}}
-                                                        </option>
-                                                        <option value="1" @if($category->status == '1') selected @endif>
-                                                            Active</option>
-                                                        <option value="0" @if($category->status == '0') selected @endif>
-                                                            Inactive</option>
+                                                        <option value="">Status</option>
+                                                        <option value="1" selected>Active</option>
+                                                        <option value="0">Inactive</option>
                                                     </select>
                                                     <div class="valid-feedback"></div>
                                                 </div>
@@ -107,13 +83,9 @@
                                                 <div class="form-group">
                                                     <label>Priority Status</label>
                                                     <select id="is_popular" name="is_popular" class="form-control" required>
-                                                        <option value="">
-                                                            {{trans('admin_string.select_priority_status')}}
-                                                        </option>
-                                                        <option value="1" @if($category->is_popular == '1') selected @endif>
-                                                            High Priority</option>
-                                                        <option value="0" @if($category->is_popular == '0') selected @endif>
-                                                            Low Priority</option>
+                                                        <option value="">Priority Status</option>
+                                                        <option value="1">High Priority</option>
+                                                        <option value="0" selected>Low Priority</option>
                                                     </select>
                                                     <div class="valid-feedback"></div>
                                                 </div>
@@ -124,10 +96,8 @@
                                                     <label>Is New</label>
                                                     <select id="is_new" name="is_new" class="form-control" required>
                                                         <option value="">Is New</option>
-                                                        <option value="1" @if($category->is_new == '1') selected @endif>
-                                                            New</option>
-                                                        <option value="0" @if($category->is_new == '0') selected @endif>
-                                                            No</option>
+                                                        <option value="1">New</option>
+                                                        <option value="0" selected>No</option>
                                                     </select>
                                                     <div class="valid-feedback"></div>
                                                 </div>
@@ -138,11 +108,12 @@
                                                     <div>
                                                         <button type="submit"
                                                             class="btn btn-primary">{{ trans('admin_string.submit') }}</button>
-                                                        <a href="{{ route('admin.service-category.index') }}"
+                                                        <a href="{{ route('admin.service-type.index') }}"
                                                             class="btn btn-secondary">{{ trans('admin_string.cancel') }}</a>
                                                     </div>
                                                 </div>
                                             </div>
+
                                         </div>
                                     </form>
                                 </div>
@@ -157,8 +128,23 @@
 @endsection
 @section('footer_script_content')
 <script>
-    var form_url = 'service-category/store';
-    var redirect_url = 'service-category';
+    var form_url = 'service-type/store';
+    var redirect_url = 'service-type';
     var is_one_image_and_multiple_image_status = 'is_one_image';
+
+    //   document.addEventListener('DOMContentLoaded', function () {
+    //     // Select all file inputs with class 'filepond'
+    //     FilePond.parse(document.body);
+
+    //     // OR explicitly register
+    //     const inputElement = document.querySelector('input[name="icon"]');
+    //     FilePond.create(inputElement, {
+    //         allowMultiple: false,
+    //         instantUpload: false,
+    //         storeAsFile: false,
+    //         acceptedFileTypes: ['image/*'],
+    //     });
+    // });
+
 </script>
 @endsection

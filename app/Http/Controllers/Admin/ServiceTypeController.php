@@ -3,17 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ServiceCategory;
+use App\Models\ServiceType;
 use App\Helpers\ImageUploadHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 
-
-class ServiceCategoryController extends Controller
+class ServiceTypeController extends Controller
 {
     protected $error_message, $exception_error_code, $validator_error_code, $controller_name;
 
@@ -22,13 +20,14 @@ class ServiceCategoryController extends Controller
         $this->error_message = config('custom.common_error_message');
         $this->exception_error_code = config('custom.exception_error_code');
         $this->validator_error_code = config('custom.validator_error_code');
-        $this->controller_name = "Admin/ServiceCategoryController";
+        $this->controller_name = "Admin/ServiceTypeController";
     }
+
     public function index()
     {
         $function_name = 'index';
         try {
-            return view('admin.service-category.index');
+            return view('admin.service-type.index');
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -39,8 +38,7 @@ class ServiceCategoryController extends Controller
     {
         $function_name = 'create';
         try {
-            $serviceTypes = \App\Models\ServiceType::where('status', 1)->get();
-            return view('admin.service-category.create', compact('serviceTypes'));
+            return view('admin.service-type.create');
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -51,12 +49,10 @@ class ServiceCategoryController extends Controller
     {
         $function_name = 'edit';
         try {
-            $category = ServiceCategory::where('id', decryptId($id))->first();
-            $serviceTypes = \App\Models\ServiceType::where('status', 1)->get();
-            if ($category) {
-                return view('admin.service-category.edit', [
-                    'category' => $category,
-                    'serviceTypes' => $serviceTypes
+            $type = ServiceType::where('id', decryptId($id))->first();
+            if ($type) {
+                return view('admin.service-type.edit', [
+                    'type' => $type
                 ]);
             }
         } catch (\Exception $e) {
@@ -65,83 +61,80 @@ class ServiceCategoryController extends Controller
         }
     }
 
-    public function getDataServiceCategory(Request $request)
+    public function getDataServiceType(Request $request)
     {
-        $function_name = 'getDataServiceCategory';
+        $function_name = 'getDataServiceType';
         try {
             if ($request->ajax()) {
-                $categories = DB::table('service_categories')
-                    ->leftJoin('service_types', 'service_categories.service_type_id', '=', 'service_types.id')
-                    ->select('service_categories.*', 'service_types.name as service_type_name');
+                $types = DB::table('service_types')->select('service_types.*');
 
                 if ($request->status !== null && $request->status !== '') {
-                    $categories->where('service_categories.status', $request->status);
+                    $types->where('service_types.status', $request->status);
                 }
 
                 if ($request->popular !== null && $request->popular !== '') {
-                    $categories->where('service_categories.is_popular', $request->popular);
+                    $types->where('service_types.is_popular', $request->popular);
                 }
 
                 if ($request->is_new !== null && $request->is_new !== '') {
-                    $categories->where('service_categories.is_new', $request->is_new);
+                    $types->where('service_types.is_new', $request->is_new);
                 }
 
                 if ($request->created_date) {
-                    $categories->whereDate('service_categories.created_at', $request->created_date);
+                    $types->whereDate('service_types.created_at', $request->created_date);
                 }
 
-                return DataTables::of($categories)
-                    ->addColumn('status', function ($categories) {
+                return DataTables::of($types)
+                    ->addColumn('status', function ($types) {
                         $status_array = [
                             'is_simple_active' => 1,
-                            'current_status' => $categories->status
+                            'current_status' => $types->status
                         ];
                         return view('admin.render-view.datable-label', [
                             'status_array' => $status_array
                         ])->render();
                     })
-                    ->addColumn('is_popular', function ($categories) {
+                    ->addColumn('is_popular', function ($types) {
                         $status_array = [
                             'is_simple_active' => 1,
                             'current_status' => 3,
-                            'current_is_popular_priority_status' => $categories->is_popular
+                            'current_is_popular_priority_status' => $types->is_popular
                         ];
                         return view('admin.render-view.datable-label', [
                             'status_array' => $status_array
                         ])->render();
                     })
-                    ->addColumn('is_new', function ($categories) {
+                    ->addColumn('is_new', function ($types) {
                         $status_array = [
                             'is_simple_active' => 1,
                             'current_status' => 4,
-                            'current_is_new_priority_status' => $categories->is_new
+                            'current_is_new_priority_status' => $types->is_new
                         ];
                         return view('admin.render-view.datable-label', [
                             'status_array' => $status_array
                         ])->render();
                     })
-                    ->addColumn('action', function ($categories) {
+                    ->addColumn('action', function ($types) {
                         $action_array = [
                             'is_simple_action' => 1,
-                            'edit_route' => route('admin.service-category.edit', encryptId($categories->id)),
-                            'delete_id' => $categories->id,
-                            'current_status' => $categories->status,
-                            'current_is_popular_priority_status' => $categories->is_popular,
-                            'current_is_new_status' => $categories->is_new,
-                            'hidden_id' => $categories->id,
+                            'edit_route' => route('admin.service-type.edit', encryptId($types->id)),
+                            'delete_id' => $types->id,
+                            'current_status' => $types->status,
+                            'current_is_popular_priority_status' => $types->is_popular,
+                            'current_is_new_status' => $types->is_new,
+                            'hidden_id' => $types->id,
                         ];
                         return view('admin.render-view.datable-action', [
                             'action_array' => $action_array
                         ])->render();
                     })
-                    ->addColumn('icon', function ($categories) {
-                        if ($categories->icon && file_exists(public_path('uploads/service-category/' . $categories->icon))) {
-                            $imageUrl = asset('uploads/service-category/' . $categories->icon);
-                            return '<img src="' . $imageUrl . '" style="max-width:100px;" alt="Category Icon" />';
+                    ->addColumn('icon', function ($types) {
+                        if ($types->icon && file_exists(public_path('uploads/service-types/' . $types->icon))) {
+                            $imageUrl = asset('uploads/service-types/' . $types->icon);
+                            return '<img src="' . $imageUrl . '" style="max-width:100px;" alt="Icon" />';
                         }
                         return '';
                     })
-
                     ->rawColumns(['action', 'icon', 'status', 'is_popular', 'is_new'])
                     ->make(true);
             }
@@ -150,7 +143,6 @@ class ServiceCategoryController extends Controller
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
         }
     }
-
 
     public function store(Request $request)
     {
@@ -161,19 +153,17 @@ class ServiceCategoryController extends Controller
             $validateArray = [
                 'name' => [
                     'required',
-                    $id == 0 ? 'unique:service_categories,name' : 'unique:service_categories,name,' . $id . ',id',
+                    $id == 0 ? 'unique:service_types,name' : 'unique:service_types,name,' . $id . ',id',
                 ],
-                'service_type_id' => 'required|exists:service_types,id',
-                'icon' => $id == 0 ? 'image|mimes:jpeg,png,jpg,gif,svg,webp' : 'image|mimes:jpeg,png,jpg,gif,svg,webp',
+                'icon' => 'image|mimes:jpeg,png,jpg,gif,svg,webp',
             ];
 
             $validateMessage = [
-                'name.required' => 'The category name is required.',
-                'name.unique' => 'The category name has already been taken.',
+                'name.required' => 'The name is required.',
+                'name.unique' => 'The name has already been taken.',
                 'icon.image' => 'The file must be an image.',
-                'icon.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
+                'icon.mimes' => 'The image must be a valid format.',
             ];
-
 
             $validator = Validator::make($request_all, $validateArray, $validateMessage);
             if ($validator->fails()) {
@@ -183,11 +173,14 @@ class ServiceCategoryController extends Controller
 
             if ($id == 0) {
                 if ($request->hasFile('icon')) {
-                    $icon = ImageUploadHelper::serviceCategoryimageUpload($request->icon);
+                    // Reusing the same helper, we'll create a new method for service types if needed or just use standard upload
+                    $file = $request->file('icon');
+                    $filename = time() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/service-types'), $filename);
+                    $icon = $filename;
                 }
 
-                ServiceCategory::create([
-                    'service_type_id' => $request->service_type_id,
+                ServiceType::create([
                     'name' => $request->name,
                     'description' => $request->description,
                     'icon' => $icon ?? null,
@@ -198,24 +191,25 @@ class ServiceCategoryController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => "Service category added successfully"
+                    'message' => "Service type added successfully"
                 ]);
             } else {
-                $category = ServiceCategory::where('id', $id)->first();
+                $type = ServiceType::where('id', $id)->first();
 
                 if ($request->hasFile('icon')) {
-                    $filePath = public_path('uploads/service-category/' . $category->icon);
-
+                    $filePath = public_path('uploads/service-types/' . $type->icon);
                     if (File::exists($filePath)) {
                         File::delete($filePath);
                     }
-                    $icon = ImageUploadHelper::serviceCategoryimageUpload($request->icon);
+                    $file = $request->file('icon');
+                    $filename = time() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/service-types'), $filename);
+                    $icon = $filename;
                 } else {
-                    $icon = $category->icon;
+                    $icon = $type->icon;
                 }
 
-                ServiceCategory::where('id', $id)->update([
-                    'service_type_id' => $request->service_type_id,
+                ServiceType::where('id', $id)->update([
                     'name' => $request->name,
                     'description' => $request->description,
                     'icon' => $icon,
@@ -225,7 +219,7 @@ class ServiceCategoryController extends Controller
                 ]);
                 return response()->json([
                     'success' => true,
-                    'message' => "Service category edited successfully"
+                    'message' => "Service type edited successfully"
                 ]);
             }
         } catch (\Exception $e) {
@@ -238,7 +232,7 @@ class ServiceCategoryController extends Controller
     {
         $function_name = 'changeStatus';
         try {
-            ServiceCategory::where('id', $id)->update(['status' => $status]);
+            ServiceType::where('id', $id)->update(['status' => $status]);
             return response()->json(['message' => trans('admin_string.msg_status_change')]);
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());
@@ -250,10 +244,8 @@ class ServiceCategoryController extends Controller
     {
         $function_name = 'changePriorityStatus';
         try {
-            ServiceCategory::where('id', $id)->update(['is_popular' => $status]);
-            return response()->json([
-                'message' => trans('admin_string.msg_priority_status_change')
-            ]);
+            ServiceType::where('id', $id)->update(['is_popular' => $status]);
+            return response()->json(['message' => trans('admin_string.msg_priority_status_change')]);
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -264,10 +256,8 @@ class ServiceCategoryController extends Controller
     {
         $function_name = 'changeIsNewStatus';
         try {
-            ServiceCategory::where('id', $id)->update(['is_new' => $status]);
-            return response()->json([
-                'message' => trans('admin_string.msg_status_change')
-            ]);
+            ServiceType::where('id', $id)->update(['is_new' => $status]);
+            return response()->json(['message' => trans('admin_string.msg_status_change')]);
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -278,22 +268,16 @@ class ServiceCategoryController extends Controller
     {
         $function_name = 'destroy';
         try {
-            $category = ServiceCategory::where('id', $id)->first();
-            if ($category) {
-                $filePath = public_path('uploads/service-category/' . $category->icon);
-
+            $type = ServiceType::where('id', $id)->first();
+            if ($type) {
+                $filePath = public_path('uploads/service-types/' . $type->icon);
                 if (File::exists($filePath)) {
                     File::delete($filePath);
                 }
-
-                $category->delete();
-
-                return response()->json([
-                    'message' => trans('admin_string.category_deleted_successfully')
-                ]);
+                $type->delete();
+                return response()->json(['message' => 'Service type deleted successfully.']);
             } else {
-                logger()->error("$function_name: Failed to delete the image from S3 or no category found.");
-                return response()->json(['error' => 'Failed to delete the image from S3 or no category found.'], 500);
+                return response()->json(['error' => 'No type found.'], 500);
             }
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());
