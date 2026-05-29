@@ -84,6 +84,8 @@ class CustomerReviewController extends Controller
             $page = $request->page ?? 1;
 
             $reviews = $query->orderByDesc('r.is_popular')
+                ->orderByDesc('r.review_date')
+                ->orderByDesc('r.id')
                 ->paginate($perPage, ['*'], 'page', $page)
                 ->through(function ($review) {
                     $photos = $review->photos ? json_decode($review->photos, true) : [];

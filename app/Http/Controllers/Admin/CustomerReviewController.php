@@ -152,7 +152,7 @@ class CustomerReviewController extends Controller
         try {
             $rules = [
                 'category_id'    => 'required|exists:service_categories,id',
-                'service_id'    => 'required|exists:services,id',
+                'service_id'    => 'nullable',
                 'customer_name' => 'required|string|max:100',
                 'customer_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
                 'rating'        => 'nullable|numeric|min:0|max:5',
@@ -214,7 +214,7 @@ class CustomerReviewController extends Controller
 
             $data = [
                 'category_id'     => $request->category_id,
-                'service_id'     => $request->service_id,
+                'service_id'     => $request->service_id ?? 0,
                 'customer_name'  => $request->customer_name,
                 'customer_photo' => $photo,
                 'rating'         => $request->rating,

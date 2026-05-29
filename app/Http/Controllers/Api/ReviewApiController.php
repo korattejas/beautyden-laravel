@@ -35,7 +35,9 @@ class ReviewApiController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'appointment_id' => 'required|exists:appointments,id',
-                'rating' => 'required|numeric|min:1|max:5',
+                'category_ratings' => 'required|array',
+                'category_ratings.*.category_id' => 'required|integer',
+                'category_ratings.*.rating' => 'required|numeric|min:1|max:5',
                 'review' => 'required|string',
                 'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             ]);
@@ -57,20 +59,24 @@ class ReviewApiController extends Controller
                 }
             }
 
-            $review = CustomerReview::create([
-                'user_id' => $user->id,
-                'appointment_id' => $request->appointment_id,
-                'category_id' => $appointment->service_category_id ?? 0,
-                'service_id' => $appointment->service_id ?? 0,
-                'customer_name' => $user->name,
-                'rating' => $request->rating,
-                'review' => $request->review,
-                'review_date' => now()->toDateString(),
-                'photos' => $photoNames,
-                'status' => 0, // Pending by default
-            ]);
+            // Insert review for each category
+            $reviews = [];
+            foreach ($request->category_ratings as $catRating) {
+                $reviews[] = CustomerReview::create([
+                    'user_id' => $user->id,
+                    'appointment_id' => $request->appointment_id,
+                    'category_id' => $catRating['category_id'],
+                    'service_id' => 0, // 0 signifies category-level review
+                    'customer_name' => $user->name,
+                    'rating' => $catRating['rating'],
+                    'review' => $request->review,
+                    'review_date' => now()->toDateString(),
+                    'photos' => $photoNames,
+                    'status' => 0, // Pending by default
+                ]);
+            }
 
-            return $this->sendResponse($review, 'Review submitted successfully. It will be visible after admin approval.');
+            return $this->sendResponse($reviews, 'Review submitted successfully. It will be visible after admin approval.');
 
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);

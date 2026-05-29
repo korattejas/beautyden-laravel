@@ -27,6 +27,36 @@ class ServiceMasterController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
+    private function getCategoryReviewStats($categoryId)
+    {
+        $dummyReviewsSum = DB::table('service_masters')->where('category_id', $categoryId)->sum('reviews');
+        $dummyRatingAvg = DB::table('service_masters')->where('category_id', $categoryId)->where('rating', '>', 0)->avg('rating');
+        
+        $realReviewsCount = DB::table('customer_reviews')->where('category_id', $categoryId)->where('status', 1)->count();
+        $realRatingAvg = DB::table('customer_reviews')->where('category_id', $categoryId)->where('status', 1)->avg('rating');
+
+        $totalReviews = $dummyReviewsSum + $realReviewsCount;
+        
+        $totalRatingPoints = 0;
+        $pointsCount = 0;
+        
+        if ($dummyReviewsSum > 0 && $dummyRatingAvg > 0) {
+            $totalRatingPoints += ($dummyRatingAvg * $dummyReviewsSum);
+            $pointsCount += $dummyReviewsSum;
+        }
+        if ($realReviewsCount > 0 && $realRatingAvg > 0) {
+            $totalRatingPoints += ($realRatingAvg * $realReviewsCount);
+            $pointsCount += $realReviewsCount;
+        }
+        
+        $finalRating = $pointsCount > 0 ? round($totalRatingPoints / $pointsCount, 1) : 0;
+        
+        return [
+            'reviews' => (int) $totalReviews,
+            'rating' => (float) $finalRating
+        ];
+    }
+
     public function getServiceMasters(Request $request): JsonResponse
     {
         $function_name = 'getServiceMasters';
@@ -101,12 +131,23 @@ class ServiceMasterController extends Controller
             $page = $request->page ?? 1;
 
             $services = $query->orderByDesc('sm.is_popular')
-                ->paginate($perPage, ['*'], 'page', $page)
-                ->through(function ($service) {
-                    $service->is_popular = (int) $service->is_popular;
-                    $service->has_variants = (int) $service->has_variants;
-                    return $service;
-                });
+                ->paginate($perPage, ['*'], 'page', $page);
+                
+            $categoryStatsCache = [];
+
+            $services->getCollection()->transform(function ($service) use (&$categoryStatsCache) {
+                $service->is_popular = (int) $service->is_popular;
+                $service->has_variants = (int) $service->has_variants;
+                
+                if (!isset($categoryStatsCache[$service->category_id])) {
+                    $categoryStatsCache[$service->category_id] = $this->getCategoryReviewStats($service->category_id);
+                }
+                
+                $service->rating = $categoryStatsCache[$service->category_id]['rating'];
+                $service->reviews = $categoryStatsCache[$service->category_id]['reviews'];
+                
+                return $service;
+            });
 
             if ($services->total() === 0) {
                 return $this->sendError('No service found.', $this->backend_error_status);
@@ -150,6 +191,11 @@ class ServiceMasterController extends Controller
 
             $service->category_name = $service->category->name ?? '';
             $service->sub_category_name = $service->subcategory->name ?? '';
+
+            // Override with Category-wise ratings
+            $catStats = $this->getCategoryReviewStats($service->category_id);
+            $service->rating = $catStats['rating'];
+            $service->reviews = $catStats['reviews'];
 
             if ($service->subcategory && $service->subcategory->media_json) {
                 $media = $service->subcategory->media_json;
@@ -195,8 +241,8 @@ class ServiceMasterController extends Controller
 
                         // Ensure numeric types
                         $variant->description         = $variant->description ?? null;
-                        $variant->rating             = (float) ($variant->rating ?? 0);
-                        $variant->reviews            = (int)   ($variant->reviews ?? 0);
+                        $variant->rating             = $catStats['rating'];
+                        $variant->reviews            = $catStats['reviews'];
                         $variant->discount_percentage = $variant->discount_percentage
                             ? (float) $variant->discount_percentage
                             : null;
@@ -311,8 +357,10 @@ class ServiceMasterController extends Controller
                 ->where('scm.city_id', $cityId)
                 ->where('scm.status', 1)
                 ->get()
-                ->map(function ($item) {
+                ->map(function ($item) use ($catStats) {
                     $item->is_popular = (int) $item->is_popular;
+                    $item->rating = $catStats['rating'];
+                    $item->reviews = $catStats['reviews'];
                     return $item;
                 });
 

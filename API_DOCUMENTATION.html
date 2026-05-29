@@ -1361,9 +1361,9 @@
                         <td><strong>Required</strong>. ID of the completed appointment.</td>
                     </tr>
                     <tr>
-                        <td>rating</td>
-                        <td>Numeric</td>
-                        <td><strong>Required</strong>. Rating from 1 to 5.</td>
+                        <td>category_ratings[]</td>
+                        <td>Array of Objects</td>
+                        <td><strong>Required</strong>. Array containing `category_id` and `rating` (1 to 5) for each category. Example: `[{"category_id": 16, "rating": 5}]`</td>
                     </tr>
                     <tr>
                         <td>review</td>
@@ -1383,19 +1383,21 @@
     "code": 200,
     "status": true,
     "message": "Review submitted successfully. It will be visible after admin approval.",
-    "data": {
-        "id": 15,
-        "user_id": 4,
-        "appointment_id": "101",
-        "category_id": 16,
-        "service_id": 42,
-        "customer_name": "Tejas",
-        "rating": "5",
-        "review": "Excellent service!",
-        "review_date": "2026-05-14",
-        "photos": ["1715690000_65535.jpg"],
-        "status": 0
-    }
+    "data": [
+        {
+            "id": 15,
+            "user_id": 4,
+            "appointment_id": "101",
+            "category_id": 16,
+            "service_id": 0,
+            "customer_name": "Tejas",
+            "rating": "5",
+            "review": "Excellent service!",
+            "review_date": "2026-05-14",
+            "photos": ["1715690000_65535.jpg"],
+            "status": 0
+        }
+    ]
 }</code></pre>
         </section>
 
