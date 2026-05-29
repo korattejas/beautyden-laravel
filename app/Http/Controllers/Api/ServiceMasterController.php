@@ -187,6 +187,19 @@ class ServiceMasterController extends Controller
                         } else {
                             $variant->discount_price = 0; // Default if not found
                         }
+
+                        // Format thumbnail image URL
+                        $variant->thumbnail_image = $variant->thumbnail_image
+                            ? asset('uploads/service-variant/' . $variant->thumbnail_image)
+                            : null;
+
+                        // Ensure numeric types
+                        $variant->rating             = (float) ($variant->rating ?? 0);
+                        $variant->reviews            = (int)   ($variant->reviews ?? 0);
+                        $variant->discount_percentage = $variant->discount_percentage
+                            ? (float) $variant->discount_percentage
+                            : null;
+
                         $availableVariants[] = $variant;
                     }
                     $service->variants = $availableVariants;
@@ -469,6 +482,19 @@ class ServiceMasterController extends Controller
                         } else {
                             $variant->discount_price = 0; // Default if not found
                         }
+
+                        // Format thumbnail image URL
+                        $variant->thumbnail_image = $variant->thumbnail_image
+                            ? asset('uploads/service-variant/' . $variant->thumbnail_image)
+                            : null;
+
+                        // Ensure numeric types
+                        $variant->rating             = (float) ($variant->rating ?? 0);
+                        $variant->reviews            = (int)   ($variant->reviews ?? 0);
+                        $variant->discount_percentage = $variant->discount_percentage
+                            ? (float) $variant->discount_percentage
+                            : null;
+
                         $availableVariants[] = $variant;
                     }
                     $service->variants = $availableVariants;
