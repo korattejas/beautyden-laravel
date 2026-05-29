@@ -61,21 +61,48 @@
                     @if($service->has_variants && count($service->variants ?? []) > 0)
                         <div class="card mb-2 shadow-sm border-0">
                             <div class="card-header border-bottom"><h4 class="card-title text-primary"><i data-feather="layers" class="me-50"></i> Service Variants</h4></div>
-                            <div class="card-body pt-2">
-                                <ul class="list-group list-group-flush">
-                                    @foreach($service->variants as $variant)
-                                        <li class="list-group-item px-0">
-                                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="card-body pt-2 px-2">
+                                @foreach($service->variants as $variant)
+                                    <div class="border rounded p-2 mb-2 bg-light position-relative">
+                                        {{-- Thumbnail + Name Row --}}
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            @if($variant->thumbnail_image)
+                                                <img src="{{ asset('uploads/service-variant/' . $variant->thumbnail_image) }}"
+                                                     style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #dee2e6;">
+                                            @else
+                                                <div style="width:48px;height:48px;border-radius:8px;border:1px dashed #ccc;display:flex;align-items:center;justify-content:center;">
+                                                    <i data-feather="image" style="width:18px;color:#aaa;"></i>
+                                                </div>
+                                            @endif
+                                            <div>
                                                 <div class="fw-bold text-dark">{{ $variant->name }}</div>
-                                                <div class="text-muted small"><i data-feather="clock" style="width: 12px"></i> {{ $variant->duration ?? 'Standard' }}</div>
+                                                @if($variant->duration)
+                                                    <div class="text-muted small"><i data-feather="clock" style="width:11px"></i> {{ $variant->duration }}</div>
+                                                @endif
                                             </div>
-                                            <div class="d-flex justify-content-between mt-50">
-                                                <span class="small">Price:</span>
-                                                <span class="fw-bold text-success">₹{{ $variant->price }}</span>
+                                        </div>
+                                        {{-- Price + Discount Row --}}
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <div>
+                                                <span class="fw-bold text-success fs-6">₹{{ $variant->price }}</span>
+                                                @if($variant->discount_percentage)
+                                                    <span class="badge bg-danger ms-1">{{ $variant->discount_percentage }}% OFF</span>
+                                                @endif
                                             </div>
-                                        </li>
-                                    @endforeach
-                                </ul>
+                                            {{-- Rating + Reviews --}}
+                                            <div class="text-end">
+                                                @if($variant->rating > 0)
+                                                    <span class="badge bg-warning text-dark">
+                                                        ⭐ {{ number_format($variant->rating, 1) }}
+                                                    </span>
+                                                @endif
+                                                @if($variant->reviews > 0)
+                                                    <span class="text-muted small ms-1">({{ $variant->reviews }} reviews)</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     @endif

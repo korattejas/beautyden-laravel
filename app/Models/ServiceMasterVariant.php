@@ -11,6 +11,10 @@ class ServiceMasterVariant extends Model
         'name',
         'price',
         'duration',
+        'rating',
+        'reviews',
+        'thumbnail_image',
+        'discount_percentage',
     ];
 
     public function service_master()

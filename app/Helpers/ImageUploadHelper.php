@@ -162,6 +162,21 @@ class ImageUploadHelper
         return $file_name;
     }
 
+    public static function serviceVariantThumbnailUpload($files): string
+    {
+        $image_path = 'uploads/service-variant';
+        if (!File::exists(public_path($image_path))) {
+            File::makeDirectory(public_path($image_path), 0777, true);
+        }
+
+        $extension = $files->getClientOriginalExtension();
+        $file_name = uniqid('variant_') . '.' . $extension;
+
+        $files->move(public_path($image_path), $file_name);
+
+        return $file_name;
+    }
+
     public static function teamMemberimageUpload($files): string
     {
         $image_path = 'uploads/team-member';

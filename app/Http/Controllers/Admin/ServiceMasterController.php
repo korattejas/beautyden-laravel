@@ -335,18 +335,50 @@ class ServiceMasterController extends Controller
 
             // Handle Variants
             if ($request->has_variants == 1 && $request->variants) {
+                // Collect old thumbnail images for cleanup
+                $old_variants = ServiceMasterVariant::where('service_master_id', $service_id)->get()->keyBy('id');
+
                 ServiceMasterVariant::where('service_master_id', $service_id)->delete();
-                foreach ($request->variants as $variant) {
+
+                // Delete old thumbnail images that are no longer used
+                foreach ($old_variants as $oldVariant) {
+                    if ($oldVariant->thumbnail_image) {
+                        File::delete(public_path('uploads/service-variant/' . $oldVariant->thumbnail_image));
+                    }
+                }
+
+                foreach ($request->variants as $vKey => $variant) {
                     if (!empty($variant['name'])) {
+                        // Handle variant thumbnail image
+                        $thumbnail_image = null;
+                        if ($request->hasFile("variants.$vKey.thumbnail_image")) {
+                            $thumbnail_image = ImageUploadHelper::serviceVariantThumbnailUpload(
+                                $request->file("variants.$vKey.thumbnail_image")
+                            );
+                        } elseif (!empty($variant['old_thumbnail_image'])) {
+                            $thumbnail_image = $variant['old_thumbnail_image'];
+                        }
+
                         ServiceMasterVariant::create([
-                            'service_master_id' => $service_id,
-                            'name' => $variant['name'],
-                            'price' => $variant['price'] ?? 0,
-                            'duration' => $variant['duration'] ?? null,
+                            'service_master_id'   => $service_id,
+                            'name'                => $variant['name'],
+                            'price'               => $variant['price'] ?? 0,
+                            'duration'            => $variant['duration'] ?? null,
+                            'rating'              => $variant['rating'] ?? 0,
+                            'reviews'             => $variant['reviews'] ?? 0,
+                            'thumbnail_image'     => $thumbnail_image,
+                            'discount_percentage' => $variant['discount_percentage'] ?? null,
                         ]);
                     }
                 }
             } else {
+                // Cleanup variant thumbnail images before deleting
+                $variants_to_delete = ServiceMasterVariant::where('service_master_id', $service_id)->get();
+                foreach ($variants_to_delete as $v) {
+                    if ($v->thumbnail_image) {
+                        File::delete(public_path('uploads/service-variant/' . $v->thumbnail_image));
+                    }
+                }
                 ServiceMasterVariant::where('service_master_id', $service_id)->delete();
             }
 
