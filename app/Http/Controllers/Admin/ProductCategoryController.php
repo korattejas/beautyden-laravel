@@ -111,11 +111,7 @@ class ProductCategoryController extends Controller
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })
                     ->addColumn('image', function ($categories) {
-                        if ($categories->image && file_exists(public_path('uploads/product-category/' . $categories->image))) {
-                            $imageUrl = asset('uploads/product-category/' . $categories->image);
-                            return '<img src="' . $imageUrl . '" style="max-width:100px;" alt="Category Image" />';
-                        }
-                        return '';
+                        return $categories->image;
                     })
                     ->rawColumns(['action', 'image', 'status', 'is_featured', 'is_new'])
                     ->make(true);

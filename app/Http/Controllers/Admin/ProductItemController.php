@@ -131,8 +131,8 @@ class ProductItemController extends Controller
     {
         $id = $request->input('edit_value', 0);
         $rules = [
-            'name' => 'required|string|max:255|unique:product_items,name,' . $id,
-            'price' => 'required|numeric',
+            'name'        => 'required|string|max:255|unique:product_items,name,' . $id,
+            'price'       => 'required|numeric',
             'category_id' => 'required|exists:product_categories,id',
         ];
 
@@ -142,24 +142,34 @@ class ProductItemController extends Controller
         }
 
         try {
+            // Handle content_json - form sends it as array, needs to be JSON string for DB
+            $contentJson = $request->content_json;
+            if (is_array($contentJson)) {
+                // Filter out empty sections
+                $contentJson = array_values(array_filter($contentJson, function($section) {
+                    return !empty($section['type']);
+                }));
+            } else {
+                $contentJson = null;
+            }
+
             $data = [
-                'user_id' => auth()->id() ?? $request->user_id, // Fallback if no auth (testing)
-                'brand_id' => $request->brand_id,
-                'category_id' => $request->category_id,
-                'sub_category_id' => $request->sub_category_id,
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-                'short_description' => $request->short_description,
-                'description' => $request->description,
-                'price' => $request->price,
-                'discount_percentage' => $request->discount_percentage ?? 0,
-                'sku' => $request->sku,
-                'stock_quantity' => $request->stock_quantity ?? 0,
-                'is_featured' => (int) $request->is_featured,
-                'is_new' => (int) $request->is_new,
-                'show_in_client_app' => (int) $request->show_in_client_app,
-                'status' => (int) $request->status,
-                'content_json' => $request->content_json, // Assuming structured JSON from form
+                'brand_id'           => $request->brand_id ?: null,
+                'category_id'        => $request->category_id,
+                'sub_category_id'    => $request->sub_category_id ?: null,
+                'name'               => $request->name,
+                'slug'               => Str::slug($request->name),
+                'short_description'  => $request->short_description,
+                'description'        => $request->description,
+                'price'              => $request->price,
+                'discount_percentage'=> $request->discount_percentage ?? 0,
+                'sku'                => $request->sku,
+                'stock_quantity'     => $request->stock_quantity ?? 0,
+                'is_featured'        => $request->has('is_featured') ? 1 : 0,
+                'is_new'             => $request->has('is_new') ? 1 : 0,
+                'show_in_client_app' => $request->has('show_in_client_app') ? 1 : 0,
+                'status'             => (int) $request->status,
+                'content_json'       => $contentJson,
             ];
 
             if ($id == 0) {
@@ -167,6 +177,9 @@ class ProductItemController extends Controller
                 $msg = "Product added successfully";
             } else {
                 $product = ProductItem::find($id);
+                if (!$product) {
+                    return response()->json(['message' => 'Product not found'], 404);
+                }
                 $product->update($data);
                 $msg = "Product updated successfully";
             }
@@ -174,34 +187,36 @@ class ProductItemController extends Controller
             // Handle Media (Images/Videos)
             if ($request->hasFile('media')) {
                 foreach ($request->file('media') as $file) {
-                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $filename = time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
                     $file->move(public_path('uploads/product-media'), $filename);
                     
                     $extension = strtolower($file->getClientOriginalExtension());
-                    $type = in_array($extension, ['mp4', 'mov', 'avi']) ? 'video' : 'image';
+                    $type = in_array($extension, ['mp4', 'mov', 'avi', 'webm']) ? 'video' : 'image';
 
                     ProductMedia::create([
                         'product_id' => $product->id,
-                        'type' => $type,
-                        'file_path' => $filename,
-                        'is_main' => 0, // Default to 0, handle main image separately if needed
-                        'status' => 1
+                        'type'       => $type,
+                        'file_path'  => $filename,
+                        'is_main'    => 0,
+                        'status'     => 1
                     ]);
                 }
             }
 
-            // Handle Variants
-            if ($request->variants) {
-                // For simplicity, recreate or update. Let's assume a simple array for now.
-                ProductVariant::where('product_id', $product->id)->delete(); // Simple approach: replace all
+            // Handle Variants — replace all on update
+            if ($request->variants && is_array($request->variants)) {
+                ProductVariant::where('product_id', $product->id)->delete();
                 foreach ($request->variants as $variant) {
+                    if (!is_array($variant)) continue;
+                    $variantName = isset($variant['name']) ? trim($variant['name']) : '';
+                    if (empty($variantName)) continue;
                     ProductVariant::create([
-                        'product_id' => $product->id,
-                        'variant_name' => $variant['name'],
-                        'price' => $variant['price'] ?? null,
-                        'discount_percentage' => $variant['discount_percentage'] ?? null,
-                        'stock_quantity' => $variant['stock_quantity'] ?? 0,
-                        'status' => 1
+                        'product_id'          => $product->id,
+                        'variant_name'        => $variantName,
+                        'price'               => isset($variant['price']) && $variant['price'] !== '' ? $variant['price'] : null,
+                        'discount_percentage' => isset($variant['discount_percentage']) && $variant['discount_percentage'] !== '' ? $variant['discount_percentage'] : null,
+                        'stock_quantity'      => isset($variant['stock_quantity']) ? (int) $variant['stock_quantity'] : 0,
+                        'status'              => 1
                     ]);
                 }
             }
