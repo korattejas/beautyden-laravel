@@ -89,7 +89,8 @@ class ServiceMasterController extends Controller
                     DB::raw('CONCAT("' . asset('uploads/service') . '/", sm.icon) AS icon'),
                     DB::raw('IF(sm.icon LIKE "%.mp4" OR sm.icon LIKE "%.mov" OR sm.icon LIKE "%.avi" OR sm.icon LIKE "%.wmv", "video", "image") AS icon_type'),
                     'sm.is_popular',
-                    'sm.has_variants'
+                    'sm.has_variants',
+                    'sm.banner_media'
                 )
                 ->where('scm.status', 1)
                 ->where('sm.status', 1);
@@ -143,8 +144,30 @@ class ServiceMasterController extends Controller
                     $categoryStatsCache[$service->category_id] = $this->getCategoryReviewStats($service->category_id);
                 }
                 
-                $service->rating = $categoryStatsCache[$service->category_id]['rating'];
-                $service->reviews = $categoryStatsCache[$service->category_id]['reviews'];
+                $service->rating = (string) $categoryStatsCache[$service->category_id]['rating'];
+                $service->reviews = (string) $categoryStatsCache[$service->category_id]['reviews'];
+                
+                $banner_media = $service->banner_media ? json_decode($service->banner_media, true) : [];
+                $formatted_banner = [];
+                
+                if (!empty($banner_media) && count($banner_media) > 0) {
+                    $formatted_banner = collect($banner_media)->map(function ($media) {
+                        $media['url'] = asset('uploads/service-media/' . $media['url']);
+                        if (!isset($media['type'])) {
+                            $ext = strtolower(pathinfo($media['url'], PATHINFO_EXTENSION));
+                            $media['type'] = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
+                        }
+                        $media['is_scroll_banner_image'] = isset($media['is_scroll_banner_image']) ? (int) $media['is_scroll_banner_image'] : 0;
+                        return $media;
+                    })->toArray();
+                }
+
+                $service->banner_section = empty($formatted_banner) ? null : [
+                    'type' => 'banner_section',
+                    'data' => array_values($formatted_banner)
+                ];
+                
+                unset($service->banner_media);
                 
                 return $service;
             });
@@ -194,8 +217,8 @@ class ServiceMasterController extends Controller
 
             // Override with Category-wise ratings
             $catStats = $this->getCategoryReviewStats($service->category_id);
-            $service->rating = $catStats['rating'];
-            $service->reviews = $catStats['reviews'];
+            $service->rating = (string) $catStats['rating'];
+            $service->reviews = (string) $catStats['reviews'];
 
             if ($service->subcategory && $service->subcategory->media_json) {
                 $media = $service->subcategory->media_json;
@@ -241,8 +264,8 @@ class ServiceMasterController extends Controller
 
                         // Ensure numeric types
                         $variant->description         = $variant->description ?? null;
-                        $variant->rating             = $catStats['rating'];
-                        $variant->reviews            = $catStats['reviews'];
+                        $variant->rating             = (string) $catStats['rating'];
+                        $variant->reviews            = (string) $catStats['reviews'];
                         $variant->discount_percentage = $variant->discount_percentage
                             ? (float) $variant->discount_percentage
                             : null;
@@ -359,8 +382,8 @@ class ServiceMasterController extends Controller
                 ->get()
                 ->map(function ($item) use ($catStats) {
                     $item->is_popular = (int) $item->is_popular;
-                    $item->rating = $catStats['rating'];
-                    $item->reviews = $catStats['reviews'];
+                    $item->rating = (string) $catStats['rating'];
+                    $item->reviews = (string) $catStats['reviews'];
                     return $item;
                 });
 
@@ -539,8 +562,8 @@ class ServiceMasterController extends Controller
 
                         // Ensure numeric types
                         $variant->description         = $variant->description ?? null;
-                        $variant->rating             = (float) ($variant->rating ?? 0);
-                        $variant->reviews            = (int)   ($variant->reviews ?? 0);
+                        $variant->rating             = (string) (float) ($variant->rating ?? 0);
+                        $variant->reviews            = (string) (int)   ($variant->reviews ?? 0);
                         $variant->discount_percentage = $variant->discount_percentage
                             ? (float) $variant->discount_percentage
                             : null;
