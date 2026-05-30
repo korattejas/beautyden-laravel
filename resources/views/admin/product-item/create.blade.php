@@ -34,6 +34,22 @@
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
+        <div class="content-header row">
+            <div class="content-header-left col-md-9 col-12 mb-2">
+                <div class="row breadcrumbs-top">
+                    <div class="col-12">
+                        <h2 class="content-header-title float-start mb-0">Create Premium Product</h2>
+                        <div class="breadcrumb-wrapper">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">{{ trans('admin_string.home') }}</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.product-item.index') }}">Product Items</a></li>
+                                <li class="breadcrumb-item active"><a href="#">Create Product Item</a></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="content-body">
             <form method="POST" id="productForm" enctype="multipart/form-data">
                 @csrf
@@ -41,7 +57,6 @@
                 
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <div>
-                        <h2 class="fw-bold mb-0">Create Premium Product</h2>
                         <p class="text-muted mb-0">Add high-quality products with variants and rich content.</p>
                     </div>
                     <div class="d-flex gap-1">
@@ -283,10 +298,10 @@
             e.preventDefault();
             loaderView();
             let formData = new FormData(this);
-            axios.post(APP_URL + '/admin/' + form_url, formData)
+            axios.post(APP_URL + '/' + form_url, formData)
                 .then(res => {
                     notificationToast(res.data.message, 'success');
-                    setTimeout(() => window.location.href = APP_URL + '/admin/' + redirect_url, 1000);
+                    setTimeout(() => window.location.href = APP_URL + '/' + redirect_url, 1000);
                 })
                 .catch(err => {
                     loaderHide();
@@ -363,7 +378,7 @@
         $('#category_id').on('change', function() {
             var id = $(this).val();
             $('#sub_category_id').html('<option value="">Loading...</option>');
-            if(id) $.get(APP_URL + '/admin/product-item/get-subcategories/' + id, function(data) {
+            if(id) $.get(APP_URL + '/product-item/get-subcategories/' + id, function(data) {
                 var html = '<option value="">Select</option>';
                 data.forEach(function(i) { html += '<option value="'+i.id+'">'+i.name+'</option>'; });
                 $('#sub_category_id').html(html);

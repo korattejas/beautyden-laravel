@@ -131,7 +131,7 @@ class ProductCategoryController extends Controller
         $id = $request->input('edit_value', 0);
         $rules = [
             'name' => 'required|string|max:255|unique:product_categories,name,' . $id,
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
+            'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -143,13 +143,13 @@ class ProductCategoryController extends Controller
             $category = $id ? ProductCategory::find($id) : null;
             $image = $category ? $category->image : null;
 
-            if ($request->hasFile('image')) {
+            if ($request->hasFile('icon')) {
                 if ($image && File::exists(public_path('uploads/product-category/' . $image))) {
                     File::delete(public_path('uploads/product-category/' . $image));
                 }
                 // Assuming a helper method exists or we use standard upload
-                $image = time() . '.' . $request->image->extension();
-                $request->image->move(public_path('uploads/product-category'), $image);
+                $image = time() . '.' . $request->icon->extension();
+                $request->icon->move(public_path('uploads/product-category'), $image);
             }
 
             $data = [
