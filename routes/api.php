@@ -21,7 +21,7 @@ use App\Http\Controllers\Api\PoliciesController;
 use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\MembershipController;
-use App\Http\Controllers\Api\AttendanceApiController;
+use App\Http\Controllers\Api\Beautician\AttendanceApiController;
 use App\Http\Middleware\RequestModifier;
 use App\Http\Middleware\ResponseModifier;
 use App\Http\Middleware\SanitizeInput;
