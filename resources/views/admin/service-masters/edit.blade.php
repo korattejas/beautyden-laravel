@@ -620,14 +620,14 @@
 
         $(document).on('click', '.add-step', function() {
             var con = $(this).siblings('.steps-container');
-            var idx = con.children().length;
+            var idx = new Date().getTime();
             con.append('<div class="step-card border rounded p-1 mb-1 bg-white shadow-sm position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="row"><div class="col-4"><div class="premium-file-input p-1" style="min-height:60px"><div class="placeholder-content"><p class="mb-0 x-small fw-bold">Img</p></div><input type="file" name="'+$(this).data('prefix')+'['+idx+'][image]" onchange="handlePreview(this)"></div><div class="preview-container"></div></div><div class="col-8"><input type="text" name="'+$(this).data('prefix')+'['+idx+'][title]" class="form-control mb-1 form-control-sm" placeholder="Title"><textarea name="'+$(this).data('prefix')+'['+idx+'][desc]" class="form-control form-control-sm" rows="2"></textarea></div></div></div>');
             feather.replace();
         });
 
         $(document).on('click', '.add-protocol-item', function() {
             var con = $(this).siblings('.protocol-items-container');
-            var idx = con.children().length;
+            var idx = new Date().getTime();
             con.append('<div class="col-6 mb-1"><div class="border rounded p-1 bg-white position-relative"><button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button><div class="premium-file-input p-1" style="min-height:50px"><div class="placeholder-content"><i data-feather="image" style="width:16px"></i></div><input type="file" name="'+$(this).data('prefix')+'['+idx+'][image]" onchange="handlePreview(this)"></div><div class="preview-container"></div><input type="text" name="'+$(this).data('prefix')+'['+idx+'][title]" class="form-control form-control-sm mt-1" placeholder="Protocol Name"></div></div>');
             feather.replace();
         });

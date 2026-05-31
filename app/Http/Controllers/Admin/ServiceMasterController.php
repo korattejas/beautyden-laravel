@@ -338,14 +338,21 @@ class ServiceMasterController extends Controller
                 // Collect old thumbnail images for cleanup
                 $old_variants = ServiceMasterVariant::where('service_master_id', $service_id)->get()->keyBy('id');
 
-                ServiceMasterVariant::where('service_master_id', $service_id)->delete();
+                $new_variant_thumbnails = [];
+                foreach ($request->variants as $variant) {
+                    if (!empty($variant['old_thumbnail_image'])) {
+                        $new_variant_thumbnails[] = $variant['old_thumbnail_image'];
+                    }
+                }
 
                 // Delete old thumbnail images that are no longer used
                 foreach ($old_variants as $oldVariant) {
-                    if ($oldVariant->thumbnail_image) {
+                    if ($oldVariant->thumbnail_image && !in_array($oldVariant->thumbnail_image, $new_variant_thumbnails)) {
                         File::delete(public_path('uploads/service-variant/' . $oldVariant->thumbnail_image));
                     }
                 }
+
+                ServiceMasterVariant::where('service_master_id', $service_id)->delete();
 
                 foreach ($request->variants as $vKey => $variant) {
                     if (!empty($variant['name'])) {
