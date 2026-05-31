@@ -111,14 +111,14 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
 
 /*======================================================== Beautician API ==============================================*/
 
-Route::middleware([SanitizeInput::class])->group(function () {
+Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/beautician')->group(function () {
         Route::post('sendLoginOtp', [BeauticianController::class, 'sendLoginOtp']);
         Route::post('verifyLoginOtp', [BeauticianController::class, 'verifyLoginOtp']);
     });
 });
 
-Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(function () {
+Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/beautician')->group(function () {
         Route::post('dashboard', [BeauticianController::class, 'dashboard']);
         Route::post('getAppointments', [BeauticianController::class, 'getAppointments']);
@@ -210,3 +210,31 @@ Route::middleware([])->group(function () {
 
     });
 });
+
+
+Route::middleware([SanitizeInput::class])->group(function () {
+    Route::prefix('Test/V1/beautician')->group(function () {
+        Route::post('sendLoginOtp', [BeauticianController::class, 'sendLoginOtp']);
+        Route::post('verifyLoginOtp', [BeauticianController::class, 'verifyLoginOtp']);
+    });
+});
+
+Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(function () {
+    Route::prefix('Test/V1/beautician')->group(function () {
+        Route::post('dashboard', [BeauticianController::class, 'dashboard']);
+        Route::post('getAppointments', [BeauticianController::class, 'getAppointments']);
+        Route::post('exportAppointments', [BeauticianController::class, 'exportAppointments']);
+        Route::post('getAppointmentDetails', [BeauticianController::class, 'getAppointmentDetails']);
+        Route::post('getRepeatCustomers', [BeauticianController::class, 'getRepeatCustomers']);
+        Route::post('appointmentUpdateStatus', [BeauticianController::class, 'appointmentUpdateStatus']);
+        Route::post('getProfile', [BeauticianController::class, 'getProfile']);
+        Route::post('updateProfile', [BeauticianController::class, 'updateProfile']);
+        Route::get('getAvailability', [AttendanceApiController::class, 'index']);
+        Route::post('markLeave', [AttendanceApiController::class, 'store']);
+        Route::post('cancelLeave', [AttendanceApiController::class, 'destroy']);
+        Route::get('productCategory', [ProductController::class, 'getProductCategories']);
+        Route::post('products', [ProductController::class, 'getProducts']);
+        Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
+    });
+});
+

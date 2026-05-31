@@ -1808,8 +1808,7 @@
 ]</code></pre>
 
             <h3>13.6 Export Appointments</h3>
-            <p>Generates a downloadable Excel or PDF report of assigned appointments. Supports same filters as Get
-                Appointments.</p>
+            <p>Generates an Excel or PDF report of assigned appointments and returns its download URL.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/beautician/exportAppointments
                 <span class="badge auth">Token Required</span>
@@ -1834,6 +1833,16 @@
                         <td>Optional. YYYY-MM-DD</td>
                     </tr>
                     <tr>
+                        <td>start_date</td>
+                        <td>Date</td>
+                        <td>Optional. YYYY-MM-DD</td>
+                    </tr>
+                    <tr>
+                        <td>end_date</td>
+                        <td>Date</td>
+                        <td>Optional. YYYY-MM-DD</td>
+                    </tr>
+                    <tr>
                         <td>status</td>
                         <td>Integer</td>
                         <td>Optional. 1=Pending, 2=Assigned, 3=Completed, 4=Cancelled</td>
@@ -1850,7 +1859,16 @@
                     </tr>
                 </tbody>
             </table>
-            <p><strong>Note:</strong> This endpoint returns the file directly as a binary download.</p>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "File generated successfully.",
+    "data": {
+        "file_url": "https://yourdomain.com/uploads/exports/appointments_report_beautician_1.pdf?v=1717150502"
+    }
+}</code></pre>
 
             <h3>13.7 Get Appointment Details</h3>
             <p>Fetches full details of a specific appointment.</p>

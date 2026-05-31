@@ -41,7 +41,30 @@
             </tr>
         </thead>
         <tbody>
+            @php
+                $totalCash = 0;
+                $totalOnline = 0;
+                $cashCount = 0;
+                $onlineCount = 0;
+                $totalAmount = 0;
+                $totalCompany = 0;
+            @endphp
             @foreach($appointments as $appointment)
+            @php
+                $amount = $appointment->services_data['summary']['grand_total'] ?? $appointment->price;
+                $payment = strtolower(trim($appointment->payment_type ?? ''));
+                
+                $totalAmount += $amount;
+                $totalCompany += $appointment->company_amount;
+                
+                if ($payment == 'cash' || $payment == 'cod') {
+                    $totalCash += $amount;
+                    $cashCount++;
+                } else if ($payment == 'online' || $payment == 'razorpay' || $payment == 'stripe') {
+                    $totalOnline += $amount;
+                    $onlineCount++;
+                }
+            @endphp
             <tr>
                 <td>{{ $appointment->order_number }}</td>
                 <td>{{ $appointment->first_name }} {{ $appointment->last_name }}</td>
@@ -57,11 +80,25 @@
                     @endif
                 </td>
                 <td>{{ strtoupper($appointment->payment_type ?? 'N/A') }}</td>
-                <td>{{ number_format($appointment->services_data['summary']['grand_total'] ?? $appointment->price, 2) }}</td>
+                <td>{{ number_format($amount, 2) }}</td>
                 <td>{{ number_format($appointment->company_amount, 2) }}</td>
             </tr>
             @endforeach
         </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="6" style="text-align: right; font-weight: bold;">Total Summary:</th>
+                <th style="font-weight: bold;">
+                    Cash: {{ $cashCount }} <br>
+                    Online: {{ $onlineCount }}
+                </th>
+                <th style="font-weight: bold;">
+                    Total: {{ number_format($totalAmount, 2) }} <br>
+                    (Cash: {{ number_format($totalCash, 2) }}, Online: {{ number_format($totalOnline, 2) }})
+                </th>
+                <th style="font-weight: bold;">{{ number_format($totalCompany, 2) }}</th>
+            </tr>
+        </tfoot>
     </table>
 </body>
 </html>

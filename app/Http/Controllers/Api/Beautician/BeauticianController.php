@@ -471,6 +471,9 @@ class BeauticianController extends Controller
             if ($request->filled('date')) {
                 $query->whereDate('appointment_date', $request->date);
             }
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween('appointment_date', [$request->start_date, $request->end_date]);
+            }
             if ($request->filled('status')) {
                 $query->where('appointments.status', $request->status);
             }
@@ -483,19 +486,40 @@ class BeauticianController extends Controller
 
             $appointments = $query->get();
             $type = $request->get('type', 'excel'); // excel or pdf
+            // Use team member ID to overwrite the file and save server space
+            $fileName = 'appointments_report_beautician_' . $teamMember->id . ($type == 'pdf' ? '.pdf' : '.xlsx');
+            $directory = public_path('uploads/exports');
+
+            if (!file_exists($directory)) {
+                mkdir($directory, 0777, true);
+            }
 
             if ($type == 'pdf') {
                 $pdf = Pdf::loadView('admin.appointments.export', compact('appointments'));
-                return $pdf->download('appointments_report_' . time() . '.pdf');
+                $pdf->save($directory . '/' . $fileName);
             } else {
-                return Excel::download(new class($appointments) implements \Maatwebsite\Excel\Concerns\FromView {
+                config(['filesystems.disks.public_exports' => [
+                    'driver' => 'local',
+                    'root' => $directory,
+                ]]);
+                
+                $exportClass = new class($appointments) implements \Maatwebsite\Excel\Concerns\FromView {
                     private $appointments;
                     public function __construct($appointments) { $this->appointments = $appointments; }
                     public function view(): \Illuminate\Contracts\View\View {
                         return view('admin.appointments.export', ['appointments' => $this->appointments]);
                     }
-                }, 'appointments_report_' . time() . '.xlsx');
+                };
+
+                Excel::store($exportClass, $fileName, 'public_exports');
             }
+
+            // Append time as query param to bypass cache, but keep the same file on server
+            $fileUrl = asset('uploads/exports/' . $fileName) . '?v=' . time();
+
+            return $this->sendResponse([
+                'file_url' => $fileUrl
+            ], 'File generated successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
