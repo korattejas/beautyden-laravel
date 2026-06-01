@@ -2363,6 +2363,116 @@
         ]
     }
 }</code></pre>
+            <h3>13.17 Place Product Order</h3>
+            <p>Places an order for multiple products from the Beautician app.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /Test/V1/beautician/placeOrder
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>items[]</td>
+                        <td>Array of Objects</td>
+                        <td><strong>Required</strong>. Array containing <code>product_id</code>, <code>qty</code>, and optional <code>variant_id</code>. Example: <code>[{"product_id": 1, "variant_id": 5, "qty": 2}]</code></td>
+                    </tr>
+                    <tr>
+                        <td>address</td>
+                        <td>String</td>
+                        <td>Optional. Delivery address for the order.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Order placed successfully.",
+    "data": {
+        "order_id": 12,
+        "total_amount": 1450.00,
+        "items": [
+            {
+                "product_id": 1,
+                "variant_id": 5,
+                "name": "Glowing Serum",
+                "variant_name": "50ml",
+                "qty": 2,
+                "price": 450.00,
+                "total": 900.00
+            }
+        ],
+        "order_status": "Pending",
+        "payment_status": "Pending"
+    }
+}</code></pre>
+
+            <h3>13.18 Get My Orders</h3>
+            <p>Retrieves a list of all product orders placed by the logged-in beautician.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /Test/V1/beautician/getMyOrders
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Orders retrieved successfully.",
+    "data": [
+        {
+            "id": 12,
+            "order_number": "BDPORD-000012",
+            "total_amount": "1450.00",
+            "total_products": 3,
+            "payment_status": "Pending",
+            "order_status": "Pending",
+            "date": "14-May-2026 10:30 AM",
+            "invoice_url": "https://yourdomain.com/api/Test/V1/beautician/exportOrderInvoice/12"
+        }
+    ]
+}</code></pre>
+
+            <h3>13.19 Export Order Invoice</h3>
+            <p>Generates a PDF invoice for a specific product order and returns its download URL.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /Test/V1/beautician/exportOrderInvoice
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>order_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. ID of the order to export.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Invoice generated successfully.",
+    "data": {
+        "file_url": "https://yourdomain.com/uploads/exports/invoice_BDPORD-000012.pdf?v=1717150502"
+    }
+}</code></pre>
         </section>
 
 
