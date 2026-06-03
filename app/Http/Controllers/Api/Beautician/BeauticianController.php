@@ -812,4 +812,24 @@ class BeauticianController extends Controller
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
+
+    /**
+     * Logout Beautician
+     */
+    public function logout(): JsonResponse
+    {
+        $function_name = 'logout';
+        try {
+            $token = JWTAuth::getToken();
+            if ($token) {
+                JWTAuth::invalidate($token);
+            }
+            auth()->guard('user')->logout();
+            
+            return $this->sendResponse([], 'Logged out successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
 }

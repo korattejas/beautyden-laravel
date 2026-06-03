@@ -120,6 +120,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
 
 Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/beautician')->group(function () {
+        Route::get('logout', [BeauticianController::class, 'logout']);
         Route::post('dashboard', [BeauticianController::class, 'dashboard']);
         Route::post('getAppointments', [BeauticianController::class, 'getAppointments']);
         Route::post('exportAppointments', [BeauticianController::class, 'exportAppointments']);
@@ -224,6 +225,7 @@ Route::middleware([SanitizeInput::class])->group(function () {
 
 Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(function () {
     Route::prefix('Test/V1/beautician')->group(function () {
+        Route::get('logout', [BeauticianController::class, 'logout']);
         Route::post('dashboard', [BeauticianController::class, 'dashboard']);
         Route::post('getAppointments', [BeauticianController::class, 'getAppointments']);
         Route::post('exportAppointments', [BeauticianController::class, 'exportAppointments']);
