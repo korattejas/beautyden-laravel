@@ -145,16 +145,35 @@ class ProductController extends Controller
             $products = $query->orderByDesc('p.id')
                 ->paginate($perPage, ['*'], 'page', $page);
 
-            // Append Main Image to each product
+            // Append Main Image, All Media, and Variants to each product
             $products->getCollection()->transform(function ($product) {
-                $mainImage = DB::table('product_media')
+                // Get All Media
+                $media = DB::table('product_media')
                     ->where('product_id', $product->id)
-                    ->where('type', 'image')
+                    ->where('status', 1)
+                    ->select('id', 'type', 'file_path', 'is_main')
                     ->orderBy('is_main', 'desc')
                     ->orderBy('id', 'asc')
-                    ->value('file_path');
+                    ->get()
+                    ->map(function ($m) {
+                        $m->file_path = asset('uploads/product-media/' . $m->file_path);
+                        return $m;
+                    });
 
-                $product->main_image = $mainImage ? asset('uploads/product-media/' . $mainImage) : null;
+                // Set Main Image and All Media
+                $mainImageObj = $media->where('type', 'image')->first();
+                $product->main_image = $mainImageObj ? $mainImageObj->file_path : null;
+                $product->media = $media->values();
+
+                // Get Variants
+                $variants = DB::table('product_variants')
+                    ->where('product_id', $product->id)
+                    ->where('status', 1)
+                    ->select('id', 'variant_name', 'price', 'discount_percentage', 'stock_quantity')
+                    ->get();
+
+                $product->variants = $variants;
+
                 return $product;
             });
 
