@@ -378,6 +378,7 @@ class ProductController extends Controller
                     'payment_status' => $order->payment_status,
                     'order_status' => $order->order_status,
                     'date' => $order->created_at ? $order->created_at->format('d-M-Y h:i A') : '',
+                    'items' => is_string($order->order_data) ? json_decode($order->order_data, true) : $order->order_data,
                 ];
             });
 
