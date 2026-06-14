@@ -98,6 +98,7 @@
     .type-1 { background-color: var(--leave-color); }
     .type-2 { background-color: var(--personal-color); }
     .pending-leave { opacity: 0.8; border: 2px dashed #1a237e; color: #1a237e !important; background-color: #fff !important; }
+    .rejected-leave { opacity: 0.5; border: 2px solid #94a3b8; background-color: #f1f5f9 !important; color: #94a3b8 !important; text-decoration: line-through; }
     .type-3 { background-color: var(--sick-color); }
     .type-4 { background-color: var(--holiday-color); }
 
@@ -233,8 +234,8 @@
                                         data-staff-name="{{ $member->name }}"
                                         data-date="{{ $currentDateStr }}">
                                         @if($leave)
-                                            <div class="leave-block type-{{ $leave->type }} {{ $leave->status == 0 ? 'pending-leave' : '' }}" 
-                                                 title="{{ $leave->reason ?? $leave->type_text }} {{ $leave->status == 0 ? '(Pending)' : '' }}"
+                                            <div class="leave-block type-{{ $leave->type }} {{ $leave->status == 0 ? 'pending-leave' : '' }} {{ $leave->status == 2 ? 'rejected-leave' : '' }}" 
+                                                 title="{{ $leave->reason ?? $leave->type_text }} {{ $leave->status == 0 ? '(Pending)' : ($leave->status == 2 ? '(Rejected)' : '') }}"
                                                  onclick="showLeaveDetails({{ $leave->id }}, '{{ addslashes($member->name) }}', '{{ Carbon\Carbon::parse($leave->start_date)->format('d M Y') }} to {{ Carbon\Carbon::parse($leave->end_date)->format('d M Y') }}', '{{ $leave->type_text }}', '{{ addslashes(preg_replace("/\r|\n/", " ", $leave->reason)) }}', {{ $leave->status }})">
                                                 {{ $leave->start_date == $currentDateStr ? $leave->type_text : '' }}
                                             </div>
@@ -251,6 +252,7 @@
                 <div class="legend-item"><div class="legend-box type-1"></div> Full Day</div>
                 <div class="legend-item"><div class="legend-box type-2"></div> Half Day</div>
                 <div class="legend-item"><div class="legend-box pending-leave"></div> Pending Request</div>
+                <div class="legend-item"><div class="legend-box rejected-leave"></div> Rejected</div>
                 <div class="legend-item" style="margin-left: auto; color: #ea5455;"><i class="bi bi-info-circle"></i> Click on a block to view details and update status, or click any cell to mark leave.</div>
             </div>
 

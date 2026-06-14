@@ -38,7 +38,7 @@ class AttendanceController extends Controller
             
             $teamMembers = TeamMember::where('status', 1)->get();
             
-            $unavailabilities = StaffUnavailability::whereIn('status', [0, 1])
+            $unavailabilities = StaffUnavailability::whereIn('status', [0, 1, 2])
                 ->where(function($query) use ($startDate, $endDate) {
                     $query->whereBetween('start_date', [$startDate, $endDate])
                           ->orWhereBetween('end_date', [$startDate, $endDate])
@@ -91,7 +91,7 @@ class AttendanceController extends Controller
                 'end_date' => $request->end_date,
                 'type' => $request->type,
                 'reason' => $request->reason,
-                'status' => 1
+                'status' => 0
             ]);
 
             return response()->json(['success' => true, 'message' => 'Attendance updated successfully']);
