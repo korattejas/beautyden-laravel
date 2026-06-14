@@ -351,12 +351,45 @@ class BeauticianController extends Controller
             $todayAppointmentsCount = (clone $baseQuery)->whereDate('appointment_date', Carbon::today())->count();
             $tomorrowAppointmentsCount = (clone $baseQuery)->whereDate('appointment_date', Carbon::tomorrow())->count();
 
-            $repeatCustomersCount = (clone $baseQuery)
+            $repeatPhones = (clone $baseQuery)
                 ->select('phone')
                 ->groupBy('phone')
                 ->havingRaw('COUNT(id) > 1')
+                ->pluck('phone');
+
+            $repeatCustomersCount = $repeatPhones->count();
+
+            $repeatCustomersList = (clone $baseQuery)
+                ->whereIn('appointments.phone', $repeatPhones)
+                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select('appointments.*', 'ct.name as city_name')
+                ->orderBy('appointment_date', 'desc')
                 ->get()
-                ->count();
+                ->map(function ($appointment) {
+                    $services = [];
+                    if (isset($appointment->services_data['services'])) {
+                        $services = $appointment->services_data['services'];
+                    }
+                    return [
+                        'id' => $appointment->id,
+                        'order_number' => $appointment->order_number,
+                        'client_details' => [
+                            'name' => $appointment->first_name . ' ' . $appointment->last_name,
+                            'phone' => $appointment->phone,
+                        ],
+                        'appointment_details' => [
+                            'date' => $appointment->appointment_date,
+                            'time' => $appointment->appointment_time,
+                            'address' => $appointment->service_address,
+                            'city' => $appointment->city_name,
+                            'notes' => $appointment->special_notes,
+                        ],
+                        'services' => $services,
+                        'summary' => $appointment->services_data['summary'] ?? null,
+                        'status' => $appointment->status,
+                        'payment_type' => $appointment->payment_type,
+                    ];
+                });
 
             $data = [
                 'beautician_name' => $teamMember->name,
@@ -369,6 +402,7 @@ class BeauticianController extends Controller
                 'today_appointments_count' => $todayAppointmentsCount,
                 'tomorrow_appointments_count' => $tomorrowAppointmentsCount,
                 'repeat_customers_count' => $repeatCustomersCount,
+                'repeat_customers_list' => $repeatCustomersList,
                 'start_date' => $startDate ? $startDate->toDateString() : null,
                 'end_date' => $endDate->toDateString(),
                 'settlement' => BeauticianSettlement::where('team_member_id', $teamMember->id)->first(),
