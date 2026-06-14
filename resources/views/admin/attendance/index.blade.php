@@ -235,7 +235,7 @@
                                         @if($leave)
                                             <div class="leave-block type-{{ $leave->type }} {{ $leave->status == 0 ? 'pending-leave' : '' }}" 
                                                  title="{{ $leave->reason ?? $leave->type_text }} {{ $leave->status == 0 ? '(Pending)' : '' }}"
-                                                 onclick="deleteLeave({{ $leave->id }})">
+                                                 onclick="showLeaveDetails({{ $leave->id }}, '{{ addslashes($member->name) }}', '{{ Carbon\Carbon::parse($leave->start_date)->format('d M Y') }} to {{ Carbon\Carbon::parse($leave->end_date)->format('d M Y') }}', '{{ $leave->type_text }}', '{{ addslashes(str_replace(\"\n\", \" \", $leave->reason)) }}', {{ $leave->status }})">
                                                 {{ $leave->start_date == $currentDateStr ? $leave->type_text : '' }}
                                             </div>
                                         @endif
@@ -251,7 +251,7 @@
                 <div class="legend-item"><div class="legend-box type-1"></div> Full Day</div>
                 <div class="legend-item"><div class="legend-box type-2"></div> Half Day</div>
                 <div class="legend-item"><div class="legend-box pending-leave"></div> Pending Request</div>
-                <div class="legend-item" style="margin-left: auto; color: #ea5455;"><i class="bi bi-info-circle"></i> Click on a block to delete, or click any cell to mark leave.</div>
+                <div class="legend-item" style="margin-left: auto; color: #ea5455;"><i class="bi bi-info-circle"></i> Click on a block to view details and update status, or click any cell to mark leave.</div>
             </div>
 
             @if(isset($pendingRequests) && $pendingRequests->count() > 0)
@@ -346,6 +346,34 @@
     </div>
 </div>
 
+<!-- Leave Details & Action Modal -->
+<div class="modal fade" id="leaveDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-header text-white" style="background-color: var(--mst-primary);">
+                <h5 class="modal-title text-white">Leave Request Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pb-0">
+                <table class="table table-borderless mb-0">
+                    <tr><th style="width: 130px; color: #64748b;">Beautician:</th><td><span id="dtl-name" class="font-weight-bold" style="color: #1e293b;"></span></td></tr>
+                    <tr><th style="color: #64748b;">Duration:</th><td><span id="dtl-dates" style="color: #1e293b;"></span></td></tr>
+                    <tr><th style="color: #64748b;">Type:</th><td><span id="dtl-type" class="badge bg-secondary"></span></td></tr>
+                    <tr><th style="color: #64748b;">Status:</th><td><span id="dtl-status" class="badge"></span></td></tr>
+                    <tr><th style="color: #64748b; vertical-align: top;">Reason:</th><td><div id="dtl-reason" class="text-dark p-2 rounded" style="background-color: #f8fafc; font-size: 0.9rem; min-height: 50px;"></div></td></tr>
+                </table>
+            </div>
+            <div class="modal-footer justify-content-between mt-3 border-top pt-3">
+                <button type="button" class="btn btn-outline-danger btn-sm" id="btn-delete-leave"><i class="bi bi-trash"></i> Delete Leave</button>
+                <div>
+                    <button type="button" class="btn btn-success btn-sm me-1" id="btn-approve-leave"><i class="bi bi-check-circle"></i> Approve</button>
+                    <button type="button" class="btn btn-danger btn-sm" id="btn-reject-leave"><i class="bi bi-x-circle"></i> Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('footer_script_content')
@@ -395,8 +423,50 @@
         });
     });
 
+    let currentSelectedLeaveId = null;
+
+    function showLeaveDetails(id, name, dates, typeText, reason, status) {
+        currentSelectedLeaveId = id;
+        $('#dtl-name').text(name);
+        $('#dtl-dates').text(dates);
+        $('#dtl-type').text(typeText);
+        $('#dtl-reason').text(reason || 'No reason provided by beautician.');
+        
+        let statusText = status === 0 ? 'Pending' : (status === 1 ? 'Approved' : 'Rejected');
+        let statusClass = status === 0 ? 'bg-warning text-dark' : (status === 1 ? 'bg-success' : 'bg-danger');
+        
+        $('#dtl-status').text(statusText).removeClass().addClass('badge ' + statusClass);
+
+        // Show/Hide buttons based on current status
+        if(status === 1) {
+            $('#btn-approve-leave').hide();
+            $('#btn-reject-leave').show();
+        } else if(status === 2) {
+            $('#btn-approve-leave').show();
+            $('#btn-reject-leave').hide();
+        } else {
+            // Pending
+            $('#btn-approve-leave').show();
+            $('#btn-reject-leave').show();
+        }
+
+        $('#leaveDetailsModal').modal('show');
+    }
+
+    $('#btn-approve-leave').click(function() {
+        if(currentSelectedLeaveId) updateLeaveStatus(currentSelectedLeaveId, 1);
+    });
+    
+    $('#btn-reject-leave').click(function() {
+        if(currentSelectedLeaveId) updateLeaveStatus(currentSelectedLeaveId, 2);
+    });
+    
+    $('#btn-delete-leave').click(function() {
+        if(currentSelectedLeaveId) deleteLeave(currentSelectedLeaveId);
+    });
+
     function deleteLeave(id) {
-        if(confirm("Confirm: Mark this staff back to Available for these dates?")) {
+        if(confirm("Confirm: Delete this leave record entirely?")) {
             $.ajax({
                 url: "{{ url('admin/attendance') }}/" + id,
                 type: "DELETE",
