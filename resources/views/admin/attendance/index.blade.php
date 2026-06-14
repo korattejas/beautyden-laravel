@@ -235,7 +235,7 @@
                                         @if($leave)
                                             <div class="leave-block type-{{ $leave->type }} {{ $leave->status == 0 ? 'pending-leave' : '' }}" 
                                                  title="{{ $leave->reason ?? $leave->type_text }} {{ $leave->status == 0 ? '(Pending)' : '' }}"
-                                                 onclick="showLeaveDetails({{ $leave->id }}, '{{ addslashes($member->name) }}', '{{ Carbon\Carbon::parse($leave->start_date)->format('d M Y') }} to {{ Carbon\Carbon::parse($leave->end_date)->format('d M Y') }}', '{{ $leave->type_text }}', '{{ addslashes(str_replace(\"\n\", \" \", $leave->reason)) }}', {{ $leave->status }})">
+                                                 onclick="showLeaveDetails({{ $leave->id }}, '{{ addslashes($member->name) }}', '{{ Carbon\Carbon::parse($leave->start_date)->format('d M Y') }} to {{ Carbon\Carbon::parse($leave->end_date)->format('d M Y') }}', '{{ $leave->type_text }}', '{{ addslashes(preg_replace("/\r|\n/", " ", $leave->reason)) }}', {{ $leave->status }})">
                                                 {{ $leave->start_date == $currentDateStr ? $leave->type_text : '' }}
                                             </div>
                                         @endif
