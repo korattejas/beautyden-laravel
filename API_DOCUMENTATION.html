@@ -2098,8 +2098,10 @@
             "start_date": "2026-06-01",
             "end_date": "2026-06-02",
             "type": 1,
-            "type_text": "Sick Leave",
-            "reason": "Feeling unwell"
+            "type_text": "Full Day",
+            "reason": "Feeling unwell",
+            "status": 0,
+            "status_text": "Pending"
         }
     ]
 }</code></pre>
@@ -2132,12 +2134,12 @@
                     <tr>
                         <td>type</td>
                         <td>Integer</td>
-                        <td><strong>Required</strong>. Options: 1, 2, 3, 4 (e.g., 1=Sick Leave, etc.)</td>
+                        <td><strong>Required</strong>. Options: 1 (Full Day), 2 (Half Day)</td>
                     </tr>
                     <tr>
                         <td>reason</td>
                         <td>String</td>
-                        <td>Optional. Max 500 characters</td>
+                        <td><strong>Required</strong>. Max 500 characters</td>
                     </tr>
                 </tbody>
             </table>

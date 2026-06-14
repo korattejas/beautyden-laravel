@@ -97,6 +97,7 @@
 
     .type-1 { background-color: var(--leave-color); }
     .type-2 { background-color: var(--personal-color); }
+    .pending-leave { opacity: 0.8; border: 2px dashed #1a237e; color: #1a237e !important; background-color: #fff !important; }
     .type-3 { background-color: var(--sick-color); }
     .type-4 { background-color: var(--holiday-color); }
 
@@ -232,8 +233,8 @@
                                         data-staff-name="{{ $member->name }}"
                                         data-date="{{ $currentDateStr }}">
                                         @if($leave)
-                                            <div class="leave-block type-{{ $leave->type }}" 
-                                                 title="{{ $leave->reason ?? $leave->type_text }}"
+                                            <div class="leave-block type-{{ $leave->type }} {{ $leave->status == 0 ? 'pending-leave' : '' }}" 
+                                                 title="{{ $leave->reason ?? $leave->type_text }} {{ $leave->status == 0 ? '(Pending)' : '' }}"
                                                  onclick="deleteLeave({{ $leave->id }})">
                                                 {{ $leave->start_date == $currentDateStr ? $leave->type_text : '' }}
                                             </div>
@@ -247,12 +248,50 @@
             </div>
 
             <div class="legend border shadow-sm">
-                <div class="legend-item"><div class="legend-box type-1"></div> Leave / Absent</div>
-                <div class="legend-item"><div class="legend-box type-2"></div> Personal Work</div>
-                <div class="legend-item"><div class="legend-box type-3"></div> Sick</div>
-                <div class="legend-item"><div class="legend-box type-4"></div> Holiday</div>
+                <div class="legend-item"><div class="legend-box type-1"></div> Full Day</div>
+                <div class="legend-item"><div class="legend-box type-2"></div> Half Day</div>
+                <div class="legend-item"><div class="legend-box pending-leave"></div> Pending Request</div>
                 <div class="legend-item" style="margin-left: auto; color: #ea5455;"><i class="bi bi-info-circle"></i> Click on a block to delete, or click any cell to mark leave.</div>
             </div>
+
+            @if(isset($pendingRequests) && $pendingRequests->count() > 0)
+            <div class="mt-4">
+                <h4 class="mb-3" style="color: var(--mst-primary);">Pending Leave Requests</h4>
+                <div class="card shadow-sm border-0" style="border-radius: var(--mst-radius);">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead style="background-color: var(--mst-bg);">
+                                <tr>
+                                    <th>Beautician</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Type</th>
+                                    <th>Reason</th>
+                                    <th>Requested On</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pendingRequests as $req)
+                                <tr>
+                                    <td class="font-weight-bold" style="color: var(--mst-primary);">{{ $req->teamMember->name ?? 'N/A' }}</td>
+                                    <td>{{ Carbon\Carbon::parse($req->start_date)->format('d M Y') }}</td>
+                                    <td>{{ Carbon\Carbon::parse($req->end_date)->format('d M Y') }}</td>
+                                    <td><span class="badge bg-secondary">{{ $req->type_text }}</span></td>
+                                    <td>{{ $req->reason }}</td>
+                                    <td>{{ $req->created_at->format('d M Y h:i A') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" onclick="updateLeaveStatus({{ $req->id }}, 1)"><i class="bi bi-check-circle"></i> Approve</button>
+                                        <button class="btn btn-sm btn-danger ms-1" onclick="updateLeaveStatus({{ $req->id }}, 2)"><i class="bi bi-x-circle"></i> Reject</button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>
@@ -289,15 +328,13 @@
                     <div class="mb-3">
                         <label class="form-label font-weight-bold">Reason Type</label>
                         <select name="type" class="form-select" required>
-                            <option value="1">Leave / Absent</option>
-                            <option value="2">Personal Work</option>
-                            <option value="3">Sick</option>
-                            <option value="4">Holiday</option>
+                            <option value="1">Full Day</option>
+                            <option value="2">Half Day</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label font-weight-bold">Reason / Notes (Optional)</label>
-                        <textarea name="reason" class="form-control" rows="3" placeholder="Explain why..."></textarea>
+                        <label class="form-label font-weight-bold">Reason</label>
+                        <textarea name="reason" class="form-control" rows="3" placeholder="Explain why..." required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -367,6 +404,32 @@
                 success: function(res) {
                     toastr.success(res.message);
                     setTimeout(() => location.reload(), 1000);
+                }
+            });
+        }
+    }
+
+    function updateLeaveStatus(id, status) {
+        let actionStr = status === 1 ? 'Approve' : 'Reject';
+        if(confirm(`Are you sure you want to ${actionStr} this leave request?`)) {
+            $.ajax({
+                url: "{{ route('admin.attendance.updateStatus') }}",
+                type: "POST",
+                data: { 
+                    _token: "{{ csrf_token() }}",
+                    id: id,
+                    status: status
+                },
+                success: function(res) {
+                    if(res.success) {
+                        toastr.success(res.message);
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        toastr.error(res.message || "Error updating status");
+                    }
+                },
+                error: function(err) {
+                    toastr.error("Something went wrong!");
                 }
             });
         }

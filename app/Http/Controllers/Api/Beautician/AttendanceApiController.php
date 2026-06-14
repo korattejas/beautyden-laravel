@@ -54,7 +54,6 @@ class AttendanceApiController extends Controller
             }
 
             $query = StaffUnavailability::where('team_member_id', $teamMember->id)
-                ->where('status', 1)
                 ->orderBy('start_date', 'desc');
 
             if ($request->filled('month')) {
@@ -72,6 +71,8 @@ class AttendanceApiController extends Controller
                     'type' => $item->type,
                     'type_text' => $item->type_text,
                     'reason' => $item->reason,
+                    'status' => $item->status,
+                    'status_text' => $item->status_text,
                 ];
             });
 
@@ -97,8 +98,8 @@ class AttendanceApiController extends Controller
             $validator = Validator::make($request->all(), [
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after_or_equal:start_date',
-                'type' => 'required|in:1,2,3,4',
-                'reason' => 'nullable|string|max:500',
+                'type' => 'required|in:1,2',
+                'reason' => 'required|string|max:500',
             ]);
 
             if ($validator->fails()) {
@@ -111,7 +112,7 @@ class AttendanceApiController extends Controller
                 'end_date' => $request->end_date,
                 'type' => $request->type,
                 'reason' => $request->reason,
-                'status' => 1
+                'status' => 0
             ]);
 
             return $this->sendResponse($unavailability, 'Leave marked successfully.', $this->success_status);

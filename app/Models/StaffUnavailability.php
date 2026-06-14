@@ -36,11 +36,22 @@ class StaffUnavailability extends Model
     public function getTypeTextAttribute()
     {
         $types = [
-            1 => 'Leave',
-            2 => 'Personal',
-            3 => 'Sick',
-            4 => 'Holiday'
+            1 => 'Full Day',
+            2 => 'Half Day'
         ];
         return $types[$this->type] ?? 'N/A';
+    }
+
+    /**
+     * Get human readable status
+     */
+    public function getStatusTextAttribute()
+    {
+        $statuses = [
+            0 => 'Pending',
+            1 => 'Approved',
+            2 => 'Rejected'
+        ];
+        return $statuses[$this->status] ?? 'Unknown';
     }
 }

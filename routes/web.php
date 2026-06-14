@@ -393,6 +393,7 @@ Route::group(['prefix' => 'admin'], function () {
         /* Attendance/Availability Route */
         Route::get('attendance', [AttendanceController::class, 'index'])->name('admin.attendance.index');
         Route::post('attendance/store', [AttendanceController::class, 'store'])->name('admin.attendance.store');
+        Route::post('attendance/update-status', [AttendanceController::class, 'updateStatus'])->name('admin.attendance.updateStatus');
         Route::delete('attendance/{id}', [AttendanceController::class, 'destroy'])->name('admin.attendance.destroy');
 
         /* Membership Routes */

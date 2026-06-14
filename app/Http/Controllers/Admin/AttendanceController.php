@@ -38,7 +38,7 @@ class AttendanceController extends Controller
             
             $teamMembers = TeamMember::where('status', 1)->get();
             
-            $unavailabilities = StaffUnavailability::where('status', 1)
+            $unavailabilities = StaffUnavailability::whereIn('status', [0, 1])
                 ->where(function($query) use ($startDate, $endDate) {
                     $query->whereBetween('start_date', [$startDate, $endDate])
                           ->orWhereBetween('end_date', [$startDate, $endDate])
@@ -49,9 +49,12 @@ class AttendanceController extends Controller
                 })
                 ->get();
 
+            $pendingRequests = StaffUnavailability::with('teamMember')->where('status', 0)->orderBy('created_at', 'desc')->get();
+
             return view('admin.attendance.index', compact(
                 'teamMembers', 
                 'unavailabilities', 
+                'pendingRequests',
                 'month', 
                 'year', 
                 'daysInMonth',
@@ -108,6 +111,19 @@ class AttendanceController extends Controller
             $record = StaffUnavailability::findOrFail($id);
             $record->delete();
             return response()->json(['success' => true, 'message' => 'Staff is now marked as available']);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+    public function updateStatus(Request $request)
+    {
+        $function_name = 'updateStatus';
+        try {
+            $record = StaffUnavailability::findOrFail($request->id);
+            $record->status = $request->status;
+            $record->save();
+            return response()->json(['success' => true, 'message' => 'Leave status updated successfully']);
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
