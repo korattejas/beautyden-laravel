@@ -155,7 +155,9 @@ Route::group(['prefix' => 'admin'], function () {
         /* Product Order Route */
         Route::get('product-order', [ProductOrderController::class, 'index'])->name('admin.product-order.index');
         Route::get('getDataProductOrder', [ProductOrderController::class, 'getDataProductOrder'])->name('admin.product-order.data');
-
+        Route::get('product-order-view/{id}', [ProductOrderController::class, 'view']);
+        Route::get('product-order/status/{id}/{status}', [ProductOrderController::class, 'changeStatus']);
+        Route::get('product-order/{id}/pdf', [ProductOrderController::class, 'downloadPdf'])->name('admin.product-order.pdf');
 
 
          /* Portfoio */
