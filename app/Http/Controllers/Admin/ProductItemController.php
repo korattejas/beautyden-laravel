@@ -164,6 +164,7 @@ class ProductItemController extends Controller
                 'price'              => $request->price,
                 'discount_percentage'=> $request->discount_percentage ?? 0,
                 'sku'                => $request->sku,
+                'unit'               => $request->unit,
                 'stock_quantity'     => $request->stock_quantity ?? 0,
                 'is_featured'        => $request->has('is_featured') ? 1 : 0,
                 'is_new'             => $request->has('is_new') ? 1 : 0,

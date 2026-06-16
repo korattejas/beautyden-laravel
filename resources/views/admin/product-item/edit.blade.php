@@ -105,9 +105,13 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-6 mb-1">
+                                    <div class="col-md-3 mb-1">
                                         <label class="form-label">SKU</label>
                                         <input type="text" name="sku" class="form-control" value="{{ $product->sku }}" placeholder="e.g. PROD123">
+                                    </div>
+                                    <div class="col-md-3 mb-1">
+                                        <label class="form-label">Unit</label>
+                                        <input type="text" name="unit" class="form-control" value="{{ $product->unit }}" placeholder="e.g. 500ml">
                                     </div>
                                 </div>
                                 <div class="row">

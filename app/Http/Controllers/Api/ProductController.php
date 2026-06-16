@@ -101,6 +101,7 @@ class ProductController extends Controller
                     'p.discount_percentage',
                     DB::raw('p.price - (p.price * p.discount_percentage / 100) as sale_price'),
                     'p.sku',
+                    'p.unit',
                     'p.stock_quantity',
                     'p.is_featured',
                     'p.is_new',
@@ -111,15 +112,18 @@ class ProductController extends Controller
 
             // Filters
             if ($request->filled('category_id')) {
-                $query->where('p.category_id', $request->category_id);
+                $categoryIds = is_array($request->category_id) ? $request->category_id : explode(',', $request->category_id);
+                $query->whereIn('p.category_id', $categoryIds);
             }
 
             if ($request->filled('sub_category_id')) {
-                $query->where('p.sub_category_id', $request->sub_category_id);
+                $subCategoryIds = is_array($request->sub_category_id) ? $request->sub_category_id : explode(',', $request->sub_category_id);
+                $query->whereIn('p.sub_category_id', $subCategoryIds);
             }
 
             if ($request->filled('brand_id')) {
-                $query->where('p.brand_id', $request->brand_id);
+                $brandIds = is_array($request->brand_id) ? $request->brand_id : explode(',', $request->brand_id);
+                $query->whereIn('p.brand_id', $brandIds);
             }
 
             if ($request->filled('is_featured')) {
@@ -142,8 +146,22 @@ class ProductController extends Controller
             $perPage = $request->per_page ?? 20;
             $page = $request->page ?? 1;
 
-            $products = $query->orderByDesc('p.id')
-                ->paginate($perPage, ['*'], 'page', $page);
+            // Sorting
+            if ($request->filled('sort_by')) {
+                if ($request->sort_by === 'price_low_high') {
+                    $query->orderBy('sale_price', 'asc');
+                } elseif ($request->sort_by === 'price_high_low') {
+                    $query->orderBy('sale_price', 'desc');
+                } elseif ($request->sort_by === 'newest') {
+                    $query->where('p.is_new', 1)->orderByDesc('p.id');
+                } else {
+                    $query->orderByDesc('p.id');
+                }
+            } else {
+                $query->orderByDesc('p.id');
+            }
+
+            $products = $query->paginate($perPage, ['*'], 'page', $page);
 
             // Append Main Image, All Media, and Variants to each product
             $products->getCollection()->transform(function ($product) {
@@ -177,13 +195,22 @@ class ProductController extends Controller
                 return $product;
             });
 
-            if ($products->total() === 0) {
-                return $this->sendError('No product found.', $this->backend_error_status);
-            }
+            $responseData = $products->toArray();
+
+            $responseData['filters'] = [
+                'categories' => DB::table('product_categories')->select('id', 'name')->where('status', 1)->get(),
+                'sub_categories' => DB::table('product_sub_categories')->select('id', 'name', 'category_id')->where('status', 1)->get(),
+                'brands' => DB::table('product_brands')->select('id', 'name')->where('status', 1)->get(),
+                'sort_options' => [
+                    ['id' => 'newest', 'name' => 'Newest Arrivals'],
+                    ['id' => 'price_low_high', 'name' => 'Price: Low to High'],
+                    ['id' => 'price_high_low', 'name' => 'Price: High to Low']
+                ]
+            ];
 
             return $this->sendResponse(
-                $products,
-                'Products retrieved successfully',
+                $responseData,
+                $products->total() > 0 ? 'Products retrieved successfully' : 'No products found.',
                 $this->success_status
             );
 
@@ -275,12 +302,16 @@ class ProductController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
+            DB::beginTransaction();
+
             $total_amount = 0;
             $order_data = [];
+            $stock_updates = [];
 
             foreach ($request->items as $item) {
-                $product = DB::table('product_items')->where('id', $item['product_id'])->where('status', 1)->first();
+                $product = DB::table('product_items')->where('id', $item['product_id'])->where('status', 1)->lockForUpdate()->first();
                 if (!$product) {
+                    DB::rollBack();
                     return $this->sendError('Product not found or inactive: ' . $item['product_id'], $this->validation_error_status);
                 }
 
@@ -289,14 +320,37 @@ class ProductController extends Controller
                 $variantName = '';
 
                 if (!empty($item['variant_id'])) {
-                    $variant = DB::table('product_variants')->where('id', $item['variant_id'])->where('product_id', $item['product_id'])->where('status', 1)->first();
+                    $variant = DB::table('product_variants')->where('id', $item['variant_id'])->where('product_id', $item['product_id'])->where('status', 1)->lockForUpdate()->first();
                     if ($variant) {
+                        if ($variant->stock_quantity < $item['qty']) {
+                            DB::rollBack();
+                            return $this->sendError('Out of stock for variant: ' . $variant->variant_name . ' of product: ' . $product->name, $this->validation_error_status);
+                        }
+
                         $price = $variant->price;
                         $discount_percentage = $variant->discount_percentage;
                         $variantName = $variant->variant_name;
+
+                        $stock_updates[] = [
+                            'table' => 'product_variants',
+                            'id' => $variant->id,
+                            'qty' => $item['qty']
+                        ];
                     } else {
+                        DB::rollBack();
                         return $this->sendError('Invalid variant ID: ' . $item['variant_id'] . ' for product: ' . $product->name, $this->validation_error_status);
                     }
+                } else {
+                    if ($product->stock_quantity < $item['qty']) {
+                        DB::rollBack();
+                        return $this->sendError('Out of stock for product: ' . $product->name, $this->validation_error_status);
+                    }
+
+                    $stock_updates[] = [
+                        'table' => 'product_items',
+                        'id' => $product->id,
+                        'qty' => $item['qty']
+                    ];
                 }
 
                 $salePrice = $price - ($price * $discount_percentage / 100);
@@ -329,6 +383,13 @@ class ProductController extends Controller
                 'status' => 1,
             ]);
 
+            // Deduct Stock
+            foreach ($stock_updates as $update) {
+                DB::table($update['table'])->where('id', $update['id'])->decrement('stock_quantity', $update['qty']);
+            }
+
+            DB::commit();
+
             $responseData = [
                 'order_id' => $order->id,
                 'total_amount' => $order->total_amount,
@@ -340,6 +401,9 @@ class ProductController extends Controller
             return $this->sendResponse($responseData, 'Order placed successfully.', $this->success_status);
 
         } catch (Exception $e) {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
