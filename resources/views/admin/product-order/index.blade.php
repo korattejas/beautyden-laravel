@@ -28,7 +28,7 @@
                                                 <th>Mobile</th>
                                                 <th>Total Amount</th>
                                                 <th>Order Status</th>
-                                                <th>Active/Inactive</th>
+                                                <!-- <th>Active/Inactive</th> -->
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -88,7 +88,7 @@
                 {data: 'mobile_number', name: 'users.mobile_number'},
                 {data: 'total_amount', name: 'total_amount'},
                 {data: 'order_status', name: 'order_status', orderable: false, searchable: false},
-                {data: 'status', name: 'status'},
+                // {data: 'status', name: 'status'},
                 {data: 'action', name: 'action', orderable: false, searchable: false}
             ],
             order: [[0, 'desc']]
