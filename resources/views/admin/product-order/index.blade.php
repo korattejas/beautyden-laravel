@@ -93,7 +93,6 @@
             ],
             order: [[0, 'desc']]
         });
-        });
 
         // Handle Order Status change
         $(document).on('click', '.order-status-change', function(e) {
