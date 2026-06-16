@@ -37,7 +37,8 @@ class StaffUnavailability extends Model
     {
         $types = [
             1 => 'Full Day',
-            2 => 'Half Day'
+            2 => 'First Half',
+            3 => 'Second Half'
         ];
         return $types[$this->type] ?? 'N/A';
     }

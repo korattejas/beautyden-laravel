@@ -77,7 +77,7 @@ class AttendanceController extends Controller
                 'team_member_id' => 'required|exists:team_members,id',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after_or_equal:start_date',
-                'type' => 'required|in:1,2,3,4',
+                'type' => 'required|in:1,2,3',
                 'reason' => 'nullable|string|max:500',
             ]);
 

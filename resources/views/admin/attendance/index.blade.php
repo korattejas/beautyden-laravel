@@ -250,7 +250,8 @@
 
             <div class="legend border shadow-sm">
                 <div class="legend-item"><div class="legend-box type-1"></div> Full Day</div>
-                <div class="legend-item"><div class="legend-box type-2"></div> Half Day</div>
+                <div class="legend-item"><div class="legend-box type-2"></div> First Half</div>
+                <div class="legend-item"><div class="legend-box type-3"></div> Second Half</div>
                 <div class="legend-item"><div class="legend-box pending-leave"></div> Pending Request</div>
                 <div class="legend-item"><div class="legend-box rejected-leave"></div> Rejected</div>
                 <div class="legend-item" style="margin-left: auto; color: #ea5455;"><i class="bi bi-info-circle"></i> Click on a block to view details and update status, or click any cell to mark leave.</div>
@@ -331,7 +332,8 @@
                         <label class="form-label font-weight-bold">Reason Type</label>
                         <select name="type" class="form-select" required>
                             <option value="1">Full Day</option>
-                            <option value="2">Half Day</option>
+                            <option value="2">First Half</option>
+                            <option value="3">Second Half</option>
                         </select>
                     </div>
                     <div class="mb-3">

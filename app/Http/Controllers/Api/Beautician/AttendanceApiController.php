@@ -98,7 +98,7 @@ class AttendanceApiController extends Controller
             $validator = Validator::make($request->all(), [
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after_or_equal:start_date',
-                'type' => 'required|in:1,2',
+                'type' => 'required|in:1,2,3',
                 'reason' => 'required|string|max:500',
             ]);
 
