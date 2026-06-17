@@ -221,6 +221,225 @@ class AppointmentsController extends Controller
         }
     }
 
+    public function bookAppointmentForApp(Request $request): JsonResponse
+    {
+        $function_name = 'bookAppointmentForApp';
+
+        try {
+            $validator = Validator::make($request->all(), [
+                'city_id'                   => 'required|integer',
+                'service_category_id'       => 'nullable|integer',
+                'service_sub_category_id'   => 'nullable|integer',
+                'items'                     => 'required|array|min:1',
+                'items.*.service_master_id' => 'required|integer',
+                'items.*.variant_id'        => 'nullable|integer',
+                'items.*.qty'               => 'required|integer|min:1',
+                'first_name'                => 'required|string|max:50',
+                'last_name'                 => 'nullable|string|max:50',
+                'email'                     => 'nullable|email|max:100',
+                'phone'                     => 'required|string|max:20',
+                'discount_price'            => 'nullable|numeric',
+                'service_address'           => 'nullable|string',
+                'appointment_date'          => 'nullable|date',
+                'appointment_time'          => 'nullable',
+                'notes'                     => 'nullable|string',
+                'status'                    => 'nullable|in:0,1',
+                'coupon_id'                 => 'nullable|integer|exists:coupon_codes,id',
+            ]);
+
+            if ($validator->fails()) {
+                logValidationException($this->controller_name, $function_name, $validator);
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $orderNumber = '#BD' . Str::upper(Str::random(8));
+
+            $subTotal = 0;
+            $totalDuration = 0;
+            $services = [];
+            $serviceIdsForDB = [];
+
+            foreach ($request->items as $item) {
+                $serviceMaster = \App\Models\ServiceMaster::find($item['service_master_id']);
+
+                if ($serviceMaster) {
+                    $priceToUse = 0;
+                    $variantName = '';
+                    $itemDuration = 0;
+                    $serviceIdsForDB[] = $item['service_master_id'];
+
+                    if (!empty($item['variant_id'])) {
+                        $variantPriceObj = \App\Models\ServiceCityVariantPrice::where('service_master_id', $item['service_master_id'])
+                            ->where('variant_id', $item['variant_id'])
+                            ->where('city_id', $request->city_id)
+                            ->first();
+
+                        if ($variantPriceObj) {
+                            $priceToUse = $variantPriceObj->discount_price > 0 ? $variantPriceObj->discount_price : $variantPriceObj->price;
+                        }
+
+                        $variant = \Illuminate\Support\Facades\DB::table('service_master_variants')->where('id', $item['variant_id'])->first();
+                        $variantName = $variant ? $variant->variant_name : '';
+                        $itemDuration = $variant ? (int) $variant->duration : 0;
+
+                    } else {
+                        $cityMaster = \App\Models\ServiceCityMaster::where('service_master_id', $item['service_master_id'])
+                            ->where('city_id', $request->city_id)
+                            ->first();
+
+                        if ($cityMaster) {
+                            $priceToUse = $cityMaster->discount_price > 0 ? $cityMaster->discount_price : $cityMaster->price;
+                        }
+                        $itemDuration = (int) $serviceMaster->duration;
+                    }
+
+                    $totalDuration += ($itemDuration * $item['qty']);
+
+                    $services[] = [
+                        'type'     => 'service',
+                        'name'     => $serviceMaster->name . ($variantName ? ' - ' . $variantName : ''),
+                        'price'    => $priceToUse,
+                        'qty'      => $item['qty'],
+                        'duration' => $itemDuration,
+                        'total'    => $priceToUse * $item['qty'],
+                    ];
+                    $subTotal += ($priceToUse * $item['qty']);
+                }
+            }
+
+            $discountAmount = $request->discount_price ?? 0;
+            $couponCode = null;
+
+            // Re-calculate or verify discount if coupon_id is provided
+            if ($request->filled('coupon_id')) {
+                $coupon = \App\Models\CouponCode::find($request->coupon_id);
+                if ($coupon) {
+                    $couponCode = $coupon->code;
+                    if ($coupon->discount_type == 'percentage') {
+                        $discountAmount = ($subTotal * $coupon->discount_value) / 100;
+                        if ($coupon->max_discount_amount && $discountAmount > $coupon->max_discount_amount) {
+                            $discountAmount = $coupon->max_discount_amount;
+                        }
+                    } else {
+                        $discountAmount = $coupon->discount_value;
+                    }
+                }
+            }
+
+            $travelCharges = 0;
+            $grandTotal = ($subTotal + $travelCharges) - $discountAmount;
+
+            $servicesData = [
+                'client' => [
+                    'first_name' => $request->first_name,
+                    'last_name'  => $request->last_name,
+                    'email'      => $request->email,
+                    'phone'      => $request->phone,
+                ],
+                'appointment' => [
+                    'date'    => $request->appointment_date,
+                    'time'    => $request->appointment_time,
+                    'address' => $request->service_address,
+                    'notes'   => $request->notes,
+                ],
+                'services' => $services,
+                'summary' => [
+                    'sub_total'        => number_format($subTotal, 2, '.', ''),
+                    'total_duration'   => $totalDuration,
+                    'travel_charges'   => number_format($travelCharges, 2, '.', ''),
+                    'discount_percent' => $request->discount_percent ?? 0,
+                    'discount_amount'  => number_format($discountAmount, 2, '.', ''),
+                    'coupon_code'      => $couponCode,
+                    'grand_total'      => number_format($grandTotal, 2, '.', ''),
+                ],
+            ];
+
+            // total quantity
+            $totalQuantity = 0;
+            foreach ($request->items as $item) {
+                $totalQuantity += $item['qty'];
+            }
+
+            $appointment = \App\Models\Appointment::create([
+                'order_number'        => $orderNumber,
+                'city_id'             => $request->city_id,
+                'first_name'          => $request->first_name,
+                'last_name'           => $request->last_name,
+                'email'               => $request->email,
+                'phone'               => $request->phone,
+                'service_id'          => implode(',', $serviceIdsForDB),
+                'service_category_id' => $request->service_category_id,
+                'service_sub_category_id' => $request->service_sub_category_id,
+                'quantity'            => $totalQuantity,
+                'price'               => $subTotal,
+                'discount_price'      => $discountAmount,
+                'service_address'     => $request->service_address,
+                'appointment_date'    => $request->appointment_date,
+                'appointment_time'    => $request->appointment_time,
+                'special_notes'       => $request->notes,
+                'services_data'       => $servicesData,
+                'status'              => '1',
+            ]);
+
+            // Record Coupon Usage
+            if ($appointment && $request->filled('coupon_id')) {
+                \App\Models\CouponUsage::create([
+                    'coupon_id' => $request->coupon_id,
+                    'user_id' => auth('user')->check() ? auth('user')->id() : null,
+                    'appointment_id' => $appointment->id,
+                    'discount_amount' => $discountAmount,
+                ]);
+            }
+
+            if (!empty($request->phone)) {
+                $this->sendWhatsAppBooking($request->phone, $request->first_name, $orderNumber, $request->appointment_date, $request->appointment_time);
+            }
+
+            $message = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                            <p>Thank you for booking with <strong>BeautyDen</strong>! 💖</p>
+
+                            <p><strong>📋 Your Order Number:</strong> <span style="color:#d63384;">' . $orderNumber . '</span></p>
+
+                            <p>Your appointment request has been received successfully.</p>
+
+                            <p>⏳ Our team will shortly review your booking details and check:</p>
+                            <ul>
+                                <li>Service availability</li>
+                                <li>Provider schedule</li>
+                                <li>Your location &amp; timing</li>
+                            </ul>
+
+                            <p>📌 Once everything is verified, we’ll confirm your appointment and share the final details with you.</p>
+
+                            <p>✨ Sit back &amp; relax — you’re in safe hands with <strong>BeautyDen</strong>!</p>
+
+                            <p>📞 If you don’t hear back from us soon, please feel free to reach us at:</p>
+                            <ul>
+                                <li><strong>WhatsApp:</strong> +91 95747 58282</li>
+                                <li><strong>Email:</strong> contact@beautyden.com</li>
+                                <li><strong>Phone:</strong> +91 95747 58282</li>
+                            </ul>
+                        </div>
+                    ';
+
+            return $this->sendResponse(
+                [
+                    'appointment'  => $appointment,
+                    'order_number' => $orderNumber,
+                ],
+                $message,
+                $this->success_status
+            );
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
+
     protected function sendWhatsAppBooking($phone, $customerName, $orderNumber, $appointmentDate = null, $appointmentTime = null)
     {
         try {

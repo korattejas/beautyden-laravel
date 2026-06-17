@@ -83,6 +83,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('products', [ProductController::class, 'getProducts']);
         Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
+        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
     });
 
 });
@@ -106,6 +107,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
         Route::get('settings', [SettingController::class, 'getsettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
+        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
@@ -194,6 +196,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('products', [ProductController::class, 'getProducts']);
         Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
+        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
     });
 });
 
@@ -214,6 +217,7 @@ Route::middleware([])->group(function () {
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
         Route::get('settings', [SettingController::class, 'getsettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
+        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);

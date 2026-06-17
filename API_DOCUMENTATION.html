@@ -1047,6 +1047,98 @@
 
         <section id="booking">
             <h2><i class="bi bi-calendar-check text-primary"></i> 7. Booking & History</h2>
+
+            <h3>Book Appointment (App)</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/bookAppointmentForApp
+                <span class="badge auth">Token Required</span>
+            </div>
+            <p>Creates a new appointment booking using the new Service Master catalog (supports service variants and dynamic duration calculation).</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. ID of the selected city.</td>
+                    </tr>
+                    <tr>
+                        <td>first_name</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. Customer's first name.</td>
+                    </tr>
+                    <tr>
+                        <td>phone</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. Customer's phone number.</td>
+                    </tr>
+                    <tr>
+                        <td>appointment_date</td>
+                        <td>String</td>
+                        <td>Optional. YYYY-MM-DD.</td>
+                    </tr>
+                    <tr>
+                        <td>appointment_time</td>
+                        <td>String</td>
+                        <td>Optional. HH:MM AM/PM.</td>
+                    </tr>
+                    <tr>
+                        <td>service_address</td>
+                        <td>String</td>
+                        <td>Optional. Address for home services.</td>
+                    </tr>
+                    <tr>
+                        <td>items</td>
+                        <td>Array of Objects</td>
+                        <td><strong>Required</strong>. Array of selected services/variants. Each object must contain `service_master_id` and `qty`. Include `variant_id` if a variant was selected. Example: `[{"service_master_id": 10, "variant_id": 5, "qty": 1}, {"service_master_id": 12, "qty": 1}]`</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "&lt;div style=\"font-family: Arial...\"&gt;Thank you for booking with BeautyDen...&lt;/div&gt;",
+    "data": {
+        "appointment": {
+            "id": 101,
+            "order_number": "#BDXYZ123",
+            "city_id": 1,
+            "first_name": "Tejas",
+            "phone": "9876543210",
+            "service_id": "10,12",
+            "quantity": 2,
+            "price": "2500.00",
+            "services_data": {
+                "services": [
+                    {
+                        "type": "service",
+                        "name": "Facial - Premium",
+                        "price": "1500",
+                        "qty": 1,
+                        "duration": 60,
+                        "total": 1500
+                    }
+                ],
+                "summary": {
+                    "sub_total": "2500.00",
+                    "total_duration": 90,
+                    "travel_charges": "0.00",
+                    "grand_total": "2500.00"
+                }
+            }
+        },
+        "order_number": "#BDXYZ123"
+    }
+}</code></pre>
+
             <h3>Get My Bookings</h3>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customer/getTotalBookService
