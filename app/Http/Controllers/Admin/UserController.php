@@ -23,17 +23,39 @@ class UserController extends Controller
         $this->controller_name = "Admin/UserController";
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.user.index');
+        $query = User::query();
+
+        $totalUsers = (clone $query)->count();
+        $activeUsers = (clone $query)->where('status', 1)->count();
+        $suspendedUsers = (clone $query)->where('status', 0)->count();
+        $appUsers = (clone $query)->where('role', 1)->count();
+        $webUsers = (clone $query)->where('role', 0)->count();
+
+        return view('admin.user.index', compact(
+            'totalUsers',
+            'activeUsers',
+            'suspendedUsers',
+            'appUsers',
+            'webUsers'
+        ));
     }
 
     public function show($id)
+    {
+        // kept for backward compatibility if needed
+    }
+
+    public function view($id)
     {
         try {
             $user = User::with(['addresses', 'subscriptions.plan' => function($q) {
                 $q->withTrashed();
             }])->findOrFail($id);
+
+            $cityName = \App\Models\City::where('id', $user->city_id)->value('name');
+            $user->city_name = $cityName;
 
             // Fetch appointments linked to this user's ID primarily, with fallback to phone/email
             $appointments = Appointment::where('user_id', $user->id)
@@ -44,11 +66,23 @@ class UserController extends Controller
 
             $total_appointments = $appointments->count();
             $total_coupons = CouponUsage::where('user_id', $user->id)->count();
+            $total_spent = $appointments->where('status', 3)->sum(function ($appointment) {
+                return (float) ($appointment->services_data['summary']['grand_total'] ?? 0);
+            });
 
-            return view('admin.user.show', compact('user', 'appointments', 'total_appointments', 'total_coupons'));
+            return response()->json([
+                'data' => [
+                    'user' => $user,
+                    'total_appointments' => $total_appointments,
+                    'total_coupons' => $total_coupons,
+                    'total_spent' => $total_spent,
+                    'addresses' => $user->addresses,
+                    'subscription' => $user->subscriptions->first(),
+                ]
+            ], 200);
         } catch (\Exception $e) {
-            logCatchException($e, $this->controller_name, 'show');
-            return back()->with('error', 'User not found or error loading profile');
+            logCatchException($e, $this->controller_name, 'view');
+            return response()->json(['error' => 'User not found or error loading profile'], 500);
         }
     }
 
@@ -62,7 +96,25 @@ class UserController extends Controller
                     $users->where('status', $request->status);
                 }
 
+                if ($request->filter_type) {
+                    if ($request->filter_type == 'active') {
+                        $users->where('status', 1);
+                    } elseif ($request->filter_type == 'suspended') {
+                        $users->where('status', 0);
+                    } elseif ($request->filter_type == 'app') {
+                        $users->where('role', 1);
+                    } elseif ($request->filter_type == 'web') {
+                        $users->where('role', 0);
+                    }
+                }
+
                 return DataTables::of($users)
+                    ->addColumn('total_appointments', function ($row) {
+                        return \App\Models\Appointment::where('user_id', $row->id)
+                            ->orWhere('phone', $row->mobile_number)
+                            ->orWhere('email', $row->email)
+                            ->count();
+                    })
                     ->addColumn('status', function ($row) {
                         return view('admin.render-view.datable-label', [
                             'status_array' => [
@@ -75,8 +127,7 @@ class UserController extends Controller
                         return view('admin.render-view.datable-action', [
                             'action_array' => [
                                 'is_simple_action' => 1,
-                                'view_label' => 'View Profile',
-                                'view_route' => route('admin.user.show', $row->id),
+                                'view_id' => $row->id,
                                 'delete_id' => $row->id,
                                 'current_status' => $row->status,
                                 'hidden_id' => $row->id,

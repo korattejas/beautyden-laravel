@@ -1689,4 +1689,25 @@
     }
 </script>
 <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
+<script>
+$(document).ready(function() {
+    let urlParams = new URLSearchParams(window.location.search);
+    let phoneParam = urlParams.get('phone');
+    if (phoneParam) {
+        let dtCheckInterval = setInterval(function() {
+            if ($.fn.DataTable.isDataTable('#table-appointments')) {
+                clearInterval(dtCheckInterval);
+                let dt = $('#table-appointments').DataTable();
+                // Column index 3 is Phone
+                let searchInput = $('.dt-column-search thead tr:eq(1) th:eq(3) input');
+                if (searchInput.length) {
+                    searchInput.val(phoneParam).trigger('keyup');
+                } else {
+                    dt.column(3).search(phoneParam).draw();
+                }
+            }
+        }, 200);
+    }
+});
+</script>
 @endsection

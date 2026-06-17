@@ -173,6 +173,7 @@ Route::group(['prefix' => 'admin'], function () {
         /* Users */
         Route::get('users', [UserController::class, 'index'])->name('admin.user.index');
         Route::get('users/show/{id}', [UserController::class, 'show'])->name('admin.user.show');
+        Route::get('user-view/{id}', [UserController::class, 'view'])->name('admin.user.view');
         Route::get('getDataUser', [UserController::class, 'getDataUser'])->name('admin.user.getDataUser');
 
         /* Offers */
