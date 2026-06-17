@@ -43,6 +43,8 @@ Route::get('/user', function (Request $request) {
 
 /*======================================================== Customer API ==============================================*/
 
+
+// App Customer Routes
 Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/customer')->group(function () {
         Route::post('sendOtpOnMobileNumber', [AuthenticationController::class, 'sendOtpOnMobileNumber']);
@@ -84,6 +86,8 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
 
 });
 
+
+// Web Routes
 Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/')->group(function () {
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
