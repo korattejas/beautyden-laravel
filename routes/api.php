@@ -82,6 +82,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::get('productCategory', [ProductController::class, 'getProductCategories']);
         Route::post('products', [ProductController::class, 'getProducts']);
         Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
+        Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
     });
 
 });
@@ -192,6 +193,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::get('productCategory', [ProductController::class, 'getProductCategories']);
         Route::post('products', [ProductController::class, 'getProducts']);
         Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
+        Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
     });
 });
 

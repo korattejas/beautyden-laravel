@@ -1384,10 +1384,12 @@
                             <span style="font-weight: 700;">Company Amount</span>
                             <span style="font-weight: 800; color: #7367f0;">₹${parseFloat(data.company_amount || 0).toFixed(2)}</span>
                         </div>
+                        ${parseFloat(summary.discount_amount || 0) > 0 ? `
                         <div class="summary-line text-danger">
-                            <span style="font-weight: 600;">Discount (${summary.discount_percent || 0}%)</span>
+                            <span style="font-weight: 600;">Discount ${summary.coupon_code ? '(' + summary.coupon_code + ')' : (summary.discount_percent > 0 ? '(' + summary.discount_percent + '%)' : '')}</span>
                             <span style="font-weight: 700;">- ₹${parseFloat(summary.discount_amount || 0).toFixed(2)}</span>
                         </div>
+                        ` : ''}
                         <div class="summary-line summary-total">
                             <span>Grand Total</span>
                             <span>₹${parseFloat(summary.grand_total || 0).toFixed(2)}</span>
@@ -1447,7 +1449,8 @@
         
         text += `Subtotal: ₹${parseFloat(summary.sub_total || 0).toFixed(2)}\n`;
         if (parseFloat(summary.discount_amount || 0) > 0) {
-            text += `Discount: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
+            let desc = summary.coupon_code ? ` (${summary.coupon_code})` : (summary.discount_percent > 0 ? ` (${summary.discount_percent}%)` : ``);
+            text += `Discount${desc}: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
         }
         text += `Travel Charges: + ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}\n`;
         text += `Grand Total: ₹${parseFloat(summary.grand_total || 0).toFixed(2)}\n\n`;
@@ -1498,7 +1501,8 @@
         
         text += `Subtotal: ₹${parseFloat(summary.sub_total || 0).toFixed(2)}\n`;
         if (parseFloat(summary.discount_amount || 0) > 0) {
-            text += `Discount: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
+            let desc = summary.coupon_code ? ` (${summary.coupon_code})` : (summary.discount_percent > 0 ? ` (${summary.discount_percent}%)` : ``);
+            text += `Discount${desc}: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
         }
         text += `Travel Charges: + ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}\n`;
         text += `Grand Total: ₹${parseFloat(summary.grand_total || 0).toFixed(2)}\n\n`;

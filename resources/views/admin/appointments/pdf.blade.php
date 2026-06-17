@@ -230,7 +230,14 @@
             {{-- ✅ Show Discount Only If > 0 --}}
             @if(!empty($summary['discount_amount']) && $summary['discount_amount'] > 0)
             <tr>
-                <td style="color: #d9534f;">Discount</td>
+                <td style="color: #d9534f;">
+                    Discount
+                    @if(!empty($summary['coupon_code']))
+                        <small>({{ $summary['coupon_code'] }})</small>
+                    @elseif(!empty($summary['discount_percent']) && $summary['discount_percent'] > 0)
+                        <small>({{ $summary['discount_percent'] }}%)</small>
+                    @endif
+                </td>
                 <td align="right" style="color: #d9534f;">
                     - ₹{{ number_format($summary['discount_amount'], 2) }}
                 </td>

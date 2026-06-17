@@ -96,11 +96,13 @@ class AppointmentsController extends Controller
             }
 
             $discountAmount = $request->discount_price ?? 0;
+            $couponCode = null;
             
             // Re-calculate or verify discount if coupon_id is provided
             if ($request->filled('coupon_id')) {
                 $coupon = \App\Models\CouponCode::find($request->coupon_id);
                 if ($coupon) {
+                    $couponCode = $coupon->code;
                     if ($coupon->discount_type == 'percentage') {
                         $discountAmount = ($subTotal * $coupon->discount_value) / 100;
                         if ($coupon->max_discount_amount && $discountAmount > $coupon->max_discount_amount) {
@@ -134,6 +136,7 @@ class AppointmentsController extends Controller
                     'travel_charges'   => number_format($travelCharges, 2, '.', ''),
                     'discount_percent' => $request->discount_percent ?? 0,
                     'discount_amount'  => number_format($discountAmount, 2, '.', ''),
+                    'coupon_code'      => $couponCode,
                     'grand_total'      => number_format($grandTotal, 2, '.', ''),
                 ],
             ];
