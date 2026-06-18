@@ -679,7 +679,7 @@ class TeamMemberController extends Controller
                 "Expires"             => "0"
             ];
 
-            $columns = ['Address', 'Name', 'Mobile Number', 'Experience (Years)', 'Role'];
+            $columns = ['Name', 'Mobile Number', 'Experience (Years)', 'Role', 'Address'];
 
             $callback = function() use($members, $columns) {
                 $file = fopen('php://output', 'w');
@@ -687,11 +687,11 @@ class TeamMemberController extends Controller
 
                 foreach ($members as $member) {
                     fputcsv($file, [
-                        $member->address,
                         $member->name,
                         $member->phone,
                         $member->experience_years,
-                        $member->role
+                        $member->role,
+                        $member->address
                     ]);
                 }
 

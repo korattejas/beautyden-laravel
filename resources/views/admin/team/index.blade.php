@@ -724,7 +724,7 @@
                         <i class="bi bi-file-earmark-excel"></i> Export
                     </a>
                     <a href="{{ route('admin.team.create') }}" class="btn btn-primary me-2">
-                        <i class="bi bi-plus-lg"></i> Add Member
+                        Add
                     </a>
                     <div class="btn-group">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
