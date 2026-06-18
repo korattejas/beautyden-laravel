@@ -127,20 +127,14 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text">₹</span>
-                                            <input type="number" class="form-control form-control-sm company-to-beautician" 
-                                                value="{{ $member->settlement->company_to_beautician }}" 
-                                                data-id="{{ $member->id }}" step="0.01">
+                                        <div class="fw-bold fs-5 company-owed-display" id="display-company-{{ $member->id }}" data-val="{{ $member->settlement->company_to_beautician }}" style="color: {{ $member->settlement->company_to_beautician > 0 ? 'red' : 'inherit' }}">
+                                            ₹ {{ number_format($member->settlement->company_to_beautician, 2) }}
                                         </div>
                                         <small class="text-muted">Company to Beautician</small>
                                     </td>
                                     <td>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text">₹</span>
-                                            <input type="number" class="form-control form-control-sm beautician-to-company" 
-                                                value="{{ $member->settlement->beautician_to_company }}" 
-                                                data-id="{{ $member->id }}" step="0.01">
+                                        <div class="fw-bold fs-5 beautician-owed-display" id="display-beautician-{{ $member->id }}" data-val="{{ $member->settlement->beautician_to_company }}" style="color: {{ $member->settlement->beautician_to_company > 0 ? 'green' : 'inherit' }}">
+                                            ₹ {{ number_format($member->settlement->beautician_to_company, 2) }}
                                         </div>
                                         <small class="text-muted">Beautician to Company</small>
                                     </td>
@@ -148,13 +142,36 @@
                                         {{ $member->settlement->updated_at->format('d M Y, h:i A') }}
                                     </td>
                                     <td>
-                                        <button class="btn btn-update btn-sm btn-update-settlement" data-id="{{ $member->id }}">
-                                            <i class="bi bi-check2-circle me-25"></i> Update
+                                        <button class="btn btn-update btn-sm btn-open-modal" 
+                                            data-id="{{ $member->id }}" 
+                                            data-name="{{ $member->name }}"
+                                            data-company="{{ $member->settlement->company_to_beautician }}"
+                                            data-beautician="{{ $member->settlement->beautician_to_company }}">
+                                            <i class="bi bi-pencil-square me-25"></i> Manage
                                         </button>
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th><strong>Total</strong></th>
+                                    <th>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text fw-bold">₹</span>
+                                            <input type="text" class="form-control form-control-sm fw-bold" id="total_company_owed" readonly value="0.00" style="background-color: #f8f9fa;">
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text fw-bold">₹</span>
+                                            <input type="text" class="form-control form-control-sm fw-bold" id="total_beautician_owed" readonly value="0.00" style="background-color: #f8f9fa;">
+                                        </div>
+                                    </th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -162,17 +179,154 @@
         </div>
     </div>
 </div>
+
+<!-- Custom View Modal -->
+<div class="modal fade" id="settlementModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered c-modal-dialog">
+        <div class="modal-content c-modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
+            
+            <!-- Header -->
+            <div class="c-modal-header" style="position: relative; background: linear-gradient(135deg, #102365 0%, #1a4a7a 100%); padding: 20px 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="color: #fff;">
+                        <span class="badge bg-white text-primary rounded-pill mb-1 fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">Settlement Details</span>
+                        <h3 class="mb-0 fw-bolder text-white" style="font-size: 1.5rem;" id="modal-beautician-name">Beautician Name</h3>
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <!-- Decorative Elements -->
+                <div style="position: absolute; right: -20px; top: -20px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-4" style="background: #fcfcfd;">
+                <input type="hidden" id="modal-member-id">
+                
+                <div class="detail-section-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7367f0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-wallet2"></i> Account Balances
+                </div>
+                
+                <div class="detail-info-card" style="background: #f8f9fa; border-radius: 16px; padding: 20px; border: 1px solid #edf2f7;">
+                    
+                    <div class="form-group mb-3">
+                        <label style="font-size: 0.85rem; color: #82868b; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Company to Beautician (₹)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white" style="font-weight: bold;">₹</span>
+                            <input type="number" id="modal-company-owed" class="form-control" style="font-weight: bold; font-size: 1.1rem;" step="0.01">
+                        </div>
+                        <small class="text-muted">Amount the company owes to the beautician.</small>
+                    </div>
+
+                    <div class="form-group mb-0">
+                        <label style="font-size: 0.85rem; color: #82868b; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Beautician to Company (₹)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white" style="font-weight: bold;">₹</span>
+                            <input type="number" id="modal-beautician-owed" class="form-control" style="font-weight: bold; font-size: 1.1rem;" step="0.01">
+                        </div>
+                        <small class="text-muted">Amount the beautician owes to the company.</small>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="c-modal-footer" style="background: #f8f9fa; border-top: 1px solid #edf2f7; padding: 16px 24px; display: flex; justify-content: space-between;">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 10px 20px;">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" id="btn-save-modal" style="border-radius: 8px; padding: 10px 20px; background-color: #1a237e;">
+                    <i class="bi bi-check2-circle me-2"></i> Save Changes
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('footer_script_content')
 <script>
-    $(document).on('click', '.btn-update-settlement', function() {
-        var btn = $(this);
-        var id = btn.data('id');
-        var company_to_beautician = $('.company-to-beautician[data-id="' + id + '"]').val();
-        var beautician_to_company = $('.beautician-to-company[data-id="' + id + '"]').val();
+    function calculateTotalsAndColors() {
+        let totalCompany = 0;
+        let totalBeautician = 0;
 
-        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+        $('.company-owed-display').each(function() {
+            let val = parseFloat($(this).attr('data-val')) || 0;
+            totalCompany += val;
+        });
+
+        $('.beautician-owed-display').each(function() {
+            let val = parseFloat($(this).attr('data-val')) || 0;
+            totalBeautician += val;
+        });
+
+        $('#total_company_owed').val(totalCompany.toFixed(2));
+        if (totalCompany > 0) {
+            $('#total_company_owed').css('color', 'red');
+        } else {
+            $('#total_company_owed').css('color', 'inherit');
+        }
+
+        $('#total_beautician_owed').val(totalBeautician.toFixed(2));
+        if (totalBeautician > 0) {
+            $('#total_beautician_owed').css('color', 'green');
+        } else {
+            $('#total_beautician_owed').css('color', 'inherit');
+        }
+    }
+
+    $(document).ready(function() {
+        calculateTotalsAndColors();
+
+        // Color input text based on value in modal
+        $(document).on('input', '#modal-company-owed', function() {
+            let val = parseFloat($(this).val()) || 0;
+            if (val > 0) {
+                $(this).css('color', 'red');
+                $(this).prev('.input-group-text').css('color', 'red');
+            } else {
+                $(this).css('color', 'inherit');
+                $(this).prev('.input-group-text').css('color', 'inherit');
+            }
+        });
+
+        $(document).on('input', '#modal-beautician-owed', function() {
+            let val = parseFloat($(this).val()) || 0;
+            if (val > 0) {
+                $(this).css('color', 'green');
+                $(this).prev('.input-group-text').css('color', 'green');
+            } else {
+                $(this).css('color', 'inherit');
+                $(this).prev('.input-group-text').css('color', 'inherit');
+            }
+        });
+    });
+
+    $(document).on('click', '.btn-open-modal', function() {
+        var btn = $(this);
+        var id = btn.attr('data-id');
+        var name = btn.attr('data-name');
+        var companyOwed = btn.attr('data-company');
+        var beauticianOwed = btn.attr('data-beautician');
+
+        $('#modal-member-id').val(id);
+        $('#modal-beautician-name').text(name);
+        $('#modal-company-owed').val(companyOwed).trigger('input');
+        $('#modal-beautician-owed').val(beauticianOwed).trigger('input');
+
+        $('#settlementModal').modal('show');
+    });
+
+    $(document).on('click', '#btn-save-modal', function() {
+        var btn = $(this);
+        var id = $('#modal-member-id').val();
+        var company_to_beautician = $('#modal-company-owed').val() || 0;
+        var beautician_to_company = $('#modal-beautician-owed').val() || 0;
+
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
 
         $.ajax({
             url: "{{ route('admin.settlement.update') }}",
@@ -184,16 +338,36 @@
                 beautician_to_company: beautician_to_company
             },
             success: function(response) {
-                btn.prop('disabled', false).html('<i class="bi bi-check2-circle me-25"></i> Update');
+                btn.prop('disabled', false).html('<i class="bi bi-check2-circle me-2"></i> Save Changes');
                 if(response.success) {
                     toastr.success(response.message);
+                    
+                    // Update table display
+                    let compDis = $('#display-company-' + id);
+                    compDis.attr('data-val', company_to_beautician);
+                    compDis.html('₹ ' + parseFloat(company_to_beautician).toFixed(2));
+                    compDis.css('color', company_to_beautician > 0 ? 'red' : 'inherit');
+
+                    let beautDis = $('#display-beautician-' + id);
+                    beautDis.attr('data-val', beautician_to_company);
+                    beautDis.html('₹ ' + parseFloat(beautician_to_company).toFixed(2));
+                    beautDis.css('color', beautician_to_company > 0 ? 'green' : 'inherit');
+
+                    // Update button data attributes
+                    let updateBtn = $('.btn-open-modal[data-id="' + id + '"]');
+                    updateBtn.attr('data-company', company_to_beautician);
+                    updateBtn.attr('data-beautician', beautician_to_company);
+
                     $('.last-updated-' + id).text(response.updated_at);
+                    
+                    calculateTotalsAndColors();
+                    $('#settlementModal').modal('hide');
                 } else {
                     toastr.error(response.message);
                 }
             },
             error: function() {
-                btn.prop('disabled', false).html('<i class="bi bi-check2-circle me-25"></i> Update');
+                btn.prop('disabled', false).html('<i class="bi bi-check2-circle me-2"></i> Save Changes');
                 toastr.error('Something went wrong. Please try again.');
             }
         });
