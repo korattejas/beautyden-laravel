@@ -665,6 +665,45 @@ class TeamMemberController extends Controller
         }
     }
 
+    public function exportActive()
+    {
+        try {
+            $members = TeamMember::where('status', 1)->get();
+
+            $filename = "active_team_members_" . date('Ymd_His') . ".csv";
+            $headers = [
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=$filename",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            ];
+
+            $columns = ['Address', 'Name', 'Mobile Number', 'Experience (Years)', 'Role'];
+
+            $callback = function() use($members, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+
+                foreach ($members as $member) {
+                    fputcsv($file, [
+                        $member->address,
+                        $member->name,
+                        $member->phone,
+                        $member->experience_years,
+                        $member->role
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
     private function geocode($address)
     {
         try {

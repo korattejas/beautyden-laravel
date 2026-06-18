@@ -484,8 +484,8 @@
 
     .c-modal-header {
         padding: 1.25rem 1.5rem;
-        background: linear-gradient(135deg, #1a237e 0%, #3f51b5 100%);
-        color: #fff;
+        background: #fff;
+        border-bottom: 1px solid #f1f5f9;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -494,16 +494,17 @@
     .c-modal-title {
         margin: 0;
         font-weight: 700;
-        font-size: 1.15rem;
+        font-size: 1.25rem;
+        color: #1e293b;
         display: flex;
         align-items: center;
         gap: 10px;
     }
 
     .c-close-btn {
-        background: rgba(255, 255, 255, 0.1);
+        background: #f8fafc;
         border: none;
-        color: #fff;
+        color: #64748b;
         font-size: 1.5rem;
         width: 32px;
         height: 32px;
@@ -512,12 +513,12 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: all 0.2s;
     }
 
-    .c-close-btn:hover { background: rgba(255, 255, 255, 0.2); }
+    .c-close-btn:hover { background: #f1f5f9; color: #ef4444; }
 
-    .c-modal-body { padding: 1.5rem; max-height: 80vh; overflow-y: auto; }
+    .c-modal-body { padding: 1.5rem; max-height: calc(100vh - 140px); overflow-y: auto; }
 
     .c-profile-section {
         display: flex;
@@ -529,67 +530,103 @@
     }
 
     .c-profile-avatar {
-        width: 110px;
-        height: 110px;
-        border-radius: 24px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
         object-fit: cover;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         border: 4px solid #fff;
     }
 
     .c-profile-initials {
-        width: 110px;
-        height: 110px;
-        border-radius: 24px;
-        background: #f1f5f9;
-        color: var(--mst-primary);
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(115, 103, 240, 0.1);
+        color: #7367f0;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2.2rem;
+        font-size: 2rem;
         font-weight: 700;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         border: 4px solid #fff;
     }
 
-    .c-profile-info h4 { margin: 0; font-weight: 800; color: #1e293b; font-size: 1.8rem; }
-    .c-profile-info p { margin: 5px 0 0; color: #64748b; font-weight: 600; font-size: 1.15rem; }
+    .c-profile-info h4 { margin: 0; font-weight: 800; color: #1e293b; font-size: 1.6rem; }
+    .c-profile-info p { margin: 5px 0 0; color: #64748b; font-weight: 600; font-size: 1.1rem; }
 
     .c-row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
-    .c-col-6 { width: 50%; padding: 0 10px; margin-bottom: 15px; }
-    .c-col-12 { width: 100%; padding: 0 10px; margin-bottom: 15px; }
+    .c-col-6 { width: 50%; padding: 0 10px; margin-bottom: 20px; }
+    .c-col-12 { width: 100%; padding: 0 10px; margin-bottom: 20px; }
 
-    .c-detail-card {
-        background: #f8fafc;
-        padding: 15px 20px;
-        border-radius: 12px;
-        height: 100%;
-        border: 1px solid #eef2f7;
-        border-left: 4px solid #1a237e;
-        transition: all 0.2s ease;
-    }
-    
-    .c-detail-card:hover {
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        transform: translateX(4px);
-    }
-
-    .c-detail-card label {
-        display: block;
-        font-size: 0.85rem;
-        color: #0ea5e9;
-        font-weight: 800;
+    .detail-section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-bottom: 8px;
+        color: #7367f0;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .c-detail-card p {
+    .detail-info-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px;
+        height: 100%;
+        border: 1px solid #edf2f7;
+        transition: all 0.3s ease;
+    }
+
+    .detail-info-card:hover {
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-color: #7367f0;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-icon {
+        width: 32px;
+        height: 32px;
+        background: rgba(115, 103, 240, 0.1);
+        color: #7367f0;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .info-content label {
+        display: block;
+        font-size: 0.72rem;
+        color: #82868b;
+        font-weight: 700;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-content p {
         margin: 0;
+        font-size: 1.1rem;
         font-weight: 700;
         color: #1e293b;
-        font-size: 1.1rem;
+        line-height: 1.3;
     }
 
     .c-include-badge {
@@ -683,6 +720,9 @@
                         <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
                         <input type="text" id="search-address" class="form-control" placeholder="Search address (15km)..." value="{{ request('address_search') }}">
                     </div>
+                    <a href="{{ route('admin.team.exportActive') }}" class="btn btn-success me-2 text-nowrap">
+                        <i class="bi bi-file-earmark-excel"></i> Export
+                    </a>
                     <a href="{{ route('admin.team.create') }}" class="btn btn-primary me-2">
                         <i class="bi bi-plus-lg"></i> Add Member
                     </a>
@@ -1398,7 +1438,7 @@
                     }
 
                     let html = `
-                    <div class="c-profile-section" style="background: linear-gradient(to right, #f8faff, #ffffff); padding: 25px; border-radius: 20px; border: 1px solid #eef2f7;">
+                    <div class="c-profile-section">
                         ${avatarHtml}
                         <div class="c-profile-info">
                             <span class="badge bg-soft-primary text-primary mb-2" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; font-weight:800;">Team Member</span>
@@ -1407,85 +1447,107 @@
                         </div>
                     </div>
 
-                    <div class="c-row mt-4">
+                    <div class="c-row">
                         <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-card-text"></i> ID Number</label>
-                                <p>${data.id_number ?? '0'}</p>
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-person-vcard"></i> Personal Info</div>
+                                
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-card-text"></i></div>
+                                    <div class="info-content">
+                                        <label>ID Number</label>
+                                        <p>${data.id_number ?? '0'}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-telephone"></i></div>
+                                    <div class="info-content">
+                                        <label>Mobile Number</label>
+                                        <p><a href="tel:${data.phone}" style="text-decoration:none; color:inherit;">${data.phone ?? '-'}</a></p>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-calendar-heart"></i></div>
+                                    <div class="info-content">
+                                        <label>Date of Birth</label>
+                                        <p>${data.dob ?? '-'}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
                         <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-telephone"></i> Mobile Number</label>
-                                <p><a href="tel:${data.phone}" style="text-decoration:none; color:inherit;">${data.phone ?? '-'}</a></p>
-                            </div>
-                        </div>
-                        <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-calendar-heart"></i> Date of Birth</label>
-                                <p>${data.dob ?? '-'}</p>
-                            </div>
-                        </div>
-                        <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-droplet-half"></i> Blood Group</label>
-                                <p>${data.blood_group ?? '-'}</p>
-                            </div>
-                        </div>
-                        <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-clock-history"></i> Experience</label>
-                                <p>${data.experience_years ?? '-'} Years</p>
-                            </div>
-                        </div>
-                        
-                        <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-geo-alt"></i> Location</label>
-                                <p>${data.city ?? '-'}</p>
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-briefcase"></i> Professional</div>
+                                
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-clock-history"></i></div>
+                                    <div class="info-content">
+                                        <label>Experience</label>
+                                        <p>${data.experience_years ?? '-'} Years</p>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-geo-alt"></i></div>
+                                    <div class="info-content">
+                                        <label>Location</label>
+                                        <p>${data.city ?? '-'}</p>
+                                    </div>
+                                </div>
+
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-droplet-half"></i></div>
+                                    <div class="info-content">
+                                        <label>Blood Group</label>
+                                        <p>${data.blood_group ?? '-'}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="c-col-12">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-info-circle"></i> Professional Bio</label>
-                                <p style="font-size:0.95rem; line-height:1.6; color:#475569;">${data.bio ?? 'No bio provided.'}</p>
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-journal-text"></i> Professional Bio</div>
+                                <p style="font-size:0.95rem; line-height:1.6; color:#475569; margin:0;">${data.bio ?? 'No bio provided.'}</p>
                             </div>
                         </div>
 
                         <div class="c-col-12">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-stars"></i> Core Specialties</label>
-                                <div class="mt-2">${
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-stars"></i> Core Specialties</div>
+                                <div>${
                                     data.specialties 
-                                    ? JSON.parse(data.specialties).map(item => `<span class="c-include-badge" style="background:#f1f5f9; border:none; color:#1a237e;">${item}</span>`).join("") 
+                                    ? JSON.parse(data.specialties).map(item => `<span class="c-include-badge">${item}</span>`).join("") 
                                     : '<span class="text-muted">None listed</span>'
                                 }</div>
                             </div>
                         </div>
 
                         <div class="c-col-12">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-patch-check"></i> Certifications</label>
-                                <div class="mt-2">${
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-patch-check"></i> Certifications</div>
+                                <div>${
                                     data.certifications 
-                                    ? JSON.parse(data.certifications).map(item => `<span class="c-include-badge" style="background:#f0fdf4; border:none; color:#166534;">${item}</span>`).join("") 
+                                    ? JSON.parse(data.certifications).map(item => `<span class="c-include-badge" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;">${item}</span>`).join("") 
                                     : '<span class="text-muted">None listed</span>'
                                 }</div>
                             </div>
                         </div>
 
                         <div class="c-col-12">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-geo"></i> Full Address</label>
-                                <p>${data.address ?? ''}${data.village ? ', ' + data.village : ''}${data.taluko ? ', ' + data.taluko : ''}${data.city ? ', ' + data.city : ''}${data.state ? ', ' + data.state : ''}</p>
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-geo"></i> Full Address</div>
+                                <p style="margin:0; font-weight:600; color:#1e293b;">${data.address ?? ''}${data.village ? ', ' + data.village : ''}${data.taluko ? ', ' + data.taluko : ''}${data.city ? ', ' + data.city : ''}${data.state ? ', ' + data.state : ''}</p>
                             </div>
                         </div>
 
                         <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-toggle-on"></i> Account Status</label>
-                                <p>${data.status == 1 
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-gear"></i> Account Status</div>
+                                <p style="margin:0;">${data.status == 1 
                                     ? '<span class="text-success font-weight-bold"><i class="bi bi-check-circle-fill"></i> Active</span>' 
                                     : '<span class="text-danger font-weight-bold"><i class="bi bi-x-circle-fill"></i> Inactive</span>'
                                 }</p>
@@ -1493,24 +1555,26 @@
                         </div>
 
                         <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-star"></i> Popularity</label>
-                                <p>${data.is_popular == 1 
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-star"></i> Popularity</div>
+                                <p style="margin:0;">${data.is_popular == 1 
                                     ? '<span class="text-warning font-weight-bold"><i class="bi bi-star-fill"></i> Popular</span>' 
                                     : '<span class="text-muted">Standard</span>'
                                 }</p>
                             </div>
                         </div>
+                        
                         <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-calendar-plus"></i> Joined On</label>
-                                <p>${data.created_at ? new Date(data.created_at).toLocaleDateString() : '-'}</p>
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-calendar-plus"></i> Joined On</div>
+                                <p style="margin:0; font-weight:700;">${data.created_at ? new Date(data.created_at).toLocaleDateString() : '-'}</p>
                             </div>
                         </div>
+
                         <div class="c-col-6">
-                            <div class="c-detail-card">
-                                <label><i class="bi bi-clock-history"></i> Last Updated</label>
-                                <p>${data.updated_at ? new Date(data.updated_at).toLocaleDateString() : '-'}</p>
+                            <div class="detail-info-card">
+                                <div class="detail-section-label"><i class="bi bi-clock-history"></i> Last Updated</div>
+                                <p style="margin:0; font-weight:700;">${data.updated_at ? new Date(data.updated_at).toLocaleDateString() : '-'}</p>
                             </div>
                         </div>
                     </div>

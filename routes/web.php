@@ -254,6 +254,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         // Team Members
         Route::get('team', [TeamMemberController::class, 'index'])->name('admin.team.index');
+        Route::get('team/export-active', [TeamMemberController::class, 'exportActive'])->name('admin.team.exportActive');
         Route::get('team/create', [TeamMemberController::class, 'create'])->name('admin.team.create');
         Route::post('team/store', [TeamMemberController::class, 'store'])->name('admin.team.store');
         Route::get('team/edit/{id}', [TeamMemberController::class, 'edit'])->name('admin.team.edit');
