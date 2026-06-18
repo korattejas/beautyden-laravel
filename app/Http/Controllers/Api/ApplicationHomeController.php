@@ -273,31 +273,39 @@ class ApplicationHomeController extends Controller
                         $join->on('scm.service_master_id', '=', 'sm.id')
                              ->where('scm.city_id', $cityId);
                     })
+                    ->leftJoin('service_master_variants as smv', 'sci.variant_id', '=', 'smv.id')
+                    ->leftJoin('service_city_variant_prices as scvp', function($join) use ($cityId) {
+                        $join->on('scvp.variant_id', '=', 'sci.variant_id')
+                             ->where('scvp.city_id', $cityId);
+                    })
                     ->select(
                         'sci.combo_id',
                         'sm.id',
                         'sm.id as service_id',
-                        'sm.name',
+                        DB::raw('IF(sci.variant_id IS NOT NULL, CONCAT(sm.name, " - ", smv.name), sm.name) as name'),
                         'sm.description',
                         'sm.category_id',
                         'sm.sub_category_id',
-                        DB::raw('IFNULL(scm.price, sm.price) as price'),
-                        DB::raw('IFNULL(scm.discount_price, sm.discount_price) as discount_price'),
-                        'sm.duration',
-                        'sci.is_default'
+                        DB::raw('IF(sci.variant_id IS NOT NULL, IFNULL(scvp.price, smv.price), IFNULL(scm.price, sm.price)) as price'),
+                        DB::raw('IF(sci.variant_id IS NOT NULL, IFNULL(scvp.discount_price, smv.price - (smv.price * smv.discount_percentage / 100)), IFNULL(scm.discount_price, sm.discount_price)) as discount_price'),
+                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.duration, sm.duration) as duration'),
+                        'sci.is_default',
+                        'sci.variant_id'
                     );
                 } else {
-                    $itemsQuery->select(
+                    $itemsQuery->leftJoin('service_master_variants as smv', 'sci.variant_id', '=', 'smv.id')
+                    ->select(
                         'sci.combo_id',
                         'sm.id',
                         'sm.id as service_id',
-                        'sm.name',
+                        DB::raw('IF(sci.variant_id IS NOT NULL, CONCAT(sm.name, " - ", smv.name), sm.name) as name'),
                         'sm.category_id',
                         'sm.sub_category_id',
-                        'sm.price',
-                        'sm.discount_price',
-                        'sm.duration',
-                        'sci.is_default'
+                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.price, sm.price) as price'),
+                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.price - (smv.price * smv.discount_percentage / 100), sm.discount_price) as discount_price'),
+                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.duration, sm.duration) as duration'),
+                        'sci.is_default',
+                        'sci.variant_id'
                     );
                 }
                 

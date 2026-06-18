@@ -72,19 +72,24 @@ class ServiceComboController extends Controller
 
     public function create()
     {
-        $services = ServiceMaster::where('status', 1)->get();
+        $services = ServiceMaster::with('variants')->where('status', 1)->get();
         return view('admin.combo.create', compact('services'));
     }
 
     public function edit($id)
     {
         $combo = ServiceCombo::with('items')->findOrFail(decryptId($id));
-        $services = ServiceMaster::where('status', 1)->get();
+        $services = ServiceMaster::with('variants')->where('status', 1)->get();
         
-        $selectedServiceIds = $combo->items->pluck('service_master_id')->toArray();
-        $defaultServiceIds = $combo->items->where('is_default', 1)->pluck('service_master_id')->toArray();
+        $selectedItems = $combo->items->map(function ($item) {
+            return $item->variant_id ? "S_{$item->service_master_id}_V_{$item->variant_id}" : "S_{$item->service_master_id}";
+        })->toArray();
+
+        $defaultItems = $combo->items->where('is_default', 1)->map(function ($item) {
+            return $item->variant_id ? "S_{$item->service_master_id}_V_{$item->variant_id}" : "S_{$item->service_master_id}";
+        })->toArray();
         
-        return view('admin.combo.edit', compact('combo', 'services', 'selectedServiceIds', 'defaultServiceIds'));
+        return view('admin.combo.edit', compact('combo', 'services', 'selectedItems', 'defaultItems'));
     }
 
     public function store(Request $request)
@@ -140,12 +145,20 @@ class ServiceComboController extends Controller
 
             // Sync Services
             $defaultServices = $request->input('default_services', []);
-            foreach ($request->services as $serviceId) {
-                ServiceComboItem::create([
-                    'combo_id' => $combo->id,
-                    'service_master_id' => $serviceId,
-                    'is_default' => in_array($serviceId, $defaultServices) ? 1 : 0
-                ]);
+            foreach ($request->services as $selectedValue) {
+                // Expected format: S_1 or S_1_V_2
+                $parts = explode('_', $selectedValue);
+                $serviceId = $parts[1] ?? null;
+                $variantId = isset($parts[3]) ? $parts[3] : null;
+
+                if ($serviceId) {
+                    ServiceComboItem::create([
+                        'combo_id' => $combo->id,
+                        'service_master_id' => $serviceId,
+                        'variant_id' => $variantId,
+                        'is_default' => in_array($selectedValue, $defaultServices) ? 1 : 0
+                    ]);
+                }
             }
 
             return response()->json(['success' => true, 'message' => 'Combo saved successfully']);

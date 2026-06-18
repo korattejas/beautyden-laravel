@@ -84,7 +84,15 @@
                                                     <label>Select Services (Multiple)</label>
                                                     <select name="services[]" id="services-select" class="form-control select2" multiple required>
                                                         @foreach($services as $service)
-                                                            <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                                            @if($service->variants->count() > 0)
+                                                                <optgroup label="{{ $service->name }}">
+                                                                    @foreach($service->variants as $variant)
+                                                                        <option value="S_{{ $service->id }}_V_{{ $variant->id }}">{{ $variant->name }}</option>
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @else
+                                                                <option value="S_{{ $service->id }}">{{ $service->name }}</option>
+                                                            @endif
                                                         @endforeach
                                                     </select>
                                                     <div class="valid-feedback"></div>

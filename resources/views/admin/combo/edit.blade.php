@@ -95,9 +95,21 @@
                                                     <label>Select Services (Multiple)</label>
                                                     <select name="services[]" id="services-select" class="form-control select2" multiple required>
                                                         @foreach($services as $service)
-                                                            <option value="{{ $service->id }}" {{ in_array($service->id, $selectedServiceIds) ? 'selected' : '' }}>
-                                                                {{ $service->name }}
-                                                            </option>
+                                                            @if($service->variants->count() > 0)
+                                                                <optgroup label="{{ $service->name }}">
+                                                                    @foreach($service->variants as $variant)
+                                                                        @php $val = "S_{$service->id}_V_{$variant->id}"; @endphp
+                                                                        <option value="{{ $val }}" {{ in_array($val, $selectedItems) ? 'selected' : '' }}>
+                                                                            {{ $variant->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </optgroup>
+                                                            @else
+                                                                @php $val = "S_{$service->id}"; @endphp
+                                                                <option value="{{ $val }}" {{ in_array($val, $selectedItems) ? 'selected' : '' }}>
+                                                                    {{ $service->name }}
+                                                                </option>
+                                                            @endif
                                                         @endforeach
                                                     </select>
                                                     <div class="valid-feedback"></div>
@@ -109,11 +121,24 @@
                                                     <label>Mark Default (Pre-selected) Services</label>
                                                     <div id="default-services-list" class="mt-2">
                                                         @foreach($services as $service)
-                                                            @if(in_array($service->id, $selectedServiceIds))
-                                                                <div class="form-check mb-1">
-                                                                    <input class="form-check-input" type="checkbox" name="default_services[]" value="{{ $service->id }}" id="def_{{ $service->id }}" {{ in_array($service->id, $defaultServiceIds) ? 'checked' : '' }}>
-                                                                    <label class="form-check-label" for="def_{{ $service->id }}">{{ $service->name }}</label>
-                                                                </div>
+                                                            @if($service->variants->count() > 0)
+                                                                @foreach($service->variants as $variant)
+                                                                    @php $val = "S_{$service->id}_V_{$variant->id}"; @endphp
+                                                                    @if(in_array($val, $selectedItems))
+                                                                        <div class="form-check mb-1">
+                                                                            <input class="form-check-input" type="checkbox" name="default_services[]" value="{{ $val }}" id="def_{{ $val }}" {{ in_array($val, $defaultItems) ? 'checked' : '' }}>
+                                                                            <label class="form-check-label" for="def_{{ $val }}">{{ $variant->name }}</label>
+                                                                        </div>
+                                                                    @endif
+                                                                @endforeach
+                                                            @else
+                                                                @php $val = "S_{$service->id}"; @endphp
+                                                                @if(in_array($val, $selectedItems))
+                                                                    <div class="form-check mb-1">
+                                                                        <input class="form-check-input" type="checkbox" name="default_services[]" value="{{ $val }}" id="def_{{ $val }}" {{ in_array($val, $defaultItems) ? 'checked' : '' }}>
+                                                                        <label class="form-check-label" for="def_{{ $val }}">{{ $service->name }}</label>
+                                                                    </div>
+                                                                @endif
                                                             @endif
                                                         @endforeach
                                                     </div>
@@ -158,7 +183,8 @@
             if (selectedData.length > 0) {
                 $('#default-services-section').show();
                 selectedData.forEach(item => {
-                    let isChecked = $(`#def_${item.id}`).prop('checked') !== false ? 'checked' : '';
+                    let oldEl = $(document.getElementById(`def_${item.id}`));
+                    let isChecked = (oldEl.length > 0 && !oldEl.prop('checked')) ? '' : 'checked';
                     listHtml += `
                         <div class="form-check mb-1">
                             <input class="form-check-input" type="checkbox" name="default_services[]" value="${item.id}" id="def_${item.id}" ${isChecked}>
