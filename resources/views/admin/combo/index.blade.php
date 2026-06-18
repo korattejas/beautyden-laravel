@@ -39,6 +39,7 @@
                                             <th>Id</th>
                                             <th data-search="false">Image</th>
                                             <th>Name</th>
+                                            <th data-search="false">Included Services</th>
                                             <th>Min. Price</th>
                                             <th data-stuff="Active,InActive">Status</th>
                                             <th data-search="false">Action</th>
@@ -85,6 +86,12 @@
                 {
                     data: 'name',
                     name: 'name'
+                },
+                {
+                    data: 'services',
+                    name: 'services',
+                    orderable: false,
+                    searchable: false
                 },
                 {
                     data: 'min_price',

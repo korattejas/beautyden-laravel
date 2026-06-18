@@ -34,7 +34,7 @@ class ServiceComboController extends Controller
         $function_name = 'getData';
         try {
             if ($request->ajax()) {
-                $combos = ServiceCombo::query();
+                $combos = ServiceCombo::with(['items.service', 'items.variant']);
                 return DataTables::of($combos)
                     ->addColumn('status', function ($item) {
                         return view('admin.render-view.datable-label', [
@@ -58,10 +58,23 @@ class ServiceComboController extends Controller
                         }
                         return 'N/A';
                     })
+                    ->addColumn('services', function ($item) {
+                        $serviceNames = [];
+                        foreach ($item->items as $comboItem) {
+                            $name = $comboItem->service ? $comboItem->service->name : '';
+                            if ($comboItem->variant) {
+                                $name .= ' (' . $comboItem->variant->name . ')';
+                            }
+                            if ($name) {
+                                $serviceNames[] = '<span class="badge badge-light-primary mb-1">' . $name . '</span>';
+                            }
+                        }
+                        return implode(' ', $serviceNames);
+                    })
                     ->editColumn('min_price', function($item) {
                         return '₹' . number_format($item->min_price, 2);
                     })
-                    ->rawColumns(['action', 'status', 'image'])
+                    ->rawColumns(['action', 'status', 'image', 'services'])
                     ->make(true);
             }
         } catch (\Exception $e) {

@@ -50,7 +50,7 @@ class CouponUsageController extends Controller
                         if ($appointment) {
                             $url = route('admin.appointments.edit', encryptId($appointment->id));
                             return '<a href="'.$url.'" class="fw-bold text-primary d-flex align-items-center">
-                                        <i class="bi bi-hash me-25"></i>'.$appointment->order_number.'
+                                        '.$appointment->order_number.'
                                     </a>';
                         }
                         return '<span class="text-muted">N/A</span>';
