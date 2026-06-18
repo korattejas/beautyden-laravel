@@ -47,67 +47,87 @@
 
     .detail-info-card {
         background: #f8f9fa;
-        border-radius: 16px;
-        padding: 20px;
+        border-radius: 12px;
+        padding: 16px;
         height: 100%;
         border: 1px solid #edf2f7;
+        transition: all 0.3s ease;
+    }
+
+    .detail-info-card:hover {
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-color: #7367f0;
     }
 
     .info-item {
         display: flex;
         align-items: flex-start;
-        margin-bottom: 16px;
+        gap: 12px;
+        margin-bottom: 12px;
     }
-    .info-item:last-child { margin-bottom: 0; }
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
 
     .info-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
+        width: 32px;
+        height: 32px;
         background: rgba(115, 103, 240, 0.1);
         color: #7367f0;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 12px;
         font-size: 1.1rem;
         flex-shrink: 0;
     }
 
     .info-content label {
         display: block;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         color: #82868b;
-        font-weight: 600;
+        font-weight: 700;
         margin-bottom: 2px;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .info-content p {
         margin: 0;
+        font-size: 1.1rem;
         font-weight: 700;
         color: #1e293b;
-        font-size: 0.95rem;
+        line-height: 1.3;
     }
 
     .summary-box {
-        background: #f8f9fa;
-        border-radius: 16px;
+        background: #fdfdfd;
+        border: 1px solid #edf2f7;
+        border-radius: 12px;
         padding: 20px;
         margin-top: 20px;
-        border: 1px dashed #d1d5db;
+        width: 100%;
     }
+
     .summary-line {
         display: flex;
         justify-content: space-between;
         margin-bottom: 12px;
         font-size: 0.95rem;
+        font-weight: 500;
+        color: #475569;
     }
-    .summary-line:last-child { margin-bottom: 0; }
+
+    .summary-line:last-child {
+        margin-bottom: 0;
+    }
+
     .summary-total {
+        border-top: 2px dashed #dbdade;
         margin-top: 15px;
         padding-top: 15px;
-        border-top: 2px dashed #e2e8f0;
         font-weight: 800;
         font-size: 1.2rem;
         color: #1e293b;
@@ -238,27 +258,20 @@
 </div>
 
 <!-- Custom View Modal -->
-<div class="modal fade" id="c-viewUserModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered c-modal-dialog">
-        <div class="modal-content c-modal-content" style="border-radius: 20px; overflow: hidden;">
+<div id="c-viewUserModal" class="c-modal">
+    <div class="c-modal-dialog" style="max-width: 800px;">
+        <div class="c-modal-content">
             
             <!-- Header -->
-            <div class="c-modal-header" style="position: relative;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div style="color: #fff;">
-                        <span class="badge bg-white text-primary rounded-pill mb-1 fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">User Profile</span>
-                        <h3 class="mb-0 fw-bolder text-white" style="font-size: 1.5rem;" id="modal-user-name">Loading...</h3>
-                    </div>
-                    <div style="text-align: right;">
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                </div>
-                <!-- Decorative Elements -->
-                <div style="position: absolute; right: -20px; top: -20px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+            <div class="c-modal-header">
+                <h5 class="c-modal-title">
+                    <i class="bi bi-person-circle"></i> <span id="modal-user-name">User Profile</span>
+                </h5>
+                <button class="c-close-btn" data-c-close>&times;</button>
             </div>
 
             <!-- Body -->
-            <div class="modal-body p-4" style="background: #fcfcfd;">
+            <div class="c-modal-body p-4" style="background: #fcfcfd;">
                 <div id="c-user-details" style="min-height: 200px;">
                     <!-- Content injected via JS -->
                     <div class="c-loader" style="text-align: center; padding: 50px 0; color: #a0aec0;">
@@ -269,8 +282,8 @@
             </div>
 
             <!-- Footer -->
-            <div class="c-modal-footer" style="background: #f8f9fa; border-top: 1px solid #edf2f7; padding: 16px 24px; text-align: right;">
-                <button class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 10px 20px;">
+            <div class="c-modal-footer" style="text-align: right;">
+                <button class="c-btn" data-c-close style="background: #e2e8f0; color: #475569;">
                     Close View
                 </button>
             </div>
@@ -384,11 +397,15 @@
         }
     });
 
+    $(document).on("click", "[data-c-close]", function() {
+        $("#c-viewUserModal").removeClass("show");
+    });
+
     $(document).on('click', '.btn-view', function(e) {
         e.preventDefault();
         let id = $(this).data('id');
 
-        $("#c-viewUserModal").modal('show');
+        $("#c-viewUserModal").addClass('show');
         $("#c-user-details").html(
             `<div class="c-loader" style="text-align: center; padding: 50px 0; color: #a0aec0;">
                 <div class="spinner-border text-primary" role="status"></div>

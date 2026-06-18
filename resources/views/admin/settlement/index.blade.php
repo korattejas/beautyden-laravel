@@ -181,63 +181,56 @@
 </div>
 
 <!-- Custom View Modal -->
-<div class="modal fade" id="settlementModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered c-modal-dialog">
-        <div class="modal-content c-modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
+<div id="settlementModal" class="c-modal">
+    <div class="c-modal-dialog" style="max-width: 600px;">
+        <div class="c-modal-content">
             
             <!-- Header -->
-            <div class="c-modal-header" style="position: relative; background: linear-gradient(135deg, #102365 0%, #1a4a7a 100%); padding: 20px 24px;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div style="color: #fff;">
-                        <span class="badge bg-white text-primary rounded-pill mb-1 fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">Settlement Details</span>
-                        <h3 class="mb-0 fw-bolder text-white" style="font-size: 1.5rem;" id="modal-beautician-name">Beautician Name</h3>
-                    </div>
-                    <div style="text-align: right;">
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                </div>
-                <!-- Decorative Elements -->
-                <div style="position: absolute; right: -20px; top: -20px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+            <div class="c-modal-header">
+                <h5 class="c-modal-title">
+                    <i class="bi bi-wallet2"></i> <span id="modal-beautician-name">Beautician Name</span>
+                </h5>
+                <button class="c-close-btn" data-c-close>&times;</button>
             </div>
 
             <!-- Body -->
-            <div class="modal-body p-4" style="background: #fcfcfd;">
+            <div class="c-modal-body" style="padding: 24px;">
                 <input type="hidden" id="modal-member-id">
                 
-                <div class="detail-section-label" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #7367f0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    <i class="bi bi-wallet2"></i> Account Balances
+                <div style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: #1a4a7a; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-arrow-left-right"></i> Account Balances
                 </div>
                 
-                <div class="detail-info-card" style="background: #f8f9fa; border-radius: 16px; padding: 20px; border: 1px solid #edf2f7;">
+                <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; border: 1px solid #edf2f7;">
                     
                     <div class="form-group mb-3">
-                        <label style="font-size: 0.85rem; color: #82868b; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Company to Beautician (₹)</label>
+                        <label style="font-size: 0.85rem; color: #475569; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Company to Beautician (₹)</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white" style="font-weight: bold;">₹</span>
                             <input type="number" id="modal-company-owed" class="form-control" style="font-weight: bold; font-size: 1.1rem;" step="0.01">
                         </div>
-                        <small class="text-muted">Amount the company owes to the beautician.</small>
+                        <small class="text-muted" style="font-size: 0.75rem;">Amount the company owes to the beautician.</small>
                     </div>
 
                     <div class="form-group mb-0">
-                        <label style="font-size: 0.85rem; color: #82868b; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Beautician to Company (₹)</label>
+                        <label style="font-size: 0.85rem; color: #475569; font-weight: 600; margin-bottom: 5px; text-transform: uppercase;">Beautician to Company (₹)</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white" style="font-weight: bold;">₹</span>
                             <input type="number" id="modal-beautician-owed" class="form-control" style="font-weight: bold; font-size: 1.1rem;" step="0.01">
                         </div>
-                        <small class="text-muted">Amount the beautician owes to the company.</small>
+                        <small class="text-muted" style="font-size: 0.75rem;">Amount the beautician owes to the company.</small>
                     </div>
 
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="c-modal-footer" style="background: #f8f9fa; border-top: 1px solid #edf2f7; padding: 16px 24px; display: flex; justify-content: space-between;">
-                <button class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 8px; padding: 10px 20px;">
+            <div class="c-modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+                <button class="c-btn" data-c-close style="background: #e2e8f0; color: #475569;">
                     Cancel
                 </button>
-                <button class="btn btn-primary" id="btn-save-modal" style="border-radius: 8px; padding: 10px 20px; background-color: #1a237e;">
-                    <i class="bi bi-check2-circle me-2"></i> Save Changes
+                <button class="c-btn" id="btn-save-modal">
+                    <i class="bi bi-check2-circle"></i> Save Changes
                 </button>
             </div>
 
@@ -317,7 +310,11 @@
         $('#modal-company-owed').val(companyOwed).trigger('input');
         $('#modal-beautician-owed').val(beauticianOwed).trigger('input');
 
-        $('#settlementModal').modal('show');
+        $('#settlementModal').addClass('show');
+    });
+
+    $(document).on("click", "[data-c-close]", function() {
+        $("#settlementModal").removeClass("show");
     });
 
     $(document).on('click', '#btn-save-modal', function() {
@@ -338,7 +335,7 @@
                 beautician_to_company: beautician_to_company
             },
             success: function(response) {
-                btn.prop('disabled', false).html('<i class="bi bi-check2-circle me-2"></i> Save Changes');
+                btn.prop('disabled', false).html('<i class="bi bi-check2-circle"></i> Save Changes');
                 if(response.success) {
                     toastr.success(response.message);
                     
@@ -361,13 +358,13 @@
                     $('.last-updated-' + id).text(response.updated_at);
                     
                     calculateTotalsAndColors();
-                    $('#settlementModal').modal('hide');
+                    $('#settlementModal').removeClass('show');
                 } else {
                     toastr.error(response.message);
                 }
             },
             error: function() {
-                btn.prop('disabled', false).html('<i class="bi bi-check2-circle me-2"></i> Save Changes');
+                btn.prop('disabled', false).html('<i class="bi bi-check2-circle"></i> Save Changes');
                 toastr.error('Something went wrong. Please try again.');
             }
         });
