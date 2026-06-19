@@ -502,6 +502,7 @@ class AuthenticationController extends Controller
                     'appointments.appointment_date',
                     'appointments.appointment_time',
                     'appointments.service_id',
+                    'appointments.assigned_to',
                     'ct.name as city_name'
                 )
                 ->where('appointments.phone', $mobile_number)
@@ -512,9 +513,31 @@ class AuthenticationController extends Controller
                 return $this->sendError('No bookings found for this user.', 404);
             }
 
-            $data = $appointments->map(function ($appointment) {
+            $allAssignedIds = [];
+            foreach ($appointments as $app) {
+                if (!empty($app->assigned_to)) {
+                    $ids = explode(',', $app->assigned_to);
+                    $allAssignedIds = array_merge($allAssignedIds, $ids);
+                }
+            }
+            $allAssignedIds = array_unique($allAssignedIds);
+            $teamMembers = \App\Models\TeamMember::whereIn('id', $allAssignedIds)->pluck('name', 'id')->toArray();
+
+            $data = $appointments->map(function ($appointment) use ($teamMembers) {
                 $serviceIds = $appointment->service_id ? explode(',', $appointment->service_id) : [];
                 $totalServices = count(array_filter($serviceIds));
+
+                $beauticianNames = null;
+                if (!empty($appointment->assigned_to)) {
+                    $assignedIds = explode(',', $appointment->assigned_to);
+                    $names = [];
+                    foreach ($assignedIds as $id) {
+                        if (isset($teamMembers[$id])) {
+                            $names[] = $teamMembers[$id];
+                        }
+                    }
+                    $beauticianNames = implode(', ', $names);
+                }
 
                 return [
                     'id'                => $appointment->id,
@@ -523,6 +546,7 @@ class AuthenticationController extends Controller
                     'appointment_time'  => $appointment->appointment_time,
                     'city_name'         => $appointment->city_name,
                     'total_services'    => $totalServices,
+                    'assigned_beautician' => $beauticianNames,
                 ];
             });
 
@@ -573,12 +597,20 @@ class AuthenticationController extends Controller
             // Decode the structured services_data
             $servicesData = $appointment->services_data ? json_decode($appointment->services_data, true) : null;
 
+            $beauticianNames = null;
+            if (!empty($appointment->assigned_to)) {
+                $assignedIds = explode(',', $appointment->assigned_to);
+                $names = \App\Models\TeamMember::whereIn('id', $assignedIds)->pluck('name')->toArray();
+                $beauticianNames = implode(', ', $names);
+            }
+
             $data = [
                 'id'                     => $appointment->id,
                 'order_number'           => $appointment->order_number,
                 'status'                 => (int) $appointment->status,
                 'company_amount'         => $appointment->company_amount,
                 'city_name'              => $appointment->city_name,
+                'assigned_beautician'    => $beauticianNames,
                 'booking_details'        => $servicesData, // This contains client, appointment, services, and summary
                 'created_at'             => $appointment->created_at,
                 'updated_at'             => $appointment->updated_at,
