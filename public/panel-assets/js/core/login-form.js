@@ -27,6 +27,7 @@ $(function () {
                 .catch(function (error) {
                     notificationToast(error.response.data.message, "warning");
                     loaderHide();
+                    $("#loginBtn").removeClass("loading");
                 });
         }
     });

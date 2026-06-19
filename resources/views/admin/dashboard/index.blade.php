@@ -3,291 +3,585 @@
 @section('header_style_content')
 <style>
     :root {
-        --mst-indigo: #102365;
-        --mst-indigo-light: #f5f7ff;
-        --mst-success: #059669;
-        --mst-warning: #d97706;
-        --mst-danger: #dc2626;
-        --mst-info: #2563eb;
-        --mst-text-main: #1e293b;
-        --mst-text-muted: #64748b;
-        --mst-bg-gray: #f8fafc;
+        --db-black: #0a0a0a;
+        --db-blue: #102365;
+        --db-blue-bright: #1e40af;
+        --db-blue-light: #3b82f6;
+        --db-blue-soft: #eff6ff;
+        --db-white: #ffffff;
+        --db-surface: #f9fafb;
+        --db-border: #e5e7eb;
+        --db-text: #111827;
+        --db-muted: #6b7280;
+        --db-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        --db-radius: 14px;
+        --db-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     #beautyden-dashboard {
-        padding: 2rem;
-        background: #f8fafc;
+        padding: 1.75rem 2rem 2.5rem;
+        background: var(--db-surface);
         min-height: 100vh;
     }
 
-    /* Welcome Header */
-    .dashboard-welcome h1 {
-        font-weight: 800;
-        color: #1e293b;
-        font-size: 2.5rem;
-        letter-spacing: -1px;
-        margin-bottom: 8px;
+    /* ── Welcome Header ── */
+    .db-welcome {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.25rem;
+        margin-bottom: 1.75rem;
+        padding: 1.5rem 1.75rem;
+        background: var(--db-white);
+        border: 1px solid var(--db-border);
+        border-radius: var(--db-radius);
+        box-shadow: var(--db-shadow);
     }
-    .dashboard-welcome p {
-        color: #64748b;
-        font-size: 1.2rem;
+
+    .db-welcome-text h1 {
+        font-size: 1.65rem;
+        font-weight: 700;
+        color: var(--db-black);
+        margin: 0 0 0.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .db-welcome-text h1 span { color: var(--db-blue); }
+
+    .db-welcome-text p {
+        margin: 0;
+        color: var(--db-muted);
+        font-size: 0.9rem;
         font-weight: 500;
     }
 
-    /* Premium Stat Cards */
-    .dashboard-stat-card {
+    .db-date-filter {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--db-surface);
+        border: 1px solid var(--db-border);
+        border-radius: 50px;
+        padding: 0.35rem 0.5rem 0.35rem 1rem;
+    }
+
+    .db-date-filter label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--db-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .db-date-input {
+        background: var(--db-white);
+        border: 1px solid var(--db-border);
+        border-radius: 8px;
+        padding: 0.4rem 0.65rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--db-text);
+        width: 115px;
+        text-align: center;
+        outline: none;
+        transition: border-color var(--db-transition);
+    }
+
+    .db-date-input:focus { border-color: var(--db-blue-bright); }
+
+    .db-date-sep { color: var(--db-muted); font-weight: 600; font-size: 0.85rem; }
+
+    .btn-db-refresh {
+        background: var(--db-blue);
+        color: #fff;
         border: none;
-        border-radius: 24px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.04);
-        overflow: hidden;
-        position: relative;
+        border-radius: 50px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background var(--db-transition), transform var(--db-transition);
+        flex-shrink: 0;
+    }
+
+    .btn-db-refresh:hover {
+        background: var(--db-blue-bright);
+        transform: rotate(90deg);
+    }
+
+    /* ── Alert Banner ── */
+    .db-alert {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.875rem 1.25rem;
         background: #fff;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid #f1f5f9;
+        border: 1px solid #fecaca;
+        border-left: 4px solid #dc2626;
+        border-radius: var(--db-radius);
+        margin-bottom: 1.5rem;
+        box-shadow: var(--db-shadow);
     }
-    .dashboard-stat-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
-    }
-    .card-accent-bar {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 6px;
-        height: 100%;
-        border-radius: 0 4px 4px 0;
-    }
-    .stat-avatar {
-        border-radius: 18px;
-        width: 64px;
-        height: 64px;
+
+    .db-alert-icon {
+        width: 42px;
+        height: 42px;
+        background: #fef2f2;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    .stat-label {
-        color: #64748b;
-        font-size: 0.95rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1.2px;
-        margin-bottom: 4px;
-    }
-    .stat-value {
-        color: #0f172a;
-        font-size: 1.8rem;
-        font-weight: 900;
-        margin-bottom: 0;
-        letter-spacing: -0.5px;
     }
 
-    /* Module Section */
-    .dashboard-section { margin-top: 3rem; }
-    .section-title { margin-bottom: 1.5rem; }
-    .section-title h4 { 
-        font-weight: 800; 
-        color: #1e293b; 
-        font-size: 1.4rem;
+    .db-alert-icon i { color: #dc2626; font-size: 1.2rem; }
+
+    .db-alert-body h6 {
+        margin: 0 0 0.15rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #dc2626;
+    }
+
+    .db-alert-body p {
+        margin: 0;
+        font-size: 0.82rem;
+        color: var(--db-muted);
+    }
+
+    .btn-db-alert {
+        background: #dc2626;
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 0.45rem 1.25rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background var(--db-transition);
+    }
+
+    .btn-db-alert:hover { background: #b91c1c; color: #fff; }
+
+    /* ── Stat Cards ── */
+    .db-stat-card {
+        background: var(--db-white);
+        border: 1px solid var(--db-border);
+        border-radius: var(--db-radius);
+        padding: 1.25rem;
+        height: 100%;
         display: flex;
         align-items: center;
-        gap: 10px;
-    }
-    .section-title h4::after {
-        content: "";
-        flex: 1;
-        height: 2px;
-        background: #f1f5f9;
+        gap: 1rem;
+        text-decoration: none !important;
+        box-shadow: var(--db-shadow);
+        transition: transform var(--db-transition), box-shadow var(--db-transition), border-color var(--db-transition);
+        position: relative;
+        overflow: hidden;
     }
 
-    .module-card-premium {
-        background: #fff;
-        padding: 24px;
-        border-radius: 20px;
-        border: 1px solid #f1f5f9;
+    .db-stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 4px;
+        height: 100%;
+        border-radius: 4px 0 0 4px;
+    }
+
+    .db-stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(16, 35, 101, 0.12);
+        border-color: var(--db-blue-light);
+    }
+
+    .db-stat-card.stat-revenue::before { background: var(--db-blue); }
+    .db-stat-card.stat-plans::before    { background: var(--db-blue-bright); }
+    .db-stat-card.stat-users::before     { background: var(--db-blue-light); }
+    .db-stat-card.stat-appts::before     { background: var(--db-black); }
+
+    .db-stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1.4rem;
+    }
+
+    .stat-revenue .db-stat-icon { background: var(--db-blue-soft); color: var(--db-blue); }
+    .stat-plans   .db-stat-icon { background: #dbeafe; color: var(--db-blue-bright); }
+    .stat-users   .db-stat-icon { background: #eff6ff; color: var(--db-blue-light); }
+    .stat-appts   .db-stat-icon { background: #f3f4f6; color: var(--db-black); }
+
+    .db-stat-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--db-muted);
+        margin: 0 0 0.2rem;
+    }
+
+    .db-stat-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--db-black);
+        margin: 0;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+    }
+
+    /* ── Panel Cards ── */
+    .db-panel {
+        background: var(--db-white);
+        border: 1px solid var(--db-border);
+        border-radius: var(--db-radius);
+        padding: 1.5rem;
+        height: 100%;
+        box-shadow: var(--db-shadow);
+    }
+
+    .db-panel-header {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--db-border);
+    }
+
+    .db-panel-header .panel-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--db-blue-soft);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--db-blue);
+        font-size: 1rem;
+    }
+
+    .db-panel-header h5 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--db-black);
+    }
+
+    /* ── Leave List ── */
+    .db-leave-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background: var(--db-surface);
+        border: 1px solid var(--db-border);
+        border-radius: 10px;
+        margin-bottom: 0.6rem;
+    }
+
+    .db-leave-item:last-child { margin-bottom: 0; }
+
+    .db-leave-avatar {
+        width: 40px;
+        height: 40px;
+        background: var(--db-white);
+        border: 1px solid var(--db-border);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--db-blue);
+    }
+
+    .db-leave-name {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--db-text);
+    }
+
+    .db-badge-leave {
+        background: #fef2f2;
+        color: #dc2626;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        padding: 0.2rem 0.5rem;
+        border-radius: 50px;
+    }
+
+    .db-leave-empty {
+        text-align: center;
+        padding: 2rem 1rem;
+        background: var(--db-blue-soft);
+        border: 1px dashed var(--db-blue-light);
+        border-radius: 12px;
+    }
+
+    .db-leave-empty i { color: var(--db-blue); font-size: 2rem; }
+    .db-leave-empty h6 { color: var(--db-blue); font-weight: 700; margin: 0.5rem 0 0.25rem; }
+    .db-leave-empty p  { color: var(--db-muted); font-size: 0.82rem; margin: 0; }
+
+    /* ── Management Center ── */
+    .db-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+        margin-top: 2rem;
+    }
+
+    .db-section-header h4 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--db-black);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .db-section-header h4::before {
+        content: '';
+        width: 4px;
+        height: 22px;
+        background: var(--db-blue);
+        border-radius: 2px;
+    }
+
+    .db-badge {
+        background: var(--db-blue-soft);
+        color: var(--db-blue);
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.35rem 0.85rem;
+        border-radius: 50px;
+        letter-spacing: 0.3px;
+    }
+
+    .db-module-card {
+        background: var(--db-white);
+        border: 1px solid var(--db-border);
+        border-radius: 12px;
+        padding: 1.25rem 0.75rem;
         text-decoration: none !important;
-        transition: all 0.3s ease;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        position: relative;
-    }
-    .module-card-premium:hover {
-        background: #fff;
-        border-color: #7367f0;
-        box-shadow: 0 15px 35px rgba(115, 103, 240, 0.1);
-        transform: translateY(-5px);
-    }
-    .module-icon {
-        font-size: 2.2rem;
-        color: #7367f0;
-        margin-bottom: 14px;
-        background: #f5f3ff;
-        width: 64px;
-        height: 64px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 16px;
-        transition: all 0.3s ease;
-    }
-    .module-card-premium:hover .module-icon {
-        background: #7367f0;
-        color: #fff;
-        transform: scale(1.1);
-    }
-    .module-name {
-        font-weight: 800;
-        color: #334155;
-        font-size: 1rem;
-        text-align: center;
-    }
-    .module-count {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: #7367f0;
-        color: #fff;
-        padding: 4px 8px;
-        border-radius: 50px;
-        font-size: 0.9rem;
-        font-weight: 800;
-        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
-        min-width: 25px;
-        text-align: center;
-    }
-
-    .module-count i { font-size: 0.6rem; }
-
-    /* Analytics Dashboard Styling */
-    .analytics-container {
-        margin-top: 3rem;
-        background: #fff;
-        border-radius: 30px;
-        padding: 30px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.04);
-        border: 1px solid #f1f5f9;
-    }
-
-    .analytics-header {
-        text-align: center;
-        margin-bottom: 2.5rem;
-    }
-
-    .analytics-header h2 {
-        font-weight: 900;
-        font-size: 2.4rem;
-        color: #0f172a;
-        margin-bottom: 10px;
-    }
-
-    .analytics-header h2 span {
-        color: #7367f0;
-    }
-
-    .analytics-filter-row {
-        background: #f8fafc;
-        padding: 15px 25px;
-        border-radius: 20px;
-        margin-bottom: 2.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 20px;
-        border: 1px solid #edf2f7;
-    }
-
-    .filter-label {
-        font-weight: 700;
-        color: #475569;
-        font-size: 0.95rem;
-    }
-
-    .analytics-date-input {
-        background: #fff;
-        border: 1px solid #cbd5e1;
-        border-radius: 12px;
-        padding: 8px 15px;
-        font-weight: 600;
-        color: #1e293b;
-        width: 150px;
-        text-align: center;
-    }
-
-    .report-card {
-        border: none;
-        border-radius: 20px;
-        overflow: hidden;
-        background: #fff;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        gap: 0.6rem;
         height: 100%;
-        border: 1px solid #f1f5f9;
+        position: relative;
+        box-shadow: var(--db-shadow);
+        transition: all var(--db-transition);
     }
 
-    .report-card-header {
-        padding: 12px 20px;
+    .db-module-card:hover {
+        border-color: var(--db-blue);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(16, 35, 101, 0.12);
+    }
+
+    .db-module-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--db-blue-soft);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--db-blue);
+        font-size: 1.3rem;
+        transition: all var(--db-transition);
+    }
+
+    .db-module-card:hover .db-module-icon {
+        background: var(--db-blue);
+        color: #fff;
+    }
+
+    .db-module-name {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--db-text);
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    .db-module-count {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: var(--db-blue);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 800;
+        min-width: 22px;
+        height: 22px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 5px;
+    }
+
+    .db-module-count i { font-size: 0.55rem; }
+
+    /* ── Analytics Section ── */
+    .db-analytics {
+        margin-top: 2rem;
+        background: var(--db-white);
+        border: 1px solid var(--db-border);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--db-shadow);
+    }
+
+    .db-analytics-title {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .db-analytics-title h2 {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--db-black);
+        margin: 0 0 0.4rem;
+        letter-spacing: -0.02em;
+    }
+
+    .db-analytics-title h2 span { color: var(--db-blue); }
+
+    .db-analytics-title p {
+        color: var(--db-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .db-report-card {
+        border: 1px solid var(--db-border);
+        border-radius: 12px;
+        overflow: hidden;
+        height: 100%;
+        background: var(--db-white);
+        box-shadow: var(--db-shadow);
+    }
+
+    .db-report-header {
+        background: var(--db-blue);
+        color: #fff;
+        padding: 0.75rem 1.25rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        color: #fff;
-        font-weight: 800;
-        font-size: 1rem;
-        letter-spacing: 0.5px;
+        font-weight: 700;
+        font-size: 0.88rem;
+        letter-spacing: 0.3px;
     }
 
-    .header-green { background: #28c76f; }
-    .header-orange { background: #ff9f43; }
-    .header-blue { background: #7367f0; }
-    .header-purple { background: #9d50bb; }
+    .db-report-header.alt { background: var(--db-black); }
+    .db-report-header.alt2 { background: var(--db-blue-bright); }
 
-    .download-icon {
+    .db-report-header .download-icon {
         cursor: pointer;
-        opacity: 0.8;
-        transition: opacity 0.3s;
+        opacity: 0.75;
+        transition: opacity var(--db-transition);
+        font-size: 0.95rem;
     }
-    .download-icon:hover { opacity: 1; }
 
-    .report-table-mini {
+    .db-report-header .download-icon:hover { opacity: 1; }
+
+    .db-report-table {
         width: 100%;
         border-collapse: collapse;
     }
 
-    .report-table-mini thead th {
-        background: #f8fafc;
-        padding: 10px 20px;
+    .db-report-table thead th {
+        background: var(--db-surface);
+        padding: 0.65rem 1.25rem;
         text-align: left;
-        font-size: 0.8rem;
-        font-weight: 800;
-        color: #64748b;
-        text-transform: uppercase;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .report-table-mini tbody td {
-        padding: 12px 20px;
-        font-size: 0.95rem;
+        font-size: 0.72rem;
         font-weight: 700;
-        color: #1e293b;
-        border-bottom: 1px solid #f8fafc;
+        color: var(--db-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--db-border);
     }
 
-    .report-table-mini tbody tr:last-child td { border-bottom: none; }
-
-    .report-total-row {
-        background: #fdfdfd;
-        border-top: 2px dashed #f1f5f9;
+    .db-report-table tbody td {
+        padding: 0.7rem 1.25rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--db-text);
+        border-bottom: 1px solid var(--db-surface);
     }
 
-    .report-total-row td {
-        padding: 15px 20px !important;
-        font-weight: 900 !important;
-        font-size: 1.1rem !important;
-        color: #0f172a !important;
+    .db-report-table tbody tr:last-child td { border-bottom: none; }
+
+    .db-report-total td {
+        background: var(--db-blue-soft);
+        padding: 0.85rem 1.25rem !important;
+        font-weight: 800 !important;
+        font-size: 0.95rem !important;
+        color: var(--db-blue) !important;
+        border-top: 2px solid var(--db-border) !important;
     }
 
+    /* ── Insight Pills ── */
+    .db-insight-pills {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-top: 2rem;
+        padding-top: 1.75rem;
+        border-top: 1px solid var(--db-border);
+    }
+
+    .db-insight-pill {
+        text-align: center;
+    }
+
+    .db-insight-pill .pill-icon {
+        width: 46px;
+        height: 46px;
+        background: var(--db-blue-soft);
+        color: var(--db-blue);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .db-insight-pill p {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--db-muted);
+        margin: 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+        #beautyden-dashboard { padding: 1.25rem 1rem 2rem; }
+        .db-welcome { padding: 1.25rem; }
+        .db-welcome-text h1 { font-size: 1.35rem; }
+        .db-date-filter { width: 100%; justify-content: center; flex-wrap: wrap; }
+        .db-analytics { padding: 1.25rem; }
+    }
 </style>
 @endsection
 
@@ -296,143 +590,114 @@
     <div class="content-wrapper">
         <div class="content-body">
             <section id="beautyden-dashboard">
-                
+
                 <!-- Welcome Header -->
-                <div class="dashboard-welcome d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-                    <div>
-                        <h1>BeautyDen Dashboard ✨</h1>
-                        <p>Your business overview at a glance.</p>
+                <div class="db-welcome">
+                    <div class="db-welcome-text">
+                        <h1>BeautyDen <span>Dashboard</span></h1>
+                        <p>Your business overview at a glance</p>
                     </div>
-                    <div class="d-flex align-items-center gap-2 mt-2 mt-md-0 bg-white p-1 rounded-pill shadow-sm border">
-                        <span class="ps-3 fw-bold text-muted small">Range:</span>
-                        <input type="text" id="global_start_date" class="analytics-date-input border-0" style="width: 120px;" value="{{ now()->startOfMonth()->format('d-m-Y') }}">
-                        <span class="fw-bold text-muted">-</span>
-                        <input type="text" id="global_end_date" class="analytics-date-input border-0" style="width: 120px;" value="{{ now()->endOfMonth()->format('d-m-Y') }}">
-                        <button class="btn btn-primary rounded-pill px-3 py-1 me-1" id="btn-refresh-dashboard">
+                    <div class="db-date-filter">
+                        <label>Range</label>
+                        <input type="text" id="global_start_date" class="db-date-input" value="{{ now()->startOfMonth()->format('d-m-Y') }}">
+                        <span class="db-date-sep">—</span>
+                        <input type="text" id="global_end_date" class="db-date-input" value="{{ now()->endOfMonth()->format('d-m-Y') }}">
+                        <button class="btn-db-refresh" id="btn-refresh-dashboard" title="Refresh">
                             <i class="bi bi-arrow-repeat"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Priority Action Alerts -->
+                <!-- Pending Reviews Alert -->
                 @if($pendingReviews > 0)
-                <div class="card mb-3 border-0 shadow-sm" style="border-radius: 16px; background: #fff5f5; overflow: hidden;">
-                    <div class="card-body p-2 d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="avatar p-1" style="background: rgba(220, 38, 38, 0.1); border-radius: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-exclamation-octagon text-danger fs-3"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold text-danger">Action Required: Pending Reviews</h6>
-                                <p class="mb-0 text-muted small">You have <strong>{{ $pendingReviews }}</strong> reviews waiting for approval.</p>
-                            </div>
+                <div class="db-alert">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="db-alert-icon">
+                            <i class="bi bi-exclamation-octagon"></i>
                         </div>
-                        <a href="{{ route('admin.reviews.index', ['status' => 0]) }}" class="btn btn-danger btn-sm rounded-pill px-4">Review Now</a>
+                        <div class="db-alert-body">
+                            <h6>Action Required: Pending Reviews</h6>
+                            <p>You have <strong>{{ $pendingReviews }}</strong> reviews waiting for approval.</p>
+                        </div>
                     </div>
+                    <a href="{{ route('admin.reviews.index', ['status' => 0]) }}" class="btn-db-alert">Review Now</a>
                 </div>
                 @endif
 
-                <!-- Vital Stats Grid -->
-                <div class="row g-2 mb-4">
-                    <div class="col-md-3">
-                        <div class="dashboard-stat-card h-100">
-                            <div class="card-accent-bar" style="background: #7367f0;"></div>
-                            <div class="card-body p-2 d-flex align-items-center">
-                                <div class="stat-avatar me-2" style="background: rgba(115, 103, 240, 0.1);">
-                                    <i class="bi bi-wallet2 fs-3" style="color: #7367f0;"></i>
-                                </div>
-                                <div>
-                                    <p class="stat-label">Total Revenue</p>
-                                    <h2 class="stat-value" id="stat-revenue">₹{{ number_format($totalRevenue, 0) }}</h2>
-                                </div>
+                <!-- Stat Cards -->
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="db-stat-card stat-revenue">
+                            <div class="db-stat-icon"><i class="bi bi-wallet2"></i></div>
+                            <div>
+                                <p class="db-stat-label">Total Revenue</p>
+                                <h2 class="db-stat-value" id="stat-revenue">₹{{ number_format($totalRevenue, 0) }}</h2>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-md-3">
-                        <a href="{{ route('admin.membership.index') }}" class="dashboard-stat-card h-100 d-block text-decoration-none">
-                            <div class="card-accent-bar" style="background: #28c76f;"></div>
-                            <div class="card-body p-2 d-flex align-items-center">
-                                <div class="stat-avatar me-2" style="background: rgba(40, 199, 111, 0.1);">
-                                    <i class="bi bi-gem fs-3" style="color: #28c76f;"></i>
-                                </div>
-                                <div class="w-100">
-                                    <p class="stat-label">Active Plans</p>
-                                    <h2 class="stat-value" id="stat-plans">{{ $activeMemberships }}</h2>
-                                </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <a href="{{ route('admin.membership.index') }}" class="db-stat-card stat-plans">
+                            <div class="db-stat-icon"><i class="bi bi-gem"></i></div>
+                            <div>
+                                <p class="db-stat-label">Active Plans</p>
+                                <h2 class="db-stat-value" id="stat-plans">{{ $activeMemberships }}</h2>
                             </div>
                         </a>
                     </div>
-
-                    <div class="col-md-3">
-                        <a href="{{ route('admin.user.index') }}" class="dashboard-stat-card h-100 d-block text-decoration-none">
-                            <div class="card-accent-bar" style="background: #00cfe8;"></div>
-                            <div class="card-body p-2 d-flex align-items-center">
-                                <div class="stat-avatar me-2" style="background: rgba(0, 207, 232, 0.1);">
-                                    <i class="bi bi-people fs-3" style="color: #00cfe8;"></i>
-                                </div>
-                                <div class="w-100">
-                                    <p class="stat-label">Total Users</p>
-                                    <h2 class="stat-value" id="stat-users">{{ $totalUsers }}</h2>
-                                </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <a href="{{ route('admin.user.index') }}" class="db-stat-card stat-users">
+                            <div class="db-stat-icon"><i class="bi bi-people"></i></div>
+                            <div>
+                                <p class="db-stat-label">Total Users</p>
+                                <h2 class="db-stat-value" id="stat-users">{{ $totalUsers }}</h2>
                             </div>
                         </a>
                     </div>
-
-                    <div class="col-md-3">
-                        <a href="{{ route('admin.appointments.index', ['date' => date('Y-m-d')]) }}" class="dashboard-stat-card h-100 d-block text-decoration-none">
-                            <div class="card-accent-bar" style="background: #ff9f43;"></div>
-                            <div class="card-body p-2 d-flex align-items-center">
-                                <div class="stat-avatar me-2" style="background: rgba(255, 159, 67, 0.1);">
-                                    <i class="bi bi-calendar-event fs-3" style="color: #ff9f43;"></i>
-                                </div>
-                                <div class="w-100">
-                                    <p class="stat-label">Total Appt.</p>
-                                    <h2 class="stat-value" id="stat-appts">{{ $todayAppointments }}</h2>
-                                </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <a href="{{ route('admin.appointments.index', ['date' => date('Y-m-d')]) }}" class="db-stat-card stat-appts">
+                            <div class="db-stat-icon"><i class="bi bi-calendar-event"></i></div>
+                            <div>
+                                <p class="db-stat-label">Today's Appts</p>
+                                <h2 class="db-stat-value" id="stat-appts">{{ $todayAppointments }}</h2>
                             </div>
                         </a>
                     </div>
                 </div>
 
-                <div class="row g-2">
-                    <!-- Charts -->
+                <!-- Charts & Staff Leave -->
+                <div class="row g-3">
                     <div class="col-lg-8">
-                        <div class="dashboard-stat-card p-3 h-100">
-                            <div class="card-accent-bar" style="background: #7367f0;"></div>
-                            <h5 class="fw-bold mb-3"><i class="bi bi-graph-up text-primary me-2"></i> Booking Trends</h5>
+                        <div class="db-panel">
+                            <div class="db-panel-header">
+                                <div class="panel-icon"><i class="bi bi-graph-up"></i></div>
+                                <h5>Booking Trends</h5>
+                            </div>
                             <div id="completed-appointments-chart"></div>
                         </div>
                     </div>
-
-                    <!-- Staff Availability -->
                     <div class="col-lg-4">
-                        <div class="dashboard-stat-card p-3 h-100">
-                            <div class="card-accent-bar" style="background: #ea5455;"></div>
-                            <h5 class="fw-bold mb-3"><i class="bi bi-calendar2-x text-danger me-2"></i> Staff on Leave Today</h5>
-                            <div class="leave-list mt-2">
+                        <div class="db-panel">
+                            <div class="db-panel-header">
+                                <div class="panel-icon"><i class="bi bi-calendar2-x"></i></div>
+                                <h5>Staff on Leave Today</h5>
+                            </div>
+                            <div class="leave-list">
                                 @forelse($onLeaveToday as $leave)
-                                <div class="d-flex align-items-center justify-content-between p-2 mb-2" style="background: #fff5f5; border-radius: 12px; border: 1px solid #fee2e2;">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="stat-avatar shadow-sm" style="background: #fff; width: 48px; height: 48px; border-radius: 12px;">
-                                            <i class="bi bi-person-fill text-danger fs-4"></i>
-                                        </div>
+                                <div class="db-leave-item">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="db-leave-avatar"><i class="bi bi-person-fill"></i></div>
                                         <div>
-                                            <div class="fw-bold" style="color: #1e293b; font-size: 0.95rem;">{{ $leave->beautician->name ?? 'N/A' }}</div>
-                                            <span class="badge rounded-pill bg-danger shadow-sm" style="font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;">ON LEAVE</span>
+                                            <div class="db-leave-name">{{ $leave->beautician->name ?? 'N/A' }}</div>
+                                            <span class="db-badge-leave">ON LEAVE</span>
                                         </div>
                                     </div>
-                                    <div class="text-end">
-                                        <span class="text-muted small fw-bold d-block">Full Day</span>
-                                    </div>
+                                    <span class="text-muted small fw-bold">Full Day</span>
                                 </div>
                                 @empty
-                                <div class="text-center py-4 px-2" style="background: #f0fdf4; border-radius: 16px; border: 1px dashed #28c76f;">
-                                    <div class="stat-avatar mx-auto mb-3 shadow-sm" style="background: #fff; width: 64px; height: 64px; border-radius: 20px;">
-                                        <i class="bi bi-check-lg text-success fs-1"></i>
-                                    </div>
-                                    <h6 class="fw-bold text-success mb-1">Perfect Availability!</h6>
-                                    <p class="text-muted small mb-0 fw-bold">All staff members are on duty today.</p>
+                                <div class="db-leave-empty">
+                                    <i class="bi bi-check-circle"></i>
+                                    <h6>Perfect Availability!</h6>
+                                    <p>All staff members are on duty today.</p>
                                 </div>
                                 @endforelse
                             </div>
@@ -440,57 +705,47 @@
                     </div>
                 </div>
 
-                <!-- Management Center (Full Modules) -->
+                <!-- Management Center -->
                 @php
                     $managementModules = [
                         ['name' => 'Appointments', 'icon' => 'calendar', 'route' => 'admin.appointments.index', 'id' => 'appointments'],
                         ['name' => 'Team Members', 'icon' => 'people', 'route' => 'admin.team.index', 'id' => 'team'],
                         ['name' => 'Attendance', 'icon' => 'clock', 'route' => 'admin.attendance.index', 'id' => 'attendance'],
                         ['name' => 'Users', 'icon' => 'person-check', 'route' => 'admin.user.index', 'id' => 'users'],
-                        // ['name' => 'Services', 'icon' => 'bag', 'route' => 'admin.service.index', 'id' => 'services'],
                         ['name' => 'Advanced Catalog', 'icon' => 'lightning', 'route' => 'admin.service-master.index', 'id' => 'advanced_catalog'],
                         ['name' => 'Master Essentials', 'icon' => 'grid', 'route' => 'admin.service-essential.index', 'id' => 'essentials'],
                         ['name' => 'Categories', 'icon' => 'box', 'route' => 'admin.service-category.index', 'id' => 'categories'],
                         ['name' => 'Sub Categories', 'icon' => 'layers', 'route' => 'admin.service-subcategory.index', 'id' => 'subcategories'],
                         ['name' => 'City List', 'icon' => 'geo-alt', 'route' => 'admin.city.index', 'id' => 'cities'],
-                        // ['name' => 'Pricing (Web)', 'icon' => 'currency-dollar', 'route' => 'admin.service-city-price.index', 'id' => 'pricing_web'],
-                        // ['name' => 'Pricing (App)', 'icon' => 'display', 'route' => 'admin.service-city-master.index', 'id' => 'pricing_app'],
                         ['name' => 'Offers (Banners)', 'icon' => 'gift', 'route' => 'admin.offers.index', 'id' => 'offers'],
                         ['name' => 'Coupon Codes', 'icon' => 'tag', 'route' => 'admin.coupon-codes.index', 'id' => 'coupons'],
                         ['name' => 'Memberships', 'icon' => 'award', 'route' => 'admin.membership.index', 'id' => 'memberships'],
                         ['name' => 'Combos', 'icon' => 'box-seam', 'route' => 'admin.combo.index', 'id' => 'combos'],
-                        // ['name' => 'Transactions', 'icon' => 'credit-card', 'route' => 'admin.razorpay.index', 'id' => 'transactions'],
-                        // ['name' => 'Inquiries', 'icon' => 'envelope', 'route' => 'admin.contact-submissions.index', 'id' => 'inquiries'],
-                        // ['name' => 'Notifications', 'icon' => 'bell', 'route' => 'admin.notifications.index', 'id' => 'notifications'],
                         ['name' => 'Reviews', 'icon' => 'star', 'route' => 'admin.reviews.index', 'id' => 'reviews'],
-                        // ['name' => 'Portfolio', 'icon' => 'image', 'route' => 'admin.portfolio.index', 'id' => 'portfolio'],
-                        // ['name' => 'Blogs', 'icon' => 'pencil-square', 'route' => 'admin.blogs.index', 'id' => 'blogs'],
                     ];
                 @endphp
 
-                <div class="dashboard-section mt-5">
-                    <div class="section-title d-flex justify-content-between align-items-center">
-                        <h4>Management Center</h4>
-                        <span class="badge bg-soft-primary text-primary rounded-pill px-3">Full Control Hub</span>
+                <div class="db-section-header">
+                    <h4>Management Center</h4>
+                    <span class="db-badge">Full Control Hub</span>
+                </div>
+                <div class="row g-2">
+                    @foreach($managementModules as $mod)
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <a href="{{ route($mod['route']) }}" class="db-module-card">
+                            <span class="db-module-count" id="count-{{ $mod['id'] }}"><i class="bi bi-arrow-repeat spin"></i></span>
+                            <div class="db-module-icon"><i class="bi bi-{{ $mod['icon'] }}"></i></div>
+                            <span class="db-module-name text-truncate">{{ $mod['name'] }}</span>
+                        </a>
                     </div>
-                    <div class="row g-2">
-                        @foreach($managementModules as $mod)
-                        <div class="col-6 col-md-3 col-lg-2">
-                            <a href="{{ route($mod['route']) }}" class="module-card-premium">
-                                <span class="module-count" id="count-{{ $mod['id'] }}"><i class="bi bi-arrow-repeat spin"></i></span>
-                                <i class="bi bi-{{ $mod['icon'] }} module-icon"></i>
-                                <span class="module-name text-truncate">{{ $mod['name'] }}</span>
-                            </a>
-                        </div>
-                        @endforeach
-                    </div>
+                    @endforeach
                 </div>
 
-                <!-- Gain Insights Section (Analytics) -->
-                <section class="analytics-container">
-                    <div class="analytics-header">
-                        <h2>Gain <span>Insights</span> & Grow Your Business!</h2>
-                        <p class="text-muted fw-bold">Track your performance with detailed analytics.</p>
+                <!-- Analytics -->
+                <div class="db-analytics">
+                    <div class="db-analytics-title">
+                        <h2>Gain <span>Insights</span> & Grow Your Business</h2>
+                        <p>Track your performance with detailed analytics</p>
                     </div>
 
                     <div class="analytics-filter-row d-none">
@@ -499,25 +754,22 @@
                     </div>
 
                     <div class="row g-3">
-                        <!-- Daily Revenue -->
                         <div class="col-md-6">
-                            <div class="report-card">
-                                <div class="report-card-header header-green">
+                            <div class="db-report-card">
+                                <div class="db-report-header">
                                     <span>Daily Revenue</span>
                                     <i class="bi bi-download download-icon" onclick="downloadReport('revenue')"></i>
                                 </div>
-                                <table class="report-table-mini">
+                                <table class="db-report-table">
                                     <thead>
                                         <tr>
                                             <th>Date</th>
                                             <th class="text-end">Revenue</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="revenue-report-body">
-                                        <!-- Dynamic Content -->
-                                    </tbody>
+                                    <tbody id="revenue-report-body"></tbody>
                                     <tfoot>
-                                        <tr class="report-total-row">
+                                        <tr class="db-report-total">
                                             <td>Total</td>
                                             <td class="text-end" id="total-revenue-val">₹0</td>
                                         </tr>
@@ -526,25 +778,22 @@
                             </div>
                         </div>
 
-                        <!-- Appointments Per Day -->
                         <div class="col-md-6">
-                            <div class="report-card">
-                                <div class="report-card-header header-orange">
+                            <div class="db-report-card">
+                                <div class="db-report-header alt2">
                                     <span>Appointments Per Day</span>
                                     <i class="bi bi-download download-icon" onclick="downloadReport('appointments')"></i>
                                 </div>
-                                <table class="report-table-mini">
+                                <table class="db-report-table">
                                     <thead>
                                         <tr>
                                             <th>Date</th>
                                             <th class="text-end">Appointments</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="appt-report-body">
-                                        <!-- Dynamic Content -->
-                                    </tbody>
+                                    <tbody id="appt-report-body"></tbody>
                                     <tfoot>
-                                        <tr class="report-total-row">
+                                        <tr class="db-report-total">
                                             <td>Total</td>
                                             <td class="text-end" id="total-appt-val">0</td>
                                         </tr>
@@ -553,14 +802,13 @@
                             </div>
                         </div>
 
-                        <!-- Top Staff by Services -->
                         <div class="col-md-6">
-                            <div class="report-card">
-                                <div class="report-card-header header-blue">
+                            <div class="db-report-card">
+                                <div class="db-report-header">
                                     <span>Top Staff by Services</span>
                                     <i class="bi bi-download download-icon" onclick="downloadReport('staff_services')"></i>
                                 </div>
-                                <table class="report-table-mini">
+                                <table class="db-report-table">
                                     <thead>
                                         <tr>
                                             <th>Staff</th>
@@ -568,64 +816,49 @@
                                             <th class="text-end">Revenue</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="staff-services-body">
-                                        <!-- Dynamic Content -->
-                                    </tbody>
+                                    <tbody id="staff-services-body"></tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <!-- Top Staff by Revenue -->
                         <div class="col-md-6">
-                            <div class="report-card">
-                                <div class="report-card-header header-purple">
+                            <div class="db-report-card">
+                                <div class="db-report-header alt">
                                     <span>Top Staff by Revenue</span>
                                     <i class="bi bi-download download-icon" onclick="downloadReport('staff_revenue')"></i>
                                 </div>
-                                <table class="report-table-mini">
+                                <table class="db-report-table">
                                     <thead>
                                         <tr>
                                             <th>Staff</th>
                                             <th class="text-end">Revenue</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="staff-revenue-body">
-                                        <!-- Dynamic Content -->
-                                    </tbody>
+                                    <tbody id="staff-revenue-body"></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row mt-4 pt-4 border-top">
-                        <div class="col-12 d-flex justify-content-center gap-4">
-                            <div class="text-center">
-                                <div class="stat-avatar mx-auto mb-2" style="background: #f0f4ff; color: #7367f0; width: 50px; height: 50px;">
-                                    <i class="bi bi-bar-chart-line fs-4"></i>
-                                </div>
-                                <p class="small fw-bold text-muted mb-0">Sales Reports</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-avatar mx-auto mb-2" style="background: #f0fdf4; color: #28c76f; width: 50px; height: 50px;">
-                                    <i class="bi bi-people fs-4"></i>
-                                </div>
-                                <p class="small fw-bold text-muted mb-0">Top Performers</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-avatar mx-auto mb-2" style="background: #fff7ed; color: #ff9f43; width: 50px; height: 50px;">
-                                    <i class="bi bi-lightbulb fs-4"></i>
-                                </div>
-                                <p class="small fw-bold text-muted mb-0">Service Insights</p>
-                            </div>
-                            <div class="text-center">
-                                <div class="stat-avatar mx-auto mb-2" style="background: #fdf2ff; color: #9d50bb; width: 50px; height: 50px;">
-                                    <i class="bi bi-wallet2 fs-4"></i>
-                                </div>
-                                <p class="small fw-bold text-muted mb-0">Revenue Tracking</p>
-                            </div>
+                    <div class="db-insight-pills">
+                        <div class="db-insight-pill">
+                            <div class="pill-icon"><i class="bi bi-bar-chart-line"></i></div>
+                            <p>Sales Reports</p>
+                        </div>
+                        <div class="db-insight-pill">
+                            <div class="pill-icon"><i class="bi bi-people"></i></div>
+                            <p>Top Performers</p>
+                        </div>
+                        <div class="db-insight-pill">
+                            <div class="pill-icon"><i class="bi bi-lightbulb"></i></div>
+                            <p>Service Insights</p>
+                        </div>
+                        <div class="db-insight-pill">
+                            <div class="pill-icon"><i class="bi bi-wallet2"></i></div>
+                            <p>Revenue Tracking</p>
                         </div>
                     </div>
-                </section>
+                </div>
 
             </section>
         </div>
@@ -638,12 +871,10 @@
     document.addEventListener('DOMContentLoaded', function () {
         let dailyChart = null;
 
-        // Initialize Flatpickr explicitly for analytics dates
         if (typeof flatpickr !== 'undefined') {
             flatpickr("#global_start_date", { dateFormat: "d-m-Y" });
             flatpickr("#global_end_date", { dateFormat: "d-m-Y" });
-            
-            // Sync with hidden report inputs
+
             $('#global_start_date, #global_end_date').on('change', function() {
                 $('#report_start_date').val($('#global_start_date').val());
                 $('#report_end_date').val($('#global_end_date').val());
@@ -656,25 +887,30 @@
             if (!chartElement) return;
 
             const options = {
-                series: series, // [ {name: 'Completed', data: [...]}, ... ]
-                chart: { 
-                    type: 'area', 
-                    height: 380, 
+                series: series,
+                chart: {
+                    type: 'area',
+                    height: 380,
                     stacked: false,
-                    toolbar: { show: true }, 
-                    zoom: { enabled: true } 
+                    toolbar: { show: true },
+                    zoom: { enabled: true },
+                    fontFamily: 'Inter, sans-serif',
                 },
                 dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 3 },
-                xaxis: { 
-                    categories: labels, 
-                    labels: { style: { colors: '#64748b', fontWeight: 600 } } 
+                stroke: { curve: 'smooth', width: 2.5 },
+                xaxis: {
+                    categories: labels,
+                    labels: { style: { colors: '#6b7280', fontWeight: 600 } }
                 },
-                fill: { 
-                    type: 'gradient', 
-                    gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } 
+                yaxis: {
+                    labels: { style: { colors: '#6b7280', fontWeight: 600 } }
                 },
-                colors: ['#28c76f', '#ff9f43', '#7367f0', '#ea5455'], // Completed, Pending, Assigned, Rejected
+                grid: { borderColor: '#e5e7eb', strokeDashArray: 4 },
+                fill: {
+                    type: 'gradient',
+                    gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.05 }
+                },
+                colors: ['#102365', '#1e40af', '#3b82f6', '#0a0a0a'],
                 tooltip: { theme: 'light', x: { show: true } },
                 legend: { position: 'top', horizontalAlign: 'left', fontWeight: 700 }
             };
@@ -687,17 +923,14 @@
             }
         }
 
-        // Initial Data from PHP
         const initialLabels = @json($chartLabels);
         const initialData = @json($chartData);
         initChart(initialLabels, [{ name: 'Completed', data: initialData }]);
 
-        // Analytics Fetching Logic
         function refreshAnalytics() {
             let start = $('#global_start_date').val();
             let end = $('#global_end_date').val();
 
-            // Show loader if needed
             $('#btn-refresh-dashboard i').addClass('fa-spin');
 
             $.ajax({
@@ -707,16 +940,13 @@
                 success: function(res) {
                     $('#btn-refresh-dashboard i').removeClass('fa-spin');
 
-                    // Update Stat Cards
                     $('#stat-revenue').text('₹' + res.stats.total_revenue);
                     $('#stat-plans').text(res.stats.active_plans);
                     $('#stat-users').text(res.stats.total_users);
                     $('#stat-appts').text(res.stats.total_appts);
 
-                    // Update Chart
                     initChart(res.chart.labels, res.chart.series);
 
-                    // 1. Revenue Table
                     let revHtml = '';
                     res.daily_revenue.forEach(item => {
                         revHtml += `<tr><td>${item.date}</td><td class="text-end">₹${parseFloat(item.revenue).toLocaleString()}</td></tr>`;
@@ -725,10 +955,6 @@
                     $('#revenue-report-body').html(revHtml);
                     $('#total-revenue-val').text('₹' + res.stats.total_revenue);
 
-                    // 2. Appointments (Not used anymore as we have chart series, but keeping body if needed)
-                    // ...
-
-                    // 3. Staff Services
                     let ssHtml = '';
                     res.top_staff_services.forEach(item => {
                         ssHtml += `<tr><td>${item.staff}</td><td class="text-center">${item.services}</td><td class="text-end">₹${parseFloat(item.revenue).toLocaleString()}</td></tr>`;
@@ -736,7 +962,6 @@
                     if(res.top_staff_services.length === 0) ssHtml = '<tr><td colspan="3" class="text-center py-4 text-muted">No performers found</td></tr>';
                     $('#staff-services-body').html(ssHtml);
 
-                    // 4. Staff Revenue
                     let srHtml = '';
                     res.top_staff_revenue.forEach(item => {
                         srHtml += `<tr><td>${item.staff}</td><td class="text-end">₹${parseFloat(item.revenue).toLocaleString()}</td></tr>`;
@@ -750,15 +975,12 @@
             });
         }
 
-        // Trigger Refresh
         $('#btn-refresh-dashboard').on('click', function() {
             refreshAnalytics();
         });
 
-        // Initial Load of full analytics
         setTimeout(refreshAnalytics, 500);
 
-        // Fetch Management Counts Asynchronously
         function fetchManagementCounts() {
             $.ajax({
                 url: "{{ route('admin.dashboard.management-counts') }}",
@@ -770,10 +992,9 @@
                 }
             });
         }
-        
+
         fetchManagementCounts();
 
-        // Download functionality
         window.downloadReport = function(type) {
             let start = $('#global_start_date').val();
             let end = $('#global_end_date').val();
