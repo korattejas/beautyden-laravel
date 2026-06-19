@@ -436,7 +436,7 @@ class ProductController extends Controller
                 
                 return [
                     'id' => $order->id,
-                    'order_number' => 'BDPORD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                    'order_number' => 'BDPROD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
                     'total_amount' => $order->total_amount,
                     'total_products' => $totalProducts,
                     'payment_status' => $order->payment_status,
@@ -452,6 +452,63 @@ class ProductController extends Controller
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
+
+    /**
+     * Get Single Order Details
+     */
+    public function getOrderDetails(Request $request): JsonResponse
+    {
+        $function_name = 'getOrderDetails';
+
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'order_id' => 'required|integer|exists:product_orders,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $user = auth()->guard('user')->user();
+            if (!$user) {
+                return $this->sendError('Unauthenticated', 401);
+            }
+
+            $order = \App\Models\ProductOrder::where('id', $request->order_id)
+                        ->where('user_id', $user->id)
+                        ->first();
+
+            if (!$order) {
+                return $this->sendError('Order not found or access denied.', 404);
+            }
+
+            $totalProducts = 0;
+            $items = is_string($order->order_data) ? json_decode($order->order_data, true) : $order->order_data;
+            if (is_array($items)) {
+                foreach ($items as $item) {
+                    $totalProducts += $item['qty'] ?? 1;
+                }
+            }
+
+            $data = [
+                'id' => $order->id,
+                'order_number' => 'BDPROD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                'total_amount' => $order->total_amount,
+                'total_products' => $totalProducts,
+                'payment_status' => $order->payment_status,
+                'order_status' => $order->order_status,
+                'date' => $order->created_at ? $order->created_at->format('d-M-Y h:i A') : '',
+                'address' => $order->address ?? null,
+                'items' => $items,
+            ];
+
+            return $this->sendResponse($data, 'Order details retrieved successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
 
     /**
      * Export Order Invoice
@@ -487,7 +544,7 @@ class ProductController extends Controller
                 ->orWhere('phone', $user->mobile_number)
                 ->first();
 
-            $orderNumber = 'BDPORD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT);
+            $orderNumber = 'BDPROD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT);
             // Use same filename to overwrite and save server space
             $fileName = 'invoice_' . $orderNumber . '.pdf';
             $directory = public_path('uploads/exports');

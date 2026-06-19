@@ -79,9 +79,6 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
-        Route::get('productCategory', [ProductController::class, 'getProductCategories']);
-        Route::post('products', [ProductController::class, 'getProducts']);
-        Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
     });
@@ -144,6 +141,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
         Route::post('placeOrder', [ProductController::class, 'placeOrder']);
         Route::post('getMyOrders', [ProductController::class, 'getMyOrders']);
+        Route::post('getOrderDetails', [ProductController::class, 'getOrderDetails']);
         Route::post('exportOrderInvoice', [ProductController::class, 'exportOrderInvoice']);
     });
 });
@@ -192,9 +190,6 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
-        Route::get('productCategory', [ProductController::class, 'getProductCategories']);
-        Route::post('products', [ProductController::class, 'getProducts']);
-        Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
     });
@@ -252,6 +247,7 @@ Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(func
         Route::get('productDetails/{id}', [ProductController::class, 'getProductDetails']);
         Route::post('placeOrder', [ProductController::class, 'placeOrder']);
         Route::post('getMyOrders', [ProductController::class, 'getMyOrders']);
+        Route::post('getOrderDetails', [ProductController::class, 'getOrderDetails']);
         Route::post('exportOrderInvoice', [ProductController::class, 'exportOrderInvoice']);
     });
 });

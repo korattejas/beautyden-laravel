@@ -1053,7 +1053,8 @@
                 <span class="badge post">POST</span> /V1/customer/bookAppointmentForApp
                 <span class="badge auth">Token Required</span>
             </div>
-            <p>Creates a new appointment booking using the new Service Master catalog (supports service variants and dynamic duration calculation).</p>
+            <p>Creates a new appointment booking using the new Service Master catalog (supports service variants and
+                dynamic duration calculation).</p>
             <table>
                 <thead>
                     <tr>
@@ -1096,7 +1097,10 @@
                     <tr>
                         <td>items</td>
                         <td>Array of Objects</td>
-                        <td><strong>Required</strong>. Array of selected services/variants. Each object must contain `service_master_id` and `qty`. Include `variant_id` if a variant was selected. Example: `[{"service_master_id": 10, "variant_id": 5, "qty": 1}, {"service_master_id": 12, "qty": 1}]`</td>
+                        <td><strong>Required</strong>. Array of selected services/variants. Each object must contain
+                            `service_master_id` and `qty`. Include `variant_id` if a variant was selected. Example:
+                            `[{"service_master_id": 10, "variant_id": 5, "qty": 1}, {"service_master_id": 12, "qty":
+                            1}]`</td>
                     </tr>
                 </tbody>
             </table>
@@ -1455,7 +1459,8 @@
                     <tr>
                         <td>category_ratings[]</td>
                         <td>Array of Objects</td>
-                        <td><strong>Required</strong>. Array containing `category_id` and `rating` (1 to 5) for each category. Example: `[{"category_id": 16, "rating": 5}]`</td>
+                        <td><strong>Required</strong>. Array containing `category_id` and `rating` (1 to 5) for each
+                            category. Example: `[{"category_id": 16, "rating": 5}]`</td>
                     </tr>
                     <tr>
                         <td>review</td>
@@ -1797,6 +1802,7 @@
         "today_appointments_count": 1,
         "tomorrow_appointments_count": 2,
         "repeat_customers_count": 5,
+        "repeat_customers_percentage": 25.0,
         "start_date": "2026-04-14",
         "end_date": "2026-05-14"
     }
@@ -2363,7 +2369,9 @@
                     <tr>
                         <td>sort_by</td>
                         <td>String</td>
-                        <td>Optional. Options: <code>newest</code>, <code>price_low_high</code>, <code>price_high_low</code>. Default: <code>newest</code>.</td>
+                        <td>Optional. Options: <code>newest</code>, <code>price_low_high</code>,
+                            <code>price_high_low</code>. Default: <code>newest</code>.
+                        </td>
                     </tr>
                     <tr>
                         <td>per_page</td>
@@ -2481,7 +2489,9 @@
     }
 }</code></pre>
             <h3>13.17 Place Product Order</h3>
-            <p>Places an order for multiple products from the Beautician app. <br><strong>Note:</strong> The API checks stock availability. It will return an error if a product/variant is out of stock. Stock will be automatically decremented upon successful order placement.</p>
+            <p>Places an order for multiple products from the Beautician app. <br><strong>Note:</strong> The API checks
+                stock availability. It will return an error if a product/variant is out of stock. Stock will be
+                automatically decremented upon successful order placement.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /Test/V1/beautician/placeOrder
                 <span class="badge auth">Token Required</span>
@@ -2498,7 +2508,10 @@
                     <tr>
                         <td>items[]</td>
                         <td>Array of Objects</td>
-                        <td><strong>Required</strong>. Array containing <code>product_id</code>, <code>qty</code>, and optional <code>variant_id</code>. Example: <code>[{"product_id": 1, "variant_id": 5, "qty": 2}]</code></td>
+                        <td><strong>Required</strong>. Array containing <code>product_id</code>, <code>qty</code>, and
+                            optional <code>variant_id</code>. Example:
+                            <code>[{"product_id": 1, "variant_id": 5, "qty": 2}]</code>
+                        </td>
                     </tr>
                     <tr>
                         <td>address</td>
@@ -2547,7 +2560,7 @@
     "data": [
         {
             "id": 12,
-            "order_number": "BDPORD-000012",
+            "order_number": "BDPROD-000012",
             "total_amount": "1450.00",
             "total_products": 3,
             "payment_status": "Pending",
@@ -2557,8 +2570,58 @@
         }
     ]
 }</code></pre>
+            }</code></pre>
 
-            <h3>13.19 Export Order Invoice</h3>
+            <h3>13.19 Get Order Details</h3>
+            <p>Retrieves complete details of a specific product order, including all items and variants.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /Test/V1/beautician/getOrderDetails
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>order_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. ID of the order.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Order details retrieved successfully.",
+    "data": {
+        "id": 12,
+        "order_number": "BDPROD-000012",
+        "total_amount": "1450.00",
+        "total_products": 3,
+        "payment_status": "Pending",
+        "order_status": "Pending",
+        "date": "14-May-2026 10:30 AM",
+        "address": "123 Main St, City, State 380001",
+        "items": [
+            {
+                "id": 2,
+                "name": "Waterproof Mascara",
+                "variant_name": "Black",
+                "qty": 2,
+                "price": 285.00
+            }
+        ]
+    }
+}</code></pre>
+
+            <h3>13.20 Export Order Invoice</h3>
             <p>Generates a PDF invoice for a specific product order and returns its download URL.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /Test/V1/beautician/exportOrderInvoice
@@ -2587,7 +2650,7 @@
     "status": true,
     "message": "Invoice generated successfully.",
     "data": {
-        "file_url": "https://yourdomain.com/uploads/exports/invoice_BDPORD-000012.pdf?v=1717150502"
+        "file_url": "https://yourdomain.com/uploads/exports/invoice_BDPROD-000012.pdf?v=1717150502"
     }
 }</code></pre>
 

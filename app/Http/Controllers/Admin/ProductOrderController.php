@@ -154,7 +154,7 @@ class ProductOrderController extends Controller
             return response()->json([
                 'data' => [
                     'id'              => $order->id,
-                    'order_number'    => 'BDPORD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                    'order_number'    => 'BDPROD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
                     'user_name'       => $order->user_name,
                     'phone'           => $order->mobile_number,
                     'email'           => $order->email,
@@ -185,7 +185,7 @@ class ProductOrderController extends Controller
                     ->first();
             }
 
-            $orderNumber = 'BDPORD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT);
+            $orderNumber = 'BDPROD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT);
 
             $pdf = Pdf::loadView('admin.product_orders.pdf', compact('order', 'orderNumber', 'teamMember', 'user'))
                       ->setPaper('a4', 'portrait');

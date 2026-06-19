@@ -359,6 +359,11 @@ class BeauticianController extends Controller
 
             $repeatCustomersCount = $repeatPhones->count();
 
+            $totalUniqueCustomersCount = (clone $baseQuery)->distinct('phone')->count('phone');
+            $repeatCustomersPercentage = $totalUniqueCustomersCount > 0 
+                ? round(($repeatCustomersCount / $totalUniqueCustomersCount) * 100, 2) 
+                : 0;
+
             $repeatCustomersList = (clone $baseQuery)
                 ->whereIn('appointments.phone', $repeatPhones)
                 ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
@@ -402,6 +407,7 @@ class BeauticianController extends Controller
                 'today_appointments_count' => $todayAppointmentsCount,
                 'tomorrow_appointments_count' => $tomorrowAppointmentsCount,
                 'repeat_customers_count' => $repeatCustomersCount,
+                'repeat_customers_percentage' => $repeatCustomersPercentage,
                 'repeat_customers_list' => $repeatCustomersList,
                 'start_date' => $startDate ? $startDate->toDateString() : null,
                 'end_date' => $endDate->toDateString(),
