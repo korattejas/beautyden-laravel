@@ -364,6 +364,12 @@ class BeauticianController extends Controller
                 ? round(($repeatCustomersCount / $totalUniqueCustomersCount) * 100, 2) 
                 : 0;
 
+            // Fetch Ratings and Reviews for this Beautician
+            $allAppointmentIds = (clone $baseQuery)->pluck('appointments.id');
+            $totalReviewsCount = \App\Models\CustomerReview::whereIn('appointment_id', $allAppointmentIds)->distinct('appointment_id')->count('appointment_id');
+            $overallRating = \App\Models\CustomerReview::whereIn('appointment_id', $allAppointmentIds)->avg('rating');
+            $overallRating = $overallRating ? round($overallRating, 1) : 0;
+
             $repeatCustomersList = (clone $baseQuery)
                 ->whereIn('appointments.phone', $repeatPhones)
                 ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
@@ -400,6 +406,8 @@ class BeauticianController extends Controller
                 'beautician_name' => $teamMember->name,
                 'is_approved' => true,
                 'filter_applied' => $filter,
+                'overall_rating' => $overallRating,
+                'total_reviews_count' => $totalReviewsCount,
                 'total_completed' => $totalCompleted,
                 'total_revenue' => round($totalRevenue, 2),
                 'pending_appointments' => $pendingAppointments,
@@ -463,7 +471,40 @@ class BeauticianController extends Controller
 
             $appointments = $query->get();
 
-            $formattedAppointments = $appointments->map(function ($appointment) {
+            $appointmentIds = $appointments->pluck('id');
+            $reviewsData = \App\Models\CustomerReview::whereIn('appointment_id', $appointmentIds)
+                ->leftJoin('service_categories as sc', 'sc.id', '=', 'customer_reviews.category_id')
+                ->select('customer_reviews.*', 'sc.name as category_name')
+                ->get()
+                ->groupBy('appointment_id');
+
+            $formattedAppointments = $appointments->map(function ($appointment) use ($reviewsData) {
+                $reviewDetails = null;
+                if (isset($reviewsData[$appointment->id])) {
+                    $appReviews = $reviewsData[$appointment->id];
+                    $firstReview = $appReviews->first();
+                    
+                    $photos = is_string($firstReview->photos) ? json_decode($firstReview->photos, true) : (is_array($firstReview->photos) ? $firstReview->photos : []);
+                    $photoUrls = array_map(function($photo) {
+                        return asset('uploads/review/photos/' . $photo);
+                    }, $photos);
+
+                    $reviewDetails = [
+                        'average_rating' => round($appReviews->avg('rating'), 1),
+                        'review_text' => $firstReview->review,
+                        'photos' => $photoUrls,
+                        'review_date' => $firstReview->review_date,
+                        'status' => $firstReview->status,
+                        'categories' => $appReviews->map(function($r) {
+                            return [
+                                'category_id' => $r->category_id,
+                                'category_name' => $r->category_name,
+                                'rating' => $r->rating
+                            ];
+                        })->values()->all()
+                    ];
+                }
+
                 return [
                     'id' => $appointment->id,
                     'order_number' => $appointment->order_number,
@@ -476,6 +517,8 @@ class BeauticianController extends Controller
                     'total_amount' => $appointment->services_data['summary']['grand_total'] ?? $appointment->price,
                     'company_amount' => $appointment->company_amount,
                     'payment_type' => $appointment->payment_type,
+                    'average_rating' => $reviewDetails ? $reviewDetails['average_rating'] : 0,
+                    'review_details' => $reviewDetails,
                 ];
             });
 
@@ -607,17 +650,41 @@ class BeauticianController extends Controller
             }
 
             // Fetch associated review
-            $review = \App\Models\CustomerReview::where('appointment_id', $appointment->id)->first();
-            if ($review) {
-                $photos = is_array($review->photos) ? $review->photos : [];
-                $review->photos = array_map(function($photo) {
+            $reviewRows = \App\Models\CustomerReview::where('appointment_id', $appointment->id)
+                ->leftJoin('service_categories as sc', 'sc.id', '=', 'customer_reviews.category_id')
+                ->select('customer_reviews.*', 'sc.name as category_name')
+                ->get();
+            
+            $reviewDetails = null;
+            if ($reviewRows->isNotEmpty()) {
+                $firstReview = $reviewRows->first();
+                $photos = is_string($firstReview->photos) ? json_decode($firstReview->photos, true) : (is_array($firstReview->photos) ? $firstReview->photos : []);
+                $photoUrls = array_map(function($photo) {
                     return asset('uploads/review/photos/' . $photo);
                 }, $photos);
+
+                $reviewDetails = [
+                    'average_rating' => round($reviewRows->avg('rating'), 1),
+                    'review_text' => $firstReview->review,
+                    'photos' => $photoUrls,
+                    'review_date' => $firstReview->review_date,
+                    'status' => $firstReview->status,
+                    'categories' => $reviewRows->map(function($r) {
+                        return [
+                            'category_id' => $r->category_id,
+                            'category_name' => $r->category_name,
+                            'rating' => $r->rating
+                        ];
+                    })->values()->all()
+                ];
             }
+
+            $averageRating = $reviewDetails ? $reviewDetails['average_rating'] : 0;
 
             $data = [
                 'id' => $appointment->id,
                 'order_number' => $appointment->order_number,
+                'average_rating' => $averageRating,
                 'client_details' => [
                     'name' => $appointment->first_name . ' ' . $appointment->last_name,
                 ],
@@ -633,7 +700,7 @@ class BeauticianController extends Controller
                 'company_amount' => $appointment->company_amount,
                 'status' => $appointment->status,
                 'payment_type' => $appointment->payment_type,
-                'review' => $review,
+                'review_details' => $reviewDetails,
             ];
 
             return $this->sendResponse($data, 'Appointment details fetched successfully.', $this->success_status);

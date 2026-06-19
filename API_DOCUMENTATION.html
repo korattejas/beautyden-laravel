@@ -1795,6 +1795,8 @@
         "beautician_name": "Tejas",
         "is_approved": true,
         "filter_applied": "last_30_days",
+        "overall_rating": 4.5,
+        "total_reviews_count": 10,
         "total_completed": 5,
         "total_revenue": 1250.50,
         "pending_appointments": 3,
@@ -1901,7 +1903,24 @@
         "city": "Ahmedabad",
         "status": 3,
         "total_amount": "699.00",
-        "payment_type": "cod"
+        "payment_type": "cod",
+        "average_rating": 4.5,
+        "review_details": {
+            "average_rating": 4.5,
+            "review_text": "Excellent service!",
+            "photos": [
+                "https://yourdomain.com/uploads/review/photos/photo.jpg"
+            ],
+            "review_date": "2026-05-14",
+            "status": 0,
+            "categories": [
+                {
+                    "category_id": 16,
+                    "category_name": "Waxing",
+                    "rating": 5
+                }
+            ]
+        }
     }
 ]</code></pre>
 
@@ -1992,6 +2011,7 @@
     "data": {
         "id": 1,
         "order_number": "ORD-12345",
+        "average_rating": 4.5,
         "client_details": {
             "name": "John Doe"
         },
@@ -2006,11 +2026,21 @@
         "summary": {...},
         "status": 3,
         "payment_type": "cod",
-        "review": {
-            "id": 15,
-            "rating": "5.0",
-            "review": "Excellent service!",
-            "photos": ["https://.../photo.jpg"]
+        "review_details": {
+            "average_rating": 4.5,
+            "review_text": "Excellent service!",
+            "photos": [
+                "https://yourdomain.com/uploads/review/photos/photo.jpg"
+            ],
+            "review_date": "2026-05-14",
+            "status": 0,
+            "categories": [
+                {
+                    "category_id": 16,
+                    "category_name": "Waxing",
+                    "rating": 5
+                }
+            ]
         }
     }
 }</code></pre>
