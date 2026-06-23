@@ -72,10 +72,18 @@ class BeauticianController extends Controller
                     'bio' => 'required|string',
                     'experience_years' => 'required|numeric',
                     'address' => 'required|string',
+                    'icon' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
                 ]);
 
                 if ($regValidator->fails()) {
                     return $this->sendError($regValidator->errors()->first(), $this->validation_error_status);
+                }
+
+                $imageName = null;
+                if ($request->hasFile('icon')) {
+                    $image = $request->file('icon');
+                    $imageName = time() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('uploads/team-member/'), $imageName);
                 }
 
                 $teamMember = TeamMember::create([
@@ -85,6 +93,7 @@ class BeauticianController extends Controller
                     'bio' => $request->bio,
                     'experience_years' => $request->experience_years,
                     'address' => $request->address,
+                    'icon' => $imageName,
                     'status' => 0,
                 ]);
 
