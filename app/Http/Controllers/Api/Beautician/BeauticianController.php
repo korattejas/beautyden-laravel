@@ -291,11 +291,15 @@ class BeauticianController extends Controller
             $query = clone $baseQuery;
 
             // Filtering logic
-            $filter = $request->get('filter', 'last_30_days');
+            $filter = $request->get('filter', 'this_month');
             $startDate = null;
             $endDate = Carbon::now();
 
             switch ($filter) {
+                case 'this_month':
+                    $startDate = Carbon::now()->startOfMonth();
+                    $endDate = Carbon::now()->endOfMonth();
+                    break;
                 case 'today':
                     $startDate = Carbon::today();
                     $endDate = Carbon::today();
@@ -329,8 +333,9 @@ class BeauticianController extends Controller
                     }
                     break;
                 default:
-                    $startDate = Carbon::now()->subDays(30);
-                    $filter = 'last_30_days';
+                    $startDate = Carbon::now()->startOfMonth();
+                    $endDate = Carbon::now()->endOfMonth();
+                    $filter = 'this_month';
                     break;
             }
 
@@ -455,6 +460,9 @@ class BeauticianController extends Controller
             if ($request->filled('date')) {
                 $query->whereDate('appointment_date', $request->date);
             }
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween('appointment_date', [$request->start_date, $request->end_date]);
+            }
 
             // Status filter
             if ($request->filled('status')) {
@@ -462,11 +470,16 @@ class BeauticianController extends Controller
             }
 
             // Month/Year filter
-            if ($request->filled('month') && $request->month != 'all') {
-                $query->whereMonth('appointment_date', $request->month);
-            }
-            if ($request->filled('year') && $request->year != 'all') {
-                $query->whereYear('appointment_date', $request->year);
+            $month = $request->get('month', Carbon::now()->month);
+            $year = $request->get('year', Carbon::now()->year);
+
+            if (!$request->filled('date') && !($request->filled('start_date') && $request->filled('end_date'))) {
+                if ($month != 'all') {
+                    $query->whereMonth('appointment_date', $month);
+                }
+                if ($year != 'all') {
+                    $query->whereYear('appointment_date', $year);
+                }
             }
 
             $appointments = $query->get();
@@ -560,11 +573,18 @@ class BeauticianController extends Controller
             if ($request->filled('status')) {
                 $query->where('appointments.status', $request->status);
             }
-            if ($request->filled('month') && $request->month != 'all') {
-                $query->whereMonth('appointment_date', $request->month);
-            }
-            if ($request->filled('year') && $request->year != 'all') {
-                $query->whereYear('appointment_date', $request->year);
+            
+            // Month/Year filter
+            $month = $request->get('month', Carbon::now()->month);
+            $year = $request->get('year', Carbon::now()->year);
+
+            if (!$request->filled('date') && !($request->filled('start_date') && $request->filled('end_date'))) {
+                if ($month != 'all') {
+                    $query->whereMonth('appointment_date', $month);
+                }
+                if ($year != 'all') {
+                    $query->whereYear('appointment_date', $year);
+                }
             }
 
             $appointments = $query->get();

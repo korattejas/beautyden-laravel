@@ -1763,8 +1763,9 @@
                     <tr>
                         <td>filter</td>
                         <td>String</td>
-                        <td>Optional. Options: <code>today</code>, <code>yesterday</code>, <code>last_7_days</code>,
-                            <code>last_30_days</code> (default), <code>last_3_months</code>, <code>last_6_months</code>,
+                        <td>Optional. Options: <code>this_month</code> (default), <code>today</code>,
+                            <code>yesterday</code>, <code>last_7_days</code>,
+                            <code>last_30_days</code>, <code>last_3_months</code>, <code>last_6_months</code>,
                             <code>last_1_year</code>, <code>all</code>, <code>custom</code>.
                         </td>
                     </tr>
@@ -1796,7 +1797,7 @@
     "data": {
         "beautician_name": "Tejas",
         "is_approved": true,
-        "filter_applied": "last_30_days",
+        "filter_applied": "this_month",
         "overall_rating": 4.5,
         "total_reviews_count": 10,
         "total_completed": 5,
@@ -1883,12 +1884,12 @@
                     <tr>
                         <td>month</td>
                         <td>Integer</td>
-                        <td>Optional. 1-12</td>
+                        <td>Optional. 1-12 (Defaults to current month)</td>
                     </tr>
                     <tr>
                         <td>year</td>
                         <td>Integer</td>
-                        <td>Optional. e.g., 2026</td>
+                        <td>Optional. e.g., 2026 (Defaults to current year)</td>
                     </tr>
                 </tbody>
             </table>
@@ -1969,12 +1970,12 @@
                     <tr>
                         <td>month</td>
                         <td>Integer</td>
-                        <td>Optional. 1-12</td>
+                        <td>Optional. 1-12 (Defaults to current month)</td>
                     </tr>
                     <tr>
                         <td>year</td>
                         <td>Integer</td>
-                        <td>Optional. e.g., 2026</td>
+                        <td>Optional. e.g., 2026 (Defaults to current year)</td>
                     </tr>
                 </tbody>
             </table>
@@ -2205,14 +2206,24 @@
                 </thead>
                 <tbody>
                     <tr>
+                        <td>start_date</td>
+                        <td>Date</td>
+                        <td>Optional. YYYY-MM-DD (Requires end_date)</td>
+                    </tr>
+                    <tr>
+                        <td>end_date</td>
+                        <td>Date</td>
+                        <td>Optional. YYYY-MM-DD (Requires start_date)</td>
+                    </tr>
+                    <tr>
                         <td>month</td>
                         <td>Integer</td>
-                        <td>Optional. 1-12</td>
+                        <td>Optional. 1-12 (Defaults to current month)</td>
                     </tr>
                     <tr>
                         <td>year</td>
                         <td>Integer</td>
-                        <td>Optional. e.g., 2026</td>
+                        <td>Optional. e.g., 2026 (Defaults to current year)</td>
                     </tr>
                 </tbody>
             </table>
