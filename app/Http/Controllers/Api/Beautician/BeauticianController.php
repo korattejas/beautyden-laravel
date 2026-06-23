@@ -381,6 +381,11 @@ class BeauticianController extends Controller
                 ->select('appointments.*', 'ct.name as city_name')
                 ->orderBy('appointment_date', 'desc')
                 ->get()
+                ->groupBy('phone')
+                ->sortByDesc(function ($group) {
+                    return $group->count();
+                })
+                ->flatten(1)
                 ->map(function ($appointment) {
                     $services = [];
                     if (isset($appointment->services_data['services'])) {
@@ -759,7 +764,12 @@ class BeauticianController extends Controller
                 ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
                 ->select('appointments.*', 'ct.name as city_name')
                 ->orderBy('appointment_date', 'desc')
-                ->get();
+                ->get()
+                ->groupBy('phone')
+                ->sortByDesc(function ($group) {
+                    return $group->count();
+                })
+                ->flatten(1);
 
             $data = $appointments->map(function ($appointment) {
                 $services = [];
