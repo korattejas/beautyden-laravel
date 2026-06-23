@@ -575,6 +575,19 @@ class TeamMemberController extends Controller
                 ];
             }
             
+            // Filter by search query (name or phone)
+            $search = $request->input('search');
+            if (!empty($search)) {
+                $search = strtolower(trim($search));
+                $filteredJourney = [];
+                foreach ($customerJourney as $phone => $data) {
+                    if (str_contains(strtolower($data['customer_name']), $search) || str_contains(strtolower($phone), $search)) {
+                        $filteredJourney[] = $data;
+                    }
+                }
+                $customerJourney = $filteredJourney;
+            }
+            
             // Sort by number of appointments desc
             usort($customerJourney, function($a, $b) {
                 return count($b['appointments']) <=> count($a['appointments']);

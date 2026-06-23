@@ -1164,6 +1164,13 @@
                     <button class="c-close-btn" data-c-close-platform-retention>&times;</button>
                 </div>
                 <div class="c-modal-body" id="platform-retention-modal-body">
+                    <div class="mb-4 px-1">
+                        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                            <span class="input-group-text bg-white border-0 ps-3"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" id="platform-retention-search" class="form-control border-0 shadow-none" placeholder="Search by name or mobile number..." autocomplete="off">
+                            <button type="button" class="btn px-4 text-white" id="btn-search-platform-retention" style="background: linear-gradient(135deg, #7367f0 0%, #a889f4 100%); font-weight: 600;">Search</button>
+                        </div>
+                    </div>
                     <div id="platform-retention-table-container">
                         <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status"></div>
@@ -1885,8 +1892,19 @@
 
         // Platform Retention Logic
         $(document).on('click', '#btn-platform-retention', function() {
+            $('#platform-retention-search').val('');
             $("#c-platformRetentionModal").addClass("show");
             loadPlatformRetention(1);
+        });
+
+        $(document).on('click', '#btn-search-platform-retention', function() {
+            loadPlatformRetention(1);
+        });
+
+        $(document).on('keypress', '#platform-retention-search', function(e) {
+            if(e.which == 13) {
+                loadPlatformRetention(1);
+            }
         });
 
         $(document).on("click", "[data-c-close-platform-retention]", function() {
@@ -1900,8 +1918,17 @@
         });
 
         function loadPlatformRetention(page) {
+            let search = $('#platform-retention-search').val() || '';
+            
+            $("#platform-retention-table-container").html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Fetching platform retention data...</p>
+                </div>
+            `);
+
             $.ajax({
-                url: `/admin/team/platform-retention-report?page=${page}`,
+                url: `/admin/team/platform-retention-report?page=${page}&search=${encodeURIComponent(search)}`,
                 type: 'GET',
                 success: function(response) {
                     if (response.success) {
