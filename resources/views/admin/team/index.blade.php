@@ -723,6 +723,9 @@
                     <a href="{{ route('admin.team.exportActive') }}" class="btn btn-success me-2 text-nowrap">
                         <i class="bi bi-file-earmark-excel"></i> Export
                     </a>
+                    <button type="button" class="btn btn-info me-2 text-nowrap text-white" id="btn-platform-retention" style="background: linear-gradient(135deg, #7367f0 0%, #a889f4 100%); border: none;">
+                        <i class="bi bi-people"></i> Platform Retention
+                    </button>
                     <a href="{{ route('admin.team.create') }}" class="btn btn-primary me-2">
                         Add
                     </a>
@@ -1148,6 +1151,26 @@
                         <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status"></div>
                             <p class="mt-2 text-muted">Fetching return customers...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Retention Report Modal -->
+    <div id="c-platformRetentionModal" class="c-modal">
+        <div class="c-modal-dialog" style="max-width: 900px;">
+            <div class="c-modal-content">
+                <div class="c-modal-header" style="background: linear-gradient(135deg, #7367f0 0%, #a889f4 100%);">
+                    <h5 class="c-modal-title report-modal-header-title text-white"><i class="bi bi-people-fill"></i> Platform Retention Report</h5>
+                    <button class="c-close-btn" data-c-close-platform-retention>&times;</button>
+                </div>
+                <div class="c-modal-body" id="platform-retention-modal-body">
+                    <div id="platform-retention-table-container">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-2 text-muted">Fetching platform retention data...</p>
                         </div>
                     </div>
                 </div>
@@ -1861,6 +1884,96 @@
                     }
                 });
             }
+        });
+
+        // Platform Retention Logic
+        $(document).on('click', '#btn-platform-retention', function() {
+            $("#c-platformRetentionModal").addClass("show");
+            loadPlatformRetention(1);
+        });
+
+        $(document).on("click", "[data-c-close-platform-retention]", function() {
+            $("#c-platformRetentionModal").removeClass("show");
+            $("#platform-retention-table-container").html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Fetching platform retention data...</p>
+                </div>
+            `);
+        });
+
+        function loadPlatformRetention(page) {
+            $.ajax({
+                url: `/admin/team/platform-retention-report?page=${page}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        let html = '';
+                        if (response.data.length > 0) {
+                            response.data.forEach(customer => {
+                                html += `
+                                <div class="card mb-3 border-0 shadow-sm" style="background: #f8fafc; border-radius: 12px;">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                            <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-person-circle text-primary me-1"></i> ${customer.customer_name}</h6>
+                                            <a href="tel:${customer.phone}" class="text-primary fw-bold" style="text-decoration:none;"><i class="bi bi-telephone"></i> ${customer.phone}</a>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-borderless mb-0">
+                                                <thead style="background: #e2e8f0; border-radius: 6px;">
+                                                    <tr>
+                                                        <th style="border-top-left-radius:6px; border-bottom-left-radius:6px;" class="py-2 px-3"><small>Order</small></th>
+                                                        <th class="py-2 px-3"><small>Date & Time</small></th>
+                                                        <th class="py-2 px-3"><small>Beautician</small></th>
+                                                        <th style="border-top-right-radius:6px; border-bottom-right-radius:6px;" class="py-2 px-3"><small>Revenue</small></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                `;
+                                
+                                customer.appointments.forEach((app, index) => {
+                                    let badge = index === 0 
+                                        ? '<span class="badge bg-success ms-1" style="font-size: 0.6rem;">1st</span>' 
+                                        : '';
+                                    html += `
+                                        <tr style="border-bottom: 1px dashed #cbd5e1;">
+                                            <td class="px-3 align-middle"><strong class="text-secondary" style="font-size:0.85rem;">${app.order_number}</strong></td>
+                                            <td class="px-3 align-middle"><span style="font-size:0.85rem;">${app.date} <span class="text-muted">${app.time}</span></span></td>
+                                            <td class="px-3 align-middle"><span class="fw-bold" style="color: #475569; font-size:0.85rem;">${app.beautician} ${badge}</span></td>
+                                            <td class="px-3 align-middle"><span style="color: #7367f0; font-weight: 700; font-size:0.85rem;">${app.total}</span></td>
+                                        </tr>
+                                    `;
+                                });
+                                
+                                html += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                            });
+                        } else {
+                            html += `<div class="text-center py-4 text-muted">No repeat customers found on the platform yet.</div>`;
+                        }
+                        
+                        if (response.pagination) {
+                            html += `<div class="pagination-wrapper mt-3">${response.pagination}</div>`;
+                        }
+
+                        $("#platform-retention-table-container").html(html);
+                    }
+                },
+                error: function() {
+                    $("#platform-retention-table-container").html('<div class="alert alert-danger">Failed to load platform retention data.</div>');
+                }
+            });
+        }
+
+        $(document).on('click', '#c-platformRetentionModal .pagination a', function(e) {
+            e.preventDefault();
+            let page = $(this).attr('href').split('page=')[1];
+            loadPlatformRetention(page);
         });
     </script>
     <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>

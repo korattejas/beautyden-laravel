@@ -265,6 +265,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('team-view/{id}', [TeamMemberController::class, 'view']);
         Route::get('team/appointments-report/{id}', [TeamMemberController::class, 'getAppointmentsReport'])->name('admin.team.appointmentsReport');
         Route::get('team/appointments-report-download/{id}', [TeamMemberController::class, 'downloadAppointmentsReport'])->name('admin.team.appointmentsReportDownload');
+        Route::get('team/platform-retention-report', [TeamMemberController::class, 'getPlatformRetentionReport'])->name('admin.team.platformRetentionReport');
         Route::get('team/return-customers-report/{id}', [TeamMemberController::class, 'getReturnCustomersReport'])->name('admin.team.returnCustomersReport');
 
         // Customer Reviews

@@ -86,23 +86,20 @@ class TeamMemberController extends Controller
                 ->orderBy('appointment_time', 'asc')
                 ->get();
 
-            $returnCredits = []; // member_id => count
-            $lastBeauticians = null;
-            $lastPhone = null;
-
-            foreach ($allCompletedAppointments as $app) {
-                if ($app->phone === $lastPhone && $lastBeauticians) {
-                    // This is a return. The previous beauticians get credit.
-                    $beauticianIds = explode(',', $lastBeauticians);
-                    foreach ($beauticianIds as $bid) {
-                        $bid = trim($bid);
-                        if ($bid) {
-                            $returnCredits[$bid] = ($returnCredits[$bid] ?? 0) + 1;
-                        }
-                    }
-                }
-                $lastPhone = $app->phone;
-                $lastBeauticians = $app->assigned_to;
+            $returnCredits = [];
+            foreach ($allMembers as $member) {
+                 $phones = [];
+                 $repeatCount = 0;
+                 foreach($allCompletedAppointments as $app) {
+                     if (in_array($member->id, array_map('trim', explode(',', $app->assigned_to)))) {
+                          if (!isset($phones[$app->phone])) $phones[$app->phone] = 0;
+                          $phones[$app->phone]++;
+                     }
+                 }
+                 foreach ($phones as $p => $count) {
+                      if ($count > 1) $repeatCount++;
+                 }
+                 $returnCredits[$member->id] = $repeatCount;
             }
 
             // Total Return Customers (Global)
@@ -465,49 +462,135 @@ class TeamMemberController extends Controller
     public function getReturnCustomersReport(Request $request, $id)
     {
         try {
-            // Logic to find customers who returned AFTER being served by this member
-            $allCompletedAppointments = DB::table('appointments')
+            $repeatPhones = DB::table('appointments')
                 ->where('status', 3)
-                ->orderBy('phone')
-                ->orderBy('appointment_date', 'asc')
-                ->orderBy('appointment_time', 'asc')
-                ->get();
+                ->whereRaw("FIND_IN_SET(?, assigned_to)", [$id])
+                ->select('phone')
+                ->groupBy('phone')
+                ->havingRaw('COUNT(id) > 1')
+                ->pluck('phone');
 
-            $returnAppointments = [];
-            $lastBeauticians = null;
-            $lastPhone = null;
+            $returnAppointments = DB::table('appointments')
+                ->where('status', 3)
+                ->whereRaw("FIND_IN_SET(?, assigned_to)", [$id])
+                ->whereIn('phone', $repeatPhones)
+                ->orderBy('appointment_date', 'desc')
+                ->orderBy('appointment_time', 'desc')
+                ->get()
+                ->groupBy('phone')
+                ->sortByDesc(function ($group) {
+                    return $group->count();
+                })
+                ->flatten(1)
+                ->all(); // Convert to array
 
-            foreach ($allCompletedAppointments as $app) {
-                if ($app->phone === $lastPhone && $lastBeauticians) {
-                    $beauticianIds = explode(',', $lastBeauticians);
-                    if (in_array($id, array_map('trim', $beauticianIds))) {
-                        // This appointment is a return specifically from member $id
-                        $servicesData = json_decode($app->services_data, true);
-                        $returnAppointments[] = [
-                            'order_number' => $app->order_number,
-                            'customer_name' => ($app->first_name ?? '') . ' ' . ($app->last_name ?? ''),
-                            'phone' => $app->phone,
-                            'date' => $app->appointment_date,
-                            'time' => $app->appointment_time,
-                            'total' => '₹' . number_format((float)($servicesData['summary']['grand_total'] ?? 0), 0),
-                        ];
-                    }
-                }
-                $lastPhone = $app->phone;
-                $lastBeauticians = $app->assigned_to;
+            $formatted = [];
+            foreach ($returnAppointments as $app) {
+                $servicesData = json_decode($app->services_data, true);
+                $formatted[] = [
+                    'order_number' => $app->order_number,
+                    'customer_name' => ($app->first_name ?? '') . ' ' . ($app->last_name ?? ''),
+                    'phone' => $app->phone,
+                    'date' => $app->appointment_date,
+                    'time' => $app->appointment_time,
+                    'total' => '₹' . number_format((float)($servicesData['summary']['grand_total'] ?? 0), 0),
+                ];
             }
 
             // Manual pagination for returnAppointments
             $perPage = 10;
             $currentPage = $request->input('page', 1);
-            $pagedData = array_slice($returnAppointments, ($currentPage - 1) * $perPage, $perPage);
+            $pagedData = array_slice($formatted, ($currentPage - 1) * $perPage, $perPage);
             
             $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
                 $pagedData,
-                count($returnAppointments),
+                count($formatted),
                 $perPage,
                 $currentPage,
                 ['path' => Route('admin.team.returnCustomersReport', $id)]
+            );
+
+            return response()->json([
+                'success' => true,
+                'data' => $pagedData,
+                'pagination' => (string) $paginator->links('pagination::bootstrap-5')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getPlatformRetentionReport(Request $request)
+    {
+        try {
+            // Find global repeat customers (phones with >1 completed appointment)
+            $repeatPhones = DB::table('appointments')
+                ->where('status', 3)
+                ->select('phone')
+                ->groupBy('phone')
+                ->havingRaw('COUNT(id) > 1')
+                ->pluck('phone');
+
+            $appointments = DB::table('appointments')
+                ->where('status', 3)
+                ->whereIn('phone', $repeatPhones)
+                ->orderBy('phone')
+                ->orderBy('appointment_date', 'asc')
+                ->orderBy('appointment_time', 'asc')
+                ->get();
+
+            $teamMembers = DB::table('team_members')->pluck('name', 'id')->toArray();
+            
+            $customerJourney = [];
+            
+            foreach ($appointments as $app) {
+                $beauticianNames = [];
+                if ($app->assigned_to) {
+                    $bIds = explode(',', $app->assigned_to);
+                    foreach($bIds as $bId) {
+                        $bId = trim($bId);
+                        if(isset($teamMembers[$bId])) {
+                            $beauticianNames[] = $teamMembers[$bId];
+                        }
+                    }
+                }
+                
+                $bNameString = implode(', ', $beauticianNames);
+                
+                if (!isset($customerJourney[$app->phone])) {
+                    $customerJourney[$app->phone] = [
+                        'customer_name' => ($app->first_name ?? '') . ' ' . ($app->last_name ?? ''),
+                        'phone' => $app->phone,
+                        'appointments' => []
+                    ];
+                }
+                
+                $servicesData = json_decode($app->services_data, true);
+                $customerJourney[$app->phone]['appointments'][] = [
+                    'order_number' => $app->order_number,
+                    'date' => $app->appointment_date,
+                    'time' => $app->appointment_time,
+                    'beautician' => $bNameString ?: 'Unassigned',
+                    'total' => '₹' . number_format((float)($servicesData['summary']['grand_total'] ?? 0), 0),
+                ];
+            }
+            
+            // Sort by number of appointments desc
+            usort($customerJourney, function($a, $b) {
+                return count($b['appointments']) <=> count($a['appointments']);
+            });
+
+            // Manual pagination
+            $perPage = 10;
+            $currentPage = $request->input('page', 1);
+            $pagedData = array_slice($customerJourney, ($currentPage - 1) * $perPage, $perPage);
+            
+            $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                $pagedData,
+                count($customerJourney),
+                $perPage,
+                $currentPage,
+                ['path' => Route('admin.team.platformRetentionReport')]
             );
 
             return response()->json([
