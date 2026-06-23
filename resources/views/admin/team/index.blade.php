@@ -723,9 +723,6 @@
                     <a href="{{ route('admin.team.exportActive') }}" class="btn btn-success me-2 text-nowrap">
                         <i class="bi bi-file-earmark-excel"></i> Export
                     </a>
-                    <button type="button" class="btn btn-info me-2 text-nowrap text-white" id="btn-platform-retention" style="background: linear-gradient(135deg, #7367f0 0%, #a889f4 100%); border: none;">
-                        <i class="bi bi-people"></i> Platform Retention
-                    </button>
                     <a href="{{ route('admin.team.create') }}" class="btn btn-primary me-2">
                         Add
                     </a>
@@ -870,9 +867,9 @@
                                     <h4 class="mb-0 fw-bold">Beautician Return Performance</h4>
                                     <p class="text-muted small mb-0">Total customers who returned after being served by each beautician</p>
                                 </div>
-                                <div class="badge bg-light-primary text-primary px-3 py-2 rounded-pill fw-bold">
-                                    <i class="bi bi-graph-up-arrow me-1"></i> Performance Analytics
-                                </div>
+                                <button type="button" id="btn-platform-retention" class="btn btn-sm text-white px-4 py-2 rounded-pill shadow-sm" style="background: linear-gradient(135deg, #7367f0 0%, #a889f4 100%); font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; border: none;">
+                                    <i class="bi bi-people-fill me-1"></i> View Platform Journey
+                                </button>
                             </div>
                             <canvas id="returnPerformanceChart" style="max-height: 300px;"></canvas>
                         </div>
