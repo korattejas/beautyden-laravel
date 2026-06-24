@@ -80,7 +80,7 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Category</th>
-                                                <th>Service</th>
+                                                <th>Rating</th>
                                                 <th>Customer Name</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-stuff="High Priority,Low Priority">Is Popular</th>
@@ -146,8 +146,8 @@
                     name: 'service_category_name'
                 },
                 {
-                    data: 'service_name',
-                    name: 'service_name'
+                    data: 'rating',
+                    name: 'rating'
                 },
                 {
                     data: 'customer_name',
