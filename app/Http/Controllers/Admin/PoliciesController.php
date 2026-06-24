@@ -42,6 +42,8 @@ class PoliciesController extends Controller
                 'payment_policy'   => 'required|string',
                 'privacy_policy'   => 'required|string',
                 'terms_conditions' => 'required|string',
+                'beautician_privacy_policy'   => 'required|string',
+                'beautician_terms_conditions' => 'required|string',
             ];
 
             $validator = Validator::make($request_all, $validateArray);
@@ -54,6 +56,8 @@ class PoliciesController extends Controller
                 'payment_policy'   => $request->payment_policy,
                 'privacy_policy'   => $request->privacy_policy,
                 'terms_conditions' => $request->terms_conditions,
+                'beautician_privacy_policy'   => $request->beautician_privacy_policy,
+                'beautician_terms_conditions' => $request->beautician_terms_conditions,
             ];
 
             foreach ($data as $type => $desc) {

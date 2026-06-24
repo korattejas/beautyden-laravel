@@ -58,6 +58,22 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Beautician Privacy Policy -->
+                                            <div class="col-12 mt-2">
+                                                <div class="form-group">
+                                                    <label>Beautician Privacy Policy</label>
+                                                    <textarea class="form-control editor" name="beautician_privacy_policy" rows="5" placeholder="Enter Beautician Privacy Policy" required>{{ old('beautician_privacy_policy', $policies['beautician_privacy_policy'] ?? '') }}</textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Beautician Terms & Conditions -->
+                                            <div class="col-12 mt-2">
+                                                <div class="form-group">
+                                                    <label>Beautician Terms & Conditions</label>
+                                                    <textarea class="form-control editor" name="beautician_terms_conditions" rows="5" placeholder="Enter Beautician Terms & Conditions" required>{{ old('beautician_terms_conditions', $policies['beautician_terms_conditions'] ?? '') }}</textarea>
+                                                </div>
+                                            </div>
+
                                             <!-- Submit -->
                                             <div class="col-12">
                                                 <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">
