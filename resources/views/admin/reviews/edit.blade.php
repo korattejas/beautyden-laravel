@@ -144,7 +144,7 @@
                                                 <div class="form-group">
                                                     <label>Review Date</label>
                                                     <input type="date" class="form-control" name="review_date"
-                                                        value="{{ $review->review_date }}" required>
+                                                        value="{{ $review->review_date ? \Carbon\Carbon::parse($review->review_date)->format('Y-m-d') : '' }}" required>
                                                 </div>
                                             </div>
 
