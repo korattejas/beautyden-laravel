@@ -68,7 +68,8 @@ class ServiceController extends Controller
                     DB::raw('IF(c.icon LIKE "%.mp4" OR c.icon LIKE "%.mov" OR c.icon LIKE "%.avi" OR c.icon LIKE "%.wmv", "video", "image") AS icon_type'),
                     'c.description',
                     'c.is_popular',
-                    'c.is_new'
+                    'c.is_new',
+                    'c.media_json'
                 )
                 ->where('c.status', 1);
 
@@ -135,6 +136,36 @@ class ServiceController extends Controller
                 $category->is_popular = (int) $category->is_popular;
                 $category->is_new = (int) $category->is_new;
                 $category->subcategories = $subCategories[$category->id] ?? collect();
+                
+                // Format media_json with full URLs for category
+                $media = $category->media_json ? json_decode($category->media_json, true) : ['images' => [], 'videos' => []];
+                
+                if (isset($media['images']) && is_array($media['images'])) {
+                    $media['images'] = array_map(function($img) {
+                        $ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
+                        return [
+                            'url' => asset('uploads/service-media/' . $img),
+                            'type' => in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image'
+                        ];
+                    }, $media['images']);
+                } else {
+                    $media['images'] = [];
+                }
+
+                if (isset($media['videos']) && is_array($media['videos'])) {
+                    $media['videos'] = array_map(function($vid) {
+                        $ext = strtolower(pathinfo($vid, PATHINFO_EXTENSION));
+                        return [
+                            'url' => asset('uploads/service-media/' . $vid),
+                            'type' => in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image'
+                        ];
+                    }, $media['videos']);
+                } else {
+                    $media['videos'] = [];
+                }
+
+                $category->media_json = $media;
+                
                 return $category;
             });
 

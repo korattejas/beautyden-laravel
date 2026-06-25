@@ -165,6 +165,8 @@ class ServiceCategoryController extends Controller
                 ],
                 'service_type_id' => 'required|exists:service_types,id',
                 'icon' => $id == 0 ? 'image|mimes:jpeg,png,jpg,gif,svg,webp' : 'image|mimes:jpeg,png,jpg,gif,svg,webp',
+                'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
+                'gallery_videos.*' => 'nullable|mimes:mp4,mov,ogg,qt,webm|max:50000',
             ];
 
             $validateMessage = [
@@ -172,6 +174,9 @@ class ServiceCategoryController extends Controller
                 'name.unique' => 'The category name has already been taken.',
                 'icon.image' => 'The file must be an image.',
                 'icon.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
+                'gallery_images.*.image' => 'Each gallery file must be an image.',
+                'gallery_videos.*.mimes' => 'Each video must be a valid video format.',
+                'gallery_videos.*.max' => 'The video size cannot exceed 50MB.',
             ];
 
 
@@ -179,6 +184,50 @@ class ServiceCategoryController extends Controller
             if ($validator->fails()) {
                 logValidationException($this->controller_name, $function_name, $validator);
                 return response()->json(['message' => $validator->errors()->first()], $this->validator_error_code);
+            }
+
+            $media_json = [
+                'images' => [],
+                'videos' => []
+            ];
+
+            if ($id != 0) {
+                $category = ServiceCategory::where('id', $id)->first();
+                $media_json = $category->media_json ?? $media_json;
+
+                // Handle Removed Media
+                if ($request->has('removed_media')) {
+                    foreach ($request->removed_media as $removed) {
+                        // Check in images
+                        if (($key = array_search($removed, $media_json['images'])) !== false) {
+                            unset($media_json['images'][$key]);
+                            $filePath = public_path('uploads/service-media/' . $removed);
+                            if (File::exists($filePath)) File::delete($filePath);
+                        }
+                        // Check in videos
+                        if (($key = array_search($removed, $media_json['videos'])) !== false) {
+                            unset($media_json['videos'][$key]);
+                            $filePath = public_path('uploads/service-media/' . $removed);
+                            if (File::exists($filePath)) File::delete($filePath);
+                        }
+                    }
+                    $media_json['images'] = array_values($media_json['images']);
+                    $media_json['videos'] = array_values($media_json['videos']);
+                }
+            }
+
+            // Upload New Images
+            if ($request->hasFile('gallery_images')) {
+                foreach ($request->file('gallery_images') as $image) {
+                    $media_json['images'][] = ImageUploadHelper::serviceMediaUpload($image);
+                }
+            }
+
+            // Upload New Videos
+            if ($request->hasFile('gallery_videos')) {
+                foreach ($request->file('gallery_videos') as $video) {
+                    $media_json['videos'][] = ImageUploadHelper::serviceMediaUpload($video);
+                }
             }
 
             if ($id == 0) {
@@ -191,6 +240,7 @@ class ServiceCategoryController extends Controller
                     'name' => $request->name,
                     'description' => $request->description,
                     'icon' => $icon ?? null,
+                    'media_json' => $media_json,
                     'is_popular' => (int) $request->is_popular,
                     'is_new' => (int) $request->is_new,
                     'status' => (int) $request->status,
@@ -201,7 +251,9 @@ class ServiceCategoryController extends Controller
                     'message' => "Service category added successfully"
                 ]);
             } else {
-                $category = ServiceCategory::where('id', $id)->first();
+                if (!isset($category)) {
+                    $category = ServiceCategory::where('id', $id)->first();
+                }
 
                 if ($request->hasFile('icon')) {
                     $filePath = public_path('uploads/service-category/' . $category->icon);
@@ -219,6 +271,7 @@ class ServiceCategoryController extends Controller
                     'name' => $request->name,
                     'description' => $request->description,
                     'icon' => $icon,
+                    'media_json' => $media_json,
                     'is_popular' => (int) $request->is_popular,
                     'is_new' => (int) $request->is_new,
                     'status' => (int) $request->status,
@@ -284,6 +337,16 @@ class ServiceCategoryController extends Controller
 
                 if (File::exists($filePath)) {
                     File::delete($filePath);
+                }
+
+                // Delete gallery media
+                if ($category->media_json) {
+                    $media = $category->media_json;
+                    $all_media = array_merge($media['images'] ?? [], $media['videos'] ?? []);
+                    foreach ($all_media as $item) {
+                        $mPath = public_path('uploads/service-media/' . $item);
+                        if (File::exists($mPath)) File::delete($mPath);
+                    }
                 }
 
                 $category->delete();

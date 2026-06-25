@@ -14,9 +14,14 @@ class ServiceCategory extends Model
         'name',
         'description',
         'icon',
+        'media_json',
         'is_popular',
         'is_new',
         'status',
+    ];
+
+    protected $casts = [
+        'media_json' => 'array',
     ];
 
     public function category()
