@@ -364,6 +364,7 @@ class BeauticianController extends Controller
 
             $todayAppointmentsCount = (clone $baseQuery)->whereDate('appointment_date', Carbon::today())->count();
             $tomorrowAppointmentsCount = (clone $baseQuery)->whereDate('appointment_date', Carbon::tomorrow())->count();
+            $upcomingAppointmentsCount = (clone $baseQuery)->whereDate('appointment_date', '>', Carbon::today())->count();
 
             $repeatPhones = (clone $baseQuery)
                 ->select('phone')
@@ -433,6 +434,7 @@ class BeauticianController extends Controller
                 'total_appointments' => $totalAppointments,
                 'today_appointments_count' => $todayAppointmentsCount,
                 'tomorrow_appointments_count' => $tomorrowAppointmentsCount,
+                'upcoming_appointments_count' => $upcomingAppointmentsCount,
                 'repeat_customers_count' => $repeatCustomersCount,
                 'repeat_customers_percentage' => $repeatCustomersPercentage,
                 'repeat_customers_list' => $repeatCustomersList,
