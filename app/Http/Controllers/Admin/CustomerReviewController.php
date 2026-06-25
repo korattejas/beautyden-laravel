@@ -187,7 +187,7 @@ class CustomerReviewController extends Controller
                 $photos_array = [];
                 foreach ($request->file('photos') as $file) {
                     if (!empty($review->photos)) {
-                        $oldPhotos = json_decode($review->photos, true);
+                        $oldPhotos = is_string($review->photos) ? json_decode($review->photos, true) : (is_array($review->photos) ? $review->photos : []);
                         if (is_array($oldPhotos)) {
                             foreach ($oldPhotos as $oldFile) {
                                 $filePath = public_path('uploads/review/photos/' . $oldFile);
@@ -273,7 +273,7 @@ class CustomerReviewController extends Controller
                 }
 
                 if ($review->photos) {
-                    $photos = json_decode($review->photos, true);
+                    $photos = is_string($review->photos) ? json_decode($review->photos, true) : (is_array($review->photos) ? $review->photos : []);
                     if (!empty($photos)) {
                         foreach ($photos as $photo) {
                             $filePath = public_path('uploads/review/photos/' . $photo);
