@@ -111,13 +111,18 @@
                                                 <div class="form-group">
                                                     <label>Photos (multiple)</label>
                                                     @if ($review->photos)
-                                                        <div class="mb-2">
-                                                            @foreach (json_decode($review->photos) as $photo)
-                                                                <img src="{{ asset('uploads/review/photos/' . $photo) }}"
-                                                                    style="max-width:100px; margin-right:5px;"
-                                                                    alt="Review Photo">
-                                                            @endforeach
-                                                        </div>
+                                                        @php
+                                                            $photos = is_string($review->photos) ? json_decode($review->photos, true) : (is_array($review->photos) ? $review->photos : []);
+                                                        @endphp
+                                                        @if(!empty($photos))
+                                                            <div class="mb-2">
+                                                                @foreach ($photos as $photo)
+                                                                    <img src="{{ asset('uploads/review/photos/' . $photo) }}"
+                                                                        style="max-width:100px; margin-right:5px;"
+                                                                        alt="Review Photo">
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
                                                     @endif
                                                     <input type="file" class="form-control filepond" name="photos[]"
                                                         multiple>
