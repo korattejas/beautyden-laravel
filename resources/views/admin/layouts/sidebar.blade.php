@@ -475,6 +475,12 @@
                     <span class="menu-title text-truncate">App Settings</span>
                 </a>
             </li>
+            <li class="nav-item {{ Request::routeIs('admin.policies.index') ? 'active' : '' }}">
+                <a class="d-flex align-items-center" href="{{ route('admin.policies.index') }}">
+                    <i data-feather="file-text"></i>
+                    <span class="menu-title text-truncate">Policies</span>
+                </a>
+            </li>
             @endif
 
             @if($isSuperAdmin)
