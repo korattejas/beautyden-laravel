@@ -386,6 +386,23 @@
             </div>
         </section>
 
+        <section>
+            <h3>Delete Account</h3>
+            <p>Deactivates the customer account, invalidates the session, and frees up the mobile number.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/deleteAccount
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Account deleted successfully.",
+    "data": []
+}</code></pre>
+        </section>
+
         <h2 id="fcm"><i class="bi bi-phone text-primary"></i> 3. Device Management</h2>
         <section>
             <h3>Update FCM Token</h3>
@@ -2715,6 +2732,23 @@
     "code": 200,
     "status": true,
     "message": "Logged out successfully.",
+    "data": []
+}</code></pre>
+        </section>
+
+        <section>
+            <h3>13.21 Delete Account</h3>
+            <p>Deactivates the beautician account, invalidates the session, and frees up the mobile number.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/beautician/deleteAccount
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Account deleted successfully.",
     "data": []
 }</code></pre>
         </section>

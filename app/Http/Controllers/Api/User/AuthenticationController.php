@@ -736,6 +736,41 @@ class AuthenticationController extends Controller
         }
     }
 
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        $function_name = 'deleteAccount';
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            // Invalidate Token
+            $token = JWTAuth::getToken();
+            if ($token) {
+                JWTAuth::invalidate($token);
+            }
+
+            // Soft delete/Deactivate user
+            $deletedSuffix = '_del_' . time();
+            
+            $authUser->update([
+                'status' => 0,
+                'mobile_number' => $authUser->mobile_number . $deletedSuffix,
+                'email' => $authUser->email ? $authUser->email . $deletedSuffix : null,
+            ]);
+
+            auth()->guard('user')->logout();
+
+            return $this->sendResponse([], 'Account deleted successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+
     private function processOtp($key, $value, $is_forgot): JsonResponse
     {
         $verification = User::where($key, $value)->first();

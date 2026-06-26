@@ -62,6 +62,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
         Route::post('updateFcmToken', [AuthenticationController::class, 'updateFcmToken']);
         Route::get('logout', [AuthenticationController::class, 'logout']);
+        Route::post('deleteAccount', [AuthenticationController::class, 'deleteAccount']);
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
@@ -133,6 +134,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('appointmentUpdateStatus', [BeauticianController::class, 'appointmentUpdateStatus']);
         Route::post('getProfile', [BeauticianController::class, 'getProfile']);
         Route::post('updateProfile', [BeauticianController::class, 'updateProfile']);
+        Route::post('deleteAccount', [BeauticianController::class, 'deleteAccount']);
         Route::get('getAvailability', [AttendanceApiController::class, 'index']);
         Route::post('markLeave', [AttendanceApiController::class, 'store']);
         Route::post('cancelLeave', [AttendanceApiController::class, 'destroy']);
@@ -173,6 +175,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
         Route::post('updateFcmToken', [AuthenticationController::class, 'updateFcmToken']);
         Route::get('logout', [AuthenticationController::class, 'logout']);
+        Route::post('deleteAccount', [AuthenticationController::class, 'deleteAccount']);
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
@@ -239,6 +242,7 @@ Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(func
         Route::post('appointmentUpdateStatus', [BeauticianController::class, 'appointmentUpdateStatus']);
         Route::post('getProfile', [BeauticianController::class, 'getProfile']);
         Route::post('updateProfile', [BeauticianController::class, 'updateProfile']);
+        Route::post('deleteAccount', [BeauticianController::class, 'deleteAccount']);
         Route::get('getAvailability', [AttendanceApiController::class, 'index']);
         Route::post('markLeave', [AttendanceApiController::class, 'store']);
         Route::post('cancelLeave', [AttendanceApiController::class, 'destroy']);

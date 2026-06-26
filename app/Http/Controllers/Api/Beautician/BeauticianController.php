@@ -971,6 +971,49 @@ class BeauticianController extends Controller
     }
 
     /**
+     * Delete Beautician Account
+     */
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        $function_name = 'deleteAccount';
+        try {
+            $teamMember = $this->getTeamMember($request);
+            $user = auth()->guard('user')->user();
+
+            if (!$teamMember || !$user) {
+                return $this->sendError('Account not found.', 404);
+            }
+
+            // Invalidate Token
+            $token = JWTAuth::getToken();
+            if ($token) {
+                JWTAuth::invalidate($token);
+            }
+
+            // Soft delete/Deactivate user and team member
+            $deletedSuffix = '_del_' . time();
+            
+            $user->update([
+                'status' => 0,
+                'mobile_number' => $user->mobile_number . $deletedSuffix,
+                'email' => $user->email ? $user->email . $deletedSuffix : null,
+            ]);
+
+            $teamMember->update([
+                'status' => 0,
+                'phone' => $teamMember->phone . $deletedSuffix,
+            ]);
+            
+            auth()->guard('user')->logout();
+
+            return $this->sendResponse([], 'Account deleted successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    /**
      * Logout Beautician
      */
     public function logout(): JsonResponse
