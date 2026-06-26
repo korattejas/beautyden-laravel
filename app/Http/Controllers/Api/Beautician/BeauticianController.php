@@ -499,6 +499,7 @@ class BeauticianController extends Controller
             }
 
             $appointments = $query->get();
+            $totalAppointments = $appointments->count();
 
             $appointmentIds = $appointments->pluck('id');
             $reviewsData = \App\Models\CustomerReview::whereIn('appointment_id', $appointmentIds)
@@ -506,6 +507,9 @@ class BeauticianController extends Controller
                 ->select('customer_reviews.*', 'sc.name as category_name')
                 ->get()
                 ->groupBy('appointment_id');
+
+            $allReviews = $reviewsData->flatten();
+            $overallAverageRating = $allReviews->isNotEmpty() ? round($allReviews->avg('rating'), 1) : 0;
 
             $formattedAppointments = $appointments->map(function ($appointment) use ($reviewsData) {
                 $reviewDetails = null;
@@ -551,7 +555,12 @@ class BeauticianController extends Controller
                 ];
             });
 
-            return $this->sendResponse($formattedAppointments, 'Appointments fetched successfully.', $this->success_status);
+            $extra = [
+                'total_appointments' => $totalAppointments,
+                'average_rating' => $overallAverageRating,
+            ];
+
+            return $this->sendResponse($formattedAppointments, 'Appointments fetched successfully.', $this->success_status, $extra);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);

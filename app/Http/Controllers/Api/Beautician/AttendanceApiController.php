@@ -71,7 +71,14 @@ class AttendanceApiController extends Controller
                 }
             }
 
-            $data = $query->get()->map(function($item) {
+            $records = $query->get();
+
+            $pending_leaves = $records->where('status', 0)->count();
+            $approved_leaves = $records->where('status', 1)->count();
+            $rejected_leaves = $records->where('status', 2)->count();
+            $total_leaves = $records->count();
+
+            $data = $records->map(function($item) {
                 return [
                     'id' => $item->id,
                     'start_date' => $item->start_date,
@@ -84,7 +91,14 @@ class AttendanceApiController extends Controller
                 ];
             });
 
-            return $this->sendResponse($data, 'Attendance data fetched successfully.', $this->success_status);
+            $extra = [
+                'total_leaves' => $total_leaves,
+                'pending_leaves' => $pending_leaves,
+                'approved_leaves' => $approved_leaves,
+                'rejected_leaves' => $rejected_leaves,
+            ];
+
+            return $this->sendResponse($data, 'Attendance data fetched successfully.', $this->success_status, $extra);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
