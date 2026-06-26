@@ -24,6 +24,7 @@
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
+                                                <th>Order No.</th>
                                                 <th>User</th>
                                                 <th>Mobile</th>
                                                 <th>Total Amount</th>
@@ -84,6 +85,7 @@
             ajax: "{{ route('admin.product-order.data') }}",
             columns: [
                 {data: 'id', name: 'id'},
+                {data: 'order_number', name: 'order_number', orderable: false, searchable: false},
                 {data: 'user_name', name: 'users.name'},
                 {data: 'mobile_number', name: 'users.mobile_number'},
                 {data: 'total_amount', name: 'total_amount'},

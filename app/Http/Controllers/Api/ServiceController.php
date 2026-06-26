@@ -240,8 +240,8 @@ class ServiceController extends Controller
                         's.reviews',
                         's.description',
                         's.includes',
-                        DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
-                        DB::raw('IF(s.icon LIKE "%.mp4" OR s.icon LIKE "%.mov" OR s.icon LIKE "%.avi" OR s.icon LIKE "%.wmv", "video", "image") AS icon_type'),
+                        DB::raw('IF(s.icon IS NOT NULL AND s.icon != "", CONCAT("' . asset('uploads/service') . '/", s.icon), "' . asset('uploads/default.png') . '") AS icon'),
+                        DB::raw('IF(s.icon IS NOT NULL AND (s.icon LIKE "%.mp4" OR s.icon LIKE "%.mov" OR s.icon LIKE "%.avi" OR s.icon LIKE "%.wmv"), "video", "image") AS icon_type'),
                         's.is_popular'
                     )
                     ->where('scp.status', 1);
@@ -263,8 +263,8 @@ class ServiceController extends Controller
                         's.reviews',
                         's.description',
                         's.includes',
-                        DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
-                        DB::raw('IF(s.icon LIKE "%.mp4" OR s.icon LIKE "%.mov" OR s.icon LIKE "%.avi" OR s.icon LIKE "%.wmv", "video", "image") AS icon_type'),
+                        DB::raw('IF(s.icon IS NOT NULL AND s.icon != "", CONCAT("' . asset('uploads/service') . '/", s.icon), "' . asset('uploads/default.png') . '") AS icon'),
+                        DB::raw('IF(s.icon IS NOT NULL AND (s.icon LIKE "%.mp4" OR s.icon LIKE "%.mov" OR s.icon LIKE "%.avi" OR s.icon LIKE "%.wmv"), "video", "image") AS icon_type'),
                         's.is_popular'
                     )
                     ->where('s.status', 1);

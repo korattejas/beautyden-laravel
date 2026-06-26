@@ -44,6 +44,9 @@ class ProductOrderController extends Controller
                 }
 
                 return DataTables::of($orders)
+                    ->addColumn('order_number', function ($order) {
+                        return 'BDPROD-' . str_pad($order->id, 6, '0', STR_PAD_LEFT);
+                    })
                     ->addColumn('order_status', function ($order) {
                         $statusBadge = '';
                         switch ($order->order_status) {
