@@ -799,7 +799,8 @@ class BeauticianController extends Controller
             }
 
             $orderNumber = $appointment->order_number ?? 'BDAPP-' . str_pad($appointment->id, 6, '0', STR_PAD_LEFT);
-            $fileName = 'appointment_' . $orderNumber . '_' . $teamMember->id . '.pdf';
+            $safeOrderNumber = str_replace('#', '', $orderNumber);
+            $fileName = 'appointment_' . $safeOrderNumber . '_' . $teamMember->id . '.pdf';
             $directory = public_path('uploads/exports');
 
             if (!file_exists($directory)) {
