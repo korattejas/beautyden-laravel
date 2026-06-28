@@ -475,32 +475,25 @@ class BeauticianController extends Controller
             // Date filter
             if ($request->filled('date')) {
                 $query->whereDate('appointment_date', $request->date);
-            }
-            if ($request->filled('start_date') && $request->filled('end_date')) {
+            } elseif ($request->filled('start_date') && $request->filled('end_date')) {
                 $query->whereBetween('appointment_date', [$request->start_date, $request->end_date]);
+            } elseif ($request->filled('month') || $request->filled('year')) {
+                $month = $request->get('month');
+                $year = $request->get('year');
+                if ($month && $month != 'all') {
+                    $query->whereMonth('appointment_date', $month);
+                }
+                if ($year && $year != 'all') {
+                    $query->whereYear('appointment_date', $year);
+                }
+            } else {
+                // Default to today if no date filters are provided
+                $query->whereDate('appointment_date', Carbon::today());
             }
 
             // Status filter
             if ($request->filled('status')) {
                 $query->where('appointments.status', $request->status);
-            }
-
-            // Month/Year filter
-            $month = $request->get('month');
-            $year = $request->get('year');
-
-            if (!$request->filled('date') && !($request->filled('start_date') && $request->filled('end_date'))) {
-                if ($request->has('month') || $request->has('year')) {
-                    if ($month && $month != 'all') {
-                        $query->whereMonth('appointment_date', $month);
-                    }
-                    if ($year && $year != 'all') {
-                        $query->whereYear('appointment_date', $year);
-                    }
-                } else {
-                    // Default to today
-                    $query->whereDate('appointment_date', Carbon::today());
-                }
             }
 
             $appointments = $query->get();
@@ -593,33 +586,28 @@ class BeauticianController extends Controller
                 ->select('appointments.*', 'ct.name as city_name')
                 ->orderBy('appointment_date', 'desc');
 
-            // Apply filters
+            // Date filter
             if ($request->filled('date')) {
                 $query->whereDate('appointment_date', $request->date);
-            }
-            if ($request->filled('start_date') && $request->filled('end_date')) {
+            } elseif ($request->filled('start_date') && $request->filled('end_date')) {
                 $query->whereBetween('appointment_date', [$request->start_date, $request->end_date]);
+            } elseif ($request->filled('month') || $request->filled('year')) {
+                $month = $request->get('month');
+                $year = $request->get('year');
+                if ($month && $month != 'all') {
+                    $query->whereMonth('appointment_date', $month);
+                }
+                if ($year && $year != 'all') {
+                    $query->whereYear('appointment_date', $year);
+                }
+            } else {
+                // Default to today if no date filters are provided
+                $query->whereDate('appointment_date', Carbon::today());
             }
+
+            // Status filter
             if ($request->filled('status')) {
                 $query->where('appointments.status', $request->status);
-            }
-            
-            // Month/Year filter
-            $month = $request->get('month');
-            $year = $request->get('year');
-
-            if (!$request->filled('date') && !($request->filled('start_date') && $request->filled('end_date'))) {
-                if ($request->has('month') || $request->has('year')) {
-                    if ($month && $month != 'all') {
-                        $query->whereMonth('appointment_date', $month);
-                    }
-                    if ($year && $year != 'all') {
-                        $query->whereYear('appointment_date', $year);
-                    }
-                } else {
-                    // Default to today
-                    $query->whereDate('appointment_date', Carbon::today());
-                }
             }
 
             $appointments = $query->get();
