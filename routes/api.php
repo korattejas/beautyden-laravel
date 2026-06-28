@@ -130,6 +130,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('getAppointments', [BeauticianController::class, 'getAppointments']);
         Route::post('exportAppointments', [BeauticianController::class, 'exportAppointments']);
         Route::post('getAppointmentDetails', [BeauticianController::class, 'getAppointmentDetails']);
+        Route::post('exportAppointmentDetails', [BeauticianController::class, 'exportAppointmentDetails']);
         Route::post('getRepeatCustomers', [BeauticianController::class, 'getRepeatCustomers']);
         Route::post('appointmentUpdateStatus', [BeauticianController::class, 'appointmentUpdateStatus']);
         Route::post('getProfile', [BeauticianController::class, 'getProfile']);
@@ -238,6 +239,7 @@ Route::middleware([JWTTokenMiddleware::class, SanitizeInput::class])->group(func
         Route::post('getAppointments', [BeauticianController::class, 'getAppointments']);
         Route::post('exportAppointments', [BeauticianController::class, 'exportAppointments']);
         Route::post('getAppointmentDetails', [BeauticianController::class, 'getAppointmentDetails']);
+        Route::post('exportAppointmentDetails', [BeauticianController::class, 'exportAppointmentDetails']);
         Route::post('getRepeatCustomers', [BeauticianController::class, 'getRepeatCustomers']);
         Route::post('appointmentUpdateStatus', [BeauticianController::class, 'appointmentUpdateStatus']);
         Route::post('getProfile', [BeauticianController::class, 'getProfile']);

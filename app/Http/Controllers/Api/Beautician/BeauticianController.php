@@ -756,6 +756,72 @@ class BeauticianController extends Controller
     }
 
     /**
+     * Export Appointment Details to PDF
+     */
+    public function exportAppointmentDetails(Request $request): JsonResponse
+    {
+        $function_name = 'exportAppointmentDetails';
+        try {
+            $validator = Validator::make($request->all(), [
+                'appointment_id' => 'required|integer|exists:appointments,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $teamMember = $this->getTeamMember($request);
+            if (!$teamMember) {
+                return $this->sendError('Beautician profile not found.', 404);
+            }
+
+            if ($teamMember->status != 1) {
+                return $this->sendError('Your profile is under review. Appointment details will be available once approved.', 403);
+            }
+
+            $appointment = Appointment::whereRaw("FIND_IN_SET(?, assigned_to)", [$teamMember->id])
+                ->leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select('appointments.*', 'ct.name as city_name')
+                ->where('appointments.id', $request->appointment_id)
+                ->first();
+
+            if (!$appointment) {
+                return $this->sendError('Appointment not found or not assigned to you.', 404);
+            }
+
+            $services = [];
+            $summary = [];
+            if (isset($appointment->services_data['services'])) {
+                $services = $appointment->services_data['services'];
+            }
+            if (isset($appointment->services_data['summary'])) {
+                $summary = $appointment->services_data['summary'];
+            }
+
+            $orderNumber = $appointment->order_number ?? 'BDAPP-' . str_pad($appointment->id, 6, '0', STR_PAD_LEFT);
+            $fileName = 'appointment_' . $orderNumber . '_' . $teamMember->id . '.pdf';
+            $directory = public_path('uploads/exports');
+
+            if (!file_exists($directory)) {
+                mkdir($directory, 0777, true);
+            }
+
+            $pdf = Pdf::loadView('admin.appointments.pdf', compact('appointment', 'services', 'summary'));
+            $pdf->save($directory . '/' . $fileName);
+
+            $fileUrl = asset('uploads/exports/' . $fileName) . '?v=' . time();
+
+            return $this->sendResponse([
+                'file_url' => $fileUrl
+            ], 'Appointment details exported successfully.', $this->success_status);
+
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    /**
      * Get Repeat Customer Appointments
      */
     public function getRepeatCustomers(Request $request): JsonResponse
