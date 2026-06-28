@@ -182,6 +182,19 @@ class ProductItemController extends Controller
                     return response()->json(['message' => 'Product not found'], 404);
                 }
                 $product->update($data);
+                
+                // Delete removed media
+                $keptMedia = $request->input('existing_media', []);
+                $mediaToDelete = ProductMedia::where('product_id', $product->id)
+                    ->whereNotIn('id', $keptMedia)
+                    ->get();
+                foreach ($mediaToDelete as $m) {
+                    if (File::exists(public_path('uploads/product-media/' . $m->file_path))) {
+                        File::delete(public_path('uploads/product-media/' . $m->file_path));
+                    }
+                    $m->delete();
+                }
+
                 $msg = "Product updated successfully";
             }
 

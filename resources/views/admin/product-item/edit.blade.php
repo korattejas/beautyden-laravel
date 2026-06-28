@@ -169,6 +169,7 @@
                             <div class="card-body pt-2" id="media-container">
                                 @foreach($product->media as $media)
                                     <div class="media-row mb-1 p-2 border rounded bg-light bg-opacity-50 position-relative">
+                                        <input type="hidden" name="existing_media[]" value="{{ $media->id }}">
                                         <button type="button" class="btn btn-sm btn-icon btn-flat-danger position-absolute top-0 end-0 m-1 remove-row" style="z-index:10"><i data-feather="x"></i></button>
                                         <div class="preview-container" style="display:block">
                                             <div class="preview-actions">
@@ -207,15 +208,15 @@
                                         <div class="row">
                                             <div class="col-4">
                                                 <label class="form-label">Variant Name</label>
-                                                <input type="text" name="variants[][name]" class="form-control form-control-sm" value="{{ $variant->variant_name }}" placeholder="e.g. Ruby Red">
+                                                <input type="text" name="variants[{{ $loop->index }}][name]" class="form-control form-control-sm" value="{{ $variant->variant_name }}" placeholder="e.g. Ruby Red">
                                             </div>
                                             <div class="col-4">
                                                 <label class="form-label">Price</label>
-                                                <input type="number" name="variants[][price]" class="form-control form-control-sm" value="{{ $variant->price }}" placeholder="Optional">
+                                                <input type="number" name="variants[{{ $loop->index }}][price]" class="form-control form-control-sm" value="{{ $variant->price }}" placeholder="Optional">
                                             </div>
                                             <div class="col-4">
                                                 <label class="form-label">Stock</label>
-                                                <input type="number" name="variants[][stock_quantity]" class="form-control form-control-sm" value="{{ $variant->stock_quantity }}" placeholder="0">
+                                                <input type="number" name="variants[{{ $loop->index }}][stock_quantity]" class="form-control form-control-sm" value="{{ $variant->stock_quantity }}" placeholder="0">
                                             </div>
                                         </div>
                                     </div>
@@ -391,8 +392,21 @@
             row.find('.placeholder-content').show();
         });
 
+        function reindexVariants() {
+            $('#variant-container .variant-row').each(function(index) {
+                $(this).find('input').each(function() {
+                    let name = $(this).attr('name');
+                    if (name) {
+                        let newName = name.replace(/variants\[\d*\]/, 'variants[' + index + ']');
+                        $(this).attr('name', newName);
+                    }
+                });
+            });
+        }
+
         $('#productForm').on('submit', function(e) {
             e.preventDefault();
+            reindexVariants();
             loaderView();
             let formData = new FormData(this);
             axios.post(APP_URL + '/' + form_url, formData)

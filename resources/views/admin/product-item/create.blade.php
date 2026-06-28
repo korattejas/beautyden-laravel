@@ -298,8 +298,21 @@
             row.find('.placeholder-content').show();
         });
 
+        function reindexVariants() {
+            $('#variant-container .variant-row').each(function(index) {
+                $(this).find('input').each(function() {
+                    let name = $(this).attr('name');
+                    if (name) {
+                        let newName = name.replace(/variants\[\d*\]/, 'variants[' + index + ']');
+                        $(this).attr('name', newName);
+                    }
+                });
+            });
+        }
+
         $('#productForm').on('submit', function(e) {
             e.preventDefault();
+            reindexVariants();
             loaderView();
             let formData = new FormData(this);
             axios.post(APP_URL + '/' + form_url, formData)
