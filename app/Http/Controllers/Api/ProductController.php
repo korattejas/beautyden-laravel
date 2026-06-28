@@ -198,7 +198,7 @@ class ProductController extends Controller
             $responseData = $products->toArray();
 
             $responseData['filters'] = [
-                'categories' => DB::table('product_categories')->select('id', 'name')->where('status', 1)->get(),
+                'categories' => DB::table('product_categories')->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/product-category') . '/", image) AS image'))->where('status', 1)->get(),
                 'sub_categories' => DB::table('product_sub_categories')->select('id', 'name', 'category_id')->where('status', 1)->get(),
                 'brands' => DB::table('product_brands')->select('id', 'name')->where('status', 1)->get(),
                 'sort_options' => [
