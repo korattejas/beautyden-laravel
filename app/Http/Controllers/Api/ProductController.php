@@ -107,8 +107,7 @@ class ProductController extends Controller
                     'p.is_new',
                     'p.short_description'
                 )
-                ->where('p.status', 1)
-                ->where('p.show_in_client_app', 1); // Only show products marked for client app
+                ->where('p.status', 1); // Only show products marked for client app
 
             // Filters
             if ($request->filled('category_id')) {
