@@ -2467,6 +2467,7 @@
                 "brand_name": "L'Oreal",
                 "category_id": 1,
                 "category_name": "Skincare",
+                "category_image": "https://.../category.png",
                 "sub_category_id": 3,
                 "price": "500.00",
                 "discount_percentage": 10,
@@ -2484,7 +2485,7 @@
         "per_page": 20,
         "filters": {
             "categories": [
-                {"id": 1, "name": "Skincare"}
+                {"id": 1, "name": "Skincare", "image": "https://.../category.png"}
             ],
             "sub_categories": [
                 {"id": 3, "name": "Serums", "category_id": 1}
@@ -2534,6 +2535,7 @@
         "status": 1,
         "brand_name": "L'Oreal",
         "category_name": "Skincare",
+        "category_image": "https://.../category.png",
         "sale_price": "450.00",
         "media": [
             {
@@ -2632,11 +2634,20 @@
             "payment_status": "Pending",
             "order_status": "Pending",
             "date": "14-May-2026 10:30 AM",
-            "invoice_url": "https://yourdomain.com/api/Test/V1/beautician/exportOrderInvoice/12"
+            "items": [
+                {
+                    "product_id": 1,
+                    "name": "Glowing Serum",
+                    "variant_name": "50ml",
+                    "qty": 2,
+                    "price": 450.00,
+                    "total": 900.00,
+                    "product_image": "https://.../product.jpg"
+                }
+            ]
         }
     ]
 }</code></pre>
-            }</code></pre>
 
             <h3>13.19 Get Order Details</h3>
             <p>Retrieves complete details of a specific product order, including all items and variants.</p>
@@ -2677,11 +2688,13 @@
         "address": "123 Main St, City, State 380001",
         "items": [
             {
-                "id": 2,
+                "product_id": 2,
                 "name": "Waterproof Mascara",
                 "variant_name": "Black",
                 "qty": 2,
-                "price": 285.00
+                "price": 285.00,
+                "total": 570.00,
+                "product_image": "https://.../mascara.jpg"
             }
         ]
     }
