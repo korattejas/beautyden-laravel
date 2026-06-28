@@ -96,6 +96,7 @@ class ProductController extends Controller
                     'b.name as brand_name',
                     'p.category_id',
                     'c.name as category_name',
+                    DB::raw('CONCAT("' . asset('uploads/product-category') . '/", c.image) AS category_image'),
                     'p.sub_category_id',
                     'p.price',
                     'p.discount_percentage',
@@ -234,6 +235,7 @@ class ProductController extends Controller
                     'p.*',
                     'b.name as brand_name',
                     'c.name as category_name',
+                    DB::raw('CONCAT("' . asset('uploads/product-category') . '/", c.image) AS category_image'),
                     DB::raw('p.price - (p.price * p.discount_percentage / 100) as sale_price')
                 )
                 ->where('p.id', $id)
@@ -425,11 +427,46 @@ class ProductController extends Controller
                         ->orderBy('id', 'desc')
                         ->get();
 
-            $formattedOrders = $orders->map(function ($order) {
+            $productIds = [];
+            foreach ($orders as $order) {
+                $items = is_string($order->order_data) ? json_decode($order->order_data, true) : $order->order_data;
+                if (is_array($items)) {
+                    foreach ($items as $item) {
+                        if (isset($item['product_id'])) {
+                            $productIds[] = $item['product_id'];
+                        }
+                    }
+                }
+            }
+            $productIds = array_unique($productIds);
+
+            $media = DB::table('product_media')
+                ->whereIn('product_id', $productIds)
+                ->where('type', 'image')
+                ->where('status', 1)
+                ->orderBy('is_main', 'desc')
+                ->orderBy('id', 'asc')
+                ->get()
+                ->groupBy('product_id');
+
+            $productImages = [];
+            foreach ($media as $productId => $productMediaList) {
+                $firstMedia = $productMediaList->first();
+                $productImages[$productId] = asset('uploads/product-media/' . $firstMedia->file_path);
+            }
+
+            $formattedOrders = $orders->map(function ($order) use ($productImages) {
                 $totalProducts = 0;
-                if (is_array($order->order_data)) {
-                    foreach ($order->order_data as $item) {
+                $items = is_string($order->order_data) ? json_decode($order->order_data, true) : $order->order_data;
+                
+                if (is_array($items)) {
+                    foreach ($items as &$item) {
                         $totalProducts += $item['qty'] ?? 1;
+                        if (isset($item['product_id'])) {
+                            $item['product_image'] = $productImages[$item['product_id']] ?? null;
+                        } else {
+                            $item['product_image'] = null;
+                        }
                     }
                 }
                 
@@ -441,7 +478,7 @@ class ProductController extends Controller
                     'payment_status' => $order->payment_status,
                     'order_status' => $order->order_status,
                     'date' => $order->created_at ? $order->created_at->format('d-M-Y h:i A') : '',
-                    'items' => is_string($order->order_data) ? json_decode($order->order_data, true) : $order->order_data,
+                    'items' => $items,
                 ];
             });
 
@@ -484,8 +521,36 @@ class ProductController extends Controller
             $totalProducts = 0;
             $items = is_string($order->order_data) ? json_decode($order->order_data, true) : $order->order_data;
             if (is_array($items)) {
+                $productIds = [];
                 foreach ($items as $item) {
+                    if (isset($item['product_id'])) {
+                        $productIds[] = $item['product_id'];
+                    }
+                }
+                $productIds = array_unique($productIds);
+
+                $media = DB::table('product_media')
+                    ->whereIn('product_id', $productIds)
+                    ->where('type', 'image')
+                    ->where('status', 1)
+                    ->orderBy('is_main', 'desc')
+                    ->orderBy('id', 'asc')
+                    ->get()
+                    ->groupBy('product_id');
+
+                $productImages = [];
+                foreach ($media as $productId => $productMediaList) {
+                    $firstMedia = $productMediaList->first();
+                    $productImages[$productId] = asset('uploads/product-media/' . $firstMedia->file_path);
+                }
+
+                foreach ($items as &$item) {
                     $totalProducts += $item['qty'] ?? 1;
+                    if (isset($item['product_id'])) {
+                        $item['product_image'] = $productImages[$item['product_id']] ?? null;
+                    } else {
+                        $item['product_image'] = null;
+                    }
                 }
             }
 

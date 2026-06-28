@@ -181,7 +181,6 @@
             <td class="address-col">
                 <div class="section-title">Customer Details</div>
                 <div class="name">{{ $appointment->first_name ?? '' }} {{ $appointment->last_name ?? '' }}</div>
-                Phone: {{ $appointment->phone ?? '' }}<br>
                 Email: {{ $appointment->email ?? 'N/A' }}<br>
                 Address: {{ $appointment->service_address ?? '' }}
             </td>
