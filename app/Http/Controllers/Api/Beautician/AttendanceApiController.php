@@ -54,22 +54,7 @@ class AttendanceApiController extends Controller
             }
 
             $query = StaffUnavailability::where('team_member_id', $teamMember->id)
-                ->orderBy('start_date', 'desc');
-
-            $month = $request->get('month', Carbon::now()->month);
-            $year = $request->get('year', Carbon::now()->year);
-
-            if ($request->filled('start_date') && $request->filled('end_date')) {
-                $query->whereDate('start_date', '<=', $request->end_date)
-                      ->whereDate('end_date', '>=', $request->start_date);
-            } else {
-                if ($month != 'all') {
-                    $query->whereMonth('start_date', $month);
-                }
-                if ($year != 'all') {
-                    $query->whereYear('start_date', $year);
-                }
-            }
+                ->orderBy('created_at', 'desc');
 
             $records = $query->get();
 

@@ -139,6 +139,21 @@ class ProductOrderController extends Controller
         }
     }
 
+    public function destroy($id)
+    {
+        try {
+            $order = ProductOrder::find($id);
+            if ($order) {
+                $order->delete();
+                return response()->json(['message' => 'Product order deleted successfully']);
+            }
+            return response()->json(['error' => 'Product order not found'], 404);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, 'destroy');
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
+        }
+    }
+
     public function view($id)
     {
         try {

@@ -158,6 +158,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('product-order-view/{id}', [ProductOrderController::class, 'view']);
         Route::get('product-order/status/{id}/{status}', [ProductOrderController::class, 'changeStatus']);
         Route::get('product-order/{id}/pdf', [ProductOrderController::class, 'downloadPdf'])->name('admin.product-order.pdf');
+        Route::delete('product-order/{id}', [ProductOrderController::class, 'destroy']);
 
 
          /* Portfoio */
