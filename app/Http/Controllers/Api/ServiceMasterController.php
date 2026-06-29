@@ -136,7 +136,25 @@ class ServiceMasterController extends Controller
                 
             $categoryStatsCache = [];
 
-            $services->getCollection()->transform(function ($service) use (&$categoryStatsCache) {
+            $serviceIdsWithVariants = collect($services->items())->filter(function($service) {
+                return $service->has_variants == 1;
+            })->pluck('id')->toArray();
+
+            $variants = collect();
+            $variantPrices = collect();
+
+            if (!empty($serviceIdsWithVariants)) {
+                $variants = \App\Models\ServiceMasterVariant::whereIn('service_master_id', $serviceIdsWithVariants)
+                    ->get()
+                    ->groupBy('service_master_id');
+                    
+                $variantPrices = \App\Models\ServiceCityVariantPrice::whereIn('service_master_id', $serviceIdsWithVariants)
+                    ->where('city_id', $cityId)
+                    ->get()
+                    ->groupBy('service_master_id');
+            }
+
+            $services->getCollection()->transform(function ($service) use (&$categoryStatsCache, $variants, $variantPrices) {
                 $service->is_popular = (int) $service->is_popular;
                 $service->has_variants = (int) $service->has_variants;
                 
@@ -169,6 +187,47 @@ class ServiceMasterController extends Controller
                 
                 unset($service->banner_media);
                 
+                if ($service->has_variants == 1) {
+                    $serviceVariants = $variants->get($service->id, collect());
+                    $serviceVariantPrices = $variantPrices->get($service->id, collect())->keyBy('variant_id');
+
+                    $availableVariants = [];
+                    foreach ($serviceVariants as $variant) {
+                        if ($serviceVariantPrices->has($variant->id)) {
+                            // Check if variant is available for this city
+                            $priceData = $serviceVariantPrices->get($variant->id);
+                            if ($priceData->is_available == 0) {
+                                continue; // Skip this variant
+                            }
+                            $variant->price = $priceData->price;
+                            $variant->discount_price = $priceData->discount_price;
+                        } else {
+                            $variant->discount_price = 0; // Default if not found
+                        }
+
+                        // Format thumbnail image URL
+                        $variant->thumbnail_image = $variant->thumbnail_image
+                            ? asset('uploads/service-variant/' . $variant->thumbnail_image)
+                            : null;
+
+                        // Ensure numeric types
+                        $variant->description         = $variant->description ?? null;
+                        $variant->rating             = (string) $categoryStatsCache[$service->category_id]['rating'];
+                        $variant->reviews            = (string) $categoryStatsCache[$service->category_id]['reviews'];
+                        $variant->discount_percentage = $variant->discount_percentage
+                            ? (float) $variant->discount_percentage
+                            : null;
+
+                        $availableVariants[] = $variant;
+                    }
+                    
+                    if (!empty($availableVariants)) {
+                        $service->variants = $availableVariants;
+                    } else {
+                        $service->has_variants = 0;
+                    }
+                }
+
                 return $service;
             });
 
