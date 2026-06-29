@@ -40,16 +40,23 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-
-/*======================================================== Customer API ==============================================*/
-
-
-// App Customer Routes
+//Customer Routes
 Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/customer')->group(function () {
         Route::post('sendOtpOnMobileNumber', [AuthenticationController::class, 'sendOtpOnMobileNumber']);
         Route::post('verifyOtpOnMobileNumber', [AuthenticationController::class, 'verifyOtpOnMobileNumber']);
         Route::post('sendTestNotification', [NotificationController::class, 'sendTestNotification']);
+        Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
+        Route::post('getServiceSearchData', [ApplicationHomeController::class, 'getServiceSearchData']);
+        Route::get('offerBanner', [OfferController::class, 'getOffers']);
+        Route::get('listCoupons', [CouponController::class, 'listCoupons']);
+        Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
+        Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('serviceType', [ServiceController::class, 'getServiceType']);
+        Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
+        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
+        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
+        Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
     });
 });
 
@@ -66,20 +73,9 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
-        Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
-        Route::post('getServiceSearchData', [ApplicationHomeController::class, 'getServiceSearchData']);
-        Route::get('offerBanner', [OfferController::class, 'getOffers']);
-        Route::get('listCoupons', [CouponController::class, 'listCoupons']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
-        Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
-        Route::get('cities', [CityController::class, 'getCities']);
-        Route::get('serviceType', [ServiceController::class, 'getServiceType']);
-        Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
-        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
-        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
-        Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
     });
@@ -114,8 +110,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
     });
 });
 
-/*======================================================== Beautician API ==============================================*/
-
+//Beautician Routes
 Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/beautician')->group(function () {
         Route::post('sendLoginOtp', [BeauticianController::class, 'sendLoginOtp']);
@@ -151,20 +146,25 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
 
 
 
-
-
-
-
-
-
-
 /*======================================================== Debug API ==============================================*/
 
+//Customer Routes
 Route::middleware([])->group(function () {
     Route::prefix('Test/V1/customer')->group(function () {
         Route::post('sendOtpOnMobileNumber', [AuthenticationController::class, 'sendOtpOnMobileNumber']);
         Route::post('verifyOtpOnMobileNumber', [AuthenticationController::class, 'verifyOtpOnMobileNumber']);
         Route::post('sendTestNotification', [NotificationController::class, 'sendTestNotification']);
+        Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
+        Route::post('getServiceSearchData', [ApplicationHomeController::class, 'getServiceSearchData']);
+        Route::get('offerBanner', [OfferController::class, 'getOffers']);
+        Route::get('listCoupons', [CouponController::class, 'listCoupons']);
+        Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
+        Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('serviceType', [ServiceController::class, 'getServiceType']);
+        Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
+        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
+        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
+        Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
     });
 });
 
@@ -180,25 +180,16 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
-        Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
-        Route::post('getServiceSearchData', [ApplicationHomeController::class, 'getServiceSearchData']);
-        Route::get('offerBanner', [OfferController::class, 'getOffers']);
-        Route::get('listCoupons', [CouponController::class, 'listCoupons']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
-        Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
-        Route::get('cities', [CityController::class, 'getCities']);
-        Route::get('serviceType', [ServiceController::class, 'getServiceType']);
-        Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
-        Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
-        Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
-        Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
     });
 });
 
+
+//Web Routes
 Route::middleware([])->group(function () {
     Route::prefix('Test/V1/')->group(function () {
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
@@ -225,6 +216,9 @@ Route::middleware([])->group(function () {
 });
 
 
+
+
+//Beautician Routes
 Route::middleware([SanitizeInput::class])->group(function () {
     Route::prefix('Test/V1/beautician')->group(function () {
         Route::post('sendLoginOtp', [BeauticianController::class, 'sendLoginOtp']);
