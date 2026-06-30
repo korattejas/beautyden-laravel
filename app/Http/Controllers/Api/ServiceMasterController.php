@@ -29,21 +29,23 @@ class ServiceMasterController extends Controller
 
     private function getCategoryReviewStats($categoryId)
     {
-        $dummyReviewsSum = DB::table('service_masters')->where('category_id', $categoryId)->sum('reviews');
-        $dummyRatingAvg = DB::table('service_masters')->where('category_id', $categoryId)->where('rating', '>', 0)->avg('rating');
+        // $dummyReviewsSum = DB::table('service_masters')->where('category_id', $categoryId)->sum('reviews');
+        // $dummyRatingAvg = DB::table('service_masters')->where('category_id', $categoryId)->where('rating', '>', 0)->avg('rating');
         
         $realReviewsCount = DB::table('customer_reviews')->where('category_id', $categoryId)->where('status', 1)->count();
         $realRatingAvg = DB::table('customer_reviews')->where('category_id', $categoryId)->where('status', 1)->avg('rating');
 
-        $totalReviews = $dummyReviewsSum + $realReviewsCount;
+        // $totalReviews = $dummyReviewsSum + $realReviewsCount;
+        $totalReviews = $realReviewsCount;
         
         $totalRatingPoints = 0;
         $pointsCount = 0;
         
-        if ($dummyReviewsSum > 0 && $dummyRatingAvg > 0) {
-            $totalRatingPoints += ($dummyRatingAvg * $dummyReviewsSum);
-            $pointsCount += $dummyReviewsSum;
-        }
+        // if ($dummyReviewsSum > 0 && $dummyRatingAvg > 0) {
+        //     $totalRatingPoints += ($dummyRatingAvg * $dummyReviewsSum);
+        //     $pointsCount += $dummyReviewsSum;
+        // }
+        
         if ($realReviewsCount > 0 && $realRatingAvg > 0) {
             $totalRatingPoints += ($realRatingAvg * $realReviewsCount);
             $pointsCount += $realReviewsCount;
