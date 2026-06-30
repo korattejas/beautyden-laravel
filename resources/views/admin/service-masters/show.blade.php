@@ -1,24 +1,12 @@
 @extends('admin.layouts.app')
 @section('content')
-<style>
-    .service-view-header { background: linear-gradient(135deg, #1a237e 0%, #311b92 100%); color: white; border-radius: 15px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
-    .service-view-header::after { content: ''; position: absolute; top: 0; right: 0; width: 400px; height: 100%; background: linear-gradient(to left, rgba(255, 255, 255, 0.1), transparent); transform: skewX(-25deg); pointer-events: none; }
-    .badge-premium { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 0.5rem 1.2rem; border-radius: 50px; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.5px; }
-    .media-card { border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 16/9; background: #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .media-card video, .media-card img { width: 100%; height: 100%; object-fit: cover; }
-    .ba-card { border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-    .ba-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; text-transform: uppercase; }
-    .section-preview { border-left: 4px solid #1a237e; background: #f8fafc; padding: 1.5rem; border-radius: 0 12px 12px 0; margin-bottom: 1.5rem; }
-    .essential-icon-view { width: 40px; height: 40px; border-radius: 8px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; margin-right: 10px; }
-</style>
 
-<div class="app-content content">
+<div class="app-content content pa-catalog-page pa-catalog-view">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
         <div class="content-body">
-            <!-- Header Section -->
-            <div class="service-view-header shadow-lg">
+            <div class="service-view-header pa-catalog-view-hero shadow-lg">
                 <div class="row align-items-center">
                     <div class="col-md-2 text-center">
                         @if($service->icon)
@@ -43,9 +31,10 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row pa-catalog-layout">
                 <!-- Left Sidebar: Basic & Media -->
                 <div class="col-lg-4">
+                    <div class="pa-catalog-sidebar">
                     <!-- Basic Info Card -->
                     <div class="card mb-2">
                         <div class="card-header border-bottom"><h4 class="card-title">Quick Stats</h4></div>
@@ -141,11 +130,12 @@
                             @endif
                         @endforeach
                     @endif
+                    </div>
                 </div>
 
                 <!-- Right Side: Content Sections -->
                 <div class="col-lg-8">
-                    <div class="card">
+                    <div class="card pa-catalog-card">
                         <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Detailed Service Catalog</h4>
                             <span class="text-muted small">{{ count($service->content_json ?? []) }} Dynamic Sections</span>

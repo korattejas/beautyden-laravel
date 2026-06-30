@@ -19,10 +19,10 @@
         :root {
             --black: #0a0a0a;
             --black-soft: #111827;
-            --blue: #102365;
-            --blue-bright: #1e40af;
-            --blue-light: #3b82f6;
-            --blue-glow: rgba(30, 64, 175, 0.15);
+            --blue: #4f46e5;
+            --blue-bright: #6366f1;
+            --blue-light: #818cf8;
+            --blue-glow: rgba(79, 70, 229, 0.15);
             --text: #111827;
             --text-muted: #6b7280;
             --border: #e5e7eb;
@@ -67,9 +67,9 @@
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(ellipse 80% 60% at 20% 80%, rgba(30, 64, 175, 0.25) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 55%),
-                linear-gradient(160deg, var(--black) 0%, var(--blue) 100%);
+                radial-gradient(ellipse 80% 60% at 20% 80%, rgba(79, 70, 229, 0.25) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(129, 140, 248, 0.15) 0%, transparent 55%),
+                linear-gradient(160deg, var(--black) 0%, #312e81 100%);
         }
 
         .brand-grid {
@@ -335,7 +335,7 @@
         .btn-login:hover {
             background: var(--blue-bright);
             transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.35);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
         }
 
         .btn-login:active { transform: translateY(0); }

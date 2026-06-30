@@ -1,0 +1,213 @@
+/* ═══════════════════════════════════════════════════════════════
+   BeautyDen Premium Forms — Legacy CRUD create/edit pages
+   Applies to #addEditForm — EXCLUDES .pa-appointment-form-page
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Full-width form layout + compact top spacing ── */
+.pa-content:not(:has(.pa-appointment-form-page)):has(#addEditForm) {
+    padding-top: 0.65rem !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .pa-crud-page-header {
+    margin-bottom: 0.75rem !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0 !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) > section {
+    margin: 0;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .row > [class*="col-"] {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .card {
+    border: 1px solid var(--pa-border) !important;
+    border-radius: 16px !important;
+    box-shadow: var(--pa-shadow-card) !important;
+    background: #fff !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .card-body {
+    padding: 1.35rem 1.5rem 1.5rem !important;
+}
+
+/* ── Form field spacing ── */
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .row.row-sm {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    margin: 0;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .row.row-sm > .col-12 {
+    margin-top: 0 !important;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .form-group {
+    margin-bottom: 0 !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .form-group > label {
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    color: var(--pa-text) !important;
+    margin-bottom: 0.45rem !important;
+    letter-spacing: 0.01em;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .form-control,
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .form-select {
+    min-height: 46px !important;
+    font-size: 0.9375rem !important;
+    font-weight: 500 !important;
+    border-radius: 12px !important;
+    border: 1.5px solid var(--pa-border) !important;
+    padding: 0.65rem 1rem !important;
+    color: var(--pa-text) !important;
+    background: #fff !important;
+    box-shadow: none !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) textarea.form-control {
+    min-height: 120px !important;
+    padding: 0.85rem 1rem !important;
+    line-height: 1.55 !important;
+    resize: vertical;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .form-control:focus,
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .form-select:focus {
+    border-color: var(--pa-primary) !important;
+    box-shadow: 0 0 0 3px var(--pa-primary-glow) !important;
+    outline: none !important;
+}
+
+/* ── Select2 on form pages ── */
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .select2-container--default .select2-selection--single {
+    min-height: 46px !important;
+    height: 46px !important;
+    border: 1.5px solid var(--pa-border) !important;
+    border-radius: 12px !important;
+    padding: 8px 12px !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .select2-container--default .select2-selection__rendered {
+    font-size: 0.9375rem !important;
+    font-weight: 500 !important;
+    line-height: 28px !important;
+    color: var(--pa-text) !important;
+}
+
+/* ── File upload (FilePond) ── */
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .filepond--root {
+    font-family: var(--pa-font);
+    margin-bottom: 0;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .filepond--panel-root {
+    background: var(--pa-surface-2) !important;
+    border: 1.5px dashed #cbd5e1 !important;
+    border-radius: 12px !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .filepond--drop-label {
+    font-size: 0.875rem !important;
+    font-weight: 500;
+    color: var(--pa-text-muted) !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .form-group img {
+    border-radius: 12px;
+    border: 1px solid var(--pa-border-light);
+    max-width: 100%;
+    height: auto;
+}
+
+/* ── Nested gallery / media card ── */
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .card.border.shadow-none {
+    border: 1px solid var(--pa-border) !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+    background: var(--pa-surface-2) !important;
+    overflow: hidden;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .card.border.shadow-none > .card-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--pa-border-light) !important;
+    padding: 0.9rem 1rem !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .card.border.shadow-none .card-title {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: var(--pa-text) !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .card.border.shadow-none > .card-body {
+    padding: 1rem !important;
+    background: transparent !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) #media-container .media-row .border {
+    border: 1px solid var(--pa-border) !important;
+    border-radius: 12px !important;
+    background: #fff;
+    padding: 0.65rem !important;
+}
+
+/* ── Form action buttons ── */
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .col-12.text-end {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 0.25rem !important;
+    padding-top: 1.25rem !important;
+    border-top: 1px solid var(--pa-border-light);
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .content-body:has(#addEditForm) .col-12.text-end .btn {
+    min-height: 44px !important;
+    padding: 0.55rem 1.25rem !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    border-radius: 11px !important;
+}
+
+/* ── Page header on legacy form pages ── */
+.pa-content:not(:has(.pa-appointment-form-page)) .app-content:has(#addEditForm) .content-header {
+    margin-bottom: 0.65rem !important;
+    max-width: 100%;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .app-content:has(#addEditForm) .content-header .mb-2 {
+    margin-bottom: 0.25rem !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .app-content:has(#addEditForm) .content-header-title {
+    margin-bottom: 0.15rem !important;
+    font-size: 1.35rem !important;
+    line-height: 1.25 !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .app-content:has(#addEditForm) .breadcrumb-wrapper {
+    margin-top: 0 !important;
+}
+
+.pa-content:not(:has(.pa-appointment-form-page)) .app-content:has(#addEditForm) .horizontal-wizard {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}

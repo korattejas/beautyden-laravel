@@ -523,7 +523,7 @@ class TeamMemberController extends Controller
     public function getPlatformRetentionReport(Request $request)
     {
         try {
-            // Find global repeat customers (phones with >1 completed appointment)
+            // Platform-wide repeat customers (2+ completed visits) — sorted by most visits first
             $repeatPhones = DB::table('appointments')
                 ->where('status', 3)
                 ->select('phone')
@@ -534,73 +534,79 @@ class TeamMemberController extends Controller
             $appointments = DB::table('appointments')
                 ->where('status', 3)
                 ->whereIn('phone', $repeatPhones)
-                ->orderBy('phone')
                 ->orderBy('appointment_date', 'asc')
                 ->orderBy('appointment_time', 'asc')
                 ->get();
 
             $teamMembers = DB::table('team_members')->pluck('name', 'id')->toArray();
-            
             $customerJourney = [];
-            
+
             foreach ($appointments as $app) {
+                if (!isset($customerJourney[$app->phone])) {
+                    $customerJourney[$app->phone] = [
+                        'customer_name' => trim(($app->first_name ?? '') . ' ' . ($app->last_name ?? '')),
+                        'phone' => $app->phone,
+                        'service_count' => 0,
+                        'appointments' => [],
+                    ];
+                }
+
+                $servicesData = json_decode($app->services_data, true);
+                $visitServiceCount = $this->countAppointmentServices($servicesData);
+                $customerJourney[$app->phone]['service_count'] += $visitServiceCount;
+
                 $beauticianNames = [];
                 if ($app->assigned_to) {
-                    $bIds = explode(',', $app->assigned_to);
-                    foreach($bIds as $bId) {
+                    foreach (explode(',', $app->assigned_to) as $bId) {
                         $bId = trim($bId);
-                        if(isset($teamMembers[$bId])) {
+                        if (isset($teamMembers[$bId])) {
                             $beauticianNames[] = $teamMembers[$bId];
                         }
                     }
                 }
-                
-                $bNameString = implode(', ', $beauticianNames);
-                
-                if (!isset($customerJourney[$app->phone])) {
-                    $customerJourney[$app->phone] = [
-                        'customer_name' => ($app->first_name ?? '') . ' ' . ($app->last_name ?? ''),
-                        'phone' => $app->phone,
-                        'appointments' => []
-                    ];
-                }
-                
-                $servicesData = json_decode($app->services_data, true);
+
                 $customerJourney[$app->phone]['appointments'][] = [
                     'order_number' => $app->order_number,
                     'date' => $app->appointment_date,
                     'time' => $app->appointment_time,
-                    'beautician' => $bNameString ?: 'Unassigned',
-                    'total' => '₹' . number_format((float)($servicesData['summary']['grand_total'] ?? 0), 0),
+                    'beautician' => implode(', ', $beauticianNames) ?: 'Unassigned',
+                    'services_count' => $visitServiceCount,
+                    'total' => '₹' . number_format((float) ($servicesData['summary']['grand_total'] ?? 0), 0),
                 ];
             }
-            
-            // Filter by search query (name or phone)
+
             $search = $request->input('search');
+            $customerList = array_values($customerJourney);
+
             if (!empty($search)) {
                 $search = strtolower(trim($search));
-                $filteredJourney = [];
-                foreach ($customerJourney as $phone => $data) {
-                    if (str_contains(strtolower($data['customer_name']), $search) || str_contains(strtolower($phone), $search)) {
-                        $filteredJourney[] = $data;
-                    }
-                }
-                $customerJourney = $filteredJourney;
+                $customerList = array_values(array_filter($customerList, function ($data) use ($search) {
+                    return str_contains(strtolower($data['customer_name']), $search)
+                        || str_contains(strtolower((string) $data['phone']), $search);
+                }));
             }
-            
-            // Sort by number of appointments desc
-            usort($customerJourney, function($a, $b) {
-                return count($b['appointments']) <=> count($a['appointments']);
+
+            foreach ($customerList as &$row) {
+                $row['total_appointments'] = count($row['appointments']);
+            }
+            unset($row);
+
+            usort($customerList, function ($a, $b) {
+                $byVisits = ($b['total_appointments'] ?? 0) <=> ($a['total_appointments'] ?? 0);
+                if ($byVisits !== 0) {
+                    return $byVisits;
+                }
+
+                return ($b['service_count'] ?? 0) <=> ($a['service_count'] ?? 0);
             });
 
-            // Manual pagination
             $perPage = 10;
-            $currentPage = $request->input('page', 1);
-            $pagedData = array_slice($customerJourney, ($currentPage - 1) * $perPage, $perPage);
-            
+            $currentPage = (int) $request->input('page', 1);
+            $pagedData = array_slice($customerList, ($currentPage - 1) * $perPage, $perPage);
+
             $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
                 $pagedData,
-                count($customerJourney),
+                count($customerList),
                 $perPage,
                 $currentPage,
                 ['path' => Route('admin.team.platformRetentionReport')]
@@ -609,11 +615,34 @@ class TeamMemberController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $pagedData,
-                'pagination' => (string) $paginator->links('pagination::bootstrap-5')
+                'pagination' => (string) $paginator->links('pagination::bootstrap-5'),
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    private function countAppointmentServices(?array $servicesData): int
+    {
+        if (!is_array($servicesData)) {
+            return 1;
+        }
+
+        $services = $servicesData['services'] ?? null;
+        if (!is_array($services) || $services === []) {
+            return 1;
+        }
+
+        $total = 0;
+        foreach ($services as $service) {
+            if (!is_array($service)) {
+                $total += 1;
+                continue;
+            }
+            $total += max(1, (int) ($service['qty'] ?? $service['quantity'] ?? 1));
+        }
+
+        return max(1, $total);
     }
 
     public function getAppointmentsReport(Request $request, $id)

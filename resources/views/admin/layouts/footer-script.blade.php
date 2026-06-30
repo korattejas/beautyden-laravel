@@ -11,6 +11,7 @@
 <!-- Datatables -->
 <script src="{{ URL::asset('panel-assets/vendors/js/tables/datatable/jquery.dataTables.min.js') }}"></script>
 <script src="{{ URL::asset('panel-assets/vendors/js/tables/datatable/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ URL::asset('panel-assets/js/core/datatable-defaults.js') }}?v={{ time() }}"></script>
 <script src="{{ URL::asset('panel-assets/vendors/js/tables/datatable/datatables.buttons.min.js') }}"></script>
 <script src="{{ URL::asset('panel-assets/vendors/js/tables/datatable/dataTables.responsive.min.js') }}"></script>
 <script src="{{ URL::asset('panel-assets/vendors/js/tables/datatable/responsive.bootstrap5.min.js') }}"></script>
@@ -40,6 +41,7 @@
 <script src="{{ URL::asset('panel-assets/js/core/form.js') }}?v={{ time() }}"></script>
 <script src="{{ URL::asset('panel-assets/js/core/custom.js') }}"></script>
 <script src="{{ URL::asset('panel-assets/js/scripts/customizer.js') }}"></script>
+<script src="{{ URL::asset('panel-assets/js/core/premium-admin.js') }}?v={{ time() }}"></script>
 <!-- END: Theme JS -->
 
 <!-- Feather Icons Init -->

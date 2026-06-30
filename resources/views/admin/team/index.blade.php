@@ -18,6 +18,9 @@
 
     body {
         background-color: var(--mst-bg);
+    }
+
+    .team-members-page {
         font-family: 'Poppins', sans-serif;
     }
 
@@ -184,34 +187,34 @@
     .btn-view-card:hover { color: #1e293b; border-color: #1e293b; }
 
     .search-input-group {
-        width: 350px !important; /* Increased width */
-        max-width: 350px !important;
-        margin-right: 12px;
+        flex: 1 1 0;
+        min-width: 0;
+        width: auto;
+        max-width: none;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: stretch;
     }
 
     .search-input-group .input-group-text {
-        background: #fff;
-        border-right: none;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
         color: var(--mst-text-muted);
-        padding-left: 15px;
-        border-radius: 10px 0 0 10px !important;
+        padding: 0 0.75rem 0 0.9rem !important;
     }
 
-    .search-input-group .form-control {
-        border-left: none;
-        padding: 12px 15px; /* Taller input */
-        font-size: 0.95rem;
-        border-radius: 0 10px 10px 0 !important;
-        box-shadow: none !important;
-        transition: all 0.2s ease;
-    }
-
+    .search-input-group .form-control,
     .search-input-group .form-control:focus {
-        background-color: #fcfdfe;
-    }
-
-    .search-input-group:focus-within {
-        box-shadow: 0 4px 12px rgba(26, 35, 126, 0.1) !important;
+        border: none !important;
+        padding: 0 0.9rem 0 0.25rem !important;
+        font-size: 0.9rem;
+        box-shadow: none !important;
+        background: transparent !important;
+        min-height: 44px !important;
+        height: 44px !important;
+        border-radius: 0 !important;
+        outline: none !important;
     }
 
 
@@ -281,39 +284,6 @@
         letter-spacing: 0.8px;
     }
 
-    /* Premium DataTable (Separate Rows) */
-    #table-team-members {
-        width: 100% !important;
-        border-spacing: 0 10px !important;
-        border-collapse: separate !important;
-    }
-    #table-team-members thead th {
-        border-bottom: 2px solid #ebe9f1 !important;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        padding: 12px 15px !important;
-        color: #5e5873;
-        background-color: #f8f8f8;
-    }
-    #table-team-members tbody tr {
-        transition: all 0.25s ease;
-        cursor: pointer;
-    }
-    #table-team-members tbody tr:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(26, 35, 126, 0.1);
-        background-color: #fcfaff !important;
-    }
-    #table-team-members td {
-        padding: 15px !important;
-        vertical-align: middle !important;
-        border-top: none !important;
-        background: #fff;
-    }
-    #table-team-members tr td:first-child { border-radius: 12px 0 0 12px; }
-    #table-team-members tr td:last-child { border-radius: 0 12px 12px 0; }
-
     /* Report Table */
     .report-table {
         width: 100%;
@@ -350,8 +320,17 @@
         color: #1a237e;
     }
 
+    .chart-container,
+    .pa-chart-panel {
+        background: var(--mst-card-bg);
+        border: 1px solid #eef2f7;
+        border-radius: var(--mst-radius);
+        box-shadow: var(--mst-shadow);
+        padding: 1.35rem 1.5rem;
+    }
+
     .report-modal-header-title {
-        font-size: 1.4rem; /* Increased from 1.25rem */
+        font-size: 1.4rem;
         font-weight: 700;
     }
 
@@ -429,12 +408,6 @@
 
     .distance-pill i {
         font-size: 1rem;
-    }
-
-    .search-input-group {
-        width: 400px !important; /* Increased width */
-        max-width: 400px !important;
-        margin-right: 15px !important;
     }
 
     .role-label {
@@ -687,119 +660,238 @@
     }
 
     .fw-800 { font-weight: 800 !important; }
+
+    /* Platform Retention Modal */
+    .pa-retention-modal .pa-retention-modal-dialog {
+        width: min(920px, 94vw);
+        max-width: 920px;
+    }
+
+    .pa-retention-modal-content {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+    }
+
+    .pa-retention-modal-header {
+        background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+        color: #fff;
+        padding: 1.1rem 1.35rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: none;
+    }
+
+    .pa-retention-modal-header .c-modal-title {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .pa-retention-modal-close {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .pa-retention-modal-close:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .pa-retention-modal-body {
+        padding: 1.25rem 1.35rem 1.5rem;
+        background: #fff;
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+    .pa-modal-search-row {
+        display: flex;
+        align-items: stretch;
+        gap: 0.65rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .pa-modal-search-input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .pa-retention-modal .search-input-group {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        border: 1.5px solid var(--pa-border);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pa-retention-modal .search-input-group:focus-within {
+        border-color: var(--pa-primary);
+        box-shadow: 0 0 0 3px var(--pa-primary-glow);
+    }
+
+    .pa-retention-modal .search-input-group .input-group-text {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        color: var(--pa-text-muted);
+        padding: 0 0.75rem 0 0.9rem !important;
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+    }
+
+    .pa-retention-modal .search-input-group .form-control,
+    .pa-retention-modal .search-input-group .form-control:focus {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        min-height: 44px !important;
+        height: 44px !important;
+        padding: 0 0.9rem 0 0.25rem !important;
+        border-radius: 0 !important;
+        flex: 1 1 auto;
+        min-width: 0;
+        outline: none !important;
+    }
+
+    .pa-modal-search-row .pa-btn {
+        flex-shrink: 0;
+        min-width: 110px;
+    }
+
+    .pa-retention-customer-card {
+        background: var(--pa-surface-2);
+        border: 1px solid var(--pa-border);
+        border-radius: 14px;
+        padding: 1rem 1.15rem;
+        margin-bottom: 1rem;
+    }
+
+    .pa-retention-customer-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding-bottom: 0.75rem;
+        margin-bottom: 0.75rem;
+        border-bottom: 1px solid var(--pa-border);
+    }
+
+    .pa-retention-customer-head h6 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--pa-text);
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+    }
+
+    .pa-retention-rank {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2rem;
+        padding: 0.15rem 0.45rem;
+        border-radius: 8px;
+        background: var(--pa-primary-light);
+        color: var(--pa-primary);
+        font-size: 0.75rem;
+        font-weight: 800;
+    }
+
+    .pa-retention-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .pa-retention-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .pa-retention-table thead th {
+        background: #e2e8f0;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #64748b;
+        padding: 0.55rem 0.75rem;
+    }
+
+    .pa-retention-table thead th:first-child { border-radius: 8px 0 0 8px; }
+    .pa-retention-table thead th:last-child { border-radius: 0 8px 8px 0; }
+
+    .pa-retention-table tbody td {
+        padding: 0.65rem 0.75rem;
+        font-size: 0.85rem;
+        color: var(--pa-text-secondary);
+        border-bottom: 1px dashed #cbd5e1;
+        vertical-align: middle;
+    }
+
+    .pa-retention-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    @media (max-width: 575px) {
+        .pa-modal-search-row {
+            flex-wrap: wrap;
+        }
+
+        .pa-modal-search-row .pa-btn {
+            width: 100%;
+        }
+    }
 </style>
 @endsection
 
+@section('page_title', 'Team Members')
+@section('page_heading', 'Team Members')
+
 @section('content')
-    <div class="app-content content">
-        <div class="content-overlay"></div>
-        <div class="header-navbar-shadow"></div>
-        <div class="content-wrapper">
-            <div class="content-header row">
-                <div class="content-header-left col-md-4 col-12 mb-2">
-                    <div class="row breadcrumbs-top">
-                        <div class="col-12">
-                            <h2 class="content-header-title float-start mb-0">Team Members</h2>
-                            <div class="breadcrumb-wrapper">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item">
-                                        <a href="{{ route('admin.dashboard') }}">Home</a>
-                                    </li>
-                                    <li class="breadcrumb-item active"><a href="#">Team Members</a></li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
+    <div class="pa-list-page team-members-page">
+            @include('admin.layouts.crud-header', [
+                'title' => 'Team Members',
+                'items' => [
+                    ['label' => 'Home', 'url' => route('admin.dashboard')],
+                    ['label' => 'Team Members'],
+                ],
+                'actions' => view('admin.team.partials.header-actions')->render(),
+            ])
+
+            <div class="pa-list-toolbar pa-list-search-bar">
+                <div class="input-group search-input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="search-member" class="form-control border-0 shadow-none" placeholder="Search name..." value="{{ request('search') }}">
                 </div>
-                <div class="content-header-right text-md-end col-md-8 col-12 d-md-flex align-items-center justify-content-end d-none">
-                    <div class="input-group search-input-group shadow-sm">
-                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" id="search-member" class="form-control" placeholder="Search name..." value="{{ request('search') }}">
-                    </div>
-                    <div class="input-group search-input-group shadow-sm">
-                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                        <input type="text" id="search-address" class="form-control" placeholder="Search address (15km)..." value="{{ request('address_search') }}">
-                    </div>
-                    <a href="{{ route('admin.team.exportActive') }}" class="btn btn-success me-2 text-nowrap">
-                        <i class="bi bi-file-earmark-excel"></i> Export
-                    </a>
-                    <a href="{{ route('admin.team.create') }}" class="btn btn-primary me-2">
-                        Add
-                    </a>
-                    <div class="btn-group">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <i class="bi bi-funnel"></i> Filter
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 320px;">
-                            <div class="mb-2">
-                                <label class="form-label">Status</label>
-                                <select id="filter-status" class="form-select">
-                                    <option value="">All</option>
-                                    <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
-                                </select>
-                            </div>
-                            <div class="mb-2">
-                                <label class="form-label">Is Popular</label>
-                                <select id="filter-popular" class="form-select">
-                                    <option value="">All</option>
-                                    <option value="1" {{ request('popular') == '1' ? 'selected' : '' }}>High Priority</option>
-                                    <option value="0" {{ request('popular') == '0' ? 'selected' : '' }}>Low Priority</option>
-                                </select>
-                            </div>
-                            <div class="mb-2">
-                                <label class="form-label">Experience (Years)</label>
-                                <select id="filter-year-of-experience" class="form-select">
-                                    <option value="">All</option>
-                                    @for ($i = 0; $i <= 10; $i++)
-                                        @php $val = ($i < 10) ? $i : '10+'; @endphp
-                                        <option value="{{ $val }}" {{ request('year_of_experience') == (string)$val ? 'selected' : '' }}>
-                                            {{ $i < 10 ? $i . ' year' . ($i > 1 ? 's' : '') : '10+ years' }}
-                                        </option>
-                                    @endfor
-                                </select>
-                            </div>
-
-                            <div class="row mb-2">
-                                <div class="col-6">
-                                    <label class="form-label">Month</label>
-                                    <select id="filter-month" class="form-select">
-                                        <option value="">All Months</option>
-                                        @foreach(range(1, 12) as $m)
-                                            <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>{{ date('F', mktime(0,0,0,$m, 1)) }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label">Year</label>
-                                    <select id="filter-year" class="form-select">
-                                        <option value="">All Years</option>
-                                        @foreach(range(date('Y'), 2020) as $y)
-                                            <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>{{ $y }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Created Date</label>
-                                <input type="date" id="filter-created-date" class="form-control" value="{{ request('created_date') }}">
-                            </div>
-                            <div class="d-flex justify-content-between pt-1">
-                                <button id="btn-apply-card-filters" class="btn btn-primary w-100 me-1">
-                                    Apply
-                                </button>
-                                <button id="btn-reset-card-filters" class="btn btn-outline-secondary w-100">
-                                    Reset
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="input-group search-input-group">
+                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                    <input type="text" id="search-address" class="form-control border-0 shadow-none" placeholder="Search address (15km)..." value="{{ request('address_search') }}">
                 </div>
             </div>
 
-            <div class="content-body">
+            <div class="pa-list-content">
                 @if(request('address_search'))
                     <div class="location-banner">
                         <div class="location-icon-box">
@@ -861,17 +953,19 @@
                 <!-- Return Customers Chart -->
                 <div class="row mb-4">
                     <div class="col-12">
-                        <div class="chart-container">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="chart-container pa-chart-panel">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
                                 <div>
-                                    <h4 class="mb-0 fw-bold">Beautician Return Performance</h4>
+                                    <h4 class="mb-1 fw-bold">Beautician Return Performance</h4>
                                     <p class="text-muted small mb-0">Total customers who returned after being served by each beautician</p>
                                 </div>
-                                <button type="button" id="btn-platform-retention" class="btn btn-sm text-white px-4 py-2 rounded-pill shadow-sm" style="background: linear-gradient(135deg, #7367f0 0%, #a889f4 100%); font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; border: none;">
-                                    <i class="bi bi-people-fill me-1"></i> View Platform Journey
+                                <button type="button" id="btn-platform-retention" class="pa-btn pa-btn-primary pa-btn-sm">
+                                    <i class="bi bi-people-fill"></i> View Platform Journey
                                 </button>
                             </div>
-                            <canvas id="returnPerformanceChart" style="max-height: 300px;"></canvas>
+                            <div style="position:relative;width:100%;height:320px;">
+                                <canvas id="returnPerformanceChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -988,12 +1082,12 @@
                 <!-- DataTable Section -->
                 <div class="row mt-4">
                     <div class="col-12">
-                        <div class="card shadow-sm" style="border-radius: 16px; border: none; overflow: hidden;">
-                            <div class="card-header bg-white border-bottom py-3">
-                                <h4 class="card-title mb-0 fw-bold"><i class="bi bi-table me-2 text-primary"></i> Detailed Team List</h4>
+                        <div class="pa-dt-panel">
+                            <div class="pa-dt-panel-header">
+                                <h4 class="card-title"><i class="bi bi-table me-2 text-primary"></i> Detailed Team List</h4>
                             </div>
-                            <div class="card-datatable table-responsive px-2 pb-2">
-                                <table class="dt-column-search table table-hover" id="table-team-members">
+                            <div class="card-datatable table-responsive">
+                                <table class="dt-column-search table table-hover w-100" id="table-team-members">
                                     <thead>
                                         <tr>
                                             <th data-search="false">#</th>
@@ -1014,9 +1108,8 @@
                     </div>
                 </div>
             </div>
-            </div>
-        </div>
     </div>
+
     <div id="c-viewTeamModal" class="c-modal">
         <div class="c-modal-dialog">
             <div class="c-modal-content">
@@ -1156,22 +1249,26 @@
     </div>
 
     <!-- Platform Retention Report Modal -->
-    <div id="c-platformRetentionModal" class="c-modal">
-        <div class="c-modal-dialog" style="max-width: 900px;">
-            <div class="c-modal-content">
-                <div class="c-modal-header" style="background: linear-gradient(135deg, #7367f0 0%, #a889f4 100%);">
-                    <h5 class="c-modal-title report-modal-header-title text-white"><i class="bi bi-people-fill"></i> Platform Retention Report</h5>
-                    <button class="c-close-btn" data-c-close-platform-retention>&times;</button>
+    <div id="c-platformRetentionModal" class="c-modal pa-retention-modal">
+        <div class="c-modal-dialog pa-retention-modal-dialog">
+            <div class="c-modal-content pa-retention-modal-content">
+                <div class="c-modal-header pa-retention-modal-header">
+                    <h5 class="c-modal-title"><i class="bi bi-people-fill me-2"></i> Platform Retention Report</h5>
+                    <button type="button" class="pa-retention-modal-close" data-c-close-platform-retention aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                 </div>
-                <div class="c-modal-body" id="platform-retention-modal-body">
-                    <div class="mb-4 px-1">
-                        <div class="input-group shadow-sm rounded-pill overflow-hidden">
-                            <span class="input-group-text bg-white border-0 ps-3"><i class="bi bi-search text-muted"></i></span>
+                <div class="c-modal-body pa-retention-modal-body">
+                    <div class="pa-modal-search-row">
+                        <div class="input-group search-input-group pa-modal-search-input">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
                             <input type="text" id="platform-retention-search" class="form-control border-0 shadow-none" placeholder="Search by name or mobile number..." autocomplete="off">
-                            <button type="button" class="btn px-4 text-white" id="btn-search-platform-retention" style="background: linear-gradient(135deg, #7367f0 0%, #a889f4 100%); font-weight: 600;">Search</button>
                         </div>
+                        <button type="button" class="pa-btn pa-btn-primary" id="btn-search-platform-retention">
+                            <i class="bi bi-search"></i> Search
+                        </button>
                     </div>
-                    <div id="platform-retention-table-container">
+                    <div id="platform-retention-table-container" class="pa-retention-results">
                         <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status"></div>
                             <p class="mt-2 text-muted">Fetching platform retention data...</p>
@@ -1181,6 +1278,7 @@
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @endsection
 
@@ -1878,7 +1976,11 @@
                             },
                             x: {
                                 ticks: {
-                                    font: { weight: '600' }
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    autoSkip: true,
+                                    maxTicksLimit: 12,
+                                    font: { size: 11, weight: '600' }
                                 },
                                 grid: {
                                     display: false
@@ -1934,45 +2036,56 @@
                     if (response.success) {
                         let html = '';
                         if (response.data.length > 0) {
-                            response.data.forEach(customer => {
+                            const pageStartRank = ((page - 1) * 10) + 1;
+                            response.data.forEach((customer, index) => {
+                                const rank = pageStartRank + index;
+                                const serviceCount = customer.service_count || 0;
+                                const apptCount = customer.total_appointments || customer.appointments.length;
                                 html += `
-                                <div class="card mb-3 border-0 shadow-sm" style="background: #f8fafc; border-radius: 12px;">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                            <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-person-circle text-primary me-1"></i> ${customer.customer_name}</h6>
-                                            <a href="tel:${customer.phone}" class="text-primary fw-bold" style="text-decoration:none;"><i class="bi bi-telephone"></i> ${customer.phone}</a>
+                                <div class="pa-retention-customer-card">
+                                    <div class="pa-retention-customer-head">
+                                        <h6>
+                                            <span class="pa-retention-rank">#${rank}</span>
+                                            <i class="bi bi-person-circle text-primary me-1"></i>${customer.customer_name || 'Unknown'}
+                                        </h6>
+                                        <div class="pa-retention-meta">
+                                            <span class="pa-badge pa-badge-primary">${serviceCount} Services</span>
+                                            <span class="pa-badge pa-badge-neutral">${apptCount} Visits</span>
+                                            <a href="tel:${customer.phone}" class="pa-btn pa-btn-sm pa-btn-outline"><i class="bi bi-telephone"></i> ${customer.phone}</a>
                                         </div>
-                                        <div class="table-responsive">
-                                            <table class="table table-sm table-borderless mb-0">
-                                                <thead style="background: #e2e8f0; border-radius: 6px;">
-                                                    <tr>
-                                                        <th style="border-top-left-radius:6px; border-bottom-left-radius:6px;" class="py-2 px-3"><small>Order</small></th>
-                                                        <th class="py-2 px-3"><small>Date & Time</small></th>
-                                                        <th class="py-2 px-3"><small>Beautician</small></th>
-                                                        <th style="border-top-right-radius:6px; border-bottom-right-radius:6px;" class="py-2 px-3"><small>Revenue</small></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="pa-retention-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Order</th>
+                                                    <th>Date & Time</th>
+                                                    <th>Beautician</th>
+                                                    <th>Services</th>
+                                                    <th>Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
                                 `;
-                                
-                                customer.appointments.forEach((app, index) => {
-                                    let badge = index === 0 
-                                        ? '<span class="badge bg-success ms-1" style="font-size: 0.6rem;">1st</span>' 
+
+                                customer.appointments.forEach((app, visitIndex) => {
+                                    const visitBadge = visitIndex === 0
+                                        ? '<span class="pa-badge pa-badge-success ms-1">1st Visit</span>'
                                         : '';
                                     html += `
-                                        <tr style="border-bottom: 1px dashed #cbd5e1;">
-                                            <td class="px-3 align-middle"><strong class="text-secondary" style="font-size:0.85rem;">${app.order_number}</strong></td>
-                                            <td class="px-3 align-middle"><span style="font-size:0.85rem;">${app.date} <span class="text-muted">${app.time}</span></span></td>
-                                            <td class="px-3 align-middle"><span class="fw-bold" style="color: #475569; font-size:0.85rem;">${app.beautician} ${badge}</span></td>
-                                            <td class="px-3 align-middle"><span style="color: #7367f0; font-weight: 700; font-size:0.85rem;">${app.total}</span></td>
+                                        <tr>
+                                            <td><strong class="text-secondary">${app.order_number}</strong></td>
+                                            <td>${app.date} <span class="text-muted">${app.time || ''}</span>${visitBadge}</td>
+                                            <td><span class="fw-semibold">${app.beautician || 'Unassigned'}</span></td>
+                                            <td><span class="fw-semibold">${app.services_count || 1}</span></td>
+                                            <td><span class="fw-bold text-primary">${app.total}</span></td>
                                         </tr>
                                     `;
                                 });
                                 
                                 html += `
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                                 `;

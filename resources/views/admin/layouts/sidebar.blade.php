@@ -1,172 +1,14 @@
-<style>
-    /* Premium Sidebar Redesign - Sleek Light Edition */
-    .main-menu {
-        background: #ffffff !important;
-        border-right: 1px solid rgba(0, 0, 0, 0.06) !important;
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.03) !important;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    .main-menu .navbar-header {
-        height: 110px !important;
-        padding: 1.5rem !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        background: #ffffff !important;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
-        margin-bottom: 0.5rem;
-    }
-
-    .sidebar-main-logo {
-        height: 80px !important;
-        width: auto !important;
-        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .navbar-brand:hover .sidebar-main-logo {
-        transform: scale(1.08);
-    }
-
-    .main-menu-content {
-        padding: 0.8rem 1rem !important;
-    }
-
-    .navigation-main {
-        background: transparent !important;
-    }
-
-    .navigation-main .nav-item {
-        margin: 4px 0 !important;
-        border-radius: 12px !important;
-        transition: all 0.3s ease !important;
-    }
-
-    .navigation-main .nav-item a {
-        padding: 12px 18px !important;
-        border-radius: 12px !important;
-        color: #4b5563 !important;
-        font-weight: 500 !important;
-        font-size: 0.92rem !important;
-        transition: all 0.3s ease !important;
-        background: transparent !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 12px !important;
-    }
-
-    /* Icon Styling */
-    .navigation-main .nav-item a i, 
-    .navigation-main .nav-item a svg {
-        width: 19px !important;
-        height: 19px !important;
-        transition: all 0.3s ease !important;
-        color: #94a3b8 !important;
-    }
-
-    /* Hover State */
-    .navigation-main .nav-item:not(.active) a:hover {
-        background: #f8fafc !important;
-        color: #6366f1 !important;
-        transform: translateX(5px);
-    }
-
-    .navigation-main .nav-item:not(.active) a:hover i,
-    .navigation-main .nav-item:not(.active) a:hover svg {
-        color: #6366f1 !important;
-    }
-
-    /* Active State - Premium Soft Look */
-    .navigation-main .nav-item.active {
-        background: #f5f3ff !important;
-    }
-
-    .navigation-main .nav-item.active a {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-        color: #ffffff !important;
-        font-weight: 600 !important;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-    }
-
-    .navigation-main .nav-item.active a i,
-    .navigation-main .nav-item.active a svg {
-        color: #ffffff !important;
-        transform: scale(1.1);
-    }
-
-    /* Navigation Header */
-    .navigation-header {
-        margin: 1.8rem 0 0.8rem 1.2rem !important;
-        padding: 0 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1.2px !important;
-        font-size: 0.72rem !important;
-        font-weight: 700 !important;
-        color: #94a3b8 !important;
-    }
-
-    .navigation-header span {
-        background: #f1f5f9;
-        padding: 2px 8px;
-        border-radius: 4px;
-    }
-
-    /* Scrollbar Style */
-    .main-menu-content::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    .main-menu-content::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .main-menu-content::-webkit-scrollbar-thumb {
-        background: #e2e8f0;
-        border-radius: 10px;
-    }
-
-    .main-menu-content:hover::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-    }
-
-    /* Toggle Switch Style */
-    .sidebar-toggle {
-        display: flex;
-        background: #f1f5f9;
-        border-radius: 10px;
-        padding: 4px;
-        margin-bottom: 1rem;
-    }
-    .sidebar-toggle button {
-        flex: 1;
-        border: none;
-        background: transparent;
-        padding: 8px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: #64748b;
-        transition: all 0.3s;
-    }
-    .sidebar-toggle button.active {
-        background: #ffffff;
-        color: #6366f1;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-</style>
-
 @php
     $admin = Auth::guard('admin')->user();
     $isSuperAdmin = empty($admin->role_id);
-    
+
     $userPermissions = [];
     if (!$isSuperAdmin && $admin->role && $admin->role->permissions) {
         $perms = $admin->role->permissions;
-        // Keep decoding as long as it's a string
         while(is_string($perms)) {
             $decoded = json_decode($perms, true);
             if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
-                break; // Stop if it's not valid JSON
+                break;
             }
             $perms = $decoded;
         }
@@ -181,363 +23,230 @@
     }
 @endphp
 
-<div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
-    <div class="navbar-header">
-        <ul class="nav navbar-nav flex-row">
-            <li class="nav-item me-auto">
-                <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
-                    <span class="brand-logo">
-                        <!-- <img src="{{ URL::asset('panel-assets/admin-logo/sidebar-Logo.png') }}" class="sidebar-main-logo" alt="Logo" /> -->
-                    </span>
-                </a>
-            </li>
-        </ul>
+<aside class="pa-sidebar" id="paSidebar">
+    <div class="pa-sidebar-header">
+        <a class="pa-brand" href="{{ route('admin.dashboard') }}">
+            {{-- <img src="{{ URL::asset('panel-assets/admin-logo/sidebar-Logo.png') }}" class="sidebar-main-logo pa-sidebar-logo" alt="BeautyDen"> --}}
+        </a>
+        <button class="pa-sidebar-toggle" id="paSidebarToggle" type="button" aria-label="Toggle sidebar">
+            <i data-feather="chevrons-left"></i>
+        </button>
     </div>
 
-    <div class="shadow-bottom"></div>
-    <div class="main-menu-content">
-        
-        <!-- Toggle Switch -->
-        <div class="sidebar-toggle">
-            <button id="show-services" class="active">Services</button>
-            <button id="show-products">Products</button>
-        </div>
+    <div class="pa-sidebar-tabs">
+        <button class="pa-sidebar-tab active" id="show-services" type="button">Services</button>
+        <button class="pa-sidebar-tab" id="show-products" type="button">Products</button>
+    </div>
 
-        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+    <nav class="pa-sidebar-nav">
+        <ul class="pa-nav-section list-unstyled mb-0">
 
-            <!-- Common / Dashboard -->
             @if(hasMenuAccess('dashboard', $isSuperAdmin, $userPermissions))
-            <li class=" nav-item {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.dashboard') }}">
+            <li class="pa-nav-item {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.dashboard') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard">
                     <i data-feather="grid"></i>
-                    <span class="menu-title text-truncate">Dashboard</span>
+                    <span>Dashboard</span>
                 </a>
             </li>
             @endif
 
-            <!-- SERVICES MENU -->
+            @if(hasMenuAccess('reports', $isSuperAdmin, $userPermissions) || $isSuperAdmin)
+            <li class="pa-nav-item {{ Request::routeIs('admin.reports.*') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.reports.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Reports">
+                    <i data-feather="bar-chart-2"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            @endif
+
             <div class="services-menu-section">
-                
                 @if(hasMenuAccess('appointments', $isSuperAdmin, $userPermissions) || hasMenuAccess('team_members', $isSuperAdmin, $userPermissions) || hasMenuAccess('service_catalog', $isSuperAdmin, $userPermissions))
-                <li class=" navigation-header">
-                    <span>Service Management</span>
-                </li>
+                <li class="pa-nav-label">Service Management</li>
                 @endif
 
                 @if(hasMenuAccess('appointments', $isSuperAdmin, $userPermissions))
-                <li class="nav-item {{ Request::routeIs('admin.appointments.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.appointments.index') }}">
-                        <i data-feather="calendar"></i>
-                        <span class="menu-title text-truncate">Appointments</span>
+                <li class="pa-nav-item {{ Request::routeIs('admin.appointments.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.appointments.index') }}">
+                        <i data-feather="calendar"></i><span>Appointments</span>
                     </a>
                 </li>
                 @endif
 
                 @if(hasMenuAccess('team_members', $isSuperAdmin, $userPermissions))
-                <li class="nav-item {{ Request::routeIs('admin.team.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.team.index') }}">
-                        <i data-feather="users"></i>
-                        <span class="menu-title text-truncate">Team Members</span>
+                <li class="pa-nav-item {{ Request::routeIs('admin.team.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.team.index') }}">
+                        <i data-feather="users"></i><span>Team Members</span>
                     </a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.attendance.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.attendance.index') }}">
-                        <i data-feather="clock"></i>
-                        <span class="menu-title text-truncate">Attendance</span>
+                <li class="pa-nav-item {{ Request::routeIs('admin.attendance.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.attendance.index') }}">
+                        <i data-feather="clock"></i><span>Attendance</span>
                     </a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.user.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.user.index') }}">
-                        <i data-feather="user-check"></i>
-                        <span class="menu-title text-truncate">Registered Users</span>
+                <li class="pa-nav-item {{ Request::routeIs('admin.user.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.user.index') }}">
+                        <i data-feather="user-check"></i><span>Customers</span>
                     </a>
                 </li>
                 @endif
 
                 @if(hasMenuAccess('service_catalog', $isSuperAdmin, $userPermissions))
-                <li class="nav-item {{ Request::routeIs('admin.service.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.service.index') }}">
-                        <i data-feather="shopping-bag"></i>
-                        <span class="menu-title text-truncate">Service Catalog</span>
+                <li class="pa-nav-item {{ Request::routeIs('admin.service.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.service.index') }}">
+                        <i data-feather="heart"></i><span>Services</span>
                     </a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.service-master.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.service-master.index') }}">
-                        <i data-feather="zap"></i>
-                        <span class="menu-title text-truncate">Advanced Catalog</span>
+                <li class="pa-nav-item {{ Request::routeIs('admin.service-master.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.service-master.index') }}">
+                        <i data-feather="zap"></i><span>Advanced Catalog</span>
                     </a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.service-essential.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.service-essential.index') }}">
-                        <i data-feather="grid"></i>
-                        <span class="menu-title text-truncate">Master Essentials</span>
+                <li class="pa-nav-item {{ Request::routeIs('admin.service-essential.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.service-essential.index') }}">
+                        <i data-feather="layers"></i><span>Master Essentials</span>
                     </a>
                 </li>
 
-                <li class=" navigation-header">
-                    <span>Service Config</span>
+                <li class="pa-nav-label">Service Config</li>
+                <li class="pa-nav-item {{ Request::routeIs('admin.service-type.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.service-type.index') }}"><i data-feather="list"></i><span>Service Types</span></a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.service-type.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.service-type.index') }}">
-                        <i data-feather="list"></i>
-                        <span class="menu-title text-truncate">Service Types</span>
-                    </a>
+                <li class="pa-nav-item {{ Request::routeIs('admin.service-category.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.service-category.index') }}"><i data-feather="box"></i><span>Categories</span></a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.service-category.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.service-category.index') }}">
-                        <i data-feather="box"></i>
-                        <span class="menu-title text-truncate">Categories</span>
-                    </a>
+                <li class="pa-nav-item {{ Request::routeIs('admin.service-subcategory.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.service-subcategory.index') }}"><i data-feather="folder"></i><span>Sub Categories</span></a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.service-subcategory.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.service-subcategory.index') }}">
-                        <i data-feather="layers"></i>
-                        <span class="menu-title text-truncate">Sub Categories</span>
-                    </a>
+                <li class="pa-nav-item {{ Request::routeIs('admin.city.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.city.index') }}"><i data-feather="map-pin"></i><span>City List</span></a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.city.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.city.index') }}">
-                        <i data-feather="map-pin"></i>
-                        <span class="menu-title text-truncate">City List</span>
-                    </a>
+                <li class="pa-nav-item {{ Request::routeIs('admin.service-city-price.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.service-city-price.index') }}"><i data-feather="dollar-sign"></i><span>Pricing (Web)</span></a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.service-city-price.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.service-city-price.index') }}">
-                        <i data-feather="dollar-sign"></i>
-                        <span class="menu-title text-truncate">Service Pricing (Web)</span>
-                    </a>
-                </li>
-                <li class="nav-item {{ Request::routeIs('admin.service-city-master.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.service-city-master.index') }}">
-                        <i data-feather="monitor"></i>
-                        <span class="menu-title text-truncate">Service Pricing (App)</span>
-                    </a>
+                <li class="pa-nav-item {{ Request::routeIs('admin.service-city-master.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.service-city-master.index') }}"><i data-feather="smartphone"></i><span>Pricing (App)</span></a>
                 </li>
                 @endif
             </div>
 
-            <!-- PRODUCTS MENU -->
             @if(hasMenuAccess('products', $isSuperAdmin, $userPermissions))
             <div class="products-menu-section" style="display: none;">
-                <li class=" navigation-header">
-                    <span>Product Management</span>
+                <li class="pa-nav-label">Product Management</li>
+                <li class="pa-nav-item {{ Request::routeIs('admin.product-item.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.product-item.index') }}"><i data-feather="shopping-bag"></i><span>Products</span></a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.product-item.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.product-item.index') }}">
-                        <i data-feather="shopping-bag"></i>
-                        <span class="menu-title text-truncate">Products</span>
-                    </a>
+                <li class="pa-nav-item {{ Request::routeIs('admin.product-brand.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.product-brand.index') }}"><i data-feather="tag"></i><span>Brands</span></a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.product-brand.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.product-brand.index') }}">
-                        <i data-feather="tag"></i>
-                        <span class="menu-title text-truncate">Brands</span>
-                    </a>
+                <li class="pa-nav-label">Product Config</li>
+                <li class="pa-nav-item {{ Request::routeIs('admin.product-category.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.product-category.index') }}"><i data-feather="box"></i><span>Categories</span></a>
                 </li>
-                <li class=" navigation-header">
-                    <span>Product Config</span>
+                <li class="pa-nav-item {{ Request::routeIs('admin.product-subcategory.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.product-subcategory.index') }}"><i data-feather="folder"></i><span>Sub Categories</span></a>
                 </li>
-                <li class="nav-item {{ Request::routeIs('admin.product-category.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.product-category.index') }}">
-                        <i data-feather="box"></i>
-                        <span class="menu-title text-truncate">Categories</span>
-                    </a>
-                </li>
-                <li class="nav-item {{ Request::routeIs('admin.product-subcategory.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.product-subcategory.index') }}">
-                        <i data-feather="layers"></i>
-                        <span class="menu-title text-truncate">Sub Categories</span>
-                    </a>
-                </li>
-                <li class=" navigation-header">
-                    <span>Sales</span>
-                </li>
-                <li class="nav-item {{ Request::routeIs('admin.product-order.index') ? 'active' : '' }}">
-                    <a class="d-flex align-items-center" href="{{ route('admin.product-order.index') }}">
-                        <i data-feather="file-text"></i>
-                        <span class="menu-title text-truncate">Product Orders</span>
-                    </a>
+                <li class="pa-nav-label">Sales</li>
+                <li class="pa-nav-item {{ Request::routeIs('admin.product-order.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.product-order.index') }}"><i data-feather="file-text"></i><span>Orders</span></a>
                 </li>
             </div>
             @endif
 
-            <!-- COMMON SYSTEM MENUS -->
             @if(hasMenuAccess('offers', $isSuperAdmin, $userPermissions))
-            <li class=" navigation-header">
-                <span>Promotions</span>
+            <li class="pa-nav-label">Promotions</li>
+            <li class="pa-nav-item {{ Request::routeIs('admin.offers.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.offers.index') }}"><i data-feather="gift"></i><span>Offers</span></a>
             </li>
-            <li class="nav-item {{ Request::routeIs('admin.offers.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.offers.index') }}">
-                    <i data-feather="gift"></i>
-                    <span class="menu-title text-truncate">Offers (Banners)</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.coupon-codes.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.coupon-codes.index') }}"><i data-feather="percent"></i><span>Coupons</span></a>
             </li>
-            <li class="nav-item {{ Request::routeIs('admin.coupon-codes.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.coupon-codes.index') }}">
-                    <i data-feather="tag"></i>
-                    <span class="menu-title text-truncate">Coupon Codes</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.coupon-usage.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.coupon-usage.index') }}"><i data-feather="clipboard"></i><span>Coupon Logs</span></a>
             </li>
-            <li class="nav-item {{ Request::routeIs('admin.coupon-usage.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.coupon-usage.index') }}">
-                    <i data-feather="file-text"></i>
-                    <span class="menu-title text-truncate">Coupon Usage Logs</span>
-                </a>
+            {{-- Membership Plans — currently not in use
+            <li class="pa-nav-item {{ Request::routeIs('admin.membership.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.membership.index') }}"><i data-feather="award"></i><span>Memberships</span></a>
             </li>
-            <li class="nav-item {{ Request::routeIs('admin.membership.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.membership.index') }}">
-                    <i data-feather="award"></i>
-                    <span class="menu-title text-truncate">Memberships</span>
-                </a>
-            </li>
-            <li class="nav-item {{ Request::routeIs('admin.combo.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.combo.index') }}">
-                    <i data-feather="package"></i>
-                    <span class="menu-title text-truncate">Service Combos</span>
-                </a>
+            --}}
+            <li class="pa-nav-item {{ Request::routeIs('admin.combo.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.combo.index') }}"><i data-feather="package"></i><span>Combos</span></a>
             </li>
             @endif
 
             @if(hasMenuAccess('settings', $isSuperAdmin, $userPermissions))
-            <li class=" navigation-header">
-                <span>Finance</span>
+            <li class="pa-nav-label">Finance</li>
+            <li class="pa-nav-item {{ Request::routeIs('admin.razorpay.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.razorpay.index') }}"><i data-feather="credit-card"></i><span>Razorpay</span></a>
             </li>
-            <li class="nav-item {{ Request::routeIs('admin.razorpay.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.razorpay.index') }}">
-                    <i data-feather="credit-card"></i>
-                    <span class="menu-title text-truncate">Razorpay Trans.</span>
-                </a>
-            </li>
-            <li class="nav-item {{ Request::routeIs('admin.settlement.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.settlement.index') }}">
-                    <i data-feather="dollar-sign"></i>
-                    <span class="menu-title text-truncate">Settlements</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.settlement.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.settlement.index') }}"><i data-feather="dollar-sign"></i><span>Settlements</span></a>
             </li>
             @endif
 
             @if(hasMenuAccess('contact_submissions', $isSuperAdmin, $userPermissions) || hasMenuAccess('reviews', $isSuperAdmin, $userPermissions))
-            <li class=" navigation-header">
-                <span>Communication</span>
-            </li>
+            <li class="pa-nav-label">Communication</li>
             @endif
 
             @if(hasMenuAccess('contact_submissions', $isSuperAdmin, $userPermissions))
-            <li class="nav-item {{ Request::routeIs('admin.contact-submissions.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.contact-submissions.index') }}">
-                    <i data-feather="mail"></i>
-                    <span class="menu-title text-truncate">Inquiries</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.contact-submissions.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.contact-submissions.index') }}"><i data-feather="mail"></i><span>Inquiries</span></a>
             </li>
-            <li class="nav-item {{ Request::routeIs('admin.notifications.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.notifications.index') }}">
-                    <i data-feather="bell"></i>
-                    <span class="menu-title text-truncate">Push Notifications</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.notifications.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.notifications.index') }}"><i data-feather="bell"></i><span>Notifications</span></a>
             </li>
             @endif
 
             @if(hasMenuAccess('reviews', $isSuperAdmin, $userPermissions))
-            <li class="nav-item {{ Request::routeIs('admin.reviews.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.reviews.index') }}">
-                    <i data-feather="star"></i>
-                    <span class="menu-title text-truncate">Reviews</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.reviews.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.reviews.index') }}"><i data-feather="star"></i><span>Reviews</span></a>
             </li>
             @endif
 
             @if(hasMenuAccess('blogs', $isSuperAdmin, $userPermissions))
-            <li class=" navigation-header">
-                <span>Content</span>
+            <li class="pa-nav-label">Content</li>
+            <li class="pa-nav-item {{ Request::routeIs('admin.portfolio.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.portfolio.index') }}"><i data-feather="image"></i><span>Portfolio</span></a>
             </li>
-            <li class="nav-item {{ Request::routeIs('admin.portfolio.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.portfolio.index') }}">
-                    <i data-feather="image"></i>
-                    <span class="menu-title text-truncate">Portfolio</span>
-                </a>
-            </li>
-            <li class="nav-item {{ Request::routeIs('admin.blogs.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.blogs.index') }}">
-                    <i data-feather="edit"></i>
-                    <span class="menu-title text-truncate">Blog Posts</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.blogs.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.blogs.index') }}"><i data-feather="edit-3"></i><span>Blog Posts</span></a>
             </li>
             @endif
 
-            <li class=" navigation-header">
-                <span>System</span>
-            </li>
-            
+            <li class="pa-nav-label">System</li>
+
             @if(hasMenuAccess('settings', $isSuperAdmin, $userPermissions))
-            <li class="nav-item {{ Request::routeIs('admin.app-setting.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.app-setting.index') }}">
-                    <i data-feather="smartphone"></i>
-                    <span class="menu-title text-truncate">App Settings</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.app-setting.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.app-setting.index') }}"><i data-feather="smartphone"></i><span>App Settings</span></a>
             </li>
-            <li class="nav-item {{ Request::routeIs('admin.policies.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.policies.index') }}">
-                    <i data-feather="file-text"></i>
-                    <span class="menu-title text-truncate">Policies</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.policies.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.policies.index') }}"><i data-feather="file-text"></i><span>Policies</span></a>
             </li>
             @endif
 
             @if($isSuperAdmin)
-            <li class="nav-item {{ Request::routeIs('admin.roles.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.roles.index') }}">
-                    <i data-feather="shield"></i>
-                    <span class="menu-title text-truncate">Roles & Access</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.roles.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.roles.index') }}"><i data-feather="shield"></i><span>Roles & Access</span></a>
             </li>
-            <li class="nav-item {{ Request::routeIs('admin.admin-staff.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.admin-staff.index') }}">
-                    <i data-feather="users"></i>
-                    <span class="menu-title text-truncate">Admin Staff</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.admin-staff.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.admin-staff.index') }}"><i data-feather="user-plus"></i><span>Admin Staff</span></a>
             </li>
             @endif
 
             @if(hasMenuAccess('settings', $isSuperAdmin, $userPermissions))
-            <li class="nav-item {{ Request::routeIs('admin.setting.index') ? 'active' : '' }}">
-                <a class="d-flex align-items-center" href="{{ route('admin.setting.index') }}">
-                    <i data-feather="settings"></i>
-                    <span class="menu-title text-truncate">Settings</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.setting.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.setting.index') }}"><i data-feather="settings"></i><span>Settings</span></a>
             </li>
             @endif
 
-            <li class="nav-item">
-                <a class="d-flex align-items-center" href="{{ route('admin.logout') }}">
-                    <i data-feather="log-out"></i>
-                    <span class="menu-title text-truncate">Logout</span>
-                </a>
+            <li class="pa-nav-item {{ Request::routeIs('admin.profile.*') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.profile.index') }}"><i data-feather="user"></i><span>Profile</span></a>
             </li>
         </ul>
+    </nav>
+
+    <div class="pa-sidebar-footer">
+        <a class="pa-nav-link" href="{{ route('admin.logout') }}">
+            <i data-feather="log-out"></i><span>Logout</span>
+        </a>
     </div>
-</div>
-
-<!-- JS to handle Toggle -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('#show-services').click(function() {
-            $(this).addClass('active');
-            $('#show-products').removeClass('active');
-            $('.services-menu-section').show();
-            $('.products-menu-section').hide();
-        });
-
-        $('#show-products').click(function() {
-            $(this).addClass('active');
-            $('#show-services').removeClass('active');
-            $('.services-menu-section').hide();
-            $('.products-menu-section').show();
-        });
-
-        // Auto-select based on current URL
-        if (window.location.href.indexOf('product') > -1) {
-            $('#show-products').click();
-        }
-    });
-</script>
+</aside>

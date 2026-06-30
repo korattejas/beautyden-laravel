@@ -1,0 +1,136 @@
+/* ═══════════════════════════════════════════════════════════════
+   Add / Edit Appointment — page-scoped styles ONLY
+   Requires wrapper: .pa-appointment-form-page
+   ═══════════════════════════════════════════════════════════════ */
+
+.pa-content:has(.pa-appointment-form-page) {
+    padding-top: 0.65rem !important;
+}
+
+.pa-appointment-form-page .pa-crud-page-header {
+    margin-bottom: 1rem !important;
+}
+
+.pa-appointment-form-page .pa-crud-page-header h1 {
+    font-size: 1.75rem;
+}
+
+.pa-appointment-form-page .pa-crud-page-header > div > p {
+    font-size: 0.9375rem;
+}
+
+.pa-appointment-form-page .content-wrapper,
+.pa-appointment-form-page .content-body {
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100%;
+}
+
+.pa-appointment-form-page .horizontal-wizard .row {
+    --bs-gutter-x: 1.25rem;
+}
+
+.pa-appointment-form-page .pa-card-subtle {
+    border: 1px solid var(--pa-border);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: var(--pa-shadow-card);
+    overflow: hidden;
+}
+
+.pa-appointment-form-page .pa-card-subtle .pa-card-header {
+    padding: 1rem 1.35rem;
+    border-bottom: 1px solid var(--pa-border-light);
+    background: #fff;
+}
+
+.pa-appointment-form-page .pa-card-subtle .pa-card-header h6 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--pa-text);
+}
+
+.pa-appointment-form-page .pa-card-subtle .pa-card-body {
+    padding: 1.35rem 1.5rem 1.5rem !important;
+}
+
+.pa-appointment-form-page .pa-form-field label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--pa-text);
+    margin-bottom: 0.45rem;
+}
+
+.pa-appointment-form-page .pa-form-field .form-control,
+.pa-appointment-form-page .pa-form-field .form-select {
+    min-height: 48px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 1.5px solid var(--pa-border);
+    border-radius: 12px;
+    padding: 0.65rem 1rem;
+    background: #fff;
+    box-shadow: none;
+}
+
+.pa-appointment-form-page .pa-form-field textarea.form-control {
+    min-height: 100px;
+    line-height: 1.55;
+}
+
+.pa-appointment-form-page .pa-form-field .form-control:focus,
+.pa-appointment-form-page .pa-form-field .form-select:focus {
+    border-color: var(--pa-primary);
+    box-shadow: 0 0 0 3px var(--pa-primary-glow);
+    outline: none;
+}
+
+.pa-appointment-form-page .select2-container--default .select2-selection--single {
+    min-height: 46px !important;
+    height: 46px !important;
+    border: 1.5px solid var(--pa-border) !important;
+    border-radius: 12px !important;
+}
+
+.pa-appointment-form-page .select2-container--default .select2-selection__rendered {
+    font-size: 0.9375rem !important;
+    line-height: 28px !important;
+}
+
+.pa-appointment-form-page .pa-service-summary {
+    position: sticky;
+    top: 1rem;
+    border: 1px solid var(--pa-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    background: #fff;
+    box-shadow: var(--pa-shadow-card);
+}
+
+.pa-appointment-form-page .pa-service-summary-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--pa-text);
+    margin-bottom: 1rem;
+}
+
+.pa-appointment-form-page .pa-custom-service-box {
+    border: 1px solid var(--pa-border);
+    border-radius: 12px;
+    padding: 1rem;
+    background: var(--pa-surface-2);
+}
+
+.pa-appointment-form-page .pa-form-actions {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--pa-border-light);
+}
+
+@media (max-width: 991px) {
+    .pa-appointment-form-page .pa-service-summary {
+        position: static;
+        margin-top: 1rem;
+    }
+}

@@ -708,7 +708,7 @@
                         <span class="input-group-text bg-light border-end-0" style="border-radius: 10px 0 0 10px;">
                             <i class="bi bi-calendar-event text-primary"></i>
                         </span>
-                        <input type="text" id="main-date-filter" class="form-control border-start-0 shadow-none flatpickr-basic" 
+                        <input type="text" id="main-date-filter" class="form-control border-start-0 shadow-none flatpickr-basic"
                             placeholder="Select Date"
                             style="border-radius: 0 10px 10px 0; font-weight: 700; color: #1a4a7a; background-color: #fff !important;">
                     </div>
@@ -983,11 +983,10 @@
             clearBtn.innerHTML = '<i class="bi bi-eraser-fill me-25"></i> Clear Date';
             clearBtn.classList.add("flatpickr-clear-btn");
             clearBtn.style.cssText = "text-align: center; padding: 12px; cursor: pointer; color: #ea5455; font-weight: 800; border-top: 1px solid #ebe9f1; background: #fff; transition: all 0.2s ease; font-size: 0.9rem; letter-spacing: 0.5px;";
-            
-            // Hover effects
+
             clearBtn.onmouseover = function() { this.style.backgroundColor = "#fff5f5"; this.style.color = "#d32f2f"; };
             clearBtn.onmouseout = function() { this.style.backgroundColor = "#fff"; this.style.color = "#ea5455"; };
-            
+
             clearBtn.addEventListener("click", () => {
                 instance.clear();
                 instance.close();
@@ -1006,7 +1005,7 @@
 
     // Initial filter state
     $('#filter-type').val('total');
-    
+
     // Main Date Filter - Quick Filter Without Apply Button
     $(document).on('change', '#main-date-filter', function() {
         if (isInternalChange) {
@@ -1014,24 +1013,19 @@
         }
 
         let val = $(this).val();
-        
+
         if (val) {
-            // Clear quick stat filters as we are now in custom date mode
             $('.stat-filter-card').removeClass('active-stat');
             $('#filter-type').val('');
         } else {
-            // Only reset to "Total" if no other filter is active
             if (!$('#filter-type').val() || $('#filter-type').val() == 'total' || !$('.stat-filter-card.active-stat').length) {
                 $('.stat-filter-card').removeClass('active-stat');
                 $('[data-type="total"]').addClass('active-stat');
                 $('#filter-type').val('total');
             }
         }
-        
-        // Sync with hidden filter inside dropdown so DataTables picks it up
+
         $('#filter-appointment-date').val(val);
-        
-        // Reload DataTable
         $('#table-appointments').DataTable().ajax.reload();
     });
 
@@ -1048,7 +1042,7 @@
             setTimeout(() => { isInternalChange = false; }, 50);
         }
         $('#filter-appointment-date').val('');
-        
+
         // Handle Status Filtering: Always reset status unless it's a specific status card
         if ($(this).data('is-status')) {
             $('#filter-status').val(type);
@@ -1062,7 +1056,6 @@
     // Dropdown Filter Buttons
     $(document).on('click', '#btn-apply-filters', function() {
         $('#table-appointments').DataTable().ajax.reload();
-        // Close the dropdown
         $(this).closest('.dropdown-menu').prev('.dropdown-toggle').dropdown('toggle');
     });
 
@@ -1085,7 +1078,7 @@
             mainDateFilter.clear();
             isInternalChange = false;
         }
-        
+
         $('#table-appointments').DataTable().ajax.reload();
     });
 

@@ -40,6 +40,8 @@ use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductSubCategoryController;
 use App\Http\Controllers\Admin\ProductItemController;
 use App\Http\Controllers\Admin\ProductOrderController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\ContractController;
 
 
@@ -74,6 +76,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('get-analytics-data', [DashboardController::class, 'getAnalyticsData'])->name('admin.dashboard.analytics');
         Route::get('export-analytics', [DashboardController::class, 'exportAnalytics'])->name('admin.dashboard.export-analytics');
         Route::get('get-management-counts', [DashboardController::class, 'getManagementCounts'])->name('admin.dashboard.management-counts');
+
+        /* Profile & Reports */
+        Route::get('profile', [ProfileController::class, 'index'])->name('admin.profile.index');
+        Route::post('profile/update', [ProfileController::class, 'update'])->name('admin.profile.update');
+        Route::get('reports', [ReportsController::class, 'index'])->name('admin.reports.index');
 
         /* Contract Signed Route */
         Route::get('contract-signed', [ContractSignedController::class, 'index'])->name('admin.contract-signed.index');
@@ -402,7 +409,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('attendance/update-status', [AttendanceController::class, 'updateStatus'])->name('admin.attendance.updateStatus');
         Route::delete('attendance/{id}', [AttendanceController::class, 'destroy'])->name('admin.attendance.destroy');
 
-        /* Membership Routes */
+        /* Membership Routes — currently not in use
         Route::get('membership', [MembershipPlanController::class, 'index'])->name('admin.membership.index');
         Route::get('membership/create', [MembershipPlanController::class, 'create'])->name('admin.membership.create');
         Route::get('membership/edit/{id}', [MembershipPlanController::class, 'edit'])->name('admin.membership.edit');
@@ -410,6 +417,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('getDataMembership', [MembershipPlanController::class, 'getData'])->name('getDataMembership');
         Route::get('membership/status/{id}/{status}', [MembershipPlanController::class, 'changeStatus'])->name('admin.membership.changeStatus');
         Route::delete('membership/{id}', [MembershipPlanController::class, 'destroy'])->name('admin.membership.destroy');
+        */
 
         /* Combo Routes */
         Route::get('combo', [ServiceComboController::class, 'index'])->name('admin.combo.index');

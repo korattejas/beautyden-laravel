@@ -1,9 +1,9 @@
 @if ($action_array['is_simple_action'] == 1)
     <div class="dropdown">
-        <button type="button" class="btn btn-sm btn-icon dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-haspopup="true" aria-expanded="false" style="background: transparent; border: none;">
-            <i class="bi bi-three-dots-vertical" style="font-size: 1.5rem; color: #444050;"></i>
+        <button type="button" class="btn btn-sm btn-icon pa-dt-action-btn dropdown-toggle hide-arrow" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-haspopup="true" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical"></i>
         </button>
-        <div class="dropdown-menu dropdown-menu-end shadow-lg" style="border-radius: 12px; border: none; padding: 0.8rem; min-width: 200px; z-index: 9999; background-color: #ffffff !important; box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;">
+        <div class="dropdown-menu dropdown-menu-end">
             
             @if (isset($action_array['view_route']))
                 <a href="{{ $action_array['view_route'] }}" class="dropdown-item d-flex align-items-center py-50">

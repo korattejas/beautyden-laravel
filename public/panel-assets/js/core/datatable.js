@@ -9,11 +9,12 @@ $(function () {
 
         // Setup - add a text input to each footer cell
         $('.dt-column-search thead tr').clone(true).appendTo('.dt-column-search thead');
+        $('.dt-column-search thead tr:eq(1)').addClass('pa-dt-filters');
         $('.dt-column-search thead tr:eq(1) th').each(function (i) {
             var title = $(this).text();
             if (!$(this).attr("data-search")) {
                 if (!$(this).attr("data-stuff")) {
-                    $(this).html('<input type="text" class="form-control form-control-sm" placeholder="Search ' + title + '" />');
+                    $(this).html('<input type="text" class="form-control form-control-sm pa-dt-col-filter" placeholder="Filter ' + title + '" />');
                     $('input', this).on('keyup change', function () {
                         if (dt_filter.columns(i).search() !== this.value) {
                             dt_filter.columns(i).search(this.value).draw();
@@ -27,7 +28,7 @@ $(function () {
                         oselect_text += '<option value="' + value + '">' + value + '</option>';
                     });
 
-                    $(this).html('<select type="text" class="form-control form-control-sm">' + oselect_text + '</select>');
+                    $(this).html('<select class="form-select form-select-sm pa-dt-col-filter">' + oselect_text + '</select>');
                     $('select', this).on('keyup change', function () {
                         if (dt_filter.columns(i).search() !== this.value) {
                             dt_filter.columns(i).search(this.value).draw();
@@ -42,14 +43,13 @@ $(function () {
                     }
                 });
             } else {
-                $(this).html('-');
+                $(this).html('<span class="pa-dt-filter-empty">—</span>');
             }
         });
 
         // Initialize DataTable
         var dt_filter = dt_filter_table.DataTable({
             processing: true,
-            dom: '<"d-flex justify-content-between align-items-center mx-0 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"p>>t<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
             ajax: {
                 url: APP_URL + datatable_url,
                 data: function (d) {
@@ -77,8 +77,8 @@ $(function () {
             orderCellsTop: true,
             language: {
                 paginate: {
-                    previous: '&nbsp;',
-                    next: '&nbsp;'
+                    previous: '‹',
+                    next: '›'
                 }
             }
         });

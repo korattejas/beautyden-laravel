@@ -1,29 +1,36 @@
 @extends('admin.layouts.app')
+
+@section('page_title', 'Add Appointment')
+@section('page_heading', 'Add Appointment')
+
+@section('header_style_content')
+<link rel="stylesheet" href="{{ asset('panel-assets/css/premium-appointment-form.css') }}?v={{ time() }}">
+@endsection
+
 @section('content')
-<div class="app-content content">
+<div class="app-content content pa-appointment-form-page">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
-        <div class="content-header row">
-            <div class="content-header-left col-md-9 col-12 mb-2">
-                <h2 class="content-header-title float-start mb-0">Add Appointment</h2>
-                <div class="breadcrumb-wrapper">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.appointments.index') }}">Appointments</a>
-                        </li>
-                        <li class="breadcrumb-item active">Add Appointment</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
+        @include('admin.layouts.crud-header', [
+            'title' => 'Add Appointment',
+            'subtitle' => 'Create a new booking with client details and services',
+            'items' => [
+                ['label' => 'Home', 'url' => route('admin.dashboard')],
+                ['label' => 'Appointments', 'url' => route('admin.appointments.index')],
+                ['label' => 'Add Appointment'],
+            ],
+        ])
 
         <div class="content-body">
             <section class="horizontal-wizard">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="pa-card-subtle">
+                            <div class="pa-card-header">
+                                <h6><i class="bi bi-calendar-plus me-2 text-muted"></i>Appointment Details</h6>
+                            </div>
+                            <div class="pa-card-body">
                                 <form method="POST" data-parsley-validate id="addEditForm" role="form"
                                     enctype="multipart/form-data">
                                     @csrf
@@ -35,41 +42,41 @@
                                     <input type="hidden" name="discount_amount" id="hidden_discount_amount">
                                     <input type="hidden" name="sub_total" id="hidden_subtotal">
                                     <input type="hidden" name="grand_total" id="hidden_grandtotal">
-                                    <div class="row">
+                                    <div class="row g-3">
 
                                         <!-- First Name -->
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>First Name</label>
-                                                <input type="text" class="form-control" name="first_name"
-                                                    placeholder="First Name" required>
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="first_name">First Name</label>
+                                                <input type="text" class="form-control" id="first_name" name="first_name"
+                                                    placeholder="Enter first name" required>
                                             </div>
                                         </div>
 
                                         <!-- Last Name -->
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Last Name</label>
-                                                <input type="text" class="form-control" name="last_name"
-                                                    placeholder="Last Name">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="last_name">Last Name</label>
+                                                <input type="text" class="form-control" id="last_name" name="last_name"
+                                                    placeholder="Enter last name">
                                             </div>
                                         </div>
 
                                         <!-- Email -->
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Email</label>
-                                                <input type="email" class="form-control" name="email"
-                                                    placeholder="Email">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="email">Email</label>
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                    placeholder="Enter email address">
                                             </div>
                                         </div>
 
                                         <!-- Phone -->
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Phone</label>
-                                                <input type="number" class="form-control" name="phone"
-                                                    placeholder="Phone">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="phone">Phone</label>
+                                                <input type="number" class="form-control" id="phone" name="phone"
+                                                    placeholder="Enter phone number">
                                             </div>
                                         </div>
 
@@ -102,32 +109,32 @@
 
 
                                         <!-- Appointment Date -->
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Appointment Date</label>
-                                                <input type="date" class="form-control" name="appointment_date">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="appointment_date">Appointment Date</label>
+                                                <input type="date" class="form-control" id="appointment_date" name="appointment_date">
                                             </div>
                                         </div>
 
                                         <!-- Appointment Time -->
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Appointment Time</label>
-                                                <input type="time" class="form-control" name="appointment_time">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="appointment_time">Appointment Time</label>
+                                                <input type="time" class="form-control" id="appointment_time" name="appointment_time">
                                             </div>
                                         </div>
 
                                         <!-- Service Address -->
-                                        <div class="col-md-12 mt-2">
-                                            <div class="form-group">
-                                                <label>Service Address</label>
-                                                <textarea class="form-control" name="service_address" rows="3" placeholder="Full Address"></textarea>
+                                        <div class="col-md-12">
+                                            <div class="pa-form-field">
+                                                <label for="service_address">Service Address</label>
+                                                <textarea class="form-control" id="service_address" name="service_address" rows="3" placeholder="Enter full service address"></textarea>
                                             </div>
                                         </div>
 
                                         <!-- City Dropdown -->
-                                        <div class="col-12 mt-2">
-                                            <div class="form-group">
+                                        <div class="col-12">
+                                            <div class="pa-form-field">
                                                 <label for="city_id">City</label>
                                                 <select name="city_id" id="city_id" class="form-control select2">
                                                     <option value="">Select City</option>
@@ -147,9 +154,9 @@
                                         <!-- RIGHT SUMMARY PANEL -->
                                         <div class="col-lg-4 col-12 mt-4">
 
-                                            <div style="position:sticky;top:20px;border:1px solid #e5e5e5;border-radius:16px;padding:20px;background:#ffffff;box-shadow:0 6px 18px rgba(0,0,0,0.08);">
+                                            <div class="pa-service-summary">
 
-                                                <h5 style="font-weight:600;margin-bottom:18px;">
+                                                <h5 class="pa-service-summary-title">
                                                     Service Summary
                                                 </h5>
 
@@ -165,17 +172,15 @@
                                                 <!-- Traveling Charges -->
                                                 <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                                                     <span>Travelling Charges</span>
-                                                    <input type="number" id="travelCharges"
-                                                        value="0"
-                                                        style="width:80px;text-align:center;border:1px solid #ddd;border-radius:6px;">
+                                                    <input type="number" id="travelCharges" class="pa-inline-input"
+                                                        value="0">
                                                 </div>
 
                                                 <!-- Discount Input -->
                                                 <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                                                     <span>Discount (%)</span>
-                                                    <input type="number" id="discountPercent"
-                                                        value="0" min="0" max="100"
-                                                        style="width:80px;text-align:center;border:1px solid #ddd;border-radius:6px;">
+                                                    <input type="number" id="discountPercent" class="pa-inline-input"
+                                                        value="0" min="0" max="100">
                                                 </div>
 
                                                 <!-- Discount Row (Hide if 0) -->
@@ -208,19 +213,16 @@
                                                 </label>
                                             </div>
 
-                                            <div id="customSection" style="display:none;border:1px solid #ddd;padding:15px;border-radius:12px;">
+                                            <div id="customSection" class="pa-custom-service-box" style="display:none;">
 
-                                                <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                                                    <input type="text" id="customName"
-                                                        placeholder="Service Name"
-                                                        style="flex:2;min-width:200px;border:1px solid #ddd;border-radius:6px;padding:6px;">
+                                                <div class="d-flex gap-2 flex-wrap">
+                                                    <input type="text" id="customName" class="form-control flex-grow-1"
+                                                        placeholder="Service Name" style="min-width:200px;">
 
-                                                    <input type="number" id="customPrice"
-                                                        placeholder="Price"
-                                                        style="flex:1;min-width:120px;border:1px solid #ddd;border-radius:6px;padding:6px;">
+                                                    <input type="number" id="customPrice" class="form-control"
+                                                        placeholder="Price" style="max-width:140px;">
 
-                                                    <button type="button" id="addCustomBtn"
-                                                        style="background:#7367f0;color:#fff;border:none;border-radius:6px;padding:6px 15px;">
+                                                    <button type="button" id="addCustomBtn" class="btn btn-primary">
                                                         Add
                                                     </button>
                                                 </div>
@@ -231,18 +233,18 @@
                                         </div>
 
                                         <!-- Special Notes -->
-                                        <div class="col-md-12 mt-2">
-                                            <div class="form-group">
-                                                <label>Special Notes</label>
-                                                <textarea class="form-control" name="special_notes" rows="3" placeholder="Special instructions"></textarea>
+                                        <div class="col-md-12">
+                                            <div class="pa-form-field">
+                                                <label for="special_notes">Special Notes</label>
+                                                <textarea class="form-control" id="special_notes" name="special_notes" rows="3" placeholder="Any special instructions"></textarea>
                                             </div>
                                         </div>
 
                                         <!-- Status -->
-                                        <div class="col-md-4 mt-2">
-                                            <div class="form-group">
-                                                <label>Status</label>
-                                                <select name="status" class="form-control">
+                                        <div class="col-md-4">
+                                            <div class="pa-form-field">
+                                                <label for="status">Status</label>
+                                                <select name="status" id="status" class="form-control">
                                                     <option value="1" selected>Pending</option>
                                                     <option value="2">Assigned</option>
                                                     <option value="3">Completed</option>
@@ -252,10 +254,11 @@
                                         </div>
 
                                         <!-- Submit -->
-                                        <div class="col-12 mt-3" style="text-align: right;">
-                                            <button type="submit" class="btn btn-primary">Submit</button>
-                                            <a href="{{ route('admin.appointments.index') }}"
-                                                class="btn btn-secondary">Cancel</a>
+                                        <div class="col-12 pa-form-actions">
+                                            <button type="submit" class="pa-btn pa-btn-primary">
+                                                <i class="bi bi-check2"></i> Submit
+                                            </button>
+                                            <a href="{{ route('admin.appointments.index') }}" class="pa-btn pa-btn-outline">Cancel</a>
                                         </div>
 
                                     </div>

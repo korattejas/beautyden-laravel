@@ -1,87 +1,92 @@
 @extends('admin.layouts.app')
+
+@section('page_title', 'Edit Appointment')
+@section('page_heading', 'Edit Appointment')
+
+@section('header_style_content')
+<link rel="stylesheet" href="{{ asset('panel-assets/css/premium-appointment-form.css') }}?v={{ time() }}">
+@endsection
+
 @section('content')
-<div class="app-content content">
+<div class="app-content content pa-appointment-form-page">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
-        <div class="content-header row">
-            <div class="content-header-left col-md-9 col-12 mb-2">
-                <h2 class="content-header-title float-start mb-0">Edit Appointment</h2>
-                <div class="breadcrumb-wrapper">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.appointments.index') }}">Appointments</a></li>
-                        <li class="breadcrumb-item active">Edit Appointment</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
+        @include('admin.layouts.crud-header', [
+            'title' => 'Edit Appointment',
+            'subtitle' => 'Update booking details, services and pricing',
+            'items' => [
+                ['label' => 'Home', 'url' => route('admin.dashboard')],
+                ['label' => 'Appointments', 'url' => route('admin.appointments.index')],
+                ['label' => 'Edit Appointment'],
+            ],
+        ])
 
         <div class="content-body">
             <section class="horizontal-wizard">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <form method="POST" id="addEditForm" role="form" enctype="multipart/form-data">
+                        <div class="pa-card-subtle">
+                            <div class="pa-card-header">
+                                <h6><i class="bi bi-pencil-square me-2 text-muted"></i>Appointment Details</h6>
+                            </div>
+                            <div class="pa-card-body">
+                                <form method="POST" data-parsley-validate id="addEditForm" role="form" enctype="multipart/form-data">
                                     @csrf
                                     <input type="hidden" name="edit_value" value="{{ $appointment->id }}">
+                                    <input type="hidden" id="form-method" value="edit">
                                     <input type="hidden" name="services_json" id="services_json">
-
                                     <input type="hidden" name="travel_charges" id="hidden_travel">
                                     <input type="hidden" name="discount_percent" id="hidden_discount">
                                     <input type="hidden" name="discount_amount" id="hidden_discount_amount">
                                     <input type="hidden" name="sub_total" id="hidden_subtotal">
                                     <input type="hidden" name="grand_total" id="hidden_grandtotal">
 
-                                    <div class="row">
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>First Name</label>
-                                                <input type="text" class="form-control live-json" name="first_name" value="{{ $appointment->first_name }}" required>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="first_name">First Name</label>
+                                                <input type="text" class="form-control live-json" id="first_name" name="first_name" value="{{ $appointment->first_name }}" placeholder="Enter first name" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Last Name</label>
-                                                <input type="text" class="form-control live-json" name="last_name" value="{{ $appointment->last_name }}">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="last_name">Last Name</label>
+                                                <input type="text" class="form-control live-json" id="last_name" name="last_name" value="{{ $appointment->last_name }}" placeholder="Enter last name">
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Email</label>
-                                                <input type="email" class="form-control live-json" name="email" value="{{ $appointment->email }}">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="email">Email</label>
+                                                <input type="email" class="form-control live-json" id="email" name="email" value="{{ $appointment->email }}" placeholder="Enter email address">
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Phone</label>
-                                                <input type="number" class="form-control live-json" name="phone" value="{{ $appointment->phone }}">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="phone">Phone</label>
+                                                <input type="number" class="form-control live-json" id="phone" name="phone" value="{{ $appointment->phone }}" placeholder="Enter phone number">
                                             </div>
                                         </div>
-
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Appointment Date</label>
-                                                <input type="date" class="form-control live-json" name="appointment_date" value="{{ $appointment->appointment_date }}">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="appointment_date">Appointment Date</label>
+                                                <input type="date" class="form-control live-json" id="appointment_date" name="appointment_date" value="{{ $appointment->appointment_date }}">
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mt-2">
-                                            <div class="form-group">
-                                                <label>Appointment Time</label>
-                                                <input type="time" class="form-control live-json" name="appointment_time" value="{{ $appointment->appointment_time }}">
+                                        <div class="col-md-6">
+                                            <div class="pa-form-field">
+                                                <label for="appointment_time">Appointment Time</label>
+                                                <input type="time" class="form-control live-json" id="appointment_time" name="appointment_time" value="{{ $appointment->appointment_time }}">
                                             </div>
                                         </div>
-
-                                        <div class="col-md-12 mt-2">
-                                            <div class="form-group">
-                                                <label>Service Address</label>
-                                                <textarea class="form-control live-json" name="service_address" rows="2">{{ $appointment->service_address }}</textarea>
+                                        <div class="col-md-12">
+                                            <div class="pa-form-field">
+                                                <label for="service_address">Service Address</label>
+                                                <textarea class="form-control live-json" id="service_address" name="service_address" rows="3" placeholder="Enter full service address">{{ $appointment->service_address }}</textarea>
                                             </div>
                                         </div>
-
-                                        <div class="col-12 mt-2">
-                                            <div class="form-group">
+                                        <div class="col-12">
+                                            <div class="pa-form-field">
                                                 <label for="city_id">City</label>
                                                 <select name="city_id" id="city_id" class="form-control select2">
                                                     <option value="">Select City</option>
@@ -97,8 +102,8 @@
                                         </div>
 
                                         <div class="col-lg-4 col-12 mt-4">
-                                            <div style="position:sticky;top:20px;border:1px solid #e5e5e5;border-radius:16px;padding:20px;background:#ffffff;box-shadow:0 6px 18px rgba(0,0,0,0.08);">
-                                                <h5 style="font-weight:600;margin-bottom:18px;">Service Summary</h5>
+                                            <div class="pa-service-summary">
+                                                <h5 class="pa-service-summary-title">Service Summary</h5>
                                                 <div id="invoiceList" style="max-height:250px;overflow:auto;"></div>
                                                 <hr>
                                                 <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
@@ -107,11 +112,11 @@
                                                 </div>
                                                 <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                                                     <span>Travelling Charges</span>
-                                                    <input type="number" id="travelCharges" value="0" style="width:80px;text-align:center;border:1px solid #ddd;border-radius:6px;">
+                                                    <input type="number" id="travelCharges" class="pa-inline-input" value="0">
                                                 </div>
                                                 <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                                                     <span>Discount (%)</span>
-                                                    <input type="number" id="discountPercent" value="0" min="0" max="100" style="width:80px;text-align:center;border:1px solid #ddd;border-radius:6px;">
+                                                    <input type="number" id="discountPercent" class="pa-inline-input" value="0" min="0" max="100">
                                                 </div>
                                                 <div id="discountRow" style="display:none;justify-content:space-between;margin-bottom:8px;color:#ea5455;">
                                                     <span>Discount</span>
@@ -127,47 +132,44 @@
 
                                         <div class="col-12 mt-4">
                                             <div style="margin-bottom:10px;">
-                                                <label style="font-weight:600;"><input type="checkbox" id="customToggle"> Add Custom Service</label>
+                                                <label style="font-weight:600;">
+                                                    <input type="checkbox" id="customToggle"> Add Custom Service
+                                                </label>
                                             </div>
-                                            <div id="customSection" style="display:none;border:1px solid #ddd;padding:15px;border-radius:12px;">
-                                                <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                                                    <input type="text" id="customName" placeholder="Service Name" style="flex:2;min-width:200px;border:1px solid #ddd;border-radius:6px;padding:6px;">
-                                                    <input type="number" id="customPrice" placeholder="Price" style="flex:1;min-width:120px;border:1px solid #ddd;border-radius:6px;padding:6px;">
-                                                    <button type="button" id="addCustomBtn" style="background:#7367f0;color:#fff;border:none;border-radius:6px;padding:6px 15px;">Add</button>
+                                            <div id="customSection" class="pa-custom-service-box" style="display:none;">
+                                                <div class="d-flex gap-2 flex-wrap">
+                                                    <input type="text" id="customName" class="form-control flex-grow-1" placeholder="Service Name" style="min-width:200px;">
+                                                    <input type="number" id="customPrice" class="form-control" placeholder="Price" style="max-width:140px;">
+                                                    <button type="button" id="addCustomBtn" class="btn btn-primary">Add</button>
                                                 </div>
                                                 <div id="customList" class="row mt-3"></div>
                                             </div>
                                         </div>
 
-                                        <div class="col-md-12 mt-2">
-                                            <label>Special Notes</label>
-                                            <textarea class="form-control live-json" name="special_notes" rows="2">{{ $appointment->special_notes }}</textarea>
+                                        <div class="col-md-12">
+                                            <div class="pa-form-field">
+                                                <label for="special_notes">Special Notes</label>
+                                                <textarea class="form-control live-json" id="special_notes" name="special_notes" rows="3" placeholder="Any special instructions">{{ $appointment->special_notes }}</textarea>
+                                            </div>
                                         </div>
 
-                                        <!-- Status -->
-                                        <div class="col-md-4 mt-2">
-                                            <div class="form-group">
-                                                <label>Status</label>
-                                                <select name="status" class="form-control">
-                                                    <option value="1"
-                                                        {{ isset($appointment) && $appointment->status == 1 ? 'selected' : '' }}>
-                                                        Pending</option>
-                                                    <option value="2"
-                                                        {{ isset($appointment) && $appointment->status == 2 ? 'selected' : '' }}>
-                                                        Assigned</option>
-                                                    <option value="3"
-                                                        {{ isset($appointment) && $appointment->status == 3 ? 'selected' : '' }}>
-                                                        Completed</option>
-                                                    <option value="4"
-                                                        {{ isset($appointment) && $appointment->status == 4 ? 'selected' : '' }}>
-                                                        Rejected</option>
+                                        <div class="col-md-4">
+                                            <div class="pa-form-field">
+                                                <label for="status">Status</label>
+                                                <select name="status" id="status" class="form-control">
+                                                    <option value="1" {{ isset($appointment) && $appointment->status == 1 ? 'selected' : '' }}>Pending</option>
+                                                    <option value="2" {{ isset($appointment) && $appointment->status == 2 ? 'selected' : '' }}>Assigned</option>
+                                                    <option value="3" {{ isset($appointment) && $appointment->status == 3 ? 'selected' : '' }}>Completed</option>
+                                                    <option value="4" {{ isset($appointment) && $appointment->status == 4 ? 'selected' : '' }}>Rejected</option>
                                                 </select>
                                             </div>
                                         </div>
 
-                                        <div class="col-12 mt-3 text-end">
-                                            <button type="submit" class="btn btn-primary">Update Appointment</button>
-                                            <a href="{{ route('admin.appointments.index') }}" class="btn btn-secondary">Cancel</a>
+                                        <div class="col-12 pa-form-actions">
+                                            <button type="submit" class="pa-btn pa-btn-primary">
+                                                <i class="bi bi-check2"></i> Update Appointment
+                                            </button>
+                                            <a href="{{ route('admin.appointments.index') }}" class="pa-btn pa-btn-outline">Cancel</a>
                                         </div>
                                     </div>
                                 </form>
@@ -186,7 +188,7 @@
     var form_url = 'appointments/store';
     var redirect_url = 'appointments';
     $(document).ready(function() {
-        let savedData = @json($appointment -> services_data);
+        let savedData = @json($appointment->services_data);
         if (typeof savedData === 'string') savedData = JSON.parse(savedData);
 
         $('.select2').select2({
@@ -210,24 +212,28 @@
                 $.each(response, function(catId, cat) {
                     html += `<div style="margin-bottom:14px;border:1px solid #ddd;border-radius:12px;overflow:hidden;">
                     <div class="cat-toggle" data-id="cat${catId}" style="padding:14px;background:#f4f4f4;cursor:pointer;font-weight:600;">${cat.name}</div>
-                    <div id="cat${catId}" style="display:none;padding:14px;"><div class="row">`;
+                    <div id="cat${catId}" style="display:none;padding:14px;">`;
 
-                    if (cat.services) $.each(cat.services, function(i, s) {
-                        html += serviceCard(s);
-                    });
+                    if (cat.services) {
+                        html += `<div class="row">`;
+                        $.each(cat.services, function(i, s) {
+                            html += serviceCard(s);
+                        });
+                        html += `</div>`;
+                    }
 
                     if (cat.subcategories) {
                         $.each(cat.subcategories, function(subId, sub) {
-                            html += `<div class="col-12 mt-2 border rounded p-2">
-                            <div class="sub-toggle" data-id="sub${subId}" style="cursor:pointer;font-weight:500;">${sub.name}</div>
-                            <div id="sub${subId}" style="display:none;" class="row mt-2">`;
+                            html += `<div style="margin-top:10px;border:1px solid #eee;border-radius:10px;">
+                            <div class="sub-toggle" data-id="sub${subId}" style="padding:12px;background:#fafafa;cursor:pointer;font-weight:500;">${sub.name}</div>
+                            <div id="sub${subId}" style="display:none;padding:12px;"><div class="row">`;
                             $.each(sub.services, function(i, s) {
                                 html += serviceCard(s);
                             });
-                            html += `</div></div>`;
+                            html += `</div></div></div>`;
                         });
                     }
-                    html += `</div></div></div>`;
+                    html += `</div></div>`;
                 });
                 $('#dynamicServices').html(html);
 
@@ -237,14 +243,23 @@
         }
 
         function serviceCard(s) {
-            return `<div class="col-md-6 mb-3"><div class="service-card" style="border:1px solid #e5e5e5;padding:18px;border-radius:14px;background:#fff;">
-            <label style="font-weight:600;display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" class="service-check" data-name="${s.name}"> ${s.name}</label>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-                <input type="number" value="${s.price}" class="price" style="width:80px;border:1px solid #ddd;border-radius:6px;" disabled>
-                <div style="display:flex;border:1px solid #ddd;border-radius:8px;overflow:hidden;">
-                    <button type="button" class="qty-minus" style="width:30px;border:none;background:#f4f4f4;" disabled>−</button>
-                    <input type="text" value="1" class="qty" style="width:35px;border:none;text-align:center;" readonly>
-                    <button type="button" class="qty-plus" style="width:30px;border:none;background:#f4f4f4;" disabled>+</button>
+            return `<div class="col-md-6 mb-3">
+            <div class="service-card" style="border:1px solid #e5e5e5;padding:18px;border-radius:14px;background:#fff;transition:0.25s;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
+                <input type="checkbox" class="service-check" data-name="${s.name}"> ${s.name}
+            </label>
+            <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div style="font-size:12px;color:#888;">Price</div>
+                    <input type="number" value="${s.price}" class="price" style="width:90px;border:1px solid #ddd;border-radius:8px;padding:6px;font-weight:600;color:#7367f0;background:#f8f7ff;" disabled>
+                </div>
+                <div>
+                    <div style="font-size:12px;color:#888;">Qty</div>
+                    <div style="display:flex;align-items:center;border:1px solid #ddd;border-radius:8px;overflow:hidden;width:110px;background:#fff;">
+                        <button type="button" class="qty-minus" style="width:35px;border:none;background:#f4f4f4;font-size:18px;" disabled>−</button>
+                        <input type="text" value="1" class="qty" style="width:40px;border:none;text-align:center;font-weight:600;" readonly>
+                        <button type="button" class="qty-plus" style="width:35px;border:none;background:#f4f4f4;font-size:18px;" disabled>+</button>
+                    </div>
                 </div>
             </div>
         </div></div>`;
@@ -268,7 +283,8 @@
                                 card.find('.qty-plus, .qty-minus').prop('disabled', false);
                                 card.css({
                                     border: '2px solid #7367f0',
-                                    background: '#f8f7ff'
+                                    background: '#f8f7ff',
+                                    boxShadow: '0 8px 18px rgba(115,103,240,0.15)'
                                 });
                             }
                         });
@@ -292,10 +308,12 @@
             card.find('.price, .qty-plus, .qty-minus').prop('disabled', !chk);
             card.css(chk ? {
                 border: '2px solid #7367f0',
-                background: '#f8f7ff'
+                background: '#f8f7ff',
+                boxShadow: '0 8px 18px rgba(115,103,240,0.15)'
             } : {
                 border: '1px solid #e5e5e5',
-                background: '#fff'
+                background: '#fff',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
             });
             calculateTotal();
         });

@@ -3,7 +3,7 @@
 <link rel="shortcut icon" type="image/x-icon" href="{{ asset('panel-assets/admin-logo/logo.png') }}">
 
 <!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Vendor CSS -->
 <link rel="stylesheet" href="{{ asset('panel-assets/vendors/css/vendors.min.css') }}">
@@ -42,3 +42,7 @@
 
 <!-- Custom Style -->
 <link rel="stylesheet" href="{{ asset('panel-assets/css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('panel-assets/css/premium-admin.css') }}?v={{ time() }}">
+<link rel="stylesheet" href="{{ asset('panel-assets/css/premium-datatables.css') }}?v={{ time() }}">
+<link rel="stylesheet" href="{{ asset('panel-assets/css/premium-forms.css') }}?v={{ time() }}">
+<link rel="stylesheet" href="{{ asset('panel-assets/css/premium-catalog.css') }}?v={{ time() }}">

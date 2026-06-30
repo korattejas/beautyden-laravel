@@ -1,38 +1,8 @@
 @extends('admin.layouts.app')
 @section('content')
-<style>
-    .premium-file-input { 
-        position: relative; 
-        border: 2px dashed #d1d5db; 
-        border-radius: 12px; 
-        padding: 15px; 
-        text-align: center; 
-        background: #fff; 
-        cursor: pointer; 
-        transition: all 0.3s; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: center;
-        min-height: 100px;
-    }
-    .section-block {
-        padding: 12px;
-    }
-    .premium-file-input:hover { border-color: #6366f1; background: #f5f3ff; }
-    .premium-file-input input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5; }
-    .premium-file-input.has-preview { border-style: solid; border-color: #e2e8f0; background: #f8fafc; }
-    .preview-container { position: relative; margin-top: 10px; display: none; }
-    .preview-media { max-width: 100%; max-height: 150px; border-radius: 8px; border: 1px solid #ddd; }
-    .preview-actions { position: absolute; top: 5px; right: 5px; display: flex; gap: 5px; z-index: 10; }
-    .action-btn { background: rgba(255,255,255,0.9); border: none; border-radius: 4px; padding: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
-    .action-btn:hover { background: #fff; transform: scale(1.1); }
-</style>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-
-
-<div class="app-content content">
+<div class="app-content content pa-catalog-page">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
@@ -41,21 +11,21 @@
                 @csrf
                 <input type="hidden" name="edit_value" value="0">
                 
-                <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="pa-catalog-toolbar">
                     <div>
-                        <h2 class="fw-bold mb-0">Create Premium Catalog</h2>
-                        <p class="text-muted mb-0">Build high-quality service pages with dynamic sections.</p>
+                        <h2>Create Premium Catalog</h2>
+                        <p>Build high-quality service pages with dynamic sections.</p>
                     </div>
-                    <div class="d-flex gap-1">
+                    <div class="pa-catalog-toolbar-actions">
                         <a href="{{ route('admin.service-master.index') }}" class="btn btn-outline-secondary">Discard</a>
-                        <button type="submit" class="btn btn-primary px-3 shadow">Publish Service</button>
+                        <button type="submit" class="btn btn-primary">Publish Service</button>
                     </div>
                 </div>
 
-                <div class="row">
-                    <!-- Left Side: Essentials & Media -->
+                <div class="row pa-catalog-layout">
                     <div class="col-xl-5">
-                        <div class="card shadow-sm border-0">
+                        <div class="pa-catalog-sidebar">
+                        <div class="card shadow-sm border-0 pa-catalog-card">
                             <div class="card-header border-bottom"><h4 class="card-title"><i data-feather="info" class="me-1"></i>Basic Service Info</h4></div>
                             <div class="card-body pt-2">
                                 <div class="mb-2">
@@ -93,9 +63,9 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-12 mb-1">
-                                        <div class="form-check form-switch mt-50 p-1 border rounded bg-light">
+                                        <div class="form-check form-switch pa-variant-toggle">
                                             <input class="form-check-input ms-0 me-1" type="checkbox" name="has_variants" value="1" id="has_variants">
-                                            <label class="form-check-label fw-bold text-primary" for="has_variants">Does this service have variants? (e.g., O3, Raaga)</label>
+                                            <label class="form-check-label" for="has_variants">Does this service have variants? (e.g., O3, Raaga)</label>
                                         </div>
                                     </div>
                                 </div>
@@ -129,7 +99,7 @@
                             </div>
                         </div>
 
-                        <div class="card shadow-sm border-0" id="variants-section" style="display: none;">
+                        <div class="card shadow-sm border-0 pa-catalog-card" id="variants-section" style="display: none;">
                             <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                                 <h4 class="card-title text-primary">Service Variants</h4>
                                 <button type="button" class="btn btn-sm btn-outline-primary add-variant">+ Add Variant</button>
@@ -139,7 +109,7 @@
                             </div>
                         </div>
 
-                        <div class="card shadow-sm border-0">
+                        <div class="card shadow-sm border-0 pa-catalog-card">
                             <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                                 <h4 class="card-title">Banner Media (Carousel)</h4>
                                 <button type="button" class="btn btn-sm btn-outline-primary add-banner">+ Add Media</button>
@@ -164,7 +134,7 @@
                             </div>
                         </div>
 
-                        <div class="card shadow-sm border-0">
+                        <div class="card shadow-sm border-0 pa-catalog-card">
                             <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                                 <h4 class="card-title">Before & After Results</h4>
                                 <button type="button" class="btn btn-sm btn-outline-primary add-ba">+ Add Result</button>
@@ -182,13 +152,14 @@
                                 </div>
                             </div>
                         </div>
+                        </div>
                     </div>
 
                     <!-- Right Side: Content Sections -->
                     <div class="col-xl-7">
-                        <div class="card shadow-sm border-0 bg-light bg-opacity-25" style="min-height: 800px;">
+                        <div class="card shadow-sm border-0 pa-catalog-builder">
                             <div class="card-header d-flex justify-content-between align-items-center bg-white border-bottom">
-                                <h4 class="card-title text-primary"><i data-feather="layout" class="me-1"></i>Dynamic Page Components <small class="text-muted" style="font-size: 10px;">(Drag to Reorder)</small></h4>
+                                <h4 class="card-title text-primary"><i data-feather="layout" class="me-1"></i>Dynamic Page Components <small class="text-muted ms-1">(Drag to Reorder)</small></h4>
                                 <div class="dropdown">
                                     <button class="btn btn-primary btn-sm dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown">+ Add Section</button>
                                     <div class="dropdown-menu dropdown-menu-end shadow-lg">

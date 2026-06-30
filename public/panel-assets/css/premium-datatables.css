@@ -1,0 +1,586 @@
+/* ═══════════════════════════════════════════════════════════════
+   BeautyDen Premium DataTables — Global Design System
+   Applies to all .dt-column-search / .dataTable in admin panel
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Wrapper & card ── */
+.pa-content .card-datatable,
+.pa-content .pa-dt-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.pa-content .dataTables_wrapper.pa-dt-wrapper {
+    font-family: var(--pa-font);
+    color: var(--pa-text-secondary);
+    padding: 0.25rem 0.5rem 1rem;
+}
+
+/* ── Toolbar (length + pagination) ── */
+.pa-content .pa-dt-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.pa-content .pa-dt-toolbar-bottom {
+    margin-top: 0.85rem;
+    margin-bottom: 0;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--pa-border-light);
+}
+
+.pa-content .pa-dt-length label,
+.pa-content .dataTables_wrapper .dataTables_length label {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    font-size: 0;
+    color: transparent;
+}
+
+.pa-content .pa-dt-info {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--pa-text-muted);
+}
+.pa-content .pa-dt-length label select,
+.pa-content .dataTables_wrapper .dataTables_length label select {
+    font-size: 0.9375rem;
+    color: var(--pa-text);
+}
+
+.pa-content .pa-dt-length select,
+.pa-content .dataTables_wrapper .dataTables_length select {
+    min-width: 82px;
+    min-height: 42px !important;
+    height: 42px !important;
+    padding: 0 2rem 0 0.85rem !important;
+    border: 1.5px solid var(--pa-border) !important;
+    border-radius: 10px !important;
+    background-color: #fff !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: var(--pa-text) !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    appearance: auto;
+}
+
+.pa-content .pa-dt-length select:focus,
+.pa-content .dataTables_wrapper .dataTables_length select:focus {
+    border-color: var(--pa-primary) !important;
+    box-shadow: 0 0 0 3px var(--pa-primary-glow) !important;
+    outline: none !important;
+}
+
+/* ── Table scroll wrapper ── */
+.pa-content .pa-dt-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--pa-border);
+    border-radius: 14px;
+    background: #fff;
+}
+
+.pa-content .pa-dt-table-wrap .dataTables_scroll,
+.pa-content .pa-dt-table-wrap .table-responsive {
+    border: none;
+}
+
+/* ── Main table ── */
+.pa-content table.dataTable,
+.pa-content table.dt-column-search {
+    width: 100% !important;
+    margin: 0 !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    font-size: 1rem;
+}
+
+.pa-content table.dataTable thead th,
+.pa-content table.dt-column-search thead th {
+    background: var(--pa-surface-2) !important;
+    border-bottom: 1px solid var(--pa-border) !important;
+    border-top: none !important;
+    font-size: 0.8125rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--pa-text-muted) !important;
+    padding: 1rem 1.05rem !important;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.pa-content table.dataTable thead th.sorting,
+.pa-content table.dataTable thead th.sorting_asc,
+.pa-content table.dataTable thead th.sorting_desc {
+    cursor: pointer;
+    position: relative;
+    padding-right: 1.65rem !important;
+}
+
+.pa-content table.dataTable thead th.sorting:before,
+.pa-content table.dataTable thead th.sorting:after,
+.pa-content table.dataTable thead th.sorting_asc:before,
+.pa-content table.dataTable thead th.sorting_asc:after,
+.pa-content table.dataTable thead th.sorting_desc:before,
+.pa-content table.dataTable thead th.sorting_desc:after {
+    opacity: 0.35;
+    font-size: 0.62rem;
+    right: 0.75rem;
+}
+
+.pa-content table.dataTable thead th.sorting_asc:before,
+.pa-content table.dataTable thead th.sorting_desc:after {
+    opacity: 1;
+    color: var(--pa-primary);
+}
+
+/* ── Column filter row ── */
+.pa-content table.dataTable thead tr.pa-dt-filters th,
+.pa-content table.dt-column-search thead tr.pa-dt-filters th {
+    background: #fff !important;
+    padding: 0.55rem 0.75rem !important;
+    border-bottom: 1px solid var(--pa-border) !important;
+    vertical-align: middle;
+}
+
+.pa-content table.dataTable thead tr.pa-dt-filters th:first-child {
+    border-top: none;
+}
+
+.pa-content table.dataTable .pa-dt-col-filter,
+.pa-content table.dt-column-search .pa-dt-col-filter,
+.pa-content table.dataTable select.pa-dt-col-filter,
+.pa-content table.dt-column-search select.pa-dt-col-filter {
+    width: 100%;
+    min-width: 60px;
+    min-height: 42px !important;
+    height: 42px !important;
+    padding: 0 0.8rem !important;
+    font-size: 0.9375rem !important;
+    font-weight: 500;
+    color: var(--pa-text) !important;
+    background: var(--pa-surface-2) !important;
+    border: 1px solid var(--pa-border) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    outline: none;
+    transition: border-color var(--pa-transition), box-shadow var(--pa-transition), background var(--pa-transition);
+}
+
+.pa-content table.dataTable .pa-dt-col-filter:focus,
+.pa-content table.dt-column-search .pa-dt-col-filter:focus {
+    background: #fff !important;
+    border-color: var(--pa-primary) !important;
+    box-shadow: 0 0 0 2px var(--pa-primary-glow) !important;
+}
+
+.pa-content table.dataTable .pa-dt-col-filter::placeholder {
+    color: #b0bac9;
+    font-weight: 400;
+}
+
+.pa-content table.dataTable thead tr.pa-dt-filters .pa-dt-filter-empty {
+    color: var(--pa-text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* ── Body rows ── */
+.pa-content table.dataTable tbody td,
+.pa-content table.dt-column-search tbody td {
+    padding: 1.05rem 1.05rem !important;
+    vertical-align: middle !important;
+    border-top: none !important;
+    border-bottom: 1px solid var(--pa-border-light) !important;
+    color: var(--pa-text);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.55;
+    background: #fff;
+}
+
+.pa-content table.dataTable tbody tr {
+    transition: background var(--pa-transition);
+}
+
+.pa-content table.dataTable tbody tr:hover td {
+    background: #f8fafc !important;
+}
+
+.pa-content table.dataTable tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+.pa-content table.dataTable tbody td:first-child {
+    color: var(--pa-text-muted);
+    font-weight: 600;
+    font-size: 0.9375rem;
+}
+
+.pa-content table.dataTable tbody td img {
+    max-height: 48px;
+    max-width: 80px;
+    width: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid var(--pa-border-light);
+    background: var(--pa-surface-2);
+}
+
+/* ── Pagination ── */
+.pa-content .pa-dt-pagination-top .pagination,
+.pa-content .pa-dt-pagination-bottom .pagination,
+.pa-content .dataTables_wrapper .dataTables_paginate .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+}
+
+.pa-content .dataTables_wrapper .dataTables_paginate {
+    margin: 0 !important;
+}
+
+.pa-content .dataTables_wrapper .page-item .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 0.6rem !important;
+    margin: 0 !important;
+    border: 1px solid var(--pa-border) !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    color: var(--pa-text-secondary) !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    line-height: 1;
+    box-shadow: none !important;
+    transition: all var(--pa-transition);
+}
+
+.pa-content .dataTables_wrapper .page-item .page-link:hover {
+    background: var(--pa-surface-2) !important;
+    border-color: #cbd5e1 !important;
+    color: var(--pa-text) !important;
+}
+
+.pa-content .dataTables_wrapper .page-item.active .page-link {
+    background: var(--pa-primary) !important;
+    border-color: var(--pa-primary) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.28) !important;
+}
+
+.pa-content .dataTables_wrapper .page-item.disabled .page-link {
+    opacity: 0.45;
+    background: var(--pa-surface-2) !important;
+    cursor: not-allowed;
+}
+
+/* ── Processing / empty ── */
+.pa-content .dataTables_processing,
+.pa-content .pa-dt-loading {
+    position: absolute;
+    inset: 0;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    background: rgba(255, 255, 255, 0.82) !important;
+    backdrop-filter: blur(4px);
+    border: none !important;
+    border-radius: 12px;
+    font-size: 0.9375rem !important;
+    font-weight: 600;
+    color: var(--pa-text-muted) !important;
+    z-index: 10;
+}
+
+.pa-content .dataTables_empty {
+    padding: 2.5rem 1rem !important;
+    text-align: center;
+    color: var(--pa-text-muted);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* ── Status badges inside tables ── */
+.pa-content table.dataTable .badge,
+.pa-content table.dataTable .pa-dt-badge,
+.pa-content table.dataTable .badge-glow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.38rem 0.8rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-radius: 999px;
+    border: none;
+    line-height: 1.3;
+    white-space: nowrap;
+    box-shadow: none !important;
+}
+
+.pa-content table.dataTable .badge.bg-success,
+.pa-content table.dataTable .pa-dt-badge-success {
+    background: var(--pa-success-light) !important;
+    color: var(--pa-success) !important;
+}
+
+.pa-content table.dataTable .badge.bg-danger,
+.pa-content table.dataTable .pa-dt-badge-danger {
+    background: var(--pa-danger-light) !important;
+    color: var(--pa-danger) !important;
+}
+
+.pa-content table.dataTable .badge.bg-warning,
+.pa-content table.dataTable .pa-dt-badge-warning {
+    background: var(--pa-warning-light) !important;
+    color: #b45309 !important;
+}
+
+.pa-content table.dataTable .badge.bg-info,
+.pa-content table.dataTable .pa-dt-badge-info {
+    background: var(--pa-info-light) !important;
+    color: var(--pa-info) !important;
+}
+
+.pa-content table.dataTable .badge.bg-primary,
+.pa-content table.dataTable .pa-dt-badge-primary {
+    background: var(--pa-primary-light) !important;
+    color: var(--pa-primary) !important;
+}
+
+.pa-content table.dataTable .badge.bg-secondary,
+.pa-content table.dataTable .badge.bg-dark,
+.pa-content table.dataTable .pa-dt-badge-neutral {
+    background: var(--pa-surface-2) !important;
+    color: var(--pa-text-secondary) !important;
+}
+
+/* ── Action menu ── */
+.pa-content table.dataTable .pa-dt-action-btn,
+.pa-content table.dataTable .btn-icon.dropdown-toggle {
+    width: 36px;
+    height: 36px;
+    padding: 0 !important;
+    border: 1px solid var(--pa-border) !important;
+    border-radius: 10px !important;
+    background: #fff !important;
+    color: var(--pa-text-muted) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--pa-transition);
+}
+
+.pa-content table.dataTable .pa-dt-action-btn:hover,
+.pa-content table.dataTable .btn-icon.dropdown-toggle:hover {
+    background: var(--pa-surface-2) !important;
+    border-color: #cbd5e1 !important;
+    color: var(--pa-text) !important;
+}
+
+.pa-content table.dataTable .pa-dt-action-btn i,
+.pa-content table.dataTable .btn-icon.dropdown-toggle i {
+    font-size: 1.2rem !important;
+    color: inherit !important;
+}
+
+.pa-content table.dataTable .dropdown-menu {
+    border: 1px solid var(--pa-border) !important;
+    border-radius: 12px !important;
+    padding: 0.45rem !important;
+    min-width: 200px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12) !important;
+    background: #fff !important;
+}
+
+.pa-content table.dataTable .dropdown-item {
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem !important;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--pa-text-secondary);
+    transition: background var(--pa-transition);
+}
+
+.pa-content table.dataTable .dropdown-item:hover {
+    background: var(--pa-surface-2) !important;
+    color: var(--pa-text) !important;
+}
+
+.pa-content table.dataTable .dropdown-divider {
+    margin: 0.35rem 0;
+    border-color: var(--pa-border-light);
+}
+
+/* ── Checkboxes ── */
+.pa-content table.dataTable .form-check-input {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin: 0;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all var(--pa-transition);
+}
+
+.pa-content table.dataTable .form-check-input:checked {
+    background-color: var(--pa-primary);
+    border-color: var(--pa-primary);
+}
+
+.pa-content table.dataTable .form-check-input:focus {
+    box-shadow: 0 0 0 3px var(--pa-primary-glow);
+}
+
+/* ── DataTable panel card (optional wrapper) ── */
+.pa-content .pa-dt-panel {
+    border: 1px solid var(--pa-border);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: var(--pa-shadow-card);
+    overflow: hidden;
+}
+
+.pa-content .pa-dt-panel-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--pa-border-light);
+    background: #fff;
+}
+
+.pa-content .pa-dt-panel-header h4,
+.pa-content .pa-dt-panel-header .card-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--pa-text);
+}
+
+/* ── Legacy Vuexy wrappers inside pa-content ── */
+.pa-content #column-search-datatable .card {
+    border: 1px solid var(--pa-border) !important;
+    border-radius: 16px !important;
+    box-shadow: var(--pa-shadow-card) !important;
+    overflow: hidden;
+}
+
+.pa-content #column-search-datatable .card-datatable {
+    padding: 0rem 1rem 1rem;
+}
+
+/* ── Global list-page filter dropdown (Status, Popular, Date, etc.) ── */
+.pa-content .dropdown-menu:has([id^="filter-"]),
+.pa-content .dropdown-menu:has(#btn-apply-filters),
+.pa-content .dropdown-menu:has(#btn-reset-filters),
+.pa-content .dropdown-menu:has(#btn-apply-card-filters),
+.pa-content .dropdown-menu:has(#btn-reset-card-filters) {
+    padding: 1rem 1.15rem !important;
+    min-width: 320px !important;
+    border: 1px solid var(--pa-border) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12) !important;
+}
+
+.pa-content .dropdown-menu:has([id^="filter-"]) .form-label,
+.pa-content .dropdown-menu:has(#btn-apply-filters) .form-label,
+.pa-content .dropdown-menu:has(#btn-apply-card-filters) .form-label {
+    font-size: 0.875rem !important;
+    font-weight: 700 !important;
+    color: var(--pa-text) !important;
+    margin-bottom: 0.4rem !important;
+}
+
+.pa-content .dropdown-menu:has([id^="filter-"]) .form-select,
+.pa-content .dropdown-menu:has([id^="filter-"]) .form-control,
+.pa-content .dropdown-menu:has(#btn-apply-filters) .form-select,
+.pa-content .dropdown-menu:has(#btn-apply-filters) .form-control,
+.pa-content .dropdown-menu:has(#btn-apply-card-filters) .form-select,
+.pa-content .dropdown-menu:has(#btn-apply-card-filters) .form-control {
+    min-height: 44px !important;
+    height: 44px !important;
+    padding: 0.55rem 0.85rem !important;
+    font-size: 0.9375rem !important;
+    font-weight: 500 !important;
+    border-radius: 10px !important;
+    border: 1.5px solid var(--pa-border) !important;
+    color: var(--pa-text) !important;
+}
+
+.pa-content .dropdown-menu:has([id^="filter-"]) .mb-2,
+.pa-content .dropdown-menu:has(#btn-apply-filters) .mb-2,
+.pa-content .dropdown-menu:has(#btn-apply-card-filters) .mb-2 {
+    margin-bottom: 0.85rem !important;
+}
+
+.pa-content .dropdown-menu:has(#btn-apply-filters) .btn,
+.pa-content .dropdown-menu:has(#btn-reset-filters) .btn,
+.pa-content .dropdown-menu:has(#btn-apply-card-filters) .pa-btn,
+.pa-content .dropdown-menu:has(#btn-reset-card-filters) .pa-btn {
+    min-height: 42px !important;
+    padding: 0.55rem 1rem !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+}
+
+.pa-content .content-header-right .btn,
+.pa-content .content-header-right .dropdown-toggle {
+    font-size: 0.9375rem !important;
+}
+
+.pa-content table.dataTable tbody td .avatar,
+.pa-content table.dataTable tbody td .avatar-wrapper .avatar {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    border: 1px solid var(--pa-border-light) !important;
+    box-shadow: none !important;
+}
+
+.pa-content table.dataTable tbody td .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+    border-radius: 0;
+    max-height: none;
+    max-width: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+    .pa-content .pa-dt-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pa-content .pa-dt-pagination-top .pagination,
+    .pa-content .pa-dt-pagination-bottom .pagination,
+    .pa-content .dataTables_wrapper .dataTables_paginate .pagination {
+        justify-content: center;
+    }
+
+    .pa-content table.dataTable thead th,
+    .pa-content table.dataTable tbody td {
+        padding: 0.7rem 0.75rem !important;
+    }
+}
