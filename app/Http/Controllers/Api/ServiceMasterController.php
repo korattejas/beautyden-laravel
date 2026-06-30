@@ -547,7 +547,6 @@ class ServiceMasterController extends Controller
                     'r.rating',
                     'r.review',
                     'r.review_date',
-                    'r.helpful_count',
                     DB::raw('CONCAT("' . asset('uploads/review/videos') . '/", r.video) AS video'),
                     'r.photos'
                 )
@@ -555,6 +554,7 @@ class ServiceMasterController extends Controller
                 ->where('r.status', 1)
                 ->orderByDesc('r.is_popular')
                 ->orderByDesc('r.review_date')
+                ->limit(50)
                 ->get()
                 ->map(function ($review) {
                     $photos = $review->photos ? json_decode($review->photos, true) : [];
