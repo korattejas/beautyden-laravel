@@ -279,7 +279,7 @@ class AppointmentsController extends Controller
                         }
 
                         $variant = \Illuminate\Support\Facades\DB::table('service_master_variants')->where('id', $item['variant_id'])->first();
-                        $variantName = $variant ? $variant->variant_name : '';
+                        $variantName = $variant ? $variant->name : '';
                         $itemDuration = $variant ? (int) $variant->duration : 0;
 
                     } else {
