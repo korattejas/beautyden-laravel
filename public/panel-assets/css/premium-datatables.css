@@ -391,52 +391,6 @@
 }
 
 /* Small dot indicator baked into badges for quicker scanning */
-.pa-content table.dataTable .badge::before,
-.pa-content table.dataTable .pa-dt-badge::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-}
-
-.pa-content table.dataTable .badge.bg-success,
-.pa-content table.dataTable .pa-dt-badge-success {
-    background: var(--pa-success-light) !important;
-    color: var(--pa-success) !important;
-}
-
-.pa-content table.dataTable .badge.bg-danger,
-.pa-content table.dataTable .pa-dt-badge-danger {
-    background: var(--pa-danger-light) !important;
-    color: var(--pa-danger) !important;
-}
-
-.pa-content table.dataTable .badge.bg-warning,
-.pa-content table.dataTable .pa-dt-badge-warning {
-    background: var(--pa-warning-light) !important;
-    color: #b45309 !important;
-}
-
-.pa-content table.dataTable .badge.bg-info,
-.pa-content table.dataTable .pa-dt-badge-info {
-    background: var(--pa-info-light) !important;
-    color: var(--pa-info) !important;
-}
-
-.pa-content table.dataTable .badge.bg-primary,
-.pa-content table.dataTable .pa-dt-badge-primary {
-    background: var(--pa-primary-light) !important;
-    color: var(--pa-primary) !important;
-}
-
-.pa-content table.dataTable .badge.bg-secondary,
-.pa-content table.dataTable .badge.bg-dark,
-.pa-content table.dataTable .pa-dt-badge-neutral {
-    background: var(--pa-surface-2) !important;
-    color: var(--pa-text-secondary) !important;
-}
 
 /* ── Action menu ── */
 .pa-content table.dataTable .pa-dt-action-btn,
