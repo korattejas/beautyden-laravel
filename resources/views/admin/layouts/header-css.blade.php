@@ -44,5 +44,5 @@
 <link rel="stylesheet" href="{{ asset('panel-assets/css/style.css') }}">
 <link rel="stylesheet" href="{{ asset('panel-assets/css/premium-admin.css') }}?v={{ time() }}">
 <link rel="stylesheet" href="{{ asset('panel-assets/css/premium-datatables.css') }}?v={{ time() }}">
-<link rel="stylesheet" href="{{ asset('panel-assets/css/premium-forms.css') }}?v={{ time() }}">
+<!-- <link rel="stylesheet" href="{{ asset('panel-assets/css/premium-forms.css') }}?v={{ time() }}"> -->
 <link rel="stylesheet" href="{{ asset('panel-assets/css/premium-catalog.css') }}?v={{ time() }}">

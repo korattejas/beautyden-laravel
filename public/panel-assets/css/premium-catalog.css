@@ -79,15 +79,15 @@
     overflow: hidden;
 }
 
-.pa-catalog-page .pa-catalog-card > .card-header,
-.pa-catalog-page .card.shadow-sm.border-0 > .card-header {
+.pa-catalog-page .pa-catalog-card>.card-header,
+.pa-catalog-page .card.shadow-sm.border-0>.card-header {
     background: #fff !important;
     border-bottom: 1px solid var(--pa-border-light) !important;
     padding: 0.95rem 1.15rem !important;
 }
 
-.pa-catalog-page .pa-catalog-card > .card-header .card-title,
-.pa-catalog-page .card.shadow-sm.border-0 > .card-header .card-title {
+.pa-catalog-page .pa-catalog-card>.card-header .card-title,
+.pa-catalog-page .card.shadow-sm.border-0>.card-header .card-title {
     font-size: 0.95rem !important;
     font-weight: 700 !important;
     color: var(--pa-text) !important;
@@ -97,8 +97,8 @@
     gap: 0.4rem;
 }
 
-.pa-catalog-page .pa-catalog-card > .card-body,
-.pa-catalog-page .card.shadow-sm.border-0 > .card-body {
+.pa-catalog-page .pa-catalog-card>.card-body,
+.pa-catalog-page .card.shadow-sm.border-0>.card-body {
     padding: 1.15rem 1.15rem 1.25rem !important;
 }
 
@@ -147,7 +147,7 @@
     font-size: 0.9rem !important;
     font-weight: 600 !important;
     border-radius: 12px 0 0 12px !important;
-    min-height: 46px;
+    /* min-height: 46px; */
 }
 
 .pa-catalog-page .input-group .form-control {
@@ -292,13 +292,13 @@
     min-height: 640px;
 }
 
-.pa-catalog-page .pa-catalog-builder > .card-header {
+.pa-catalog-page .pa-catalog-builder>.card-header {
     background: #fff !important;
     border-bottom: 1px solid var(--pa-border-light) !important;
     padding: 0.95rem 1.15rem !important;
 }
 
-.pa-catalog-page .pa-catalog-builder > .card-body {
+.pa-catalog-page .pa-catalog-builder>.card-body {
     padding: 0.85rem !important;
 }
 
@@ -344,7 +344,7 @@
     margin: 0 !important;
 }
 
-.pa-catalog-page .section-block > .card-body {
+.pa-catalog-page .section-block>.card-body {
     padding: 0.85rem 1rem 1rem !important;
 }
 
@@ -375,18 +375,6 @@
 .pa-catalog-page .select2-container--default .select2-selection__rendered {
     font-size: 0.9375rem !important;
     line-height: 28px !important;
-}
-
-/* FilePond */
-.pa-catalog-page .filepond--panel-root {
-    background: var(--pa-surface-2) !important;
-    border: 1.5px dashed #cbd5e1 !important;
-    border-radius: 12px !important;
-}
-
-.pa-catalog-page .filepond--drop-label {
-    font-size: 0.875rem !important;
-    color: var(--pa-text-muted) !important;
 }
 
 /* ── VIEW page ── */
