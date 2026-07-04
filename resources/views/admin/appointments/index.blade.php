@@ -2,8 +2,7 @@
 
 @section('header_style_content')
 <style>
-    Premium Member Grid
-    .member-grid {
+     .member-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 15px;
