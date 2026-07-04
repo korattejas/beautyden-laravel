@@ -61,7 +61,10 @@ class BeauticianController extends Controller
                 return $this->sendResponse(['is_exists' => false], 'Beautician not found. Please register.', $this->success_status);
             }
 
-            $otp = rand(100000, 999999);
+            // [TESTING ONLY - REMOVE AFTER GO LIVE] Fixed OTP for Google Play Store review testing
+            $cleanedTestNumber = preg_replace('/\D/', '', $mobile_number);
+            $isTestNumber = in_array($cleanedTestNumber, ['8140622721', '918140622721']);
+            $otp = $isTestNumber ? 123456 : rand(100000, 999999);
             $otpExpirationTime = (int) config('custom.otp_expiration_time');
             $expiry = now()->addSeconds($otpExpirationTime);
 
@@ -131,8 +134,10 @@ class BeauticianController extends Controller
                 }
             }
 
-            // Send OTP via WhatsApp using Helper
-            $this->sendWhatsAppOtp($mobile_number, $teamMember->name, $otp);
+            // [TESTING ONLY - REMOVE AFTER GO LIVE] Skip WhatsApp for test number
+            if (!$isTestNumber) {
+                $this->sendWhatsAppOtp($mobile_number, $teamMember->name, $otp);
+            }
 
             $data = [
                 'is_exists' => true,
@@ -233,7 +238,10 @@ class BeauticianController extends Controller
                 return $this->sendError('Invalid OTP.', 401);
             }
 
-            if ($user->otp_expiration_at < now()) {
+            // [TESTING ONLY - REMOVE AFTER GO LIVE] Skip expiry check for test number
+            $cleanedVerifyNumber = preg_replace('/\D/', '', $request->mobile_number);
+            $isVerifyTestNumber = in_array($cleanedVerifyNumber, ['8140622721', '918140622721']);
+            if (!$isVerifyTestNumber && $user->otp_expiration_at < now()) {
                 return $this->sendError('OTP expired.', 401);
             }
 
