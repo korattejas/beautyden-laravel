@@ -90,22 +90,6 @@
     outline: none !important;
 }
 
-/* ── Table scroll wrapper ── */
-.pa-content .pa-dt-table-wrap {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border: 1px solid var(--pa-border);
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.08);
-}
-
-.pa-content .pa-dt-table-wrap .dataTables_scroll,
-.pa-content .pa-dt-table-wrap .table-responsive {
-    border: none;
-}
-
 /* Slim, premium scrollbar for the horizontal table wrap */
 .pa-content .pa-dt-table-wrap::-webkit-scrollbar {
     height: 8px;
