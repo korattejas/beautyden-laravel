@@ -34,6 +34,7 @@ class ApplicationHomeController extends Controller
         // 1. Validate: city_id is required
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'city_id' => 'required|integer',
+            'city_name' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -45,24 +46,28 @@ class ApplicationHomeController extends Controller
 
         try {
             $cityId = $request->input('city_id');
+            $cityName = $request->input('city_name', '');
 
-            // 2. Check City Status (Active vs Coming Soon)
-            $city = DB::table('cities')->where('id', $cityId)->first();
-            
-            if (!$city) {
-                return $this->sendError('City not found.', 404);
-            }
+            if ($cityId != 0) {
+                // 2. Check City Status (Active vs Coming Soon)
+                $city = DB::table('cities')->where('id', $cityId)->first();
+                
+                if (!$city) {
+                    return $this->sendError('City not found.', 404);
+                }
 
-            // status 0 = Active, status 1 = Coming Soon
-            if ($city->status != 0) {
-                return $this->sendResponse(
-                    [
-                        'is_coming_soon' => true,
-                        'city_name' => $city->name
-                    ],
-                    "Coming soon! We are not available in $city->name yet, but we will start our services here very soon.",
-                    $this->success_status
-                );
+                // status 0 = Active, status 1 = Coming Soon
+                if ($city->status != 0) {
+                    return $this->sendResponse(
+                        [
+                            'is_coming_soon' => true,
+                            'city_name' => $city->name,
+                            'current_user_selected_city_name' => $cityName
+                        ],
+                        "Coming soon! We are not available in $city->name yet, but we will start our services here very soon.",
+                        $this->success_status
+                    );
+                }
             }
 
             // 1. User Details & Subscription
@@ -136,17 +141,47 @@ class ApplicationHomeController extends Controller
                     return $offer;
                 });
 
-            // 3. Membership Plans
-            // $membershipPlans = DB::table('membership_plans')
-            //     ->select('id', 'name', 'description', 'price', 'discount_percentage', 'duration_months')
-            //     ->where('status', 1)
-            //     ->get();
-
             // 3. Service Types (New Feature)
             $serviceTypes = \App\Models\ServiceType::where('status', 1)
                 ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/service-types') . '/", icon) AS icon'), 'description', 'is_popular', 'is_new')
                 ->orderByDesc('is_popular')
                 ->get();
+
+            $cities = DB::table('cities')
+                ->select('id', 'name', 'status')
+                ->whereIn('status', [0, 1])
+                ->orderBy('name', 'asc')
+                ->get();
+
+            $activeCities = $cities->where('status', 0)->values();
+            $comingSoonCities = $cities->where('status', 1)->values();
+
+            $coupons = DB::table('coupon_codes')
+                ->select('id', 'code', 'discount_type', 'discount_value', 'description', 'start_date', 'end_date')
+                ->where('status', 1)
+                ->where(function($query) {
+                    $query->whereNull('start_date')->orWhere('start_date', '<=', now());
+                })
+                ->where(function($query) {
+                    $query->whereNull('end_date')->orWhere('end_date', '>=', now());
+                })
+                ->get();
+
+            if ($cityId == 0) {
+                return $this->sendResponse(
+                    [
+                        'current_user_selected_city_name' => $cityName,
+                        'offers' => $offers,
+                        'coupons' => $coupons,
+                        'service_types' => $serviceTypes,
+                        'active_cities' => $activeCities,
+                        'coming_soon_cities' => $comingSoonCities,
+                    ],
+                    'Home page data retrieved successfully',
+                    $this->success_status
+                );
+            }
+
 
             // 4. Category List (Service Categories)
             $categories = DB::table('service_categories')
@@ -322,28 +357,8 @@ class ApplicationHomeController extends Controller
             //     ->where('status', 1)
             //     ->orderBy('name', 'ASC')
             //     ->get();
-
-            $cities = DB::table('cities')
-                ->select('id', 'name', 'status')
-                ->whereIn('status', [0, 1])
-                ->orderBy('name', 'asc')
-                ->get();
-
-            $activeCities = $cities->where('status', 0)->values();
-            $comingSoonCities = $cities->where('status', 1)->values();
-
-            $coupons = DB::table('coupon_codes')
-                ->select('id', 'code', 'discount_type', 'discount_value', 'description', 'start_date', 'end_date')
-                ->where('status', 1)
-                ->where(function($query) {
-                    $query->whereNull('start_date')->orWhere('start_date', '<=', now());
-                })
-                ->where(function($query) {
-                    $query->whereNull('end_date')->orWhere('end_date', '>=', now());
-                })
-                ->get();
-
             $responseData = [
+                'current_user_selected_city_name' => $cityName,
                 'user' => $userData,
                 'offers' => $offers,
                 'coupons' => $coupons,
