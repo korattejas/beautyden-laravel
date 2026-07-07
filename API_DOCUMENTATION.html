@@ -1363,7 +1363,12 @@
                     <tr>
                         <td>city_id</td>
                         <td>Integer</td>
-                        <td><strong>Required</strong>. The city context for the entire home screen.</td>
+                        <td><strong>Required</strong>. The city context for the entire home screen. If the city is not supported, pass 0.</td>
+                    </tr>
+                    <tr>
+                        <td>city_name</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. The current locality name retrieved from device lat/long (e.g. "Surat").</td>
                     </tr>
                 </tbody>
             </table>
@@ -1373,8 +1378,8 @@
             <div class="note"
                 style="margin: 10px 0; background: #fffbeb; border-left-color: #f59e0b; padding: 15px; border-radius: 8px;">
                 <i class="bi bi-geo-alt-fill text-warning"></i> <strong>City Handling:</strong><br>
-                If the provided <code>city_id</code> is marked as "Coming Soon" (status 1), the API returns a response
-                with <code>"is_coming_soon": true</code> and no other home data.
+                If <code>city_id = 0</code>, the API returns a partial dashboard (offers, coupons, service types, and cities lists) without user info or specific services.<br>
+                If <code>city_id</code> is marked as "Coming Soon" (status 1), the API returns only <code>"is_coming_soon": true</code>, <code>"city_name"</code>, and <code>"current_user_selected_city_name"</code> with no other data.
             </div>
 
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -1384,6 +1389,7 @@
     "status": true,
     "message": "Home page data retrieved successfully",
     "data": {
+        "current_user_selected_city_name": "Surat",
         "user": {
             "id": 4,
             "name": "Tejas",
