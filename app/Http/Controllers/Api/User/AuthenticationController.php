@@ -894,4 +894,54 @@ class AuthenticationController extends Controller
 
         sendEmail($email_data);
     }
+
+    public function testFast2Sms(Request $request): JsonResponse
+    {
+        $function_name = 'testFast2Sms';
+        try {
+            $validator = Validator::make($request->all(), [
+                'mobile_number' => 'required|numeric',
+            ]);
+
+            if ($validator->fails()) {
+                logValidationException($this->controller_name, $function_name, $validator);
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $mobile_number = $request->mobile_number;
+            $otp = rand(100000, 999999);
+            
+            // Fast2SMS API Call
+            $authKey = env('FAST2SMS_AUTH_KEY', ''); // Get this from .env or config
+            
+            $cleanedNumber = preg_replace('/\D/', '', $mobile_number);
+            if (strlen($cleanedNumber) > 10) {
+                $cleanedNumber = substr($cleanedNumber, -10);
+            }
+            
+            $response = Http::withHeaders([
+                'authorization' => $authKey,
+            ])->get('https://www.fast2sms.com/dev/bulkV2', [
+                'variables_values' => $otp,
+                'route' => 'otp',
+                'numbers' => $cleanedNumber,
+            ]);
+
+            if ($response->successful()) {
+                Log::info("Fast2SMS OTP sent successfully to $cleanedNumber. Response: " . $response->body());
+                return $this->sendResponse([
+                    'otp' => $otp, 
+                    'response' => $response->json(),
+                    'note' => 'Please configure FAST2SMS_AUTH_KEY in .env if it returns authentication failed.'
+                ], 'Test Fast2SMS sent successfully.', $this->success_status);
+            } else {
+                Log::error("Fast2SMS OTP send failed for $cleanedNumber. Status: " . $response->status() . " Body: " . $response->body());
+                return $this->sendError('Failed to send SMS via Fast2SMS', $this->backend_error_status);
+            }
+
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
 }

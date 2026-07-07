@@ -57,6 +57,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
+        Route::post('testFast2Sms', [AuthenticationController::class, 'testFast2Sms']);
     });
 });
 
@@ -165,6 +166,7 @@ Route::middleware([])->group(function () {
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
+        Route::post('testFast2Sms', [AuthenticationController::class, 'testFast2Sms']);
     });
 });
 
