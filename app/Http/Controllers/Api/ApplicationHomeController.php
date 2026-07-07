@@ -78,7 +78,7 @@ class ApplicationHomeController extends Controller
                     ->select(
                         'id',
                         'user_id',
-                        DB::raw($user->city_id . ' as city_id'),
+                        DB::raw(($user->city_id ?? 'NULL') . ' as city_id'),
                         'address',
                         'latitude',
                         'longitude',
