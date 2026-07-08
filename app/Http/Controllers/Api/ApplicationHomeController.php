@@ -203,7 +203,6 @@ class ApplicationHomeController extends Controller
             $servicesQuery = DB::table('service_masters as s')
                 ->where('s.status', 1);
 
-                dd($cityId);
             if ($cityId) {
                 $servicesQuery->join('service_city_masters as scm', function($join) use ($cityId) {
                     $join->on('scm.service_master_id', '=', 's.id')
