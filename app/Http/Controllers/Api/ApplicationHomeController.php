@@ -199,6 +199,13 @@ class ApplicationHomeController extends Controller
                 ->orderByDesc('is_popular')
                 ->get();
 
+            // All active categories map for trending lookup (not filtered by is_popular)
+            $allCategoriesMap = DB::table('service_categories')
+                ->select('id', 'name')
+                ->where('status', 1)
+                ->get()
+                ->keyBy('id');
+
             // 5. City Wise Services & Trending Services
             $servicesQuery = DB::table('service_masters as s')
                 ->where('s.status', 1);
@@ -244,7 +251,8 @@ class ApplicationHomeController extends Controller
 
             $trendingData = [];
             foreach ($trendingServices as $catId => $items) {
-                $category = $categories->where('id', $catId)->first();
+                // Use allCategoriesMap so trending services are not limited to is_popular categories
+                $category = $allCategoriesMap->get($catId);
                 if ($category) {
                     $trendingData[] = [
                         'category_id' => $catId,
