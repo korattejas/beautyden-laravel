@@ -499,6 +499,7 @@ class AuthenticationController extends Controller
                 ->select(
                     'appointments.id',
                     'appointments.order_number',
+                    'appointments.status',
                     'appointments.appointment_date',
                     'appointments.appointment_time',
                     'appointments.service_id',
@@ -542,6 +543,7 @@ class AuthenticationController extends Controller
                 return [
                     'id'                => $appointment->id,
                     'order_number'      => $appointment->order_number,
+                    'status'            => (int) $appointment->status,
                     'appointment_date'  => $appointment->appointment_date,
                     'appointment_time'  => $appointment->appointment_time,
                     'city_name'         => $appointment->city_name,
