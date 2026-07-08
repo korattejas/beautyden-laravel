@@ -613,6 +613,7 @@ class AuthenticationController extends Controller
                 'company_amount'         => $appointment->company_amount,
                 'city_name'              => $appointment->city_name,
                 'assigned_beautician'    => $beauticianNames,
+                'special_notes'          => $appointment->special_notes,
                 'booking_details'        => $servicesData, // This contains client, appointment, services, and summary
                 'created_at'             => $appointment->created_at,
                 'updated_at'             => $appointment->updated_at,
