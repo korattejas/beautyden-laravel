@@ -262,44 +262,44 @@ class ApplicationHomeController extends Controller
                 }
             }
 
-            // 6. Reviews (Optimized)
-            $reviews = DB::table('customer_reviews as r')
-                ->select('r.id', 'r.customer_name', 'r.rating', 'r.review', 'r.review_date', 'r.appointment_id')
-                ->where('r.status', 1)
-                ->orderByDesc('r.is_popular')
-                ->limit(10)
-                ->get();
+            // // 6. Reviews (Optimized)
+            // $reviews = DB::table('customer_reviews as r')
+            //     ->select('r.id', 'r.customer_name', 'r.rating', 'r.review', 'r.review_date', 'r.appointment_id')
+            //     ->where('r.status', 1)
+            //     ->orderByDesc('r.is_popular')
+            //     ->limit(10)
+            //     ->get();
 
-            $appointmentIds = $reviews->pluck('appointment_id')->filter()->unique()->toArray();
-            if (!empty($appointmentIds)) {
-                $appointments = DB::table('appointments')
-                    ->whereIn('id', $appointmentIds)
-                    ->pluck('service_id', 'id');
+            // $appointmentIds = $reviews->pluck('appointment_id')->filter()->unique()->toArray();
+            // if (!empty($appointmentIds)) {
+            //     $appointments = DB::table('appointments')
+            //         ->whereIn('id', $appointmentIds)
+            //         ->pluck('service_id', 'id');
 
-                $allServiceIds = [];
-                foreach ($appointments as $sidString) {
-                    if ($sidString) {
-                        $allServiceIds = array_merge($allServiceIds, explode(',', $sidString));
-                    }
-                }
-                $allServiceIds = array_unique($allServiceIds);
+            //     $allServiceIds = [];
+            //     foreach ($appointments as $sidString) {
+            //         if ($sidString) {
+            //             $allServiceIds = array_merge($allServiceIds, explode(',', $sidString));
+            //         }
+            //     }
+            //     $allServiceIds = array_unique($allServiceIds);
 
-                $serviceNames = DB::table('service_masters')
-                    ->whereIn('id', $allServiceIds)
-                    ->pluck('name', 'id');
+            //     $serviceNames = DB::table('service_masters')
+            //         ->whereIn('id', $allServiceIds)
+            //         ->pluck('name', 'id');
 
-                $reviews->map(function ($review) use ($appointments, $serviceNames) {
-                    $sids = isset($appointments[$review->appointment_id]) ? explode(',', $appointments[$review->appointment_id]) : [];
-                    $review->services = array_map(fn($id) => $serviceNames[$id] ?? null, $sids);
-                    $review->services = array_values(array_filter($review->services));
-                    return $review;
-                });
-            } else {
-                $reviews->map(function ($review) {
-                    $review->services = [];
-                    return $review;
-                });
-            }
+            //     $reviews->map(function ($review) use ($appointments, $serviceNames) {
+            //         $sids = isset($appointments[$review->appointment_id]) ? explode(',', $appointments[$review->appointment_id]) : [];
+            //         $review->services = array_map(fn($id) => $serviceNames[$id] ?? null, $sids);
+            //         $review->services = array_values(array_filter($review->services));
+            //         return $review;
+            //     });
+            // } else {
+            //     $reviews->map(function ($review) {
+            //         $review->services = [];
+            //         return $review;
+            //     });
+            // }
 
             // 7. Service Combos (Optimized)
             $combos = DB::table('service_combos')
@@ -375,7 +375,7 @@ class ApplicationHomeController extends Controller
                 'categories' => $categories,
 
                 'trending_services' => $trendingData,
-                'reviews' => $reviews,
+                // 'reviews' => $reviews,
                 'combos' => $combos,
                 // 'brands' => $productBrands,
                 'active_cities' => $activeCities,
