@@ -361,6 +361,7 @@
         box-shadow: 0 0 0 4px rgba(115,103,240,0.1) !important;
         outline: none;
     }
+
 </style>
 @endsection
 
@@ -1604,6 +1605,15 @@ $(document).ready(function() {
             }
         }, 200);
     }
+
+    // Fix dropdown cutoff dynamically without permanent height increase
+    $(document).on('show.bs.dropdown', '.card-datatable .dropdown', function () {
+        $(this).closest('.card-datatable').css('padding-bottom', '220px');
+    });
+    
+    $(document).on('hide.bs.dropdown', '.card-datatable .dropdown', function () {
+        $(this).closest('.card-datatable').css('padding-bottom', '0');
+    });
 });
 </script>
 @endsection
