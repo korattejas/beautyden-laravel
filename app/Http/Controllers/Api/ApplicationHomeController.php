@@ -414,8 +414,16 @@ class ApplicationHomeController extends Controller
                     'sc.name as category_name',
                     'sm.sub_category_id',
                     DB::raw('IF(sci.variant_id IS NOT NULL, IFNULL(scvp.price, smv.price), IFNULL(scm.price, sm.price)) as price'),
-                    DB::raw('IF(sci.variant_id IS NOT NULL, IFNULL(scvp.discount_price, smv.price), IFNULL(scm.discount_price, sm.discount_price)) as discount_price'),
-                    DB::raw('IF(sci.variant_id IS NOT NULL, IFNULL(scvp.discount_price, smv.discount_percentage), IFNULL(scm.discount_price, 0)) as discount_percentage'),
+                    DB::raw('IF(
+                        sci.variant_id IS NOT NULL, 
+                        ROUND(IFNULL(scvp.price, smv.price) + (IFNULL(scvp.price, smv.price) * IFNULL(scvp.discount_price, smv.discount_percentage) / 100), 2), 
+                        IF(scm.id IS NOT NULL, ROUND(scm.price + (scm.price * scm.discount_price / 100), 2), sm.discount_price)
+                    ) as discount_price'),
+                    DB::raw('IF(
+                        sci.variant_id IS NOT NULL, 
+                        IFNULL(scvp.discount_price, smv.discount_percentage), 
+                        IF(scm.id IS NOT NULL, scm.discount_price, IF(sm.discount_price > sm.price, ROUND(((sm.discount_price - sm.price) / sm.discount_price) * 100), 0))
+                    ) as discount_percentage'),
                     DB::raw('IF(sci.variant_id IS NOT NULL, smv.duration, sm.duration) as duration'),
                     'sci.is_default',
                     'sci.variant_id'
