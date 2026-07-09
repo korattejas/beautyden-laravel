@@ -82,8 +82,9 @@ class ServiceMasterController extends Controller
                     'csc.name as sub_category_name',
                     'sm.name',
                     'sm.skin_type',
-                    'scm.price',
-                    'scm.discount_price',
+                    'scm.price as price',
+                    DB::raw('ROUND(scm.price + (scm.price * scm.discount_price / 100)) as discount_price'),
+                    'scm.discount_price as discount_percentage',
                     'sm.duration',
                     'sm.rating',
                     'sm.reviews',
@@ -157,6 +158,10 @@ class ServiceMasterController extends Controller
             }
 
             $services->getCollection()->transform(function ($service) use (&$categoryStatsCache, $variants, $variantPrices) {
+                $service->price = (int) $service->price;
+                $service->discount_price = (int) $service->discount_price;
+                $service->discount_percentage = (int) $service->discount_percentage;
+                
                 $service->is_popular = (int) $service->is_popular;
                 $service->has_variants = (int) $service->has_variants;
                 
@@ -201,10 +206,13 @@ class ServiceMasterController extends Controller
                             if ($priceData->is_available == 0) {
                                 continue; // Skip this variant
                             }
-                            $variant->price = $priceData->price;
-                            $variant->discount_price = $priceData->discount_price;
+                            $variant->price = (int) $priceData->price;
+                            $variant->discount_price = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
+                            $variant->discount_percentage = (int) $priceData->discount_price;
                         } else {
-                            $variant->discount_price = 0; // Default if not found
+                            $variant->price = 0;
+                            $variant->discount_price = 0;
+                            $variant->discount_percentage = 0;
                         }
 
                         // Format thumbnail image URL
@@ -216,9 +224,6 @@ class ServiceMasterController extends Controller
                         $variant->description         = $variant->description ?? null;
                         $variant->rating             = (string) $categoryStatsCache[$service->category_id]['rating'];
                         $variant->reviews            = (string) $categoryStatsCache[$service->category_id]['reviews'];
-                        $variant->discount_percentage = $variant->discount_percentage
-                            ? (float) $variant->discount_percentage
-                            : null;
 
                         $availableVariants[] = $variant;
                     }
@@ -296,8 +301,9 @@ class ServiceMasterController extends Controller
                     ->first();
                 
                 if ($cityService) {
-                    $service->price = $cityService->price;
-                    $service->discount_price = $cityService->discount_price;
+                    $service->price = (int) $cityService->price;
+                    $service->discount_price = (int) round($cityService->price + ($cityService->price * $cityService->discount_price / 100));
+                    $service->discount_percentage = (int) $cityService->discount_price;
                 }
 
                 if ($service->has_variants == 1 && $service->variants) {
@@ -312,10 +318,14 @@ class ServiceMasterController extends Controller
                             if ($variantPrices[$variant->id]->is_available == 0) {
                                 continue; // Skip this variant
                             }
-                            $variant->price = $variantPrices[$variant->id]->price;
-                            $variant->discount_price = $variantPrices[$variant->id]->discount_price;
+                            $priceData = $variantPrices[$variant->id];
+                            $variant->price = (int) $priceData->price;
+                            $variant->discount_price = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
+                            $variant->discount_percentage = (int) $priceData->discount_price;
                         } else {
-                            $variant->discount_price = 0; // Default if not found
+                            $variant->price = 0;
+                            $variant->discount_price = 0;
+                            $variant->discount_percentage = 0;
                         }
 
                         // Format thumbnail image URL
@@ -327,9 +337,6 @@ class ServiceMasterController extends Controller
                         $variant->description         = $variant->description ?? null;
                         $variant->rating             = (string) $catStats['rating'];
                         $variant->reviews            = (string) $catStats['reviews'];
-                        $variant->discount_percentage = $variant->discount_percentage
-                            ? (float) $variant->discount_percentage
-                            : null;
 
                         $availableVariants[] = $variant;
                     }
@@ -425,8 +432,9 @@ class ServiceMasterController extends Controller
                 ->select(
                     'sm.id',
                     'sm.name',
-                    'scm.price',
-                    'scm.discount_price',
+                    'scm.price as price',
+                    DB::raw('ROUND(scm.price + (scm.price * scm.discount_price / 100)) as discount_price'),
+                    'scm.discount_price as discount_percentage',
                     'sm.duration',
                     'sm.rating',
                     'sm.reviews',
@@ -445,6 +453,9 @@ class ServiceMasterController extends Controller
                     $item->is_popular = (int) $item->is_popular;
                     $item->rating = (string) $catStats['rating'];
                     $item->reviews = (string) $catStats['reviews'];
+                    $item->price = (int) $item->price;
+                    $item->discount_price = (int) $item->discount_price;
+                    $item->discount_percentage = (int) $item->discount_percentage;
                     return $item;
                 });
 
@@ -458,6 +469,7 @@ class ServiceMasterController extends Controller
                     'name' => $service->name,
                     'price' => $service->price ?? 0,
                     'discount_price' => $service->discount_price ?? 0,
+                    'discount_percentage' => $service->discount_percentage ?? 0,
                     'duration' => $service->duration,
                     'rating' => $service->rating,
                     'reviews' => $service->reviews,
@@ -629,8 +641,14 @@ class ServiceMasterController extends Controller
                     ->first();
                 
                 if ($cityService) {
-                    $service->price = $cityService->price;
-                    $service->discount_price = $cityService->discount_price;
+                    $service->price = (int) $cityService->price;
+                    $service->discount_price = (int) round($cityService->price + ($cityService->price * $cityService->discount_price / 100));
+                    $service->discount_percentage = (int) $cityService->discount_price;
+                } else {
+                    $service->discount_percentage = $service->discount_price > $service->price ? 
+                        (int) round((($service->discount_price - $service->price) / $service->discount_price) * 100) : 0;
+                    $service->price = (int) $service->price;
+                    $service->discount_price = (int) $service->discount_price;
                 }
 
                 if ($service->has_variants == 1 && $service->variants) {
