@@ -162,6 +162,7 @@
                     <form method="POST" data-parsley-validate="" id="addEditForm" role="form" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="edit_value" value="{{ $portfolio->id }}">
+                        <input type="hidden" name="reordered_photos" id="reordered_photos" value="">
                         
                         <div class="row">
                             <!-- Category Selection -->
@@ -197,9 +198,10 @@
                                 <label class="form-label-luxury">Gallery Collection</label>
                                 
                                 @if (isset($portfolio) && !empty($portfolio->photos))
+                                    <div class="mb-2 text-muted small"><i class="bi bi-info-circle"></i> Tip: You can drag and drop images to reorder them.</div>
                                     <div class="portfolio-photos-grid" id="existing-photos">
                                         @foreach ($portfolio->photos as $img)
-                                            <div class="photo-preview-item" id="photo-{{ md5($img) }}">
+                                            <div class="photo-preview-item" id="photo-{{ md5($img) }}" data-image-name="{{ $img }}" style="cursor: move;">
                                                 <img src="{{ asset('uploads/portfolio/' . $img) }}" alt="Portfolio Image">
                                                 <span class="remove-photo-btn remove-image-ajax" 
                                                       data-id="{{ $portfolio->id }}" 
@@ -234,6 +236,7 @@
 @endsection
 
 @section('footer_script_content')
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script>
         var form_url = 'portfolio/store';
         var redirect_url = 'portfolio';
@@ -244,7 +247,26 @@
                     placeholder: "Select a category"
                 });
             }
+
+            if (document.getElementById('existing-photos')) {
+                new Sortable(document.getElementById('existing-photos'), {
+                    animation: 150,
+                    ghostClass: 'bg-light',
+                    onEnd: function () {
+                        updatePhotoOrder();
+                    }
+                });
+                updatePhotoOrder();
+            }
         });
+
+        function updatePhotoOrder() {
+            var order = [];
+            $('#existing-photos .photo-preview-item').each(function() {
+                order.push($(this).data('image-name'));
+            });
+            $('#reordered_photos').val(JSON.stringify(order));
+        }
 
         $(document).on('click', '.remove-image-ajax', function() {
             var icon = $(this);

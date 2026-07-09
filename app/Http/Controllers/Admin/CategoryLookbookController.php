@@ -106,6 +106,16 @@ class CategoryLookbookController extends Controller
                 if ($lookbook && is_array($lookbook->photos)) {
                     $storedPhotos = $lookbook->photos;
                 }
+                if ($request->has('reordered_photos') && !empty($request->reordered_photos)) {
+                    $reordered = json_decode($request->reordered_photos, true);
+                    if (is_array($reordered)) {
+                        // Keep only valid reordered photos that exist in the stored photos just in case
+                        $validReordered = array_intersect($reordered, $storedPhotos);
+                        // Add any photos that were in storedPhotos but missed from reordered to the end
+                        $missingPhotos = array_diff($storedPhotos, $validReordered);
+                        $storedPhotos = array_merge($validReordered, $missingPhotos);
+                    }
+                }
             }
 
             if ($request->hasFile('photos')) {

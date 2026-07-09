@@ -111,6 +111,15 @@ class PortfolioController extends Controller
                 if ($portfolio && is_array($portfolio->photos)) {
                     $storedPhotos = $portfolio->photos;
                 }
+                
+                if ($request->has('reordered_photos') && !empty($request->reordered_photos)) {
+                    $reordered = json_decode($request->reordered_photos, true);
+                    if (is_array($reordered)) {
+                        $validReordered = array_intersect($reordered, $storedPhotos);
+                        $missingPhotos = array_diff($storedPhotos, $validReordered);
+                        $storedPhotos = array_merge($validReordered, $missingPhotos);
+                    }
+                }
             }
 
             if ($request->hasFile('photos')) {
