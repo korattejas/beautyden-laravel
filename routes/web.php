@@ -55,6 +55,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/api-docs', function () {
+    $path = base_path('API_DOCUMENTATION.html');
+    if (file_exists($path)) {
+        return response()->file($path);
+    }
+    abort(404, 'API Documentation not found.');
+});
+
 
 Route::get('/beautician-contracts', [ContractController::class, 'showAgreements']);
 Route::post('/contracts/verify', [ContractController::class, 'verifyProvider'])->name('contracts.verify');
