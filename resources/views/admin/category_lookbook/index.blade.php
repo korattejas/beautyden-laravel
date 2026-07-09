@@ -156,11 +156,11 @@
                 
                 <div class="portfolio-header">
                     <div class="title-area">
-                        <h2>Master Portfolio ✨</h2>
-                        <p>Manage and showcase your best work to clients.</p>
+                        <h2>Category Lookbook ✨</h2>
+                        <p>Manage and showcase reference images for your service categories.</p>
                     </div>
-                    <a href="{{ route('admin.portfolio.create') }}" class="btn-add-portfolio">
-                        <i class="bi bi-plus-lg"></i> Add New Collection
+                    <a href="{{ route('admin.category_lookbook.create') }}" class="btn-add-portfolio">
+                        <i class="bi bi-plus-lg"></i> Add New Lookbook
                     </a>
                 </div>
 
@@ -170,8 +170,7 @@
                             <thead>
                                 <tr>
                                     <th style="width: 50px;">#</th>
-                                    <th>Category</th>
-                                    <th>Portfolio Name</th>
+                                    <th>Category Name</th>
                                     <th data-search="false" style="width: 250px;">Digital Assets</th>
                                     <th data-stuff="Active,InActive" style="width: 150px;">Status</th>
                                     <th data-search="false" style="width: 150px;">Operations</th>
@@ -188,10 +187,10 @@
 
 @section('footer_script_content')
     <script>
-        const sweetalert_delete_title = "Remove Portfolio?";
+        const sweetalert_delete_title = "Remove Lookbook?";
         const sweetalert_change_status = "Update Visibility Status";
-        const form_url = '/portfolio';
-        datatable_url = '/getDataPortfolio';
+        const form_url = '/category-lookbook';
+        datatable_url = '/getDataLookbook';
 
         $.extend(true, $.fn.dataTable.defaults, {
             pageLength: 25,
@@ -207,13 +206,6 @@
                 {
                     data: 'category_name',
                     name: 'category_name',
-                    render: function(data) {
-                        return `<span class="badge bg-light text-dark border">${data}</span>`;
-                    }
-                },
-                {
-                    data: 'name',
-                    name: 'name',
                     render: function(data) {
                         return `<span class="fw-bold text-dark" style="font-size: 1.05rem;">${data}</span>`;
                     }

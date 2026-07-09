@@ -1282,7 +1282,7 @@ body:has(.pa-list-page) .pa-page-title {
     opacity: 1;
 }
 
-.pa-content .form-control:not(.form-control-sm):not(.border-0):focus,
+/* .pa-content .form-control:not(.form-control-sm):not(.border-0):focus,
 .pa-content .form-select:not(.form-select-sm):focus,
 .pa-body .form-control:not(.form-control-sm):not(.border-0):focus,
 .pa-body .form-select:not(.form-select-sm):focus,
@@ -1295,7 +1295,7 @@ body:has(.pa-list-page) .pa-page-title {
     border-color: var(--pa-primary) !important;
     box-shadow: 0 0 0 3px var(--pa-primary-glow) !important;
     outline: none !important;
-}
+} */
 
 .pa-form-field .pa-input-wrap:focus-within i {
     color: var(--pa-primary);

@@ -4,16 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Portfolio;
+use App\Models\CategoryLookbook;
+use App\Models\ServiceCategory;
 use App\Helpers\ImageUploadHelper;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
-use App\Models\ServiceCategory;
 
-class PortfolioController extends Controller
+class CategoryLookbookController extends Controller
 {
     protected $error_message, $exception_error_code, $validator_error_code, $controller_name;
 
@@ -22,13 +20,14 @@ class PortfolioController extends Controller
         $this->error_message = config('custom.common_error_message');
         $this->exception_error_code = config('custom.exception_error_code');
         $this->validator_error_code = config('custom.validator_error_code');
-        $this->controller_name = "Admin/PortfolioController";
+        $this->controller_name = "Admin/CategoryLookbookController";
     }
+    
     public function index()
     {
         $function_name = 'index';
         try {
-            return view('admin.portfolio.index');
+            return view('admin.category_lookbook.index');
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -40,7 +39,7 @@ class PortfolioController extends Controller
         $function_name = 'create';
         try {
             $categories = ServiceCategory::where('status', 1)->get();
-            return view('admin.portfolio.create', compact('categories'));
+            return view('admin.category_lookbook.create', compact('categories'));
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return response()->json(['error' => $this->error_message], $this->exception_error_code);
@@ -51,11 +50,11 @@ class PortfolioController extends Controller
     {
         $function_name = 'edit';
         try {
-            $portfolio = Portfolio::where('id', decryptId($id))->first();
-            if ($portfolio) {
+            $lookbook = CategoryLookbook::where('id', decryptId($id))->first();
+            if ($lookbook) {
                 $categories = ServiceCategory::where('status', 1)->get();
-                return view('admin.portfolio.edit', [
-                    'portfolio' => $portfolio,
+                return view('admin.category_lookbook.edit', [
+                    'lookbook' => $lookbook,
                     'categories' => $categories
                 ]);
             }
@@ -74,29 +73,25 @@ class PortfolioController extends Controller
             $id = (int) $request->input('edit_value', 0);
 
             $validateArray = [
-                'category_id' => 'required|exists:service_categories,id',
-                'name' => [
+                'category_id' => [
                     'required',
                     $id == 0
-                        ? 'unique:portfolios,name'
-                        : 'unique:portfolios,name,' . $id . ',id',
+                        ? 'unique:category_lookbooks,category_id'
+                        : 'unique:category_lookbooks,category_id,' . $id . ',id',
                 ],
                 'photos'   => 'nullable|array',
                 'photos.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp',
             ];
 
             $validateMessage = [
-                'category_id.required' => 'The category selection is required.',
-                'category_id.exists'   => 'The selected category is invalid.',
-                'name.required'   => 'The portfolio name is required.',
-                'name.unique'     => 'The portfolio name has already been taken.',
+                'category_id.required'   => 'The category selection is required.',
+                'category_id.unique'     => 'A lookbook for this category already exists.',
                 'photos.*.image'  => 'Each file must be an image.',
                 'photos.*.mimes'  => 'Images must be jpeg, png, jpg, gif, svg, webp.',
             ];
 
             $validator = Validator::make($request_all, $validateArray, $validateMessage);
             if ($validator->fails()) {
-                logValidationException($this->controller_name, $function_name, $validator);
                 return response()->json([
                     'success' => false,
                     'message' => $validator->errors()->first()
@@ -104,35 +99,35 @@ class PortfolioController extends Controller
             }
 
             $storedPhotos = [];
-            $portfolio = null;
+            $lookbook = null;
 
             if ($id !== 0) {
-                $portfolio = Portfolio::find($id);
-                if ($portfolio && is_array($portfolio->photos)) {
-                    $storedPhotos = $portfolio->photos;
+                $lookbook = CategoryLookbook::find($id);
+                if ($lookbook && is_array($lookbook->photos)) {
+                    $storedPhotos = $lookbook->photos;
                 }
             }
 
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
-                    $filename = ImageUploadHelper::PortfolioImageUpload($photo);
+                    // Using same helper method but will upload to lookbook
+                    $filename = ImageUploadHelper::PortfolioImageUpload($photo); // It might upload to portfolio folder, we'll see if that's fine or if we need a custom one
                     $storedPhotos[] = $filename;
                 }
             }
 
             $data = [
-                'category_id' => $request->category_id,
-                'name'   => $request->name,
+                'category_id'   => $request->category_id,
                 'photos' => !empty($storedPhotos) ? $storedPhotos : null,
                 'status' => (int) $request->input('status', 1),
             ];
 
             if ($id === 0) {
-                Portfolio::create($data);
-                $msg = 'Portfolio added successfully';
+                CategoryLookbook::create($data);
+                $msg = 'Category Lookbook added successfully';
             } else {
-                $portfolio->update($data);
-                $msg = 'Portfolio updated successfully';
+                $lookbook->update($data);
+                $msg = 'Category Lookbook updated successfully';
             }
 
             return response()->json([
@@ -140,7 +135,7 @@ class PortfolioController extends Controller
                 'message' => $msg
             ]);
         } catch (\Exception $e) {
-            logger()->error("Portfolio store error: " . $e->getMessage());
+            logger()->error("Lookbook store error: " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -151,23 +146,23 @@ class PortfolioController extends Controller
 
 
 
-    public function getDataPortfolio(Request $request)
+    public function getDataLookbook(Request $request)
     {
-        $function_name = 'getDataPortfolio';
+        $function_name = 'getDataLookbook';
 
         try {
             if ($request->ajax()) {
 
-                $portfolios = Portfolio::with('category');
+                $lookbooks = CategoryLookbook::with('category');
 
-                return DataTables::of($portfolios)
-                    ->addColumn('category_name', function ($portfolio) {
-                        return $portfolio->category ? $portfolio->category->name : '-';
+                return DataTables::of($lookbooks)
+                    ->addColumn('category_name', function ($lookbook) {
+                        return $lookbook->category ? $lookbook->category->name : '-';
                     })
-                    ->addColumn('status', function ($portfolio) {
+                    ->addColumn('status', function ($lookbook) {
                         $status_array = [
                             'is_simple_active' => 1,
-                            'current_status'   => $portfolio->status
+                            'current_status'   => $lookbook->status
                         ];
 
                         return view('admin.render-view.datable-label', [
@@ -175,13 +170,13 @@ class PortfolioController extends Controller
                         ])->render();
                     })
 
-                    ->addColumn('action', function ($portfolio) {
+                    ->addColumn('action', function ($lookbook) {
                         $action_array = [
                             'is_simple_action' => 1,
-                            'edit_route'      => route('admin.portfolio.edit', encryptId($portfolio->id)),
-                            'delete_id'       => $portfolio->id,
-                            'current_status'  => $portfolio->status,
-                            'hidden_id'       => $portfolio->id,
+                            'edit_route'      => route('admin.category_lookbook.edit', encryptId($lookbook->id)),
+                            'delete_id'       => $lookbook->id,
+                            'current_status'  => $lookbook->status,
+                            'hidden_id'       => $lookbook->id,
                         ];
 
                         return view('admin.render-view.datable-action', [
@@ -189,18 +184,18 @@ class PortfolioController extends Controller
                         ])->render();
                     })
 
-                    ->addColumn('photos', function ($portfolio) {
-                        if (empty($portfolio->photos)) return '<span class="text-muted">No Photos</span>';
+                    ->addColumn('photos', function ($lookbook) {
+                        if (empty($lookbook->photos)) return '<span class="text-muted">No Photos</span>';
                         
                         $html = '<div class="photo-stack">';
                         $limit = 4;
                         $count = 0;
-                        $total = count($portfolio->photos);
+                        $total = count($lookbook->photos);
 
-                        foreach ($portfolio->photos as $img) {
+                        foreach ($lookbook->photos as $img) {
                             if ($count >= $limit) break;
                             $url = asset('uploads/portfolio/' . $img);
-                            $html .= '<img src="' . $url . '" class="photo-stack-item" title="Portfolio Image" />';
+                            $html .= '<img src="' . $url . '" class="photo-stack-item" title="Lookbook Image" />';
                             $count++;
                         }
 
@@ -231,7 +226,7 @@ class PortfolioController extends Controller
     {
         $function_name = 'changeStatus';
         try {
-            Portfolio::where('id', $id)->update(['status' => $status]);
+            CategoryLookbook::where('id', $id)->update(['status' => $status]);
             return response()->json(['message' => trans('admin_string.msg_status_change')]);
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());
@@ -244,16 +239,16 @@ class PortfolioController extends Controller
         $function_name = 'destroy';
 
         try {
-            $portfolio = Portfolio::find($id);
+            $lookbook = CategoryLookbook::find($id);
 
-            if (!$portfolio) {
+            if (!$lookbook) {
                 return response()->json([
-                    'error' => 'Portfolio not found'
+                    'error' => 'Lookbook not found'
                 ], 404);
             }
 
-            if (!empty($portfolio->photos) && is_array($portfolio->photos)) {
-                foreach ($portfolio->photos as $photo) {
+            if (!empty($lookbook->photos) && is_array($lookbook->photos)) {
+                foreach ($lookbook->photos as $photo) {
                     $filePath = public_path('uploads/portfolio/' . $photo);
 
                     if (File::exists($filePath)) {
@@ -262,11 +257,11 @@ class PortfolioController extends Controller
                 }
             }
 
-            $portfolio->delete();
+            $lookbook->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Portfolio deleted successfully'
+                'message' => 'Lookbook deleted successfully'
             ]);
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());
@@ -276,15 +271,16 @@ class PortfolioController extends Controller
             ], $this->exception_error_code);
         }
     }
+    
     public function removeImage(Request $request)
     {
         try {
             $id = $request->id;
             $imageName = $request->image;
 
-            $portfolio = Portfolio::find($id);
-            if ($portfolio && is_array($portfolio->photos)) {
-                $photos = $portfolio->photos;
+            $lookbook = CategoryLookbook::find($id);
+            if ($lookbook && is_array($lookbook->photos)) {
+                $photos = $lookbook->photos;
 
                 // Remove the image name from the array
                 if (($key = array_search($imageName, $photos)) !== false) {
@@ -293,8 +289,8 @@ class PortfolioController extends Controller
                     // Reset array keys to avoid index issues
                     $photos = array_values($photos);
 
-                    // Update the portfolio
-                    $portfolio->update(['photos' => $photos]);
+                    // Update the lookbook
+                    $lookbook->update(['photos' => $photos]);
 
                     // Delete the physical file
                     $path = public_path('uploads/portfolio/' . $imageName);

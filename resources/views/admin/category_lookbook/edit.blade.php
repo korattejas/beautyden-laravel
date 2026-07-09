@@ -151,9 +151,9 @@
                 
                 <div class="edit-card-header">
                     <div class="edit-title">
-                        <h2>Edit Master Portfolio ✨</h2>
+                        <h2>Edit Category Lookbook ✨</h2>
                     </div>
-                    <a href="{{ route('admin.portfolio.index') }}" class="btn btn-outline-secondary rounded-pill">
+                    <a href="{{ route('admin.category_lookbook.index') }}" class="btn btn-outline-secondary rounded-pill">
                         <i class="bi bi-arrow-left"></i> Back to Gallery
                     </a>
                 </div>
@@ -161,34 +161,26 @@
                 <div class="edit-form-card">
                     <form method="POST" data-parsley-validate="" id="addEditForm" role="form" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="edit_value" value="{{ $portfolio->id }}">
+                        <input type="hidden" name="edit_value" value="{{ $lookbook->id }}">
                         
                         <div class="row">
                             <!-- Category Selection -->
-                            <div class="col-md-4 mb-4">
+                            <div class="col-md-8 mb-4">
                                 <label class="form-label-luxury">Select Category</label>
                                 <select name="category_id" class="form-control luxury-input select2" required>
                                     <option value="">Select a category</option>
                                     @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ $portfolio->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}" {{ $lookbook->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                     @endforeach
                                 </select>
-                            </div>
-
-                            <!-- Portfolio Name -->
-                            <div class="col-md-4 mb-4">
-                                <label class="form-label-luxury">Portfolio Name</label>
-                                <input type="text" class="form-control luxury-input" name="name"
-                                    value="{{ $portfolio->name }}"
-                                    placeholder="Enter portfolio name (e.g. Bridal Look 2024)" required>
                             </div>
 
                             <!-- Status -->
                             <div class="col-md-4 mb-4">
                                 <label class="form-label-luxury">Status</label>
                                 <select id="status" name="status" class="form-control luxury-input" required>
-                                    <option value="1" @if ($portfolio->status == '1') selected @endif>Active</option>
-                                    <option value="0" @if ($portfolio->status == '0') selected @endif>Inactive</option>
+                                    <option value="1" @if ($lookbook->status == '1') selected @endif>Active</option>
+                                    <option value="0" @if ($lookbook->status == '0') selected @endif>Inactive</option>
                                 </select>
                             </div>
 
@@ -196,13 +188,13 @@
                             <div class="col-12 mb-4">
                                 <label class="form-label-luxury">Gallery Collection</label>
                                 
-                                @if (isset($portfolio) && !empty($portfolio->photos))
+                                @if (isset($lookbook) && !empty($lookbook->photos))
                                     <div class="portfolio-photos-grid" id="existing-photos">
-                                        @foreach ($portfolio->photos as $img)
+                                        @foreach ($lookbook->photos as $img)
                                             <div class="photo-preview-item" id="photo-{{ md5($img) }}">
-                                                <img src="{{ asset('uploads/portfolio/' . $img) }}" alt="Portfolio Image">
+                                                <img src="{{ asset('uploads/portfolio/' . $img) }}" alt="Lookbook Image">
                                                 <span class="remove-photo-btn remove-image-ajax" 
-                                                      data-id="{{ $portfolio->id }}" 
+                                                      data-id="{{ $lookbook->id }}" 
                                                       data-image="{{ $img }}"
                                                       title="Delete this image">
                                                     <i class="bi bi-x"></i>
@@ -222,7 +214,7 @@
 
                             <div class="col-12 mt-4 text-end">
                                 <button type="submit" class="btn btn-submit-luxury">
-                                    Save Portfolio Changes
+                                    Save Lookbook Changes
                                 </button>
                             </div>
                         </div>
@@ -235,9 +227,9 @@
 
 @section('footer_script_content')
     <script>
-        var form_url = 'portfolio/store';
-        var redirect_url = 'portfolio';
-
+        var form_url = 'category-lookbook/store';
+        var redirect_url = 'category-lookbook';
+        
         $(document).ready(function() {
             if ($('.select2').length) {
                 $('.select2').select2({
@@ -263,7 +255,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "{{ route('admin.portfolio.removeImage') }}",
+                        url: "{{ route('admin.category_lookbook.removeImage') }}",
                         method: 'POST',
                         data: {
                             _token: "{{ csrf_token() }}",

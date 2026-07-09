@@ -207,6 +207,9 @@
             <li class="pa-nav-item {{ Request::routeIs('admin.portfolio.index') ? 'active' : '' }}">
                 <a class="pa-nav-link" href="{{ route('admin.portfolio.index') }}"><i data-feather="image"></i><span>Portfolio</span></a>
             </li>
+            <li class="pa-nav-item {{ Request::routeIs('admin.category_lookbook.*') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.category_lookbook.index') }}"><i data-feather="book-open"></i><span>Category Lookbook</span></a>
+            </li>
             <li class="pa-nav-item {{ Request::routeIs('admin.blogs.index') ? 'active' : '' }}">
                 <a class="pa-nav-link" href="{{ route('admin.blogs.index') }}"><i data-feather="edit-3"></i><span>Blog Posts</span></a>
             </li>

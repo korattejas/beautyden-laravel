@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\AppointmentsController;
 use App\Http\Controllers\Api\User\AuthenticationController;
 use App\Http\Controllers\Api\PoliciesController;
 use App\Http\Controllers\Api\PortfolioController;
+use App\Http\Controllers\Api\CategoryLookbookController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\Beautician\AttendanceApiController;
@@ -60,6 +61,8 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
         Route::post('testFast2Sms', [AuthenticationController::class, 'testFast2Sms']);
+        Route::get('categoryLookbook', [CategoryLookbookController::class, 'getCategoryLookbooks']);
+        Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
     });
 });
 
@@ -108,7 +111,6 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
-        
        
     });
 });
@@ -171,6 +173,8 @@ Route::middleware([])->group(function () {
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
         Route::post('testFast2Sms', [AuthenticationController::class, 'testFast2Sms']);
+        Route::get('categoryLookbook', [CategoryLookbookController::class, 'getCategoryLookbooks']);
+        Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
     });
 });
 

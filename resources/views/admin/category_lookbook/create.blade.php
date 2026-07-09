@@ -94,9 +94,9 @@
                 
                 <div class="create-card-header">
                     <div class="create-title">
-                        <h2>Create New Portfolio ✨</h2>
+                        <h2>Create Category Lookbook ✨</h2>
                     </div>
-                    <a href="{{ route('admin.portfolio.index') }}" class="btn btn-outline-secondary rounded-pill">
+                    <a href="{{ route('admin.category_lookbook.index') }}" class="btn btn-outline-secondary rounded-pill">
                         <i class="bi bi-arrow-left"></i> Back to Gallery
                     </a>
                 </div>
@@ -108,7 +108,7 @@
                         
                         <div class="row">
                             <!-- Category Selection -->
-                            <div class="col-md-6 mb-4">
+                            <div class="col-md-8 mb-4">
                                 <label class="form-label-luxury">Select Category</label>
                                 <select name="category_id" class="form-control luxury-input select2" required>
                                     <option value="">Select a category</option>
@@ -116,13 +116,6 @@
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
                                 </select>
-                            </div>
-
-                            <!-- Portfolio Name -->
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label-luxury">Portfolio Name</label>
-                                <input type="text" class="form-control luxury-input" name="name"
-                                    placeholder="Enter portfolio name (e.g. Bridal Look 2024)" required>
                             </div>
 
                             <!-- Status -->
@@ -155,7 +148,7 @@
 
                             <div class="col-12 mt-4 text-end">
                                 <button type="submit" class="btn btn-submit-luxury">
-                                    Create Collection
+                                    Create Lookbook
                                 </button>
                             </div>
                         </div>
@@ -168,10 +161,10 @@
 
 @section('footer_script_content')
     <script>
-        var form_url = 'portfolio/store';
-        var redirect_url = 'portfolio';
+        var form_url = 'category-lookbook/store';
+        var redirect_url = 'category-lookbook';
         var is_one_image_and_multiple_image_status = 'is_multiple_image';
-
+        
         $(document).ready(function() {
             if ($('.select2').length) {
                 $('.select2').select2({

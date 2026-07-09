@@ -1606,7 +1606,45 @@ $(document).ready(function() {
         }, 200);
     }
 
+    // Robust fix for dropdown cutoff: append to body
+    $(document).on('show.bs.dropdown', '.card-datatable .dropdown', function (e) {
+        var $dropdownMenu = $(this).find('.dropdown-menu');
+        
+        // Generate a unique ID to link them back
+        var id = 'dt-dropdown-' + new Date().getTime();
+        $(this).attr('data-dropdown-id', id);
+        $dropdownMenu.attr('data-dropdown-id', id);
+        
+        // Append to body to break out of overflow:hidden
+        $('body').append($dropdownMenu.detach());
+        
+        // Calculate position relative to document
+        var eOffset = $(this).offset();
+        // Since it's dropdown-menu-end, we align the right edge
+        $dropdownMenu.css({
+            'display': 'block',
+            'position': 'absolute',
+            'top': eOffset.top + $(this).outerHeight() + 'px',
+            'left': (eOffset.left + $(this).outerWidth() - $dropdownMenu.outerWidth()) + 'px',
+            'z-index': 9999
+        });
+    });
 
+    $(document).on('hide.bs.dropdown', '.card-datatable .dropdown', function (e) {
+        var id = $(this).attr('data-dropdown-id');
+        var $dropdownMenu = $('body').children('.dropdown-menu[data-dropdown-id="' + id + '"]');
+        
+        // Reset CSS and put it back
+        $dropdownMenu.css({
+            'display': '',
+            'position': '',
+            'top': '',
+            'left': '',
+            'z-index': ''
+        });
+        
+        $(this).append($dropdownMenu.detach());
+    });
 });
 </script>
 @endsection

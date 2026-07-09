@@ -84,22 +84,90 @@
                                                 </div>
                                             </div>
 
+@php
+    $groupedServices = [];
+    foreach($services as $service) {
+        $catName = $service->category ? $service->category->name : 'Other Categories';
+        $subCatName = $service->subcategory ? $service->subcategory->name : 'General Services';
+        
+        if (!isset($groupedServices[$catName])) {
+            $groupedServices[$catName] = [];
+        }
+        if (!isset($groupedServices[$catName][$subCatName])) {
+            $groupedServices[$catName][$subCatName] = [];
+        }
+        $groupedServices[$catName][$subCatName][] = $service;
+    }
+@endphp
+<style>
+    .service-selector-wrapper { border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; display: flex; flex-direction: column; }
+    .service-search-box { padding: 15px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px 8px 0 0; }
+    .service-list-wrapper { max-height: 400px; overflow-y: auto; padding: 0; }
+    .service-category-header { background: #1a4a7a; color: #fff; padding: 10px 15px; font-weight: 700; position: sticky; top: 0; z-index: 10; font-size: 1rem; }
+    .service-subcategory-header { background: #f1f5f9; color: #475569; padding: 8px 15px; font-weight: 600; font-size: 0.9rem; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; }
+    .service-item-row { padding: 10px 15px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; transition: background 0.2s; }
+    .service-item-row:hover { background: #f8fafc; }
+    .service-item-row:last-child { border-bottom: none; }
+    .service-checkbox { width: 18px; height: 18px; margin-right: 12px; cursor: pointer; accent-color: #1a4a7a; }
+    .service-label { margin: 0; cursor: pointer; font-weight: 500; color: #1e293b; flex-grow: 1; }
+    .variant-badge { background: #e0e7ff; color: #4f46e5; font-size: 0.75rem; padding: 2px 8px; border-radius: 50px; margin-left: 8px; font-weight: 600; }
+</style>
                                             <div class="col-md-12 mt-2">
                                                 <div class="form-group">
-                                                    <label>Select Services (Multiple)</label>
-                                                    <select name="services[]" id="services-select" class="form-control select2" multiple required>
-                                                        @foreach($services as $service)
-                                                            @if($service->variants->count() > 0)
-                                                                <optgroup label="{{ $service->name }}">
-                                                                    @foreach($service->variants as $variant)
-                                                                        <option value="S_{{ $service->id }}_V_{{ $variant->id }}">{{ $variant->name }}</option>
+                                                    <label>Select Services (Multiple) <span class="text-danger">*</span></label>
+                                                    
+                                                    <div class="service-selector-wrapper">
+                                                        <div class="service-search-box">
+                                                            <div class="input-group">
+                                                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                                                <input type="text" id="serviceSearchInput" class="form-control border-start-0 ps-0 shadow-none" placeholder="Search by service name, category or variant...">
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="service-list-wrapper" id="serviceListWrapper">
+                                                            @foreach($groupedServices as $catName => $subcategories)
+                                                                <div class="service-category-group" data-category="{{ strtolower($catName) }}">
+                                                                    <div class="service-category-header">
+                                                                        {{ $catName }}
+                                                                    </div>
+                                                                    
+                                                                    @foreach($subcategories as $subCatName => $svcs)
+                                                                        <div class="service-subcategory-group" data-subcategory="{{ strtolower($subCatName) }}">
+                                                                            @if($subCatName != 'General Services')
+                                                                                <div class="service-subcategory-header">
+                                                                                    {{ $subCatName }}
+                                                                                </div>
+                                                                            @endif
+                                                                            
+                                                                            @foreach($svcs as $service)
+                                                                                @if($service->variants->count() > 0)
+                                                                                    @foreach($service->variants as $variant)
+                                                                                        <div class="service-item-row" data-search="{{ strtolower($service->name . ' ' . $variant->name . ' ' . $catName . ' ' . $subCatName) }}">
+                                                                                            <input type="checkbox" name="services[]" value="S_{{ $service->id }}_V_{{ $variant->id }}" class="service-checkbox custom-service-checkbox" id="svc_{{ $service->id }}_var_{{ $variant->id }}">
+                                                                                            <label class="service-label" for="svc_{{ $service->id }}_var_{{ $variant->id }}">
+                                                                                                {{ $service->name }} <span class="variant-badge">{{ $variant->name }}</span>
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    @endforeach
+                                                                                @else
+                                                                                    <div class="service-item-row" data-search="{{ strtolower($service->name . ' ' . $catName . ' ' . $subCatName) }}">
+                                                                                        <input type="checkbox" name="services[]" value="S_{{ $service->id }}" class="service-checkbox custom-service-checkbox" id="svc_{{ $service->id }}">
+                                                                                        <label class="service-label" for="svc_{{ $service->id }}">
+                                                                                            {{ $service->name }}
+                                                                                        </label>
+                                                                                    </div>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        </div>
                                                                     @endforeach
-                                                                </optgroup>
-                                                            @else
-                                                                <option value="S_{{ $service->id }}">{{ $service->name }}</option>
-                                                            @endif
-                                                        @endforeach
-                                                    </select>
+                                                                </div>
+                                                            @endforeach
+                                                            <div id="noServiceFoundMsg" style="display: none; padding: 20px; text-align: center; color: #64748b;">
+                                                                <i class="bi bi-search" style="font-size: 2rem; color: #cbd5e1; margin-bottom: 10px; display: block;"></i>
+                                                                No services found matching your search.
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
@@ -143,24 +211,83 @@
         // Select2
         $('.select2').select2({ placeholder: "Choose services...", width: '100%' });
 
-        $('#services-select').on('change', function() {
-            let selectedData = $(this).select2('data');
-            let listHtml = '';
-            if (selectedData.length > 0) {
-                $('#default-services-section').show();
-                selectedData.forEach(item => {
-                    listHtml += `
-                        <div class="form-check mb-1">
-                            <input class="form-check-input" type="checkbox" name="default_services[]" value="${item.id}" id="def_${item.id}" checked>
-                            <label class="form-check-label" for="def_${item.id}">${item.text}</label>
-                        </div>
-                    `;
+        // Search functionality
+        $('#serviceSearchInput').on('keyup', function() {
+            let value = $(this).val().toLowerCase();
+            let foundAny = false;
+            
+            $('.service-category-group').each(function() {
+                let hasVisibleServiceInCategory = false;
+                
+                $(this).find('.service-subcategory-group').each(function() {
+                    let hasVisibleServiceInSubcat = false;
+                    
+                    $(this).find('.service-item-row').each(function() {
+                        let searchStr = $(this).data('search');
+                        if (searchStr.indexOf(value) > -1) {
+                            $(this).show();
+                            hasVisibleServiceInSubcat = true;
+                            hasVisibleServiceInCategory = true;
+                            foundAny = true;
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                    
+                    if (hasVisibleServiceInSubcat) {
+                        $(this).children('.service-subcategory-header').show();
+                        $(this).show();
+                    } else {
+                        $(this).children('.service-subcategory-header').hide();
+                        $(this).hide();
+                    }
                 });
+                
+                if (hasVisibleServiceInCategory) {
+                    $(this).children('.service-category-header').show();
+                    $(this).show();
+                } else {
+                    $(this).children('.service-category-header').hide();
+                    $(this).hide();
+                }
+            });
+            
+            if (!foundAny && value !== '') {
+                $('#noServiceFoundMsg').show();
+            } else {
+                $('#noServiceFoundMsg').hide();
+            }
+        });
+
+        // Update default services list
+        $(document).on('change', '.custom-service-checkbox', function() {
+            updateDefaultServicesList();
+        });
+        
+        function updateDefaultServicesList() {
+            let listHtml = '';
+            let hasChecked = false;
+            
+            $('.custom-service-checkbox:checked').each(function() {
+                hasChecked = true;
+                let val = $(this).val();
+                let text = $(this).siblings('.service-label').html(); // this includes the variant span if any
+                
+                listHtml += `
+                    <div class="form-check mb-1">
+                        <input class="form-check-input" type="checkbox" name="default_services[]" value="${val}" id="def_${val}" checked>
+                        <label class="form-check-label" for="def_${val}">${text}</label>
+                    </div>
+                `;
+            });
+            
+            if (hasChecked) {
+                $('#default-services-section').show();
             } else {
                 $('#default-services-section').hide();
             }
             $('#default-services-list').html(listHtml);
-        });
+        }
     });
 </script>
 @endsection

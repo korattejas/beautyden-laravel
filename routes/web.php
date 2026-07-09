@@ -178,6 +178,16 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('portfolio/status/{id}/{status}', [PortfolioController::class, 'changeStatus'])->name('admin.portfolio.changeStatus');
         Route::post('portfolio/remove-image', [PortfolioController::class, 'removeImage'])->name('admin.portfolio.removeImage');
 
+        /* Category Lookbook */
+        Route::get('category-lookbook', [\App\Http\Controllers\Admin\CategoryLookbookController::class, 'index'])->name('admin.category_lookbook.index');
+        Route::get('category-lookbook/create', [\App\Http\Controllers\Admin\CategoryLookbookController::class, 'create'])->name('admin.category_lookbook.create');
+        Route::post('category-lookbook/store', [\App\Http\Controllers\Admin\CategoryLookbookController::class, 'store'])->name('admin.category_lookbook.store');
+        Route::get('category-lookbook/edit/{id}', [\App\Http\Controllers\Admin\CategoryLookbookController::class, 'edit'])->name('admin.category_lookbook.edit');
+        Route::delete('category-lookbook/{id}', [\App\Http\Controllers\Admin\CategoryLookbookController::class, 'destroy'])->name('admin.category_lookbook.destroy');
+        Route::get('getDataLookbook', [\App\Http\Controllers\Admin\CategoryLookbookController::class, 'getDataLookbook'])->name('getDataLookbook');
+        Route::get('category-lookbook/status/{id}/{status}', [\App\Http\Controllers\Admin\CategoryLookbookController::class, 'changeStatus'])->name('admin.category_lookbook.changeStatus');
+        Route::post('category-lookbook/remove-image', [\App\Http\Controllers\Admin\CategoryLookbookController::class, 'removeImage'])->name('admin.category_lookbook.removeImage');
+
         /* Users */
         Route::get('users', [UserController::class, 'index'])->name('admin.user.index');
         Route::get('users/show/{id}', [UserController::class, 'show'])->name('admin.user.show');

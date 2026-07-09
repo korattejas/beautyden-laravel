@@ -237,6 +237,7 @@
         <a href="#feedback" class="nav-item">Feedback & Reviews</a>
         <a href="#config" class="nav-item">App Settings</a>
         <a href="#beautician" class="nav-item">Beautician Portal</a>
+        <a href="#media" class="nav-item">Media & Portfolios</a>
         <a href="#testing" class="nav-item">Testing Utilities</a>
     </div>
 
@@ -1384,12 +1385,14 @@
                     <tr>
                         <td>city_id</td>
                         <td>Integer</td>
-                        <td><strong>Required</strong>. The city context for the entire home screen. If the city is not supported, pass 0.</td>
+                        <td><strong>Required</strong>. The city context for the entire home screen. If the city is not
+                            supported, pass 0.</td>
                     </tr>
                     <tr>
                         <td>city_name</td>
                         <td>String</td>
-                        <td><strong>Required</strong>. The current locality name retrieved from device lat/long (e.g. "Surat").</td>
+                        <td><strong>Required</strong>. The current locality name retrieved from device lat/long (e.g.
+                            "Surat").</td>
                     </tr>
                 </tbody>
             </table>
@@ -1399,8 +1402,11 @@
             <div class="note"
                 style="margin: 10px 0; background: #fffbeb; border-left-color: #f59e0b; padding: 15px; border-radius: 8px;">
                 <i class="bi bi-geo-alt-fill text-warning"></i> <strong>City Handling:</strong><br>
-                If <code>city_id = 0</code>, the API returns a partial dashboard (offers, coupons, service types, and cities lists) without user info or specific services.<br>
-                If <code>city_id</code> is marked as "Coming Soon" (status 1), the API returns only <code>"is_coming_soon": true</code>, <code>"city_name"</code>, and <code>"current_user_selected_city_name"</code> with no other data.
+                If <code>city_id = 0</code>, the API returns a partial dashboard (offers, coupons, service types, and
+                cities lists) without user info or specific services.<br>
+                If <code>city_id</code> is marked as "Coming Soon" (status 1), the API returns only
+                <code>"is_coming_soon": true</code>, <code>"city_name"</code>, and
+                <code>"current_user_selected_city_name"</code> with no other data.
             </div>
 
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -1466,7 +1472,8 @@
                     <tr>
                         <td>city_id</td>
                         <td>Integer</td>
-                        <td><strong>Required</strong>. To fetch pricing according to the city. Send 0 if not available.</td>
+                        <td><strong>Required</strong>. To fetch pricing according to the city. Send 0 if not available.
+                        </td>
                     </tr>
                     <tr>
                         <td>category_id</td>
@@ -1530,7 +1537,8 @@
                     <tr>
                         <td>city_id</td>
                         <td>Integer</td>
-                        <td><strong>Required</strong>. Prices will be calculated according to the city. If city id is not available, please send 0.</td>
+                        <td><strong>Required</strong>. Prices will be calculated according to the city. If city id is
+                            not available, please send 0.</td>
                     </tr>
                     <tr>
                         <td>service_type_id</td>
@@ -2897,6 +2905,90 @@
 }</code></pre>
         </section>
 
+
+        <section id="media">
+            <h2><i class="bi bi-image text-primary"></i> Media & Portfolios</h2>
+            <h3>Get Portfolio</h3>
+            <p>Fetches the list of active portfolios along with their category and photos.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /Test/V1/customer/portfolio
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>category_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter portfolios by a specific category.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Portfolio retrieved successfully",
+    "data": [
+        {
+            "id": 1,
+            "category_id": 2,
+            "category_name": "Bridal Makeup",
+            "name": "Summer Collection 2026",
+            "photos": [
+                "https://yourdomain.com/uploads/portfolio/image1.jpg",
+                "https://yourdomain.com/uploads/portfolio/image2.jpg"
+            ]
+        }
+    ]
+}</code></pre>
+
+            <h3>Get Category Lookbook</h3>
+            <p>Fetches the list of active category lookbooks, optionally filtered by <code>category_id</code>.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /Test/V1/customer/categoryLookbook
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>category_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter lookbooks by a specific category.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Category lookbooks retrieved successfully",
+    "data": [
+        {
+            "id": 1,
+            "category_id": 2,
+            "category_name": "Bridal Makeup",
+            "photos": [
+                "https://yourdomain.com/uploads/portfolio/look1.jpg",
+                "https://yourdomain.com/uploads/portfolio/look2.jpg"
+            ]
+        }
+    ]
+}</code></pre>
+        </section>
 
         <section id="testing">
             <h2><i class="bi bi-bug text-primary"></i> 14. Testing Utilities</h2>

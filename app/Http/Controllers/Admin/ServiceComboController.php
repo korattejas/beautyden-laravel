@@ -86,7 +86,7 @@ class ServiceComboController extends Controller
 
     public function create()
     {
-        $services = ServiceMaster::with('variants')->where('status', 1)->get();
+        $services = ServiceMaster::with(['variants', 'category', 'subcategory'])->where('status', 1)->get();
         $serviceTypes = ServiceType::where('status', 1)->get();
         return view('admin.combo.create', compact('services', 'serviceTypes'));
     }
@@ -94,7 +94,7 @@ class ServiceComboController extends Controller
     public function edit($id)
     {
         $combo = ServiceCombo::with('items')->findOrFail(decryptId($id));
-        $services = ServiceMaster::with('variants')->where('status', 1)->get();
+        $services = ServiceMaster::with(['variants', 'category', 'subcategory'])->where('status', 1)->get();
         $serviceTypes = ServiceType::where('status', 1)->get();
         
         $selectedItems = $combo->items->map(function ($item) {
