@@ -230,6 +230,9 @@ class ServiceMasterController extends Controller
                     
                     if (!empty($availableVariants)) {
                         $service->variants = $availableVariants;
+                        $service->starts_at = collect($availableVariants)->min('price') ?? 0;
+                        $service->total_option = count($availableVariants);
+                        unset($service->price, $service->discount_price, $service->discount_percentage, $service->duration);
                     } else {
                         $service->has_variants = 0;
                     }
@@ -461,27 +464,34 @@ class ServiceMasterController extends Controller
 
             $pageLayout = [];
 
-            // 1. Service Basic Details (Hero Section)
+            $serviceInfoData = [
+                'id' => $service->id,
+                'name' => $service->name,
+                'rating' => $service->rating,
+                'reviews' => $service->reviews,
+                'icon' => $service->icon,
+                'icon_type' => $service->icon_type,
+                'category_name' => $service->category_name,
+                'sub_category_name' => $service->sub_category_name,
+                'is_popular' => $service->is_popular,
+                'status' => $service->status,
+                'has_variants' => $service->has_variants,
+            ];
+
+            if ($service->has_variants == 1 && !empty($service->variants)) {
+                $serviceInfoData['starts_at'] = collect($service->variants)->min('price') ?? 0;
+                $serviceInfoData['total_option'] = count($service->variants);
+                $serviceInfoData['variants'] = $service->variants;
+            } else {
+                $serviceInfoData['price'] = $service->price ?? 0;
+                $serviceInfoData['discount_price'] = $service->discount_price ?? 0;
+                $serviceInfoData['discount_percentage'] = $service->discount_percentage ?? 0;
+                $serviceInfoData['duration'] = $service->duration;
+            }
+
             $pageLayout[] = [
                 'type' => 'service_info_section',
-                'data' => [
-                    'id' => $service->id,
-                    'name' => $service->name,
-                    'price' => $service->price ?? 0,
-                    'discount_price' => $service->discount_price ?? 0,
-                    'discount_percentage' => $service->discount_percentage ?? 0,
-                    'duration' => $service->duration,
-                    'rating' => $service->rating,
-                    'reviews' => $service->reviews,
-                    'icon' => $service->icon,
-                    'icon_type' => $service->icon_type,
-                    'category_name' => $service->category_name,
-                    'sub_category_name' => $service->sub_category_name,
-                    'is_popular' => $service->is_popular,
-                    'status' => $service->status,
-                    'has_variants' => $service->has_variants,
-                    'variants' => $service->variants ?? []
-                ]
+                'data' => $serviceInfoData
             ];
 
             // 2. Filter Section (Currently for Facial)
