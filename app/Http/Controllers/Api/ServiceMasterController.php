@@ -229,9 +229,9 @@ class ServiceMasterController extends Controller
                     }
                     
                     if (!empty($availableVariants)) {
-                        $service->variants = $availableVariants;
                         $service->starts_at = collect($availableVariants)->min('price') ?? 0;
                         $service->total_option = count($availableVariants);
+                        $service->variants = $availableVariants;
                         unset($service->price, $service->discount_price, $service->discount_percentage, $service->duration);
                     } else {
                         $service->has_variants = 0;
@@ -506,9 +506,9 @@ class ServiceMasterController extends Controller
                     }
                     
                     if (!empty($availableVariants)) {
-                        $item->variants = $availableVariants;
                         $item->starts_at = collect($availableVariants)->min('price') ?? 0;
                         $item->total_option = count($availableVariants);
+                        $item->variants = $availableVariants;
                         unset($item->price, $item->discount_price, $item->discount_percentage, $item->duration);
                     } else {
                         $item->has_variants = 0;
