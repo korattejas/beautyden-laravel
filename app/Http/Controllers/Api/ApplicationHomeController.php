@@ -226,7 +226,8 @@ class ApplicationHomeController extends Controller
                     's.duration', 
                     's.rating', 
                     's.reviews', 
-                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon')
+                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
+                    's.has_variants'
                 );
             } else {
                 $servicesQuery->select(
@@ -239,27 +240,91 @@ class ApplicationHomeController extends Controller
                     's.duration', 
                     's.rating', 
                     's.reviews', 
-                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon')
+                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
+                    's.has_variants'
                 );
             }
 
 
 
-            // Group trending services by category for tabs
-            $trendingServices = (clone $servicesQuery)
+            $trendingServicesRaw = (clone $servicesQuery)
                 ->where('s.is_popular', 1)
-                ->get()
-                ->groupBy('category_id');
+                ->get();
+
+            $trendingServiceIdsWithVariants = $trendingServicesRaw->where('has_variants', 1)->pluck('id')->toArray();
+            $trendingVariants = collect();
+            $trendingVariantPrices = collect();
+
+            if (!empty($trendingServiceIdsWithVariants)) {
+                $trendingVariants = \App\Models\ServiceMasterVariant::whereIn('service_master_id', $trendingServiceIdsWithVariants)
+                    ->get()
+                    ->groupBy('service_master_id');
+                    
+                if ($cityId) {
+                    $trendingVariantPrices = \App\Models\ServiceCityVariantPrice::whereIn('service_master_id', $trendingServiceIdsWithVariants)
+                        ->where('city_id', $cityId)
+                        ->get()
+                        ->groupBy('service_master_id');
+                }
+            }
+
+            $trendingServices = $trendingServicesRaw->groupBy('category_id');
 
             $trendingData = [];
             foreach ($trendingServices as $catId => $items) {
-                // Use allCategoriesMap so trending services are not limited to is_popular categories
                 $category = $allCategoriesMap->get($catId);
                 if ($category) {
-                    $items->transform(function ($item) {
-                        $item->price = (int) $item->price;
-                        $item->discount_price = (int) $item->discount_price;
-                        $item->discount_percentage = (int) $item->discount_percentage;
+                    $items->transform(function ($item) use ($trendingVariants, $trendingVariantPrices, $cityId) {
+                        $item->has_variants = (int) $item->has_variants;
+                        
+                        if ($item->has_variants == 1) {
+                            $serviceVariants = $trendingVariants->get($item->id, collect());
+                            $availableVariants = [];
+                            
+                            foreach ($serviceVariants as $variant) {
+                                if ($cityId) {
+                                    $serviceVariantPrices = $trendingVariantPrices->get($item->id, collect())->keyBy('variant_id');
+                                    if ($serviceVariantPrices->has($variant->id)) {
+                                        $priceData = $serviceVariantPrices->get($variant->id);
+                                        if ($priceData->is_available == 0) continue;
+                                        
+                                        $variant->price = (int) $priceData->price;
+                                        $variant->discount_price = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
+                                        $variant->discount_percentage = (int) $priceData->discount_price;
+                                    } else {
+                                        continue;
+                                    }
+                                } else {
+                                    $variant->price = (int) $variant->price;
+                                    $variant->discount_price = (int) $variant->discount_price;
+                                    $variant->discount_percentage = $variant->discount_price > $variant->price ? 
+                                        (int) round((($variant->discount_price - $variant->price) / $variant->discount_price) * 100) : 0;
+                                }
+                                
+                                $variant->thumbnail_image = $variant->thumbnail_image
+                                    ? asset('uploads/service-variant/' . $variant->thumbnail_image)
+                                    : null;
+                                    
+                                $availableVariants[] = $variant;
+                            }
+                            
+                            if (!empty($availableVariants)) {
+                                $item->starts_at = collect($availableVariants)->min('price') ?? 0;
+                                $item->total_option = count($availableVariants);
+                                $item->variants = $availableVariants;
+                                unset($item->price, $item->discount_price, $item->discount_percentage, $item->duration);
+                            } else {
+                                $item->has_variants = 0;
+                                $item->price = (int) $item->price;
+                                $item->discount_price = (int) $item->discount_price;
+                                $item->discount_percentage = (int) $item->discount_percentage;
+                            }
+                        } else {
+                            $item->price = (int) $item->price;
+                            $item->discount_price = (int) $item->discount_price;
+                            $item->discount_percentage = (int) $item->discount_percentage;
+                        }
+                        
                         return $item;
                     });
                     
