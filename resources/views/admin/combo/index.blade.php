@@ -46,8 +46,8 @@
                                             <th>Id</th>
                                             <th data-search="false">Image</th>
                                             <th>Name</th>
+                                            <th>Service Type</th>
                                             <th data-search="false">Included Services</th>
-                                            <th>Min. Price</th>
                                             <th data-stuff="Active,InActive">Status</th>
                                             <th data-search="false">Action</th>
                                         </tr>
@@ -95,14 +95,14 @@
                     name: 'name'
                 },
                 {
+                    data: 'service_type',
+                    name: 'serviceType.name'
+                },
+                {
                     data: 'services',
                     name: 'services',
                     orderable: false,
                     searchable: false
-                },
-                {
-                    data: 'min_price',
-                    name: 'min_price'
                 },
                 {
                     data: 'status',

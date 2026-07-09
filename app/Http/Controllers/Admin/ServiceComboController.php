@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ServiceCombo;
 use App\Models\ServiceComboItem;
 use App\Models\ServiceMaster;
+use App\Models\ServiceType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -34,7 +35,7 @@ class ServiceComboController extends Controller
         $function_name = 'getData';
         try {
             if ($request->ajax()) {
-                $combos = ServiceCombo::with(['items.service', 'items.variant']);
+                $combos = ServiceCombo::with(['items.service', 'items.variant', 'serviceType']);
                 return DataTables::of($combos)
                     ->addColumn('status', function ($item) {
                         return view('admin.render-view.datable-label', [
@@ -58,6 +59,9 @@ class ServiceComboController extends Controller
                         }
                         return 'N/A';
                     })
+                    ->addColumn('service_type', function ($item) {
+                        return $item->serviceType ? $item->serviceType->name : 'N/A';
+                    })
                     ->addColumn('services', function ($item) {
                         $serviceNames = [];
                         foreach ($item->items as $comboItem) {
@@ -71,9 +75,6 @@ class ServiceComboController extends Controller
                         }
                         return implode(' ', $serviceNames);
                     })
-                    ->editColumn('min_price', function($item) {
-                        return '₹' . number_format($item->min_price, 2);
-                    })
                     ->rawColumns(['action', 'status', 'image', 'services'])
                     ->make(true);
             }
@@ -86,13 +87,15 @@ class ServiceComboController extends Controller
     public function create()
     {
         $services = ServiceMaster::with('variants')->where('status', 1)->get();
-        return view('admin.combo.create', compact('services'));
+        $serviceTypes = ServiceType::where('status', 1)->get();
+        return view('admin.combo.create', compact('services', 'serviceTypes'));
     }
 
     public function edit($id)
     {
         $combo = ServiceCombo::with('items')->findOrFail(decryptId($id));
         $services = ServiceMaster::with('variants')->where('status', 1)->get();
+        $serviceTypes = ServiceType::where('status', 1)->get();
         
         $selectedItems = $combo->items->map(function ($item) {
             return $item->variant_id ? "S_{$item->service_master_id}_V_{$item->variant_id}" : "S_{$item->service_master_id}";
@@ -102,7 +105,7 @@ class ServiceComboController extends Controller
             return $item->variant_id ? "S_{$item->service_master_id}_V_{$item->variant_id}" : "S_{$item->service_master_id}";
         })->toArray();
         
-        return view('admin.combo.edit', compact('combo', 'services', 'selectedItems', 'defaultItems'));
+        return view('admin.combo.edit', compact('combo', 'services', 'serviceTypes', 'selectedItems', 'defaultItems'));
     }
 
     public function store(Request $request)
@@ -113,8 +116,8 @@ class ServiceComboController extends Controller
             
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
+                'service_type_id' => 'required|integer|exists:service_types,id',
                 'services' => 'required|array|min:1',
-                'min_price' => 'required|numeric|min:0',
                 'icon' => $id == 0 ? 'required|image' : 'nullable|image',
             ], [
                 'icon.required' => 'The image field is required.'
@@ -142,8 +145,8 @@ class ServiceComboController extends Controller
 
             $comboData = [
                 'name' => $request->name,
+                'service_type_id' => $request->service_type_id,
                 'description' => $request->description,
-                'min_price' => $request->min_price,
                 'image' => $imageName,
                 'status' => $request->status ?? 1,
             ];

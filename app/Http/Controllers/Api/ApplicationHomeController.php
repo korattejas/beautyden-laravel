@@ -465,6 +465,7 @@ class ApplicationHomeController extends Controller
 
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'city_id' => 'required|integer',
+            'service_type_id' => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
@@ -505,10 +506,23 @@ class ApplicationHomeController extends Controller
                 );
             }
 
-            $combos = DB::table('service_combos')
-                ->select('id', 'name', 'description', DB::raw('CONCAT("' . asset('uploads/combos') . '/", image) AS image'))
-                ->where('status', 1)
-                ->get();
+            $combosQuery = DB::table('service_combos as sc')
+                ->leftJoin('service_types as st', 'sc.service_type_id', '=', 'st.id')
+                ->select(
+                    'sc.id', 
+                    'sc.name', 
+                    'sc.service_type_id', 
+                    'st.name as service_type_name',
+                    'sc.description', 
+                    DB::raw('CONCAT("' . asset('uploads/combos') . '/", sc.image) AS image')
+                )
+                ->where('sc.status', 1);
+
+            if ($request->filled('service_type_id')) {
+                $combosQuery->where('sc.service_type_id', $request->service_type_id);
+            }
+
+            $combos = $combosQuery->get();
 
             $comboIds = $combos->pluck('id')->toArray();
             if (!empty($comboIds)) {

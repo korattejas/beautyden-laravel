@@ -1532,6 +1532,11 @@
                         <td>Integer</td>
                         <td><strong>Required</strong>. Prices will be calculated according to the city. If city id is not available, please send 0.</td>
                     </tr>
+                    <tr>
+                        <td>service_type_id</td>
+                        <td>Integer</td>
+                        <td><strong>Optional</strong>. To filter combos by service type.</td>
+                    </tr>
                 </tbody>
             </table>
             <p>Returns service combos and their included services with pricing.</p>
@@ -1546,7 +1551,9 @@
             {
                 "id": 1,
                 "name": "Bridal Glow Package",
-                "description": "Complete package for bridal makeup and styling",
+                "service_type_id": 1,
+                "service_type_name": "Regular Services",
+                "description": "Complete bridal package including facial, waxing, and hair spa",
                 "image": "https://.../bridal.jpg",
                 "total_duration": 80,
                 "total_duration_formatted": "1 hr 20 min.",

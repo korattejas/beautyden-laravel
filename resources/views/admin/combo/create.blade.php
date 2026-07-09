@@ -46,8 +46,13 @@
 
                                             <div class="col-md-6 mt-2">
                                                 <div class="form-group">
-                                                    <label>Min. Order Price (₹)</label>
-                                                    <input type="number" name="min_price" class="form-control" placeholder="e.g. 599" required>
+                                                    <label>Service Type</label>
+                                                    <select name="service_type_id" class="form-control select2" required>
+                                                        <option value="">Select Service Type</option>
+                                                        @foreach($serviceTypes as $type)
+                                                            <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                                        @endforeach
+                                                    </select>
                                                     <div class="valid-feedback"></div>
                                                 </div>
                                             </div>
