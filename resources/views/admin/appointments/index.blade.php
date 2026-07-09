@@ -1606,14 +1606,7 @@ $(document).ready(function() {
         }, 200);
     }
 
-    // Fix dropdown cutoff dynamically without permanent height increase
-    $(document).on('show.bs.dropdown', '.card-datatable .dropdown', function () {
-        $(this).closest('.card-datatable').css('padding-bottom', '220px');
-    });
-    
-    $(document).on('hide.bs.dropdown', '.card-datatable .dropdown', function () {
-        $(this).closest('.card-datatable').css('padding-bottom', '0');
-    });
+
 });
 </script>
 @endsection
