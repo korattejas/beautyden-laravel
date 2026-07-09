@@ -573,7 +573,7 @@ class ServiceMasterController extends Controller
 
                 $serviceNames = $categoryServices->pluck('name')->toArray();
 
-                $subCategories = \App\Models\ServiceSubcategory::where('category_id', $service->category_id)
+                $subCategories = \App\Models\ServiceSubcategory::where('service_category_id', $service->category_id)
                     ->where('status', 1)
                     ->pluck('name')
                     ->toArray();
