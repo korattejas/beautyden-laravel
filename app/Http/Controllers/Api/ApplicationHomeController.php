@@ -433,6 +433,14 @@ class ApplicationHomeController extends Controller
                 
                 $combos->each(function ($combo) use ($allItems) {
                     $items = $allItems->get($combo->id, collect([]));
+                    
+                    $items->transform(function ($item) {
+                        $item->price = (int) $item->price;
+                        $item->discount_price = (int) $item->discount_price;
+                        $item->discount_percentage = (int) $item->discount_percentage;
+                        return $item;
+                    });
+                    
                     $combo->items = $items;
                     
                     $totalDuration = $items->where('is_default', 1)->sum(function ($item) {
@@ -452,15 +460,15 @@ class ApplicationHomeController extends Controller
                     } else {
                         $combo->total_duration_formatted = $totalDuration . ' min.';
                     }
-                    $combo->total_price = $items->where('is_default', 1)->sum(function ($item) {
-                        return (float) $item->price;
+                    $combo->total_price = (int) $items->where('is_default', 1)->sum(function ($item) {
+                        return $item->price;
                     });
-                    $combo->total_discount_price = $items->where('is_default', 1)->sum(function ($item) {
-                        return (float) $item->discount_price;
+                    $combo->total_discount_price = (int) $items->where('is_default', 1)->sum(function ($item) {
+                        return $item->discount_price;
                     });
                     
-                    $combo->discount_percentage = round($items->where('is_default', 1)->avg(function ($item) {
-                        return (float) $item->discount_percentage;
+                    $combo->discount_percentage = (int) round($items->where('is_default', 1)->avg(function ($item) {
+                        return $item->discount_percentage;
                     }));
                 });
             }
