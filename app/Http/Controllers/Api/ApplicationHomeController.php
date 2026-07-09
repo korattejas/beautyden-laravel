@@ -274,14 +274,12 @@ class ApplicationHomeController extends Controller
             foreach ($trendingServices as $catId => $items) {
                 $category = $allCategoriesMap->get($catId);
                 if ($category) {
-                    $flattenedItems = collect();
-                    
-                    foreach ($items as $item) {
+                    $items->transform(function ($item) use ($trendingVariants, $trendingVariantPrices, $cityId) {
                         $item->has_variants = (int) $item->has_variants;
                         
                         if ($item->has_variants == 1) {
                             $serviceVariants = $trendingVariants->get($item->id, collect());
-                            $hasValidVariants = false;
+                            $availableVariants = [];
                             
                             foreach ($serviceVariants as $variant) {
                                 if ($cityId) {
@@ -306,47 +304,34 @@ class ApplicationHomeController extends Controller
                                 $variant->thumbnail_image = $variant->thumbnail_image
                                     ? asset('uploads/service-variant/' . $variant->thumbnail_image)
                                     : null;
-                                
-                                // Create a flattened object for this variant
-                                $flattenedVariant = clone $item;
-                                $flattenedVariant->name = $variant->name;
-                                $flattenedVariant->price = $variant->price;
-                                $flattenedVariant->discount_price = $variant->discount_price;
-                                $flattenedVariant->discount_percentage = $variant->discount_percentage;
-                                $flattenedVariant->duration = $variant->duration ?? $item->duration;
-                                $flattenedVariant->icon = $variant->thumbnail_image ?: $item->icon;
-                                
-                                $flattenedVariant->has_variants = 0;
-                                $flattenedVariant->is_variant = 1;
-                                $flattenedVariant->variant_id = $variant->id;
-                                
-                                $flattenedItems->push($flattenedVariant);
-                                $hasValidVariants = true;
+                                    
+                                $availableVariants[] = $variant;
                             }
                             
-                            if (!$hasValidVariants) {
+                            if (!empty($availableVariants)) {
+                                $item->starts_at = collect($availableVariants)->min('price') ?? 0;
+                                $item->total_option = count($availableVariants);
+                                $item->variants = $availableVariants;
+                                unset($item->price, $item->discount_price, $item->discount_percentage, $item->duration);
+                            } else {
                                 $item->has_variants = 0;
-                                $item->is_variant = 0;
-                                $item->variant_id = 0;
                                 $item->price = (int) $item->price;
                                 $item->discount_price = (int) $item->discount_price;
                                 $item->discount_percentage = (int) $item->discount_percentage;
-                                $flattenedItems->push($item);
                             }
                         } else {
-                            $item->is_variant = 0;
-                            $item->variant_id = 0;
                             $item->price = (int) $item->price;
                             $item->discount_price = (int) $item->discount_price;
                             $item->discount_percentage = (int) $item->discount_percentage;
-                            $flattenedItems->push($item);
                         }
-                    }
+                        
+                        return $item;
+                    });
                     
                     $trendingData[] = [
                         'category_id' => $catId,
                         'category_name' => $category->name,
-                        'services' => $flattenedItems->values()
+                        'services' => $items
                     ];
                 }
             }
