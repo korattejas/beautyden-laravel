@@ -436,9 +436,15 @@ class ApplicationHomeController extends Controller
                     $items = $allItems->get($combo->id, collect([]));
                     $combo->items = $items;
                     
-                    $combo->total_duration = $items->where('is_default', 1)->sum('duration');
-                    $combo->total_price = $items->where('is_default', 1)->sum('price');
-                    $combo->total_discount_price = $items->where('is_default', 1)->sum('discount_price');
+                    $combo->total_duration = $items->where('is_default', 1)->sum(function ($item) {
+                        return (int) $item->duration;
+                    });
+                    $combo->total_price = $items->where('is_default', 1)->sum(function ($item) {
+                        return (float) $item->price;
+                    });
+                    $combo->total_discount_price = $items->where('is_default', 1)->sum(function ($item) {
+                        return (float) $item->discount_price;
+                    });
                     
                     if ($combo->total_price > 0) {
                         $combo->discount_percentage = round((($combo->total_price - $combo->total_discount_price) / $combo->total_price) * 100);
