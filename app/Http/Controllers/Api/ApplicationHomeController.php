@@ -220,8 +220,9 @@ class ApplicationHomeController extends Controller
                     's.id', 
                     's.name', 
                     's.category_id',
-                    'scm.price as base_price', 
-                    'scm.discount_price',
+                    'scm.price as price', 
+                    DB::raw('ROUND(scm.price + (scm.price * scm.discount_price / 100)) as discount_price'),
+                    'scm.discount_price as discount_percentage',
                     's.duration', 
                     's.rating', 
                     's.reviews', 
@@ -232,8 +233,9 @@ class ApplicationHomeController extends Controller
                     's.id', 
                     's.name', 
                     's.category_id',
-                    's.price as base_price', 
-                    's.discount_price',
+                    's.price as price', 
+                    's.discount_price as discount_price',
+                    DB::raw('IF(s.discount_price > s.price, ROUND(((s.discount_price - s.price) / s.discount_price) * 100), 0) as discount_percentage'),
                     's.duration', 
                     's.rating', 
                     's.reviews', 
@@ -254,6 +256,13 @@ class ApplicationHomeController extends Controller
                 // Use allCategoriesMap so trending services are not limited to is_popular categories
                 $category = $allCategoriesMap->get($catId);
                 if ($category) {
+                    $items->transform(function ($item) {
+                        $item->price = (int) $item->price;
+                        $item->discount_price = (int) $item->discount_price;
+                        $item->discount_percentage = (int) $item->discount_percentage;
+                        return $item;
+                    });
+                    
                     $trendingData[] = [
                         'category_id' => $catId,
                         'category_name' => $category->name,
