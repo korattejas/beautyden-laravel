@@ -1440,18 +1440,76 @@
         ],
         "coupons": [ ... ],
         "categories": [ ... ],
-        "trending_services": [
-            {
-                "category_id": 16,
-                "category_name": "Waxing",
-                "services": [ ... ]
-            }
-        ],
+
         "reviews": [ ... ],
         "brands": [ ... ],
         "active_cities": [ ... ],
         "coming_soon_cities": [ ... ]
     }
+}</code></pre>
+        </section>
+
+        <section id="trending-services">
+            <h3>Trending Services</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/trendingServices
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. To fetch pricing according to the city. Send 0 if not available.</td>
+                    </tr>
+                    <tr>
+                        <td>category_id</td>
+                        <td>Integer</td>
+                        <td><strong>Optional</strong>. To filter trending services by category.</td>
+                    </tr>
+                    <tr>
+                        <td>sub_category_id</td>
+                        <td>Integer</td>
+                        <td><strong>Optional</strong>. To filter trending services by sub-category.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Returns popular (trending) services grouped by categories.</p>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Trending services retrieved successfully",
+    "data": [
+        {
+            "category_id": 16,
+            "category_name": "Wax",
+            "services": [
+                {
+                    "id": 92,
+                    "name": "Cream Wax",
+                    "category_id": 16,
+                    "sub_category_id": 19,
+                    "rating": "4.9",
+                    "reviews": "106",
+                    "icon": "https://.../icon.png",
+                    "has_variants": 1,
+                    "starts_at": 299,
+                    "total_option": 2,
+                    "variants": [
+                        { ... }
+                    ]
+                }
+            ]
+        }
+    ]
 }</code></pre>
         </section>
 

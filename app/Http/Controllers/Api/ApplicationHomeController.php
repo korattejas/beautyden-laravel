@@ -199,142 +199,7 @@ class ApplicationHomeController extends Controller
                 ->orderByDesc('is_popular')
                 ->get();
 
-            // All active categories map for trending lookup (not filtered by is_popular)
-            $allCategoriesMap = DB::table('service_categories')
-                ->select('id', 'name')
-                ->where('status', 1)
-                ->get()
-                ->keyBy('id');
-
-            // 5. City Wise Services & Trending Services
-            $servicesQuery = DB::table('service_masters as s')
-                ->where('s.status', 1);
-
-            if ($cityId) {
-                $servicesQuery->join('service_city_masters as scm', function($join) use ($cityId) {
-                    $join->on('scm.service_master_id', '=', 's.id')
-                         ->where('scm.city_id', '=', $cityId)
-                         ->where('scm.status', '=', 1);
-                })
-                ->select(
-                    's.id', 
-                    's.name', 
-                    's.category_id',
-                    'scm.price as price', 
-                    DB::raw('ROUND(scm.price + (scm.price * scm.discount_price / 100)) as discount_price'),
-                    'scm.discount_price as discount_percentage',
-                    's.duration', 
-                    's.rating', 
-                    's.reviews', 
-                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
-                    's.has_variants'
-                );
-            } else {
-                $servicesQuery->select(
-                    's.id', 
-                    's.name', 
-                    's.category_id',
-                    's.price as price', 
-                    's.discount_price as discount_price',
-                    DB::raw('IF(s.discount_price > s.price, ROUND(((s.discount_price - s.price) / s.discount_price) * 100), 0) as discount_percentage'),
-                    's.duration', 
-                    's.rating', 
-                    's.reviews', 
-                    DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
-                    's.has_variants'
-                );
-            }
-
-
-
-            $trendingServicesRaw = (clone $servicesQuery)
-                ->where('s.is_popular', 1)
-                ->get();
-
-            $trendingServiceIdsWithVariants = $trendingServicesRaw->where('has_variants', 1)->pluck('id')->toArray();
-            $trendingVariants = collect();
-            $trendingVariantPrices = collect();
-
-            if (!empty($trendingServiceIdsWithVariants)) {
-                $trendingVariants = \App\Models\ServiceMasterVariant::whereIn('service_master_id', $trendingServiceIdsWithVariants)
-                    ->get()
-                    ->groupBy('service_master_id');
-                    
-                if ($cityId) {
-                    $trendingVariantPrices = \App\Models\ServiceCityVariantPrice::whereIn('service_master_id', $trendingServiceIdsWithVariants)
-                        ->where('city_id', $cityId)
-                        ->get()
-                        ->groupBy('service_master_id');
-                }
-            }
-
-            $trendingServices = $trendingServicesRaw->groupBy('category_id');
-
-            $trendingData = [];
-            foreach ($trendingServices as $catId => $items) {
-                $category = $allCategoriesMap->get($catId);
-                if ($category) {
-                    $items->transform(function ($item) use ($trendingVariants, $trendingVariantPrices, $cityId) {
-                        $item->has_variants = (int) $item->has_variants;
-                        
-                        if ($item->has_variants == 1) {
-                            $serviceVariants = $trendingVariants->get($item->id, collect());
-                            $availableVariants = [];
-                            
-                            foreach ($serviceVariants as $variant) {
-                                if ($cityId) {
-                                    $serviceVariantPrices = $trendingVariantPrices->get($item->id, collect())->keyBy('variant_id');
-                                    if ($serviceVariantPrices->has($variant->id)) {
-                                        $priceData = $serviceVariantPrices->get($variant->id);
-                                        if ($priceData->is_available == 0) continue;
-                                        
-                                        $variant->price = (int) $priceData->price;
-                                        $variant->discount_price = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
-                                        $variant->discount_percentage = (int) $priceData->discount_price;
-                                    } else {
-                                        continue;
-                                    }
-                                } else {
-                                    $variant->price = (int) $variant->price;
-                                    $variant->discount_price = (int) $variant->discount_price;
-                                    $variant->discount_percentage = $variant->discount_price > $variant->price ? 
-                                        (int) round((($variant->discount_price - $variant->price) / $variant->discount_price) * 100) : 0;
-                                }
-                                
-                                $variant->thumbnail_image = $variant->thumbnail_image
-                                    ? asset('uploads/service-variant/' . $variant->thumbnail_image)
-                                    : null;
-                                    
-                                $availableVariants[] = $variant;
-                            }
-                            
-                            if (!empty($availableVariants)) {
-                                $item->starts_at = collect($availableVariants)->min('price') ?? 0;
-                                $item->total_option = count($availableVariants);
-                                $item->variants = $availableVariants;
-                                unset($item->price, $item->discount_price, $item->discount_percentage, $item->duration);
-                            } else {
-                                $item->has_variants = 0;
-                                $item->price = (int) $item->price;
-                                $item->discount_price = (int) $item->discount_price;
-                                $item->discount_percentage = (int) $item->discount_percentage;
-                            }
-                        } else {
-                            $item->price = (int) $item->price;
-                            $item->discount_price = (int) $item->discount_price;
-                            $item->discount_percentage = (int) $item->discount_percentage;
-                        }
-                        
-                        return $item;
-                    });
-                    
-                    $trendingData[] = [
-                        'category_id' => $catId,
-                        'category_name' => $category->name,
-                        'services' => $items
-                    ];
-                }
-            }
+            // Trending services logic extracted to getTrendingServices API
 
             // // 6. Reviews (Optimized)
             // $reviews = DB::table('customer_reviews as r')
@@ -389,7 +254,7 @@ class ApplicationHomeController extends Controller
                 'service_types' => $serviceTypes,
                 'categories' => $categories,
 
-                'trending_services' => $trendingData,
+                // 'trending_services' => $trendingData,
                 // 'reviews' => $reviews,
                 // 'brands' => $productBrands,
                 'active_cities' => $activeCities,
@@ -399,6 +264,188 @@ class ApplicationHomeController extends Controller
             return $this->sendResponse(
                 $responseData,
                 'Home page data retrieved successfully',
+                $this->success_status
+            );
+
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
+
+    public function getTrendingServices(Request $request): JsonResponse
+    {
+        $function_name = 'getTrendingServices';
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'city_id' => 'required|integer',
+            'category_id' => 'nullable|integer',
+            'sub_category_id' => 'nullable|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError(
+                'Invalid parameters.',
+                $this->validation_error_status
+            );
+        }
+
+        try {
+            $cityId = $request->input('city_id');
+            
+            if ($cityId == 0) {
+                return $this->sendResponse(
+                    [
+                        'is_coming_soon' => true,
+                        'trending_services' => [],
+                    ],
+                    "Explore our app while we prepare to launch in your city!",
+                    $this->success_status
+                );
+            }
+
+            // Check City Status (Active vs Coming Soon)
+            $city = DB::table('cities')->where('id', $cityId)->first();
+            if (!$city) {
+                return $this->sendError('City not found.', 404);
+            }
+            if ($city->status != 0) {
+                return $this->sendResponse(
+                    [
+                        'is_coming_soon' => true,
+                        'trending_services' => [],
+                        'city_name' => $city->name
+                    ],
+                    "Coming soon in $city->name!",
+                    $this->success_status
+                );
+            }
+
+            // All active categories map for trending lookup (not filtered by is_popular)
+            $allCategoriesMap = DB::table('service_categories')
+                ->select('id', 'name')
+                ->where('status', 1)
+                ->get()
+                ->keyBy('id');
+
+            // 5. City Wise Services & Trending Services
+            $servicesQuery = DB::table('service_masters as s')
+                ->where('s.status', 1);
+
+            $servicesQuery->join('service_city_masters as scm', function($join) use ($cityId) {
+                $join->on('scm.service_master_id', '=', 's.id')
+                     ->where('scm.city_id', '=', $cityId)
+                     ->where('scm.status', '=', 1);
+            })
+            ->select(
+                's.id', 
+                's.name', 
+                's.category_id',
+                's.sub_category_id',
+                'scm.price as price', 
+                DB::raw('ROUND(scm.price + (scm.price * scm.discount_price / 100)) as discount_price'),
+                'scm.discount_price as discount_percentage',
+                's.duration', 
+                's.rating', 
+                's.reviews', 
+                DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
+                's.has_variants'
+            );
+
+            if ($request->has('category_id') && !empty($request->category_id)) {
+                $servicesQuery->where('s.category_id', $request->category_id);
+            }
+            if ($request->has('sub_category_id') && !empty($request->sub_category_id)) {
+                $servicesQuery->where('s.sub_category_id', $request->sub_category_id);
+            }
+
+            $trendingServicesRaw = (clone $servicesQuery)
+                ->where('s.is_popular', 1)
+                ->get();
+
+            $trendingServiceIdsWithVariants = $trendingServicesRaw->where('has_variants', 1)->pluck('id')->toArray();
+            $trendingVariants = collect();
+            $trendingVariantPrices = collect();
+
+            if (!empty($trendingServiceIdsWithVariants)) {
+                $trendingVariants = \App\Models\ServiceMasterVariant::whereIn('service_master_id', $trendingServiceIdsWithVariants)
+                    ->get()
+                    ->groupBy('service_master_id');
+                    
+                $trendingVariantPrices = \App\Models\ServiceCityVariantPrice::whereIn('service_master_id', $trendingServiceIdsWithVariants)
+                    ->where('city_id', $cityId)
+                    ->get()
+                    ->groupBy('service_master_id');
+            }
+
+            $trendingServices = $trendingServicesRaw->groupBy('category_id');
+
+            $trendingData = [];
+            foreach ($trendingServices as $catId => $items) {
+                $category = $allCategoriesMap->get($catId);
+                if ($category) {
+                    $items->transform(function ($item) use ($trendingVariants, $trendingVariantPrices, $cityId) {
+                        $item->has_variants = (int) $item->has_variants;
+                        
+                        if ($item->has_variants == 1) {
+                            $serviceVariants = $trendingVariants->get($item->id, collect());
+                            $availableVariants = [];
+                            
+                            foreach ($serviceVariants as $variant) {
+                                $serviceVariantPrices = $trendingVariantPrices->get($item->id, collect())->keyBy('variant_id');
+                                if ($serviceVariantPrices->has($variant->id)) {
+                                    $priceData = $serviceVariantPrices->get($variant->id);
+                                    if ($priceData->is_available == 0) continue;
+                                    
+                                    $variant->price = (int) $priceData->price;
+                                    $variant->discount_price = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
+                                    $variant->discount_percentage = (int) $priceData->discount_price;
+                                } else {
+                                    continue;
+                                }
+                                
+                                $variant->thumbnail_image = $variant->thumbnail_image
+                                    ? asset('uploads/service-variant/' . $variant->thumbnail_image)
+                                    : null;
+                                    
+                                $availableVariants[] = $variant;
+                            }
+                            
+                            if (!empty($availableVariants)) {
+                                $item->starts_at = collect($availableVariants)->min('price') ?? 0;
+                                $item->total_option = count($availableVariants);
+                                $item->variants = $availableVariants;
+                                unset($item->price, $item->discount_price, $item->discount_percentage, $item->duration);
+                            } else {
+                                $item->has_variants = 0;
+                                $item->price = (int) $item->price;
+                                $item->discount_price = (int) $item->discount_price;
+                                $item->discount_percentage = (int) $item->discount_percentage;
+                            }
+                        } else {
+                            $item->price = (int) $item->price;
+                            $item->discount_price = (int) $item->discount_price;
+                            $item->discount_percentage = (int) $item->discount_percentage;
+                        }
+                        
+                        return $item;
+                    });
+                    
+                    $trendingData[] = [
+                        'category_id' => $catId,
+                        'category_name' => $category->name,
+                        'services' => $items
+                    ];
+                }
+            }
+
+            return $this->sendResponse(
+                $trendingData,
+                'Trending services retrieved successfully',
                 $this->success_status
             );
 

@@ -47,6 +47,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('verifyOtpOnMobileNumber', [AuthenticationController::class, 'verifyOtpOnMobileNumber']);
         Route::post('sendTestNotification', [NotificationController::class, 'sendTestNotification']);
         Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
+        Route::post('trendingServices', [ApplicationHomeController::class, 'getTrendingServices']);
         Route::post('serviceCombos', [ApplicationHomeController::class, 'getServiceCombos']);
         Route::post('getServiceSearchData', [ApplicationHomeController::class, 'getServiceSearchData']);
         Route::get('offerBanner', [OfferController::class, 'getOffers']);
@@ -157,6 +158,7 @@ Route::middleware([])->group(function () {
         Route::post('verifyOtpOnMobileNumber', [AuthenticationController::class, 'verifyOtpOnMobileNumber']);
         Route::post('sendTestNotification', [NotificationController::class, 'sendTestNotification']);
         Route::post('homePageData', [ApplicationHomeController::class, 'getHomePageData']);
+        Route::post('trendingServices', [ApplicationHomeController::class, 'getTrendingServices']);
         Route::post('serviceCombos', [ApplicationHomeController::class, 'getServiceCombos']);
         Route::post('getServiceSearchData', [ApplicationHomeController::class, 'getServiceSearchData']);
         Route::get('offerBanner', [OfferController::class, 'getOffers']);
