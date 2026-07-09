@@ -55,7 +55,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/api-docs', function () {
+Route::get('/api-docs/BeautyDen@admin.com/0126', function () {
     $path = base_path('API_DOCUMENTATION.html');
     if (file_exists($path)) {
         return response()->file($path);
