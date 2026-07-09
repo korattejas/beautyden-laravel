@@ -301,65 +301,6 @@ class ApplicationHomeController extends Controller
             //     });
             // }
 
-            // 7. Service Combos (Optimized)
-            $combos = DB::table('service_combos')
-                ->select('id', 'name', 'description', DB::raw('CONCAT("' . asset('uploads/combos') . '/", image) AS image'), 'min_price')
-                ->where('status', 1)
-                ->get();
-
-            $comboIds = $combos->pluck('id')->toArray();
-            if (!empty($comboIds)) {
-                $itemsQuery = DB::table('service_combo_items as sci')
-                    ->join('service_masters as sm', 'sci.service_master_id', '=', 'sm.id');
-                
-                if ($cityId) {
-                    $itemsQuery->leftJoin('service_city_masters as scm', function($join) use ($cityId) {
-                        $join->on('scm.service_master_id', '=', 'sm.id')
-                             ->where('scm.city_id', $cityId);
-                    })
-                    ->leftJoin('service_master_variants as smv', 'sci.variant_id', '=', 'smv.id')
-                    ->leftJoin('service_city_variant_prices as scvp', function($join) use ($cityId) {
-                        $join->on('scvp.variant_id', '=', 'sci.variant_id')
-                             ->where('scvp.city_id', $cityId);
-                    })
-                    ->select(
-                        'sci.combo_id',
-                        'sm.id',
-                        'sm.id as service_id',
-                        DB::raw('IF(sci.variant_id IS NOT NULL, CONCAT(sm.name, " - ", smv.name), sm.name) as name'),
-                        'sm.description',
-                        'sm.category_id',
-                        'sm.sub_category_id',
-                        DB::raw('IF(sci.variant_id IS NOT NULL, IFNULL(scvp.price, smv.price), IFNULL(scm.price, sm.price)) as price'),
-                        DB::raw('IF(sci.variant_id IS NOT NULL, IFNULL(scvp.discount_price, smv.price - (smv.price * smv.discount_percentage / 100)), IFNULL(scm.discount_price, sm.discount_price)) as discount_price'),
-                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.duration, sm.duration) as duration'),
-                        'sci.is_default',
-                        'sci.variant_id'
-                    );
-                } else {
-                    $itemsQuery->leftJoin('service_master_variants as smv', 'sci.variant_id', '=', 'smv.id')
-                    ->select(
-                        'sci.combo_id',
-                        'sm.id',
-                        'sm.id as service_id',
-                        DB::raw('IF(sci.variant_id IS NOT NULL, CONCAT(sm.name, " - ", smv.name), sm.name) as name'),
-                        'sm.category_id',
-                        'sm.sub_category_id',
-                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.price, sm.price) as price'),
-                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.price - (smv.price * smv.discount_percentage / 100), sm.discount_price) as discount_price'),
-                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.duration, sm.duration) as duration'),
-                        'sci.is_default',
-                        'sci.variant_id'
-                    );
-                }
-                
-                $allItems = $itemsQuery->whereIn('sci.combo_id', $comboIds)->get()->groupBy('combo_id');
-                
-                $combos->each(function ($combo) use ($allItems) {
-                    $combo->items = $allItems->get($combo->id, []);
-                });
-            }
-
             // // 8. Others
             // $productBrands = DB::table('product_brands')
             //     ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/product-brand') . '/", icon) AS icon'))
@@ -376,7 +317,6 @@ class ApplicationHomeController extends Controller
 
                 'trending_services' => $trendingData,
                 // 'reviews' => $reviews,
-                'combos' => $combos,
                 // 'brands' => $productBrands,
                 'active_cities' => $activeCities,
                 'coming_soon_cities' => $comingSoonCities,
@@ -385,6 +325,132 @@ class ApplicationHomeController extends Controller
             return $this->sendResponse(
                 $responseData,
                 'Home page data retrieved successfully',
+                $this->success_status
+            );
+
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
+
+    public function getServiceCombos(Request $request): JsonResponse
+    {
+        $function_name = 'getServiceCombos';
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'city_id' => 'nullable|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError(
+                'Invalid parameters.',
+                $this->validation_error_status
+            );
+        }
+
+        try {
+            $cityId = $request->input('city_id');
+            
+            if ($cityId && $cityId != 0) {
+                // Check City Status (Active vs Coming Soon)
+                $city = DB::table('cities')->where('id', $cityId)->first();
+                if (!$city) {
+                    return $this->sendError('City not found.', 404);
+                }
+                if ($city->status != 0) {
+                    return $this->sendResponse(
+                        [
+                            'is_coming_soon' => true,
+                            'city_name' => $city->name,
+                        ],
+                        "Coming soon! We are not available in $city->name yet, but we will start our services here very soon.",
+                        $this->success_status
+                    );
+                }
+            }
+
+            $combos = DB::table('service_combos')
+                ->select('id', 'name', 'description', DB::raw('CONCAT("' . asset('uploads/combos') . '/", image) AS image'))
+                ->where('status', 1)
+                ->get();
+
+            $comboIds = $combos->pluck('id')->toArray();
+            if (!empty($comboIds)) {
+                $itemsQuery = DB::table('service_combo_items as sci')
+                    ->join('service_masters as sm', 'sci.service_master_id', '=', 'sm.id');
+                
+                if ($cityId && $cityId != 0) {
+                    $itemsQuery->leftJoin('service_city_masters as scm', function($join) use ($cityId) {
+                        $join->on('scm.service_master_id', '=', 'sm.id')
+                             ->where('scm.city_id', $cityId);
+                    })
+                    ->leftJoin('service_master_variants as smv', 'sci.variant_id', '=', 'smv.id')
+                    ->leftJoin('service_city_variant_prices as scvp', function($join) use ($cityId) {
+                        $join->on('scvp.variant_id', '=', 'sci.variant_id')
+                             ->where('scvp.city_id', $cityId);
+                    })
+                    ->leftJoin('service_categories as sc', 'sm.category_id', '=', 'sc.id')
+                    ->select(
+                        'sci.combo_id',
+                        'sm.id',
+                        'sm.id as service_id',
+                        DB::raw('IF(sci.variant_id IS NOT NULL, CONCAT(sm.name, " - ", smv.name), sm.name) as name'),
+                        'sm.description',
+                        'sm.category_id',
+                        'sc.name as category_name',
+                        'sm.sub_category_id',
+                        DB::raw('IF(sci.variant_id IS NOT NULL, IFNULL(scvp.price, smv.price), IFNULL(scm.price, sm.price)) as price'),
+                        DB::raw('IF(sci.variant_id IS NOT NULL, IFNULL(scvp.discount_price, smv.price - (smv.price * smv.discount_percentage / 100)), IFNULL(scm.discount_price, sm.discount_price)) as discount_price'),
+                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.duration, sm.duration) as duration'),
+                        'sci.is_default',
+                        'sci.variant_id'
+                    );
+                } else {
+                    $itemsQuery->leftJoin('service_master_variants as smv', 'sci.variant_id', '=', 'smv.id')
+                    ->leftJoin('service_categories as sc', 'sm.category_id', '=', 'sc.id')
+                    ->select(
+                        'sci.combo_id',
+                        'sm.id',
+                        'sm.id as service_id',
+                        DB::raw('IF(sci.variant_id IS NOT NULL, CONCAT(sm.name, " - ", smv.name), sm.name) as name'),
+                        'sm.description',
+                        'sm.category_id',
+                        'sc.name as category_name',
+                        'sm.sub_category_id',
+                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.price, sm.price) as price'),
+                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.price - (smv.price * smv.discount_percentage / 100), sm.discount_price) as discount_price'),
+                        DB::raw('IF(sci.variant_id IS NOT NULL, smv.duration, sm.duration) as duration'),
+                        'sci.is_default',
+                        'sci.variant_id'
+                    );
+                }
+                
+                $allItems = $itemsQuery->whereIn('sci.combo_id', $comboIds)->get()->groupBy('combo_id');
+                
+                $combos->each(function ($combo) use ($allItems) {
+                    $items = $allItems->get($combo->id, collect([]));
+                    $combo->items = $items;
+                    
+                    $combo->total_duration = $items->where('is_default', 1)->sum('duration');
+                    $combo->total_price = $items->where('is_default', 1)->sum('price');
+                    $combo->total_discount_price = $items->where('is_default', 1)->sum('discount_price');
+                    
+                    if ($combo->total_price > 0) {
+                        $combo->discount_percentage = round((($combo->total_price - $combo->total_discount_price) / $combo->total_price) * 100);
+                    } else {
+                        $combo->discount_percentage = 0;
+                    }
+                });
+            }
+
+            return $this->sendResponse(
+                ['combos' => $combos],
+                'Service combos retrieved successfully',
                 $this->success_status
             );
 

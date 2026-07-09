@@ -298,6 +298,27 @@
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customer/verifyOtpOnMobileNumber
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>mobile_number</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. 10-digit number.</td>
+                    </tr>
+                    <tr>
+                        <td>otp</td>
+                        <td>Numeric</td>
+                        <td><strong>Required</strong>. 6-digit OTP.</td>
+                    </tr>
+                </tbody>
+            </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
 <code>{
@@ -1427,24 +1448,71 @@
             }
         ],
         "reviews": [ ... ],
-        "combos": [
-            {
-                "id": "1",
-                "name": "Bridal Glow Package",
-                "items": [
-                    {
-                        "id": "25",
-                        "name": "Lotus Facial",
-                        "category_id": 16,
-                        "sub_category_id": 1,
-                        "price": "699.00"
-                    }
-                ]
-            }
-        ],
         "brands": [ ... ],
         "active_cities": [ ... ],
         "coming_soon_cities": [ ... ]
+    }
+}</code></pre>
+        </section>
+
+        <section id="combos">
+            <h3>Service Combos</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/serviceCombos
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Prices will be calculated according to the city.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Returns service combos and their included services with pricing.</p>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Service combos retrieved successfully",
+    "data": {
+        "combos": [
+            {
+                "id": 1,
+                "name": "Bridal Glow Package",
+                "description": "Complete package for bridal makeup and styling",
+                "image": "https://.../bridal.jpg",
+                "total_duration": 45,
+                "total_price": 699.00,
+                "total_discount_price": 599.00,
+                "discount_percentage": 14,
+                "items": [
+                    {
+                        "combo_id": 1,
+                        "id": 25,
+                        "service_id": 25,
+                        "name": "Lotus Facial",
+                        "description": "Premium facial",
+                        "category_id": 16,
+                        "category_name": "Waxing",
+                        "sub_category_id": 1,
+                        "price": "699.00",
+                        "discount_price": "599.00",
+                        "duration": 45,
+                        "is_default": 1,
+                        "variant_id": null
+                    }
+                ]
+            }
+        ]
     }
 }</code></pre>
         </section>
