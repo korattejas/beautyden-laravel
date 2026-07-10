@@ -900,7 +900,18 @@ class ServiceMasterController extends Controller
             }
 
             if (empty($variantsList)) {
-                return $this->sendError('No variants available for this service in the selected city.', $this->backend_error_status);
+                return response()->json([
+                    'code' => $this->backend_error_status,
+                    'status' => false,
+                    'message' => 'No variants available for this service in the selected city.',
+                    'debug_info' => [
+                        'service_id' => $serviceId,
+                        'city_id' => $cityId,
+                        'service_has_variants' => $service->has_variants,
+                        'raw_variants' => $service->variants,
+                        'raw_variant_prices' => $variantPrices->values()
+                    ]
+                ]);
             }
 
             // ── Service icon ──────────────────────────────────────────────────
