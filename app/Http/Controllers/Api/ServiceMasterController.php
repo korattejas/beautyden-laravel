@@ -200,8 +200,14 @@ class ServiceMasterController extends Controller
                         $service->starts_at   = (int) $cityPrices->min('price');
                         $service->total_option = $cityPrices->count();
                     } else {
-                        // No available variants for this city — treat as non-variant service
-                        $service->has_variants = 0;
+                        // Fallback: If no city prices exist (or IDs are mismatched), use the default prices from variants table
+                        $dbVariants = \App\Models\ServiceMasterVariant::where('service_master_id', $service->id)->get();
+                        if ($dbVariants->isNotEmpty()) {
+                            $service->starts_at   = (int) $dbVariants->min('price');
+                            $service->total_option = $dbVariants->count();
+                        } else {
+                            $service->has_variants = 0;
+                        }
                     }
 
                     // Remove per-service price fields; card only shows starts_at
@@ -870,14 +876,19 @@ class ServiceMasterController extends Controller
             foreach ($service->variants as $variant) {
                 $priceData = $variantPrices->get($variant->id);
 
-                // Skip variants not available for this city
-                if (!$priceData || $priceData->is_available == 0) {
-                    continue;
+                if ($priceData) {
+                    if ($priceData->is_available == 0) {
+                        continue; // Explicitly marked as unavailable in this city
+                    }
+                    $price           = (int) $priceData->price;
+                    $discountPercent = (int) $priceData->discount_price;
+                    $discountPrice   = (int) round($price + ($price * $discountPercent / 100));
+                } else {
+                    // Fallback to variant's default price if no city price record exists
+                    $price           = (int) $variant->price;
+                    $discountPercent = (int) $variant->discount_percentage;
+                    $discountPrice   = (int) round($price + ($price * $discountPercent / 100));
                 }
-
-                $price           = (int) $priceData->price;
-                $discountPrice   = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
-                $discountPercent = (int) $priceData->discount_price;
 
                 // Thumbnail URL
                 $thumbnailImage = $variant->thumbnail_image
@@ -900,18 +911,7 @@ class ServiceMasterController extends Controller
             }
 
             if (empty($variantsList)) {
-                return response()->json([
-                    'code' => $this->backend_error_status,
-                    'status' => false,
-                    'message' => 'No variants available for this service in the selected city.',
-                    'debug_info' => [
-                        'service_id' => $serviceId,
-                        'city_id' => $cityId,
-                        'service_has_variants' => $service->has_variants,
-                        'raw_variants' => $service->variants,
-                        'raw_variant_prices' => $variantPrices->values()
-                    ]
-                ]);
+                return $this->sendError('No variants available for this service in the selected city.', $this->backend_error_status);
             }
 
             // ── Service icon ──────────────────────────────────────────────────
