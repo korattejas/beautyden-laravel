@@ -59,6 +59,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
+        Route::post('serviceVariantDetails', [ServiceMasterController::class, 'getServiceVariantDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
         Route::post('testFast2Sms', [AuthenticationController::class, 'testFast2Sms']);
         Route::get('categoryLookbook', [CategoryLookbookController::class, 'getCategoryLookbooks']);
@@ -171,6 +172,7 @@ Route::middleware([])->group(function () {
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
+        Route::post('serviceVariantDetails', [ServiceMasterController::class, 'getServiceVariantDetails']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
         Route::post('testFast2Sms', [AuthenticationController::class, 'testFast2Sms']);
         Route::get('categoryLookbook', [CategoryLookbookController::class, 'getCategoryLookbooks']);

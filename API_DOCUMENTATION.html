@@ -229,7 +229,8 @@
         <a href="#fcm" class="nav-item">Device Management</a>
         <a href="#cities" class="nav-item">Geography</a>
         <a href="#addresses" class="nav-item">Address Management</a>
-        <a href="#services" class="nav-item">Services & Categories</a>
+        <a href="#services" class="nav-item">Services &amp; Categories</a>
+        <a href="#service-variants" class="nav-item">&nbsp;&nbsp;&nbsp;↳ Service Variant Details</a>
         <a href="#booking" class="nav-item">Booking & History</a>
         <a href="#offers" class="nav-item">Offers & Coupons</a>
         <a href="#membership" class="nav-item">Membership</a>
@@ -1077,6 +1078,126 @@
         ]
     }
 }</code></pre>
+        </section>
+
+        <section id="service-variants">
+            <h3>Service Variant Details &nbsp;<span class="badge" style="background:#8e44ad;font-size:0.75rem;">NEW</span></h3>
+            <p>Called when the user taps <strong>"View Option"</strong> on a service card that has variants (i.e., <code>has_variants = 1</code>). Returns the <strong>"Select Options" screen</strong> layout with banner, service header, and a full list of available variants for the selected city.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/serviceVariantDetails
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>service_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required.</strong> The Service Master ID</td>
+                    </tr>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required.</strong> For city-specific variant pricing &amp; availability</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="note" style="margin: 15px 0; background: #f0fdf4; border-left: 5px solid #22c55e; padding: 15px; border-radius: 8px;">
+                <strong>📐 Page Layout Order</strong><br>
+                The <code>page_layout</code> array always arrives in this order:<br>
+                <ol style="margin: 8px 0 0 20px;">
+                    <li><code>banner_section</code> &mdash; Service banner images/videos <em>(only if available)</em></li>
+                    <li><code>service_info_section</code> &mdash; Service name, rating, starts_at, total_option</li>
+                    <li><code>variants_section</code> &mdash; Full list of available variants with price &amp; details</li>
+                </ol>
+            </div>
+
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Service variant details retrieved successfully",
+    "data": {
+        "page_layout": [
+            {
+                "type": "banner_section",
+                "data": [
+                    {
+                        "url": "https://.../uploads/service-media/banner1.jpg",
+                        "type": "image",
+                        "is_scroll_banner_image": 0
+                    },
+                    {
+                        "url": "https://.../uploads/service-media/promo.mp4",
+                        "type": "video",
+                        "is_scroll_banner_image": 1
+                    }
+                ]
+            },
+            {
+                "type": "service_info_section",
+                "data": {
+                    "id": 5,
+                    "name": "Korean Glow Special",
+                    "icon": "https://.../uploads/service/korean-glow.jpg",
+                    "icon_type": "image",
+                    "category_name": "Facial",
+                    "sub_category_name": "Premium Facial",
+                    "rating": "4.2",
+                    "reviews": "3570",
+                    "has_variants": 1,
+                    "starts_at": 899,
+                    "total_option": 3
+                }
+            },
+            {
+                "type": "variants_section",
+                "data": [
+                    {
+                        "id": 12,
+                        "service_master_id": 5,
+                        "name": "Full Legs, Full Arms &amp; Underarms",
+                        "duration": "60 min",
+                        "description": "Includes Full Legs Waxing, Full Arms Waxing and Underarms Waxing.",
+                        "thumbnail_image": "https://.../uploads/service-variant/variant-legs.jpg",
+                        "price": 899,
+                        "discount_price": 1199,
+                        "discount_percentage": 33,
+                        "rating": "4.2",
+                        "reviews": "3570"
+                    },
+                    {
+                        "id": 13,
+                        "service_master_id": 5,
+                        "name": "Full Legs, Full Arms, Underarms &amp; Brazilian Waxing",
+                        "duration": "90 min",
+                        "description": null,
+                        "thumbnail_image": null,
+                        "price": 1299,
+                        "discount_price": 1599,
+                        "discount_percentage": 19,
+                        "rating": "4.2",
+                        "reviews": "3570"
+                    }
+                ]
+            }
+        ]
+    }
+}</code></pre>
+
+            <div class="note" style="margin: 15px 0; background: #fef2f2; border-left: 5px solid #ef4444; padding: 15px; border-radius: 8px;">
+                <strong>⚠️ Error Cases</strong><br>
+                • Service not found or inactive &rarr; <code>404</code> error<br>
+                • Service has <code>has_variants = 0</code> &rarr; validation error<br>
+                • No variants available / enabled for this city &rarr; <code>404</code> error
+            </div>
         </section>
 
         <section id="booking">

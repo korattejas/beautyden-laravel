@@ -139,42 +139,41 @@ class ServiceMasterController extends Controller
                 
             $categoryStatsCache = [];
 
-            $serviceIdsWithVariants = collect($services->items())->filter(function($service) {
+            // For variant services: only load city prices to compute starts_at & total_option.
+            // Full variant details (name, description, thumbnail, etc.) are NOT needed here —
+            // they are fetched on-demand via getServiceVariantDetails when user taps "View Option".
+            $serviceIdsWithVariants = collect($services->items())->filter(function ($service) {
                 return $service->has_variants == 1;
             })->pluck('id')->toArray();
 
-            $variants = collect();
             $variantPrices = collect();
 
             if (!empty($serviceIdsWithVariants)) {
-                $variants = \App\Models\ServiceMasterVariant::whereIn('service_master_id', $serviceIdsWithVariants)
-                    ->get()
-                    ->groupBy('service_master_id');
-                    
                 $variantPrices = \App\Models\ServiceCityVariantPrice::whereIn('service_master_id', $serviceIdsWithVariants)
                     ->where('city_id', $cityId)
+                    ->where('is_available', 1)
                     ->get()
                     ->groupBy('service_master_id');
             }
 
-            $services->getCollection()->transform(function ($service) use (&$categoryStatsCache, $variants, $variantPrices) {
+            $services->getCollection()->transform(function ($service) use (&$categoryStatsCache, $variantPrices) {
                 $service->price = (int) $service->price;
                 $service->discount_price = (int) $service->discount_price;
                 $service->discount_percentage = (int) $service->discount_percentage;
-                
+
                 $service->is_popular = (int) $service->is_popular;
                 $service->has_variants = (int) $service->has_variants;
-                
+
                 if (!isset($categoryStatsCache[$service->category_id])) {
                     $categoryStatsCache[$service->category_id] = $this->getCategoryReviewStats($service->category_id);
                 }
-                
+
                 $service->rating = (string) $categoryStatsCache[$service->category_id]['rating'];
                 $service->reviews = (string) $categoryStatsCache[$service->category_id]['reviews'];
-                
+
                 $banner_media = $service->banner_media ? json_decode($service->banner_media, true) : [];
                 $formatted_banner = [];
-                
+
                 if (!empty($banner_media) && count($banner_media) > 0) {
                     $formatted_banner = collect($banner_media)->map(function ($media) {
                         $media['url'] = asset('uploads/service-media/' . $media['url']);
@@ -191,51 +190,22 @@ class ServiceMasterController extends Controller
                     'type' => 'banner_section',
                     'data' => array_values($formatted_banner)
                 ];
-                
+
                 unset($service->banner_media);
-                
+
                 if ($service->has_variants == 1) {
-                    $serviceVariants = $variants->get($service->id, collect());
-                    $serviceVariantPrices = $variantPrices->get($service->id, collect())->keyBy('variant_id');
+                    $cityPrices = $variantPrices->get($service->id, collect());
 
-                    $availableVariants = [];
-                    foreach ($serviceVariants as $variant) {
-                        if ($serviceVariantPrices->has($variant->id)) {
-                            // Check if variant is available for this city
-                            $priceData = $serviceVariantPrices->get($variant->id);
-                            if ($priceData->is_available == 0) {
-                                continue; // Skip this variant
-                            }
-                            $variant->price = (int) $priceData->price;
-                            $variant->discount_price = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
-                            $variant->discount_percentage = (int) $priceData->discount_price;
-                        } else {
-                            $variant->price = 0;
-                            $variant->discount_price = 0;
-                            $variant->discount_percentage = 0;
-                        }
-
-                        // Format thumbnail image URL
-                        $variant->thumbnail_image = $variant->thumbnail_image
-                            ? asset('uploads/service-variant/' . $variant->thumbnail_image)
-                            : null;
-
-                        // Ensure numeric types
-                        $variant->description         = $variant->description ?? null;
-                        $variant->rating             = (string) $categoryStatsCache[$service->category_id]['rating'];
-                        $variant->reviews            = (string) $categoryStatsCache[$service->category_id]['reviews'];
-
-                        $availableVariants[] = $variant;
-                    }
-                    
-                    if (!empty($availableVariants)) {
-                        $service->starts_at = collect($availableVariants)->min('price') ?? 0;
-                        $service->total_option = count($availableVariants);
-                        $service->variants = $availableVariants;
-                        unset($service->price, $service->discount_price, $service->discount_percentage, $service->duration);
+                    if ($cityPrices->isNotEmpty()) {
+                        $service->starts_at   = (int) $cityPrices->min('price');
+                        $service->total_option = $cityPrices->count();
                     } else {
+                        // No available variants for this city — treat as non-variant service
                         $service->has_variants = 0;
                     }
+
+                    // Remove per-service price fields; card only shows starts_at
+                    unset($service->price, $service->discount_price, $service->discount_percentage, $service->duration);
                 }
 
                 return $service;
@@ -874,6 +844,155 @@ class ServiceMasterController extends Controller
             return $this->sendResponse(
                 $service,
                 'Service details retrieved successfully',
+                $this->success_status
+            );
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
+
+    /**
+     * getServiceVariantDetails
+     * "View Option" button click કર્યા પછી ખૂલે - Select Options screen
+     * Service ની variant-wise full details return કરે (figma second screen)
+     *
+     * Required params: service_id, city_id
+     */
+    public function getServiceVariantDetails(Request $request): JsonResponse
+    {
+        $function_name = 'getServiceVariantDetails';
+
+        try {
+            $serviceId = $request->service_id;
+            $cityId    = $request->city_id;
+
+            if (!$serviceId || !$cityId) {
+                return $this->sendError('Service ID and City ID are required.', $this->validation_error_status);
+            }
+
+            // ── Service master fetch ──────────────────────────────────────────
+            $service = \App\Models\ServiceMaster::with(['category', 'subcategory', 'variants'])
+                ->where('id', $serviceId)
+                ->where('status', 1)
+                ->first();
+
+            if (!$service) {
+                return $this->sendError('Service not found.', $this->backend_error_status);
+            }
+
+            if ($service->has_variants != 1) {
+                return $this->sendError('This service does not have variants.', $this->validation_error_status);
+            }
+
+            // ── Category review stats ─────────────────────────────────────────
+            $catStats = $this->getCategoryReviewStats($service->category_id);
+
+            // ── Variant city prices ───────────────────────────────────────────
+            $variantPrices = \App\Models\ServiceCityVariantPrice::where('service_master_id', $serviceId)
+                ->where('city_id', $cityId)
+                ->get()
+                ->keyBy('variant_id');
+
+            // ── Build variant list ────────────────────────────────────────────
+            $variantsList = [];
+            foreach ($service->variants as $variant) {
+                $priceData = $variantPrices->get($variant->id);
+
+                // Skip variants not available for this city
+                if (!$priceData || $priceData->is_available == 0) {
+                    continue;
+                }
+
+                $price           = (int) $priceData->price;
+                $discountPrice   = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
+                $discountPercent = (int) $priceData->discount_price;
+
+                // Thumbnail URL
+                $thumbnailImage = $variant->thumbnail_image
+                    ? asset('uploads/service-variant/' . $variant->thumbnail_image)
+                    : null;
+
+                $variantsList[] = [
+                    'id'                  => $variant->id,
+                    'service_master_id'   => $variant->service_master_id,
+                    'name'                => $variant->name,
+                    'duration'            => $variant->duration,
+                    'description'         => $variant->description ?? null,
+                    'thumbnail_image'     => $thumbnailImage,
+                    'price'               => $price,
+                    'discount_price'      => $discountPrice,
+                    'discount_percentage' => $discountPercent,
+                    'rating'              => (string) $catStats['rating'],
+                    'reviews'             => (string) $catStats['reviews'],
+                ];
+            }
+
+            if (empty($variantsList)) {
+                return $this->sendError('No variants available for this service in the selected city.', $this->backend_error_status);
+            }
+
+            // ── Service icon ──────────────────────────────────────────────────
+            $ext      = strtolower(pathinfo($service->icon, PATHINFO_EXTENSION));
+            $iconType = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
+            $iconUrl  = asset('uploads/service/' . $service->icon);
+
+            // ── Banner media ──────────────────────────────────────────────────
+            $bannerMedia = [];
+            if ($service->banner_media) {
+                $bannerMedia = collect($service->banner_media)->map(function ($media) {
+                    $media['url'] = asset('uploads/service-media/' . $media['url']);
+                    if (!isset($media['type'])) {
+                        $ext          = strtolower(pathinfo($media['url'], PATHINFO_EXTENSION));
+                        $media['type'] = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
+                    }
+                    $media['is_scroll_banner_image'] = isset($media['is_scroll_banner_image']) ? (int) $media['is_scroll_banner_image'] : 0;
+                    return $media;
+                })->values()->toArray();
+            }
+
+            // ── Page layout ───────────────────────────────────────────────────
+            $pageLayout = [];
+
+            // 1. Banner section first (as per Figma design)
+            if (!empty($bannerMedia)) {
+                $pageLayout[] = [
+                    'type' => 'banner_section',
+                    'data' => $bannerMedia,
+                ];
+            }
+
+            // 2. Service header / info section
+            $pageLayout[] = [
+                'type' => 'service_info_section',
+                'data' => [
+                    'id'                => $service->id,
+                    'name'              => $service->name,
+                    'icon'              => $iconUrl,
+                    'icon_type'         => $iconType,
+                    'category_name'     => $service->category->name ?? '',
+                    'sub_category_name' => $service->subcategory->name ?? '',
+                    'rating'            => (string) $catStats['rating'],
+                    'reviews'           => (string) $catStats['reviews'],
+                    'has_variants'      => 1,
+                    'starts_at'         => collect($variantsList)->min('price') ?? 0,
+                    'total_option'      => count($variantsList),
+                ],
+            ];
+
+            // 3. Variants list section
+            $pageLayout[] = [
+                'type' => 'variants_section',
+                'data' => $variantsList,
+            ];
+
+            return $this->sendResponse(
+                ['page_layout' => $pageLayout],
+                'Service variant details retrieved successfully',
                 $this->success_status
             );
         } catch (Exception $e) {
