@@ -502,9 +502,8 @@ class ServiceMasterController extends Controller
                     
                     if ($item->has_variants == 1) {
                         unset($item->price, $item->discount_price, $item->discount_percentage, $item->duration);
-                    }
                     } else {
-                        $item->has_variants = 0;
+                        // This handles the case where has_variants was set to 0 during fallback
                         $item->price = (int) $item->price;
                         $item->discount_price = (int) $item->discount_price;
                         $item->discount_percentage = (int) $item->discount_percentage;
