@@ -33,17 +33,21 @@ class CustomerReviewController extends Controller
                 ->leftJoin('services as s', 'r.service_id', '=', 's.id')
                 ->select(
                     'r.id',
+                    'r.user_id',
+                    'r.appointment_id',
                     'r.category_id',
                     'r.service_id',
                     's.name as service_name',
                     'r.customer_name',
                     DB::raw('CONCAT("' . asset('uploads/review/customer-photos') . '/", r.customer_photo) AS customer_photo'),
                     'r.rating',
+                    'r.overall_rating',
                     'r.review',
                     'r.review_date',
                     'r.helpful_count',
                     DB::raw('CONCAT("' . asset('uploads/review/videos') . '/", r.video) AS video'),
                     'r.is_popular',
+                    'r.status',
                     'r.created_at',
                     'r.updated_at',
                     'r.photos'

@@ -17,6 +17,7 @@ class CustomerReview extends Model
         'customer_name',
         'customer_photo',
         'rating',
+        'overall_rating',
         'review',
         'review_date',
         'helpful_count',
