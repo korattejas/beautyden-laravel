@@ -243,6 +243,7 @@ class ServiceMasterController extends Controller
         try {
             $serviceId = $request->service_id;
             $cityId = $request->city_id;
+            $requestedVariantId = $request->variant_id; // Optional variant ID
 
             if (!$serviceId || !$cityId) {
                 return $this->sendError('Service ID and City ID are required.', $this->validation_error_status);
@@ -291,6 +292,8 @@ class ServiceMasterController extends Controller
                         ->get()->keyBy('variant_id');
                     
                     $availableVariants = [];
+                    $selectedVariant = null;
+
                     foreach ($service->variants as $variant) {
                         if (isset($variantPrices[$variant->id])) {
                             // Check if variant is available for this city
@@ -302,10 +305,13 @@ class ServiceMasterController extends Controller
                             $variant->discount_price = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
                             $variant->discount_percentage = (int) $priceData->discount_price;
                         } else {
-                            $variant->price = 0;
-                            $variant->discount_price = 0;
-                            $variant->discount_percentage = 0;
+                            // Fallback to default price
+                            $variant->price = (int) $variant->price;
+                            $variant->discount_price = (int) round($variant->price + ($variant->price * $variant->discount_percentage / 100));
+                            $variant->discount_percentage = (int) $variant->discount_percentage;
                         }
+
+                        $rawThumbnail = $variant->thumbnail_image;
 
                         // Format thumbnail image URL
                         $variant->thumbnail_image = $variant->thumbnail_image
@@ -318,8 +324,34 @@ class ServiceMasterController extends Controller
                         $variant->reviews            = (string) $catStats['reviews'];
 
                         $availableVariants[] = $variant;
+
+                        if ($requestedVariantId && $variant->id == $requestedVariantId) {
+                            $selectedVariant = clone $variant;
+                            $selectedVariant->raw_thumbnail = $rawThumbnail;
+                        }
                     }
-                    $service->variants = $availableVariants;
+                    
+                    if ($requestedVariantId) {
+                        if ($selectedVariant) {
+                            // Override main service details with the variant's details
+                            $service->name = $selectedVariant->name;
+                            $service->price = $selectedVariant->price;
+                            $service->discount_price = $selectedVariant->discount_price;
+                            $service->discount_percentage = $selectedVariant->discount_percentage;
+                            $service->duration = $selectedVariant->duration;
+                            if ($selectedVariant->description) {
+                                $service->description = $selectedVariant->description;
+                            }
+                            if ($selectedVariant->raw_thumbnail) {
+                                $service->icon = $selectedVariant->raw_thumbnail;
+                                $service->is_variant_icon = true;
+                            }
+                        }
+                        unset($service->variants);
+                        $service->has_variants = 0;
+                    } else {
+                        $service->variants = $availableVariants;
+                    }
                 }
             }
 
@@ -331,7 +363,11 @@ class ServiceMasterController extends Controller
             // Format image/media URLs
             $ext = strtolower(pathinfo($service->icon, PATHINFO_EXTENSION));
             $service->icon_type = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
-            $service->icon = asset('uploads/service/' . $service->icon);
+            if (isset($service->is_variant_icon) && $service->is_variant_icon) {
+                $service->icon = asset('uploads/service-variant/' . $service->icon);
+            } else {
+                $service->icon = asset('uploads/service/' . $service->icon);
+            }
             
             if ($service->banner_media) {
                 $service->banner_media = collect($service->banner_media)->map(function ($media) {
