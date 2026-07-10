@@ -121,9 +121,11 @@ class ApplicationHomeController extends Controller
                 ->select(
                     'id',
                     'title',
+                    'offer_short_description',
                     'media',
                     'position',
                     'media_type',
+                    'video_thumbnail',
                     'priority',
                     'link',
                     'created_at'
@@ -139,6 +141,11 @@ class ApplicationHomeController extends Controller
                         }
                     }
                     $offer->media_urls = $media;
+                    if ($offer->video_thumbnail) {
+                        $offer->video_thumbnail_url = asset('uploads/offers/images/' . $offer->video_thumbnail);
+                    } else {
+                        $offer->video_thumbnail_url = null;
+                    }
                     return $offer;
                 });
 

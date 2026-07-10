@@ -594,40 +594,7 @@ class ServiceMasterController extends Controller
                 ];
             }
 
-            // 7. Reviews Section
-            $customerReviewsQuery = DB::table('customer_reviews as r')
-                ->select(
-                    'r.id',
-                    'r.customer_name',
-                    DB::raw('CONCAT("' . asset('uploads/review/customer-photos') . '/", r.customer_photo) AS customer_photo'),
-                    'r.rating',
-                    'r.review',
-                    'r.review_date',
-                    DB::raw('CONCAT("' . asset('uploads/review/videos') . '/", r.video) AS video'),
-                    'r.photos'
-                )
-                ->where('r.category_id', $service->category_id)
-                ->where('r.status', 1)
-                ->orderByDesc('r.is_popular')
-                ->orderByDesc('r.review_date')
-                ->limit(50)
-                ->get()
-                ->map(function ($review) {
-                    $photos = $review->photos ? json_decode($review->photos, true) : [];
-                    $review->photos = array_map(function ($photo) {
-                        return asset('uploads/review/photos/' . $photo);
-                    }, is_array($photos) ? $photos : []);
-                    return $review;
-                });
 
-            $pageLayout[] = [
-                'type' => 'reviews_section',
-                'data' => [
-                    'total_reviews' => (int) $service->reviews,
-                    'average_rating' => (string) $service->rating,
-                    'reviews' => $customerReviewsQuery
-                ]
-            ];
 
             return $this->sendResponse(
                 ['page_layout' => $pageLayout],

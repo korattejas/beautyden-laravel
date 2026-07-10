@@ -858,6 +858,30 @@
     </div>
 </div>
 
+<!-- Appointment Review Modal -->
+<div id="c-viewReviewModal" class="c-modal">
+    <div class="c-modal-dialog" style="max-width: 850px;">
+        <div class="c-modal-content">
+            <!-- Header -->
+            <div class="c-modal-header" style="background: linear-gradient(135deg, #102365 0%, #1a4a7a 100%); padding: 20px 24px; border: none;">
+                <h5 class="c-modal-title" style="margin:0; color:#fff;">
+                    <i class="bi bi-star-fill text-warning"></i> Customer Feedback
+                </h5>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <button class="c-close-btn" data-c-close-review style="color:#fff;">&times;</button>
+                </div>
+            </div>
+            <!-- Body -->
+            <div class="c-modal-body" id="c-appointment-review-details" style="background: #fdfdfd; padding: 25px;">
+                <div class="c-loader">
+                    <div class="c-spinner"></div>
+                    <span>Loading Review...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('footer_script_content')
@@ -1572,6 +1596,95 @@
                 viewAppointment(data.id);
             }
         }
+    });
+
+    $(document).on('click', '.btn-view-appointment-review', function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+
+        $("#c-viewReviewModal").addClass("show");
+        $("#c-appointment-review-details").html(
+            `<div class="c-loader"><div class="c-spinner"></div><span>Loading Review...</span></div>`
+        );
+
+        $.ajax({
+            url: "{{ url('admin/appointments-review-view') }}/" + id,
+            method: 'GET',
+            success: function(response) {
+                let data = response.data;
+                
+                let categoriesHtml = data.category_ratings.map(cat => `
+                    <div class="info-item" style="padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
+                        <div class="info-icon" style="background: rgba(115, 103, 240, 0.2);"><i class="bi bi-tags"></i></div>
+                        <div class="info-content" style="flex:1; display:flex; justify-content:space-between; align-items:center;">
+                            <label style="margin:0;">${cat.category_name}</label>
+                            <div style="font-weight: 800; color: #111827;">
+                                ${cat.rating} <i class="bi bi-star-fill text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                let html = `
+                    <div class="row">
+                        <!-- Overall Feedback Card -->
+                        <div class="col-md-6 mb-3">
+                            <div class="detail-section-label">
+                                <i class="bi bi-chat-quote-fill"></i> Overall Feedback
+                            </div>
+                            <div class="detail-info-card" style="border-left: 4px solid #7367f0; height: 100%;">
+                                <div style="display:flex; align-items:center; margin-bottom: 15px;">
+                                    <h2 style="margin: 0; font-weight: 800; color: #111827; margin-right: 15px; font-size: 2.5rem;">${data.overall_rating} <span style="font-size: 1rem; color: #9ca3af;">/ 5</span></h2>
+                                    <div>
+                                        ${[...Array(5)].map((_, i) => `<i class="bi bi-star-fill" style="color: ${i < data.overall_rating ? '#fbbf24' : '#e5e7eb'}; font-size: 1.2rem; margin-right: 2px;"></i>`).join('')}
+                                    </div>
+                                </div>
+                                <div style="font-size: 0.95rem; color: #374151; font-style: italic; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                    "${data.review ?? 'No written feedback provided.'}"
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category Ratings Card -->
+                        <div class="col-md-6 mb-3">
+                            <div class="detail-section-label">
+                                <i class="bi bi-ui-checks"></i> Category Ratings
+                            </div>
+                            <div class="detail-info-card" style="height: 100%;">
+                                ${categoriesHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (data.photos && data.photos.length > 0) {
+                    html += `
+                        <div class="detail-section-label mt-3">
+                            <i class="bi bi-images"></i> Customer Photos
+                        </div>
+                        <div class="detail-info-card d-flex flex-wrap" style="gap: 15px;">
+                            ${data.photos.map(photo => `
+                                <div style="border: 2px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#7367f0'" onmouseout="this.style.borderColor='#e2e8f0'" onclick="window.open('${photo}', '_blank')">
+                                    <img src="${photo}" style="width: 110px; height: 110px; object-fit: cover;">
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                $("#c-appointment-review-details").html(html);
+            },
+            error: function(xhr) {
+                let msg = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'Failed to load review data.';
+                $("#c-appointment-review-details").html(
+                    `<div class="text-center py-5 text-danger"><i class="bi bi-exclamation-circle fs-1 mb-2"></i><p>${msg}</p></div>`
+                );
+            }
+        });
+    });
+
+    $(document).on("click", "[data-c-close-review]", function() {
+        $("#c-viewReviewModal").removeClass("show");
     });
 
     function viewAppointment(id) {

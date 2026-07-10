@@ -126,7 +126,13 @@
         const sweetalert_change_priority_status = "Change Popular Status of Review";
 
         const form_url = '/reviews';
-        datatable_url = '/getDataReviews';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const appointmentId = urlParams.get('appointment_id');
+        var datatable_url = '/getDataReviews';
+        if (appointmentId) {
+            datatable_url += '?appointment_id=' + appointmentId;
+        }
 
         $.extend(true, $.fn.dataTable.defaults, {
             pageLength: 100,
@@ -233,8 +239,8 @@
                                 <div class="c-detail-card">
                                     <label>Review Photos</label><br>
                                     ${
-                                        data.photos 
-                                        ? JSON.parse(data.photos).map(photo => 
+                                        (data.photos && (Array.isArray(data.photos) ? data.photos.length > 0 : true)) 
+                                        ? (typeof data.photos === 'string' ? JSON.parse(data.photos) : data.photos).map(photo => 
                                             `<img src="${baseUrlCustomerPhotos + photo}" style="max-width:120px; margin:5px; cursor:pointer;" onclick="window.open('${baseUrlCustomerPhotos + photo}', '_blank')">`
                                           ).join("") 
                                         : '<p>-</p>'

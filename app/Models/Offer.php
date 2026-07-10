@@ -11,9 +11,11 @@ class Offer extends Model
 
     protected $fillable = [
         'title',
+        'offer_short_description',
         'position',
         'media_type',
         'media',
+        'video_thumbnail',
         'link',
         'priority',
         'status',

@@ -95,6 +95,10 @@ class CustomerReviewController extends Controller
                     $reviews->where('customer_reviews.status', $request->status);
                 }
 
+                if ($request->appointment_id) {
+                    $reviews->where('customer_reviews.appointment_id', $request->appointment_id);
+                }
+
                 if ($request->popular !== null && $request->popular !== '') {
                     $reviews->where('customer_reviews.is_popular', $request->popular);
                 }

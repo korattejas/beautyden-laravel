@@ -380,7 +380,7 @@ class BeauticianController extends Controller
                 ->havingRaw('COUNT(id) > 1')
                 ->pluck('phone');
 
-            $repeatCustomersCount = $repeatPhones->count();
+            $repeatCustomersCount = $repeatPhones->count(); // Used for percentage calculation below
 
             $totalUniqueCustomersCount = (clone $baseQuery)->distinct('phone')->count('phone');
             $repeatCustomersPercentage = $totalUniqueCustomersCount > 0 
@@ -429,6 +429,8 @@ class BeauticianController extends Controller
                         'payment_type' => $appointment->payment_type,
                     ];
                 });
+
+            $repeatCustomersCount = $repeatCustomersList->count();
 
             $data = [
                 'beautician_name' => $teamMember->name,

@@ -395,6 +395,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('appointments/update-amount', [AppointmentsController::class, 'updateAmount'])->name('admin.appointments.updateAmount');
         Route::post('appointments/update-payment-type', [AppointmentsController::class, 'updatePaymentType'])->name('admin.appointments.updatePaymentType');
         Route::get('appointments-view/{id}', [AppointmentsController::class, 'view']);
+        Route::get('appointments-review-view/{id}', [AppointmentsController::class, 'viewReview']);
         Route::get('appointments/get-appoinmentSubcategories/{categoryId}', [AppointmentsController::class, 'getSubcategories']);
         Route::get('appointments/{id}/pdf', [AppointmentsController::class, 'downloadPdf'])
             ->name('admin.appointments.pdf');

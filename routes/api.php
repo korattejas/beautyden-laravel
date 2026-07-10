@@ -60,6 +60,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::post('serviceVariantDetails', [ServiceMasterController::class, 'getServiceVariantDetails']);
+        Route::post('categoryReviews', [ReviewApiController::class, 'getCategoryReviews']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
         Route::post('testFast2Sms', [AuthenticationController::class, 'testFast2Sms']);
         Route::get('categoryLookbook', [CategoryLookbookController::class, 'getCategoryLookbooks']);
@@ -83,6 +84,8 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
+        Route::post("getAppointmentReview", [ReviewApiController::class, "getAppointmentReview"]);
+        Route::post("getAppointmentSummaryForReview", [ReviewApiController::class, "getAppointmentSummaryForReview"]);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
     });
@@ -173,6 +176,7 @@ Route::middleware([])->group(function () {
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::post('serviceVariantDetails', [ServiceMasterController::class, 'getServiceVariantDetails']);
+        Route::post('categoryReviews', [ReviewApiController::class, 'getCategoryReviews']);
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
         Route::post('testFast2Sms', [AuthenticationController::class, 'testFast2Sms']);
         Route::get('categoryLookbook', [CategoryLookbookController::class, 'getCategoryLookbooks']);
@@ -195,6 +199,8 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
+        Route::post("getAppointmentReview", [ReviewApiController::class, "getAppointmentReview"]);
+        Route::post("getAppointmentSummaryForReview", [ReviewApiController::class, "getAppointmentSummaryForReview"]);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
     });

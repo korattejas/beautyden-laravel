@@ -43,6 +43,14 @@
                                             </div>
                                         </div>
 
+                                        <div class="col-md-6 mt-2">
+                                            <div class="form-group">
+                                                <label>Short Description (Optional)</label>
+                                                <input type="text" name="offer_short_description" class="form-control" placeholder="e.g. valid till this weekend">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
                                         <div class="col-md-3 mt-2">
                                             <div class="form-group">
                                                 <label>Display Position</label>
@@ -115,6 +123,14 @@
                                             </div>
                                         </div>
 
+                                        <div class="col-12 mt-2" id="video-thumbnail-wrapper" style="display: none;">
+                                            <div class="form-group">
+                                                <label>Video Thumbnail Image (Optional)</label>
+                                                <input type="file" class="filepond-thumbnail">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
                                         <div class="col-12">
                                             <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">
                                                 <div>
@@ -153,13 +169,21 @@
             allowProcess: false,
         });
 
+        const thumbnailPond = FilePond.create(document.querySelector('.filepond-thumbnail'), {
+            allowMultiple: false,
+            instantUpload: false,
+            allowProcess: false,
+        });
+
         $('input[name="media_type"]').on('change', function() {
             if ($(this).val() === 'video') {
                 $('#image-upload-wrapper').hide();
                 $('#video-upload-wrapper').show();
+                $('#video-thumbnail-wrapper').show();
             } else {
                 $('#image-upload-wrapper').show();
                 $('#video-upload-wrapper').hide();
+                $('#video-thumbnail-wrapper').hide();
             }
         });
 
@@ -179,6 +203,9 @@
                 } else {
                     if (videoPond.getFiles().length > 0) {
                         formData.append('icon', videoPond.getFiles()[0].file);
+                    }
+                    if (thumbnailPond.getFiles().length > 0) {
+                        formData.append('video_thumbnail', thumbnailPond.getFiles()[0].file);
                     }
                 }
 

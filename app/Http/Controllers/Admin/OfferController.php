@@ -84,6 +84,7 @@ class OfferController extends Controller
                     $validateArray['photos.*'] = 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120';
                 } else {
                     $validateArray['icon'] = 'required|mimetypes:video/mp4,video/quicktime,video/x-realaudio,video/x-msvideo,video/x-ms-wmv|max:20480';
+                    $validateArray['video_thumbnail'] = 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120';
                 }
             } else {
                 if ($request->media_type == 'image') {
@@ -94,6 +95,9 @@ class OfferController extends Controller
                 } else {
                     if ($request->hasFile('icon')) {
                         $validateArray['icon'] = 'mimetypes:video/mp4,video/quicktime,video/x-realaudio,video/x-msvideo,video/x-ms-wmv|max:20480';
+                    }
+                    if ($request->hasFile('video_thumbnail')) {
+                        $validateArray['video_thumbnail'] = 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120';
                     }
                 }
             }
@@ -116,6 +120,11 @@ class OfferController extends Controller
                 }
             }
 
+            $videoThumbnail = null;
+            if ($id !== 0 && $offer) {
+                $videoThumbnail = $offer->video_thumbnail;
+            }
+
             if ($request->media_type == 'image') {
                 if ($request->hasFile('photos')) {
                     foreach ($request->file('photos') as $photo) {
@@ -136,13 +145,23 @@ class OfferController extends Controller
                     $filename = ImageUploadHelper::OfferVideoUpload($request->file('icon'));
                     $storedMedia = [$filename];
                 }
+                
+                if ($request->hasFile('video_thumbnail')) {
+                    if ($id !== 0 && $offer->media_type == 'video' && $offer->video_thumbnail) {
+                        $oldPath = public_path('uploads/offers/images/' . $offer->video_thumbnail);
+                        if (File::exists($oldPath)) File::delete($oldPath);
+                    }
+                    $videoThumbnail = ImageUploadHelper::OfferImageUpload($request->file('video_thumbnail'));
+                }
             }
 
             $data = [
                 'title'   => $request->title,
+                'offer_short_description' => $request->offer_short_description,
                 'position' => $request->position,
                 'media_type' => $request->media_type,
                 'media' => !empty($storedMedia) ? $storedMedia : null,
+                'video_thumbnail' => $videoThumbnail,
                 'link' => $request->link,
                 'priority' => (int) $request->input('priority', 0),
                 'status' => (int) $request->input('status', 1),

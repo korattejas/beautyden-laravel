@@ -1304,23 +1304,46 @@
                 <span class="badge auth">Token Required</span>
             </div>
             <p>Returns summary list of all previous and upcoming appointments for the user.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>year</td>
+                        <td>String/Integer</td>
+                        <td>Optional. To filter bookings by year (e.g. "2026").</td>
+                    </tr>
+                </tbody>
+            </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
 <code>{
     "code": 200,
     "status": true,
     "message": "All booking details fetched successfully.",
-    "data": [
-        {
-            "id": 12,
-            "order_number": "ORD-12345",
-            "appointment_date": "2026-05-01",
-            "appointment_time": "10:30 AM",
-            "city_name": "Ahmedabad",
-            "total_services": 2,
-            "assigned_beautician": "Sara Ali"
-        }
-    ]
+    "data": {
+        "total_completed": 8,
+        "total_pending": 4,
+        "total_assigned": 1,
+        "total_rejected": 8,
+        "bookings": [
+            {
+                "id": 12,
+                "order_number": "ORD-12345",
+                "status": 3,
+                "appointment_date": "2026-05-01",
+                "appointment_time": "10:30 AM",
+                "city_name": "Ahmedabad",
+                "total_services": 2,
+                "assigned_beautician": "Sara Ali"
+            }
+        ]
+    }
 }</code></pre>
 
             <h3>Get Booking Details</h3>
@@ -1358,6 +1381,14 @@
         "status": 1,
         "total_amount": "2500.00",
         "assigned_beautician": "Sara Ali",
+        "booked_on": "Fri, 01 May 2026 - 10:30 AM",
+        "beautician_details": {
+            "name": "Sara Ali",
+            "id_number": "BC-102",
+            "role": "Senior Beautician",
+            "experience_years": 5,
+            "photo": "https://domain.com/uploads/team-members/avatar.png"
+        },
         "service_data": {
             "client": { "name": "Tejas", "mobile": "6352755075" },
             "services": [ { "name": "Deep Tissue Massage", "price": "1500" } ],
@@ -1737,6 +1768,11 @@
                         <td><strong>Required</strong>. ID of the completed appointment.</td>
                     </tr>
                     <tr>
+                        <td>overall_rating</td>
+                        <td>Numeric</td>
+                        <td><strong>Required</strong>. Overall rating for the appointment (1 to 5).</td>
+                    </tr>
+                    <tr>
                         <td>category_ratings[]</td>
                         <td>Array of Objects</td>
                         <td><strong>Required</strong>. Array containing `category_id` and `rating` (1 to 5) for each
@@ -1745,7 +1781,7 @@
                     <tr>
                         <td>review</td>
                         <td>String</td>
-                        <td><strong>Required</strong>. Customer's feedback text.</td>
+                        <td>Optional. Customer's feedback text.</td>
                     </tr>
                     <tr>
                         <td>photos[]</td>
@@ -1769,12 +1805,128 @@
             "service_id": 0,
             "customer_name": "Tejas",
             "rating": "5",
+            "overall_rating": "5",
             "review": "Excellent service!",
             "review_date": "2026-05-14",
             "photos": ["1715690000_65535.jpg"],
             "status": 0
         }
     ]
+}</code></pre>
+
+            <h3>Get Appointment Review</h3>
+            <p>Fetches the submitted review for a specific appointment. Use this for the read-only 'View Review' screen.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/getAppointmentReview
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. ID of the completed appointment.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Review details fetched successfully.",
+    "data": {
+        "appointment_id": 101,
+        "appointment_summary": {
+            "appointment_date": "12 Nov, 2025",
+            "appointment_time": "12:30 PM",
+            "order_number": "#BDZ1BWLPID",
+            "status_text": "Completed",
+            "total_services": 1,
+            "assigned_beautician_name": "Rajveer Chauhan",
+            "booked_on": "Wed, 12 Nov 2025 - 04:13 AM",
+            "payment_mode": "Cash",
+            "beautician_details": {
+                "name": "Rajveer Chauhan",
+                "id_number": "BC-101",
+                "role": "Beautician",
+                "experience_years": 8,
+                "photo": "https://domain.com/uploads/team-members/avatar.png"
+            }
+        },
+        "overall_rating": 5,
+        "review": "Excellent service!",
+        "photos": [
+            "https://domain.com/uploads/review/photos/1715690000_65535.jpg"
+        ],
+        "category_ratings": [
+            {
+                "category_id": 16,
+                "category_name": "Waxing",
+                "rating": 5
+            },
+            {
+                "category_id": 17,
+                "category_name": "Facial",
+                "rating": 4
+            }
+        ]
+    }
+    }
+}</code></pre>
+
+            <h3>Get Appointment Summary For Review</h3>
+            <p>Fetches the top section summary details required for the 'Write a Review' screen.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/getAppointmentSummaryForReview
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. ID of the completed appointment.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Appointment summary fetched successfully.",
+    "data": {
+        "appointment_date": "12 Nov, 2025",
+        "appointment_time": "12:30 PM",
+        "order_number": "#BDZ1BWLPID",
+        "status_text": "Completed",
+        "total_services": 1,
+        "assigned_beautician_name": "Rajveer Chauhan",
+        "booked_on": "Wed, 12 Nov 2025 - 04:13 AM",
+        "payment_mode": "Cash",
+        "beautician_details": {
+            "name": "Rajveer Chauhan",
+            "id_number": "BC-101",
+            "role": "Beautician",
+            "experience_years": 8,
+            "photo": "https://domain.com/uploads/team-members/avatar.png"
+        }
+    }
 }</code></pre>
         </section>
 
@@ -1863,6 +2015,61 @@
         "per_page": 9
     }
 }</code></pre>
+        </section>
+
+        
+            <hr>
+            <h3>Get Category Reviews</h3>
+            <p>Fetches a list of public, active reviews for a specific service category. This endpoint is public and does not require authentication.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/categoryReviews
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>category_id</code></td>
+                        <td>Integer</td>
+                        <td><span class="text-danger fw-bold">Yes</span></td>
+                        <td>The ID of the category.</td>
+                    </tr>
+                    <tr>
+                        <td><code>limit</code></td>
+                        <td>Integer</td>
+                        <td>No</td>
+                        <td>Number of reviews to fetch (default: 50).</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "success": true,
+    "data": {
+        "total_reviews": 12,
+        "average_rating": "4.8",
+        "reviews": [
+            {
+                "id": 15,
+                "customer_name": "Riya Patel",
+                "customer_photo": "https://beautyden.com/uploads/review/customer-photos/photo.jpg",
+                "rating": 5,
+                "review": "The waxing service was very smooth and painless.",
+                "review_date": "2026-07-10"
+            }
+        ]
+    },
+    "message": "Category reviews retrieved successfully"
+}</code>
+            </pre>
+
         </section>
 
         <section id="config">

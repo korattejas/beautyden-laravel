@@ -241,6 +241,67 @@ class AppointmentsController extends Controller
         }
     }
 
+    public function viewReview($id)
+    {
+        try {
+            $reviews = \App\Models\CustomerReview::query()
+                ->leftJoin('service_categories as sc', 'sc.id', '=', 'customer_reviews.category_id')
+                ->where('customer_reviews.appointment_id', $id)
+                ->select('customer_reviews.*', 'sc.name as category_name')
+                ->get();
+
+            if ($reviews->isEmpty()) {
+                return response()->json(['error' => 'No review found for this appointment.'], 404);
+            }
+
+            $firstReview = $reviews->first();
+            $photos = $firstReview->photos ? (is_string($firstReview->photos) ? json_decode($firstReview->photos, true) : $firstReview->photos) : [];
+            if (!is_array($photos)) $photos = [];
+            $fullPhotoUrls = array_map(function ($photo) {
+                return asset('uploads/review/photos/' . $photo);
+            }, $photos);
+
+            $categoryRatings = $reviews->map(function ($review) {
+                return [
+                    'category_id' => $review->category_id,
+                    'category_name' => $review->category_name,
+                    'rating' => (float) $review->rating,
+                ];
+            });
+
+            // Re-use logic for beautician
+            $appointment = Appointment::find($id);
+            $beautician = null;
+            if ($appointment && !empty($appointment->assigned_to)) {
+                $assignedIds = explode(',', $appointment->assigned_to);
+                $firstBeautician = \App\Models\TeamMember::find($assignedIds[0]);
+                if ($firstBeautician) {
+                    $beautician = [
+                        'name' => $firstBeautician->name,
+                        'role' => $firstBeautician->role ?? 'Beautician',
+                        'photo' => $firstBeautician->icon ? asset('uploads/team-members/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
+                    ];
+                }
+            }
+
+            $data = [
+                'appointment_id' => $firstReview->appointment_id,
+                'overall_rating' => (float) $firstReview->overall_rating,
+                'review' => $firstReview->review,
+                'photos' => $fullPhotoUrls,
+                'category_ratings' => $categoryRatings,
+                'beautician' => $beautician,
+                'created_at' => $firstReview->created_at ? new \DateTime($firstReview->created_at) : null,
+                'customer_name' => $firstReview->customer_name
+            ];
+
+            return response()->json(['data' => $data], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     public function getDataAppointments(Request $request)
     {
         $function_name = 'getDataAppointments';
@@ -427,6 +488,7 @@ class AppointmentsController extends Controller
                             'view_id' => $appointment->id,
                             'pdf_id' => $appointment->id,
                             'current_members' => $appointment->assigned_to,
+                            'review_appointment_id' => $appointment->status == 3 ? $appointment->id : null,
                         ];
                         return view('admin.render-view.datable-action', [
                             'action_array' => $action_array

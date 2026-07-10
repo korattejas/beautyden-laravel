@@ -495,7 +495,7 @@ class AuthenticationController extends Controller
 
             $mobile_number = $authUser->mobile_number;
 
-            $appointments = Appointment::leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+            $query = Appointment::leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
                 ->select(
                     'appointments.id',
                     'appointments.order_number',
@@ -506,13 +506,18 @@ class AuthenticationController extends Controller
                     'appointments.assigned_to',
                     'ct.name as city_name'
                 )
-                ->where('appointments.phone', $mobile_number)
-                ->orderByDesc('appointments.id')
-                ->get();
+                ->where('appointments.phone', $mobile_number);
 
-            if ($appointments->isEmpty()) {
-                return $this->sendError('No bookings found for this user.', 404);
+            if ($request->has('year') && !empty($request->year)) {
+                $query->whereYear('appointments.appointment_date', $request->year);
             }
+
+            $appointments = $query->orderByDesc('appointments.id')->get();
+
+            $totalCompleted = $appointments->where('status', 3)->count();
+            $totalPending = $appointments->where('status', 1)->count();
+            $totalAssigned = $appointments->where('status', 2)->count();
+            $totalRejected = $appointments->where('status', 4)->count();
 
             $allAssignedIds = [];
             foreach ($appointments as $app) {
@@ -524,7 +529,7 @@ class AuthenticationController extends Controller
             $allAssignedIds = array_unique($allAssignedIds);
             $teamMembers = \App\Models\TeamMember::whereIn('id', $allAssignedIds)->pluck('name', 'id')->toArray();
 
-            $data = $appointments->map(function ($appointment) use ($teamMembers) {
+            $dataList = $appointments->map(function ($appointment) use ($teamMembers) {
                 $serviceIds = $appointment->service_id ? explode(',', $appointment->service_id) : [];
                 $totalServices = count(array_filter($serviceIds));
 
@@ -552,7 +557,15 @@ class AuthenticationController extends Controller
                 ];
             });
 
-            return $this->sendResponse($data, 'All booking details fetched successfully.', $this->success_status);
+            $responseData = [
+                'total_completed' => $totalCompleted,
+                'total_pending'   => $totalPending,
+                'total_assigned'  => $totalAssigned,
+                'total_rejected'  => $totalRejected,
+                'bookings'        => $dataList,
+            ];
+
+            return $this->sendResponse($responseData, 'All booking details fetched successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
@@ -600,10 +613,22 @@ class AuthenticationController extends Controller
             $servicesData = $appointment->services_data ? json_decode($appointment->services_data, true) : null;
 
             $beauticianNames = null;
+            $beauticianDetails = null;
             if (!empty($appointment->assigned_to)) {
                 $assignedIds = explode(',', $appointment->assigned_to);
                 $names = \App\Models\TeamMember::whereIn('id', $assignedIds)->pluck('name')->toArray();
                 $beauticianNames = implode(', ', $names);
+
+                $firstBeautician = \App\Models\TeamMember::find($assignedIds[0]);
+                if ($firstBeautician) {
+                    $beauticianDetails = [
+                        'name' => $firstBeautician->name,
+                        'id_number' => $firstBeautician->id_number,
+                        'role' => $firstBeautician->role ?? 'Beautician',
+                        'experience_years' => $firstBeautician->experience_years,
+                        'photo' => $firstBeautician->icon ? asset('uploads/team-members/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
+                    ];
+                }
             }
 
             $data = [
@@ -613,8 +638,10 @@ class AuthenticationController extends Controller
                 'company_amount'         => $appointment->company_amount,
                 'city_name'              => $appointment->city_name,
                 'assigned_beautician'    => $beauticianNames,
+                'beautician_details'     => $beauticianDetails,
                 'special_notes'          => $appointment->special_notes,
                 'booking_details'        => $servicesData, // This contains client, appointment, services, and summary
+                'booked_on'              => date('D, d M Y - h:i A', strtotime($appointment->created_at)),
                 'created_at'             => $appointment->created_at,
                 'updated_at'             => $appointment->updated_at,
             ];

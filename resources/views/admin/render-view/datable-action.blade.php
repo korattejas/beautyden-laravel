@@ -42,6 +42,13 @@
                 </a>
             @endif
 
+            @if (isset($action_array['review_appointment_id']) && $action_array['review_appointment_id'])
+                <button type="button" class="dropdown-item btn-view-appointment-review d-flex align-items-center py-50" data-id="{{ $action_array['review_appointment_id'] }}">
+                    <i class="bi bi-star-fill me-1 text-warning"></i>
+                    <span>View Reviews</span>
+                </button>
+            @endif
+
             <div class="dropdown-divider"></div>
 
             @if (isset($action_array['delete_id']))
