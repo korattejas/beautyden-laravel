@@ -83,6 +83,14 @@
                                             </div>
                                         </div>
 
+                                        <div class="col-md-6 mt-2">
+                                            <div class="form-group">
+                                                <label>Short Description (Optional)</label>
+                                                <input type="text" name="offer_short_description" class="form-control" value="{{ $offer->offer_short_description }}" placeholder="e.g. valid till this weekend">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
                                         <div class="col-md-3 mt-2">
                                             <div class="form-group">
                                                 <label>Display Position</label>
@@ -158,6 +166,14 @@
                                                         </div>
                                                     @endforeach
                                                 @endif
+                                                @if($offer->media_type == 'video' && $offer->video_thumbnail)
+                                                    <div class="col-md-2 col-4" id="thumbnail-asset">
+                                                        <div class="asset-item">
+                                                            <div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.5);color:#fff;font-size:10px;padding:2px 4px;border-radius:4px;z-index:2;">Thumb</div>
+                                                            <img src="{{ asset('uploads/offers/images/'.$offer->video_thumbnail) }}" alt="Video Thumbnail">
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -173,6 +189,14 @@
                                             <div class="form-group">
                                                 <label>Replace Video</label>
                                                 <input type="file" class="filepond-single">
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 mt-2" id="video-thumbnail-wrapper" style="{{ $offer->media_type == 'video' ? '' : 'display:none' }}">
+                                            <div class="form-group">
+                                                <label>Replace Video Thumbnail Image (Optional)</label>
+                                                <input type="file" class="filepond-thumbnail">
                                                 <div class="valid-feedback"></div>
                                             </div>
                                         </div>
@@ -215,13 +239,21 @@
             allowProcess: false,
         });
 
+        const thumbnailPond = FilePond.create(document.querySelector('.filepond-thumbnail'), {
+            allowMultiple: false,
+            instantUpload: false,
+            allowProcess: false,
+        });
+
         $('input[name="media_type"]').on('change', function() {
             if ($(this).val() === 'video') {
                 $('#image-upload-wrapper').hide();
                 $('#video-upload-wrapper').show();
+                $('#video-thumbnail-wrapper').show();
             } else {
                 $('#image-upload-wrapper').show();
                 $('#video-upload-wrapper').hide();
+                $('#video-thumbnail-wrapper').hide();
             }
         });
 
@@ -241,6 +273,9 @@
                 } else {
                     if (videoPond.getFiles().length > 0) {
                         formData.append('icon', videoPond.getFiles()[0].file);
+                    }
+                    if (thumbnailPond.getFiles().length > 0) {
+                        formData.append('video_thumbnail', thumbnailPond.getFiles()[0].file);
                     }
                 }
 

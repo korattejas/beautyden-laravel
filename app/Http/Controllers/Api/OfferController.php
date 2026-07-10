@@ -51,6 +51,11 @@ class OfferController extends Controller
                     }
                 }
                 $offer->media_urls = $media;
+                if ($offer->video_thumbnail) {
+                    $offer->video_thumbnail_url = asset('uploads/offers/images/' . $offer->video_thumbnail);
+                } else {
+                    $offer->video_thumbnail_url = null;
+                }
                 return $offer;
             });
 
