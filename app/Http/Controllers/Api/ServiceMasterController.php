@@ -467,61 +467,42 @@ class ServiceMasterController extends Controller
                 ->get();
 
             $relatedServiceIdsWithVariants = $relatedServices->where('has_variants', 1)->pluck('id')->toArray();
-            $relVariants = collect();
             $relVariantPrices = collect();
 
             if (!empty($relatedServiceIdsWithVariants)) {
-                $relVariants = \App\Models\ServiceMasterVariant::whereIn('service_master_id', $relatedServiceIdsWithVariants)
-                    ->get()
-                    ->groupBy('service_master_id');
-                    
                 $relVariantPrices = \App\Models\ServiceCityVariantPrice::whereIn('service_master_id', $relatedServiceIdsWithVariants)
                     ->where('city_id', $cityId)
+                    ->where('is_available', 1)
                     ->get()
                     ->groupBy('service_master_id');
             }
 
-            $relatedServices = $relatedServices->map(function ($item) use ($catStats, $relVariants, $relVariantPrices) {
+            $relatedServices = $relatedServices->map(function ($item) use ($catStats, $relVariantPrices) {
                 $item->is_popular = (int) $item->is_popular;
                 $item->rating = (string) $catStats['rating'];
                 $item->reviews = (string) $catStats['reviews'];
                 $item->has_variants = (int) $item->has_variants;
                 
                 if ($item->has_variants == 1) {
-                    $serviceVariants = $relVariants->get($item->id, collect());
-                    $serviceVariantPrices = $relVariantPrices->get($item->id, collect())->keyBy('variant_id');
+                    $cityPrices = $relVariantPrices->get($item->id, collect());
 
-                    $availableVariants = [];
-                    foreach ($serviceVariants as $variant) {
-                        if ($serviceVariantPrices->has($variant->id)) {
-                            $priceData = $serviceVariantPrices->get($variant->id);
-                            if ($priceData->is_available == 0) continue;
-                            
-                            $variant->price = (int) $priceData->price;
-                            $variant->discount_price = (int) round($priceData->price + ($priceData->price * $priceData->discount_price / 100));
-                            $variant->discount_percentage = (int) $priceData->discount_price;
+                    if ($cityPrices->isNotEmpty()) {
+                        $item->starts_at = (int) $cityPrices->min('price');
+                        $item->total_option = $cityPrices->count();
+                    } else {
+                        // Fallback to db
+                        $dbVariants = \App\Models\ServiceMasterVariant::where('service_master_id', $item->id)->get();
+                        if ($dbVariants->isNotEmpty()) {
+                            $item->starts_at = (int) $dbVariants->min('price');
+                            $item->total_option = $dbVariants->count();
                         } else {
-                            $variant->price = 0;
-                            $variant->discount_price = 0;
-                            $variant->discount_percentage = 0;
+                            $item->has_variants = 0;
                         }
-
-                        $variant->thumbnail_image = $variant->thumbnail_image
-                            ? asset('uploads/service-variant/' . $variant->thumbnail_image)
-                            : null;
-
-                        $variant->description = $variant->description ?? null;
-                        $variant->rating = (string) $catStats['rating'];
-                        $variant->reviews = (string) $catStats['reviews'];
-
-                        $availableVariants[] = $variant;
                     }
                     
-                    if (!empty($availableVariants)) {
-                        $item->starts_at = collect($availableVariants)->min('price') ?? 0;
-                        $item->total_option = count($availableVariants);
-                        $item->variants = $availableVariants;
+                    if ($item->has_variants == 1) {
                         unset($item->price, $item->discount_price, $item->discount_percentage, $item->duration);
+                    }
                     } else {
                         $item->has_variants = 0;
                         $item->price = (int) $item->price;

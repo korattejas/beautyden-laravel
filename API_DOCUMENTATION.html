@@ -954,12 +954,17 @@
                     <tr>
                         <td>service_id</td>
                         <td>Integer</td>
-                        <td>Required. The Service ID</td>
+                        <td><strong>Required.</strong> The Service ID</td>
                     </tr>
                     <tr>
                         <td>city_id</td>
                         <td>Integer</td>
-                        <td>Required. For city-specific pricing</td>
+                        <td><strong>Required.</strong> For city-specific pricing</td>
+                    </tr>
+                    <tr>
+                        <td>variant_id</td>
+                        <td>Integer</td>
+                        <td>Optional. If passed, the API will override the main service's price, duration, and icon with this specific variant's details and will <strong>remove</strong> the variants array (returning a single unified object).</td>
                     </tr>
                 </tbody>
             </table>
