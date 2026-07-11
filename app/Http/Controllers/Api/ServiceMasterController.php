@@ -554,7 +554,8 @@ class ServiceMasterController extends Controller
                 'data' => $serviceInfoData
             ];
 
-            // 2. Filter Section (Currently for Facial)
+            // 2. Filter Section (Currently for Facial) - Removed as per request
+            /*
             if (strtolower($service->category_name) == 'facial') {
                 // Optimized: Fetch both names and skin_types in a single query
                 $categoryServices = \App\Models\ServiceMaster::where('category_id', $service->category_id)
@@ -590,6 +591,7 @@ class ServiceMasterController extends Controller
                     ]
                 ];
             }
+            */
 
             // 3. Banner Section
             if (!empty($service->banner_media) && count($service->banner_media) > 0) {
