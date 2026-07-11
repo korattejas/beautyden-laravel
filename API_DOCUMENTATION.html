@@ -2101,6 +2101,144 @@
     ]
 }</code></pre>
         </section>
+
+        <section id="cart">
+            <h2><i class="bi bi-cart text-primary"></i> 13. Cart APIs (Customer)</h2>
+            <div class="note" style="margin: 10px 0; background: #fff3cd; border-left-color: #ffc107; padding: 15px; border-radius: 8px;">
+                <i class="bi bi-exclamation-triangle-fill text-warning"></i> <strong>Auth Note:</strong> All Cart APIs require the JWT token in the Authorization header.
+            </div>
+
+            <h3>13.1 Add to Cart</h3>
+            <p>Adds a service or variant to the customer's cart.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/cart/add
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>service_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. The main service ID.</td>
+                    </tr>
+                    <tr>
+                        <td>variant_id</td>
+                        <td>Integer / Null</td>
+                        <td>Optional (<strong>Required</strong> if the service has variants).</td>
+                    </tr>
+                    <tr>
+                        <td>qty</td>
+                        <td>Integer</td>
+                        <td>Optional. Default is 1. Number of items to add.</td>
+                    </tr>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. Current city ID.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Item added to cart successfully",
+    "data": []
+}</code></pre>
+
+            <h3>13.2 Get Cart</h3>
+            <p>Retrieves the user's cart items, current live pricing, and bill summary.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/cart/get
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. To fetch the exact price for the current city.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Cart retrieved successfully",
+    "data": {
+        "cart_items": [
+            {
+                "cart_id": 1,
+                "service_id": 25,
+                "variant_id": 420,
+                "name": "Threading - Upperlips Threading",
+                "icon": "https://.../variant_6a2265f1a46a8.png",
+                "duration": "15 mins",
+                "qty": "2",
+                "price": 399,
+                "discount_price": 439,
+                "discount_percentage": 10
+            }
+        ],
+        "bill_summary": {
+            "sub_total": 798,
+            "total_discount": 80,
+            "final_amount": 798
+        }
+    }
+}</code></pre>
+
+            <h3>13.3 Update / Delete Cart Item</h3>
+            <p>Modifies the quantity of an item in the cart or removes it completely.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/cart/update
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>cart_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. ID of the cart record to update.</td>
+                    </tr>
+                    <tr>
+                        <td>action</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. Options: <code>increment</code>, <code>decrement</code>, <code>delete</code>.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    // Returns the exact same response as the "Get Cart" API after updating the item.
+}</code></pre>
+        </section>
+        
         <section id="beautician">
             <h2><i class="bi bi-scissors text-primary"></i> 13. Beautician Portal</h2>
 
