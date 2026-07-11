@@ -27,6 +27,8 @@ class ServiceMaster extends Model
         'is_popular',
         'has_variants',
         'status',
+        'catalog_lookbook',
+        'portfolio',
     ];
 
     protected $casts = [

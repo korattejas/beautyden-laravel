@@ -93,7 +93,9 @@ class ServiceMasterController extends Controller
                     DB::raw('IF(sm.icon LIKE "%.mp4" OR sm.icon LIKE "%.mov" OR sm.icon LIKE "%.avi" OR sm.icon LIKE "%.wmv", "video", "image") AS icon_type'),
                     'sm.is_popular',
                     'sm.has_variants',
-                    'sm.banner_media'
+                    'sm.banner_media',
+                    'sm.catalog_lookbook',
+                    'sm.portfolio'
                 )
                 ->where('scm.status', 1)
                 ->where('sm.status', 1);
@@ -163,6 +165,8 @@ class ServiceMasterController extends Controller
 
                 $service->is_popular = (int) $service->is_popular;
                 $service->has_variants = (int) $service->has_variants;
+                $service->catalog_lookbook = (int) $service->catalog_lookbook;
+                $service->portfolio = (int) $service->portfolio;
 
                 if (!isset($categoryStatsCache[$service->category_id])) {
                     $categoryStatsCache[$service->category_id] = $this->getCategoryReviewStats($service->category_id);
@@ -530,6 +534,8 @@ class ServiceMasterController extends Controller
                 'is_popular' => $service->is_popular,
                 'status' => $service->status,
                 'has_variants' => $service->has_variants,
+                'catalog_lookbook' => (int) $service->catalog_lookbook,
+                'portfolio' => (int) $service->portfolio,
             ];
 
             if ($service->has_variants == 1 && !empty($service->variants)) {
@@ -800,6 +806,8 @@ class ServiceMasterController extends Controller
             $service->is_popular = (int) $service->is_popular;
             $service->has_variants = (int) $service->has_variants;
             $service->status = (int) $service->status;
+            $service->catalog_lookbook = (int) $service->catalog_lookbook;
+            $service->portfolio = (int) $service->portfolio;
 
             // Get related popular services in the same category
             $relatedServices = DB::table('service_city_masters as scm')

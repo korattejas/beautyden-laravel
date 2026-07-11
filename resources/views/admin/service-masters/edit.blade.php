@@ -93,6 +93,24 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="col-md-6 mb-1">
+                                        <label class="form-label">Catalog Lookbook</label>
+                                        <div class="form-check form-switch mt-50">
+                                            <input type="hidden" name="catalog_lookbook" value="0">
+                                            <input class="form-check-input" type="checkbox" name="catalog_lookbook" value="1" id="catalog_lookbook" {{ $service->catalog_lookbook ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold" for="catalog_lookbook">Show in App?</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-1">
+                                        <label class="form-label">Portfolio</label>
+                                        <div class="form-check form-switch mt-50">
+                                            <input type="hidden" name="portfolio" value="0">
+                                            <input class="form-check-input" type="checkbox" name="portfolio" value="1" id="portfolio" {{ $service->portfolio ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold" for="portfolio">Show in App?</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-6 mb-1"><label class="form-label">Rating</label><input type="number" step="0.1" name="rating" class="form-control" value="{{ $service->rating }}"></div>
                                     <div class="col-6 mb-1"><label class="form-label">Reviews</label><input type="number" name="reviews" class="form-control" value="{{ $service->reviews }}"></div>
                                 </div>

@@ -270,6 +270,8 @@ class ServiceMasterController extends Controller
                 'is_popular'          => (int) $request->is_popular,
                 'has_variants'        => (int) $request->has_variants,
                 'status'              => (int) $request->status,
+                'catalog_lookbook'    => (int) $request->catalog_lookbook,
+                'portfolio'           => (int) $request->portfolio,
             ];
 
             if ($id == 0) {
