@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\ReviewApiController;
 use App\Http\Controllers\Api\ServiceMasterController;
 use App\Http\Controllers\Api\AppSettingController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\CartController;
 
 
 Route::get('/user', function (Request $request) {
@@ -88,6 +89,11 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post("getAppointmentSummaryForReview", [ReviewApiController::class, "getAppointmentSummaryForReview"]);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
+        
+        // Cart Routes
+        Route::post('cart/add', [CartController::class, 'addToCart']);
+        Route::post('cart/get', [CartController::class, 'getCart']);
+        Route::post('cart/update', [CartController::class, 'updateCartItem']);
     });
 
 });
@@ -203,6 +209,11 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post("getAppointmentSummaryForReview", [ReviewApiController::class, "getAppointmentSummaryForReview"]);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
+        
+        // Cart Routes
+        Route::post('cart/add', [CartController::class, 'addToCart']);
+        Route::post('cart/get', [CartController::class, 'getCart']);
+        Route::post('cart/update', [CartController::class, 'updateCartItem']);
     });
 });
 
