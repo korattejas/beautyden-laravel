@@ -89,8 +89,6 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post("getAppointmentSummaryForReview", [ReviewApiController::class, "getAppointmentSummaryForReview"]);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
-        
-        // Cart Routes
         Route::post('cart/add', [CartController::class, 'addToCart']);
         Route::post('cart/get', [CartController::class, 'getCart']);
         Route::post('cart/update', [CartController::class, 'updateCartItem']);
@@ -209,8 +207,6 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post("getAppointmentSummaryForReview", [ReviewApiController::class, "getAppointmentSummaryForReview"]);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
-        
-        // Cart Routes
         Route::post('cart/add', [CartController::class, 'addToCart']);
         Route::post('cart/get', [CartController::class, 'getCart']);
         Route::post('cart/update', [CartController::class, 'updateCartItem']);

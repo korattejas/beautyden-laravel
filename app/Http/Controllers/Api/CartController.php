@@ -107,6 +107,8 @@ class CartController extends Controller
                 
                 $price = 0;
                 $discountPrice = 0;
+                $discountPercentage = 0;
+                $duration = null;
 
                 if ($item->variant_id) {
                     $variantPrice = ServiceCityVariantPrice::where('service_master_id', $item->service_master_id)
@@ -118,7 +120,9 @@ class CartController extends Controller
                     if ($variantPrice) {
                         $price = (int) $variantPrice->price;
                         $discountPrice = (int) round($price + ($price * $variantPrice->discount_price / 100));
+                        $discountPercentage = (int) $variantPrice->discount_price;
                     }
+                    $duration = $item->variant->duration ?? $service->duration;
                 } else {
                     $cityService = ServiceCityMaster::where('service_master_id', $item->service_master_id)
                         ->where('city_id', $cityId)
@@ -128,7 +132,9 @@ class CartController extends Controller
                     if ($cityService) {
                         $price = (int) $cityService->price;
                         $discountPrice = (int) round($price + ($price * $cityService->discount_price / 100));
+                        $discountPercentage = (int) $cityService->discount_price;
                     }
+                    $duration = $service->duration;
                 }
 
                 $itemSubTotal = $price * $item->qty;
@@ -141,13 +147,15 @@ class CartController extends Controller
                     'cart_id' => $item->id,
                     'service_id' => $service->id,
                     'variant_id' => $item->variant_id,
-                    'name' => $item->variant_id ? $item->variant->name : $service->name,
+                    'name' => $item->variant_id ? $service->name . ' - ' . $item->variant->name : $service->name,
                     'icon' => $item->variant_id && $item->variant->thumbnail_image 
                         ? asset('uploads/service-variant/' . $item->variant->thumbnail_image) 
                         : asset('uploads/service/' . $service->icon),
-                    'qty' => $item->qty,
+                    'duration' => $duration,
+                    'qty' => (string) $item->qty,
                     'price' => $price,
-                    'discount_price' => $discountPrice
+                    'discount_price' => $discountPrice,
+                    'discount_percentage' => $discountPercentage
                 ];
             }
 
