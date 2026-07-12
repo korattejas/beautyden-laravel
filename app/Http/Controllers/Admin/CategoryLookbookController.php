@@ -71,6 +71,17 @@ class CategoryLookbookController extends Controller
 
         try {
             $id = (int) $request->input('edit_value', 0);
+            
+            // Clean up the photos array because FilePond might send hidden string inputs alongside files
+            if (isset($request_all['photos']) && is_array($request_all['photos'])) {
+                $validPhotos = [];
+                foreach ($request_all['photos'] as $photo) {
+                    if ($photo instanceof \Illuminate\Http\UploadedFile) {
+                        $validPhotos[] = $photo;
+                    }
+                }
+                $request_all['photos'] = count($validPhotos) > 0 ? $validPhotos : null;
+            }
 
             $validateArray = [
                 'category_id' => [

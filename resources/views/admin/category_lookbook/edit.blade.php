@@ -181,7 +181,7 @@
                                 <select name="sub_category_id" id="sub_category_id" class="form-control luxury-input select2">
                                     <option value="">Select a sub category</option>
                                     @if($lookbook->category_id)
-                                        @foreach(\App\Models\ServiceSubcategory::where('category_id', $lookbook->category_id)->get() as $subCategory)
+                                        @foreach(\App\Models\ServiceSubcategory::where('service_category_id', $lookbook->category_id)->get() as $subCategory)
                                             <option value="{{ $subCategory->id }}" {{ $lookbook->sub_category_id == $subCategory->id ? 'selected' : '' }}>{{ $subCategory->name }}</option>
                                         @endforeach
                                     @endif
