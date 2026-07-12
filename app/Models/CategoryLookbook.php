@@ -11,6 +11,7 @@ class CategoryLookbook extends Model
 
     protected $fillable = [
         'category_id',
+        'sub_category_id',
         'photos',
         'status',
     ];
@@ -22,5 +23,10 @@ class CategoryLookbook extends Model
     public function category()
     {
         return $this->belongsTo(ServiceCategory::class, 'category_id', 'id');
+    }
+
+    public function subCategory()
+    {
+        return $this->belongsTo(ServiceSubcategory::class, 'sub_category_id', 'id');
     }
 }

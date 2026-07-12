@@ -31,12 +31,28 @@ class CategoryLookbookController extends Controller
         try {
             $query = DB::table('category_lookbooks')
                 ->join('service_categories', 'category_lookbooks.category_id', '=', 'service_categories.id')
-                ->select('category_lookbooks.id', 'category_lookbooks.category_id', 'service_categories.name as category_name', 'category_lookbooks.photos')
+                ->leftJoin('service_subcategories', 'category_lookbooks.sub_category_id', '=', 'service_subcategories.id')
+                ->select(
+                    'category_lookbooks.id', 
+                    'category_lookbooks.category_id', 
+                    'service_categories.name as category_name', 
+                    'category_lookbooks.sub_category_id',
+                    'service_subcategories.name as sub_category_name',
+                    'category_lookbooks.photos'
+                )
                 ->where('category_lookbooks.status', 1)
                 ->where('service_categories.status', 1);
                 
-            if ($request->has('category_id')) {
+            if ($request->has('category_id') && $request->has('sub_category_id')) {
+                $query->where('category_lookbooks.category_id', $request->category_id)
+                      ->where(function($q) use ($request) {
+                          $q->where('category_lookbooks.sub_category_id', $request->sub_category_id)
+                            ->orWhereNull('category_lookbooks.sub_category_id');
+                      });
+            } elseif ($request->has('category_id')) {
                 $query->where('category_lookbooks.category_id', $request->category_id);
+            } elseif ($request->has('sub_category_id')) {
+                $query->where('category_lookbooks.sub_category_id', $request->sub_category_id);
             }
 
             $lookbooks = $query->orderBy('service_categories.name', 'ASC')->get();
@@ -62,10 +78,12 @@ class CategoryLookbookController extends Controller
                 }
 
                 return [
-                    'id'            => $lookbook->id,
-                    'category_id'   => $lookbook->category_id,
-                    'category_name' => $lookbook->category_name,
-                    'photos'        => $photos,
+                    'id'                => $lookbook->id,
+                    'category_id'       => $lookbook->category_id,
+                    'category_name'     => $lookbook->category_name,
+                    'sub_category_id'   => $lookbook->sub_category_id,
+                    'sub_category_name' => $lookbook->sub_category_name,
+                    'photos'            => $photos,
                 ];
             });
 

@@ -75,10 +75,12 @@ class CategoryLookbookController extends Controller
             $validateArray = [
                 'category_id' => [
                     'required',
-                    $id == 0
-                        ? 'unique:category_lookbooks,category_id'
-                        : 'unique:category_lookbooks,category_id,' . $id . ',id',
+                    \Illuminate\Validation\Rule::unique('category_lookbooks')->where(function ($query) use ($request) {
+                        return $query->where('category_id', $request->category_id)
+                                     ->where('sub_category_id', $request->sub_category_id);
+                    })->ignore($id),
                 ],
+                'sub_category_id' => 'nullable|exists:service_subcategories,id',
                 'photos'   => 'nullable|array',
                 'photos.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp',
             ];
@@ -128,6 +130,7 @@ class CategoryLookbookController extends Controller
 
             $data = [
                 'category_id'   => $request->category_id,
+                'sub_category_id' => $request->sub_category_id ?: null,
                 'photos' => !empty($storedPhotos) ? $storedPhotos : null,
                 'status' => (int) $request->input('status', 1),
             ];
@@ -163,11 +166,14 @@ class CategoryLookbookController extends Controller
         try {
             if ($request->ajax()) {
 
-                $lookbooks = CategoryLookbook::with('category');
+                $lookbooks = CategoryLookbook::with(['category', 'subCategory']);
 
                 return DataTables::of($lookbooks)
                     ->addColumn('category_name', function ($lookbook) {
                         return $lookbook->category ? $lookbook->category->name : '-';
+                    })
+                    ->addColumn('sub_category_name', function ($lookbook) {
+                        return $lookbook->subCategory ? $lookbook->subCategory->name : '-';
                     })
                     ->addColumn('status', function ($lookbook) {
                         $status_array = [

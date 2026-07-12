@@ -166,13 +166,25 @@
                         
                         <div class="row">
                             <!-- Category Selection -->
-                            <div class="col-md-8 mb-4">
+                            <div class="col-md-4 mb-4">
                                 <label class="form-label-luxury">Select Category</label>
-                                <select name="category_id" class="form-control luxury-input select2" required>
+                                <select name="category_id" id="category_id" class="form-control luxury-input select2" required>
                                     <option value="">Select a category</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}" {{ $lookbook->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label-luxury">Select Sub Category (Optional)</label>
+                                <select name="sub_category_id" id="sub_category_id" class="form-control luxury-input select2">
+                                    <option value="">Select a sub category</option>
+                                    @if($lookbook->category_id)
+                                        @foreach(\App\Models\ServiceSubcategory::where('category_id', $lookbook->category_id)->get() as $subCategory)
+                                            <option value="{{ $subCategory->id }}" {{ $lookbook->sub_category_id == $subCategory->id ? 'selected' : '' }}>{{ $subCategory->name }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
                             </div>
 
@@ -236,9 +248,30 @@
         $(document).ready(function() {
             if ($('.select2').length) {
                 $('.select2').select2({
-                    placeholder: "Select a category"
+                    placeholder: "Select an option"
                 });
             }
+
+            $('#category_id').on('change', function() {
+                var categoryId = $(this).val();
+                if (categoryId) {
+                    $.ajax({
+                        url: '/admin/service-master/get-subcategories/' + categoryId,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
+                            $('#sub_category_id').empty();
+                            $('#sub_category_id').append('<option value="">Select a sub category</option>');
+                            $.each(data, function(key, value) {
+                                $('#sub_category_id').append('<option value="' + value.id + '">' + value.name + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    $('#sub_category_id').empty();
+                    $('#sub_category_id').append('<option value="">Select a sub category</option>');
+                }
+            });
 
             if (document.getElementById('existing-photos')) {
                 new Sortable(document.getElementById('existing-photos'), {

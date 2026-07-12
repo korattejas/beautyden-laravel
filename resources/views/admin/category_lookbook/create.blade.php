@@ -108,13 +108,20 @@
                         
                         <div class="row">
                             <!-- Category Selection -->
-                            <div class="col-md-8 mb-4">
+                            <div class="col-md-4 mb-4">
                                 <label class="form-label-luxury">Select Category</label>
-                                <select name="category_id" class="form-control luxury-input select2" required>
+                                <select name="category_id" id="category_id" class="form-control luxury-input select2" required>
                                     <option value="">Select a category</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label-luxury">Select Sub Category (Optional)</label>
+                                <select name="sub_category_id" id="sub_category_id" class="form-control luxury-input select2">
+                                    <option value="">Select a sub category</option>
                                 </select>
                             </div>
 
@@ -168,9 +175,30 @@
         $(document).ready(function() {
             if ($('.select2').length) {
                 $('.select2').select2({
-                    placeholder: "Select a category"
+                    placeholder: "Select an option"
                 });
             }
+
+            $('#category_id').on('change', function() {
+                var categoryId = $(this).val();
+                if (categoryId) {
+                    $.ajax({
+                        url: '/admin/service-master/get-subcategories/' + categoryId,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
+                            $('#sub_category_id').empty();
+                            $('#sub_category_id').append('<option value="">Select a sub category</option>');
+                            $.each(data, function(key, value) {
+                                $('#sub_category_id').append('<option value="' + value.id + '">' + value.name + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    $('#sub_category_id').empty();
+                    $('#sub_category_id').append('<option value="">Select a sub category</option>');
+                }
+            });
         });
     </script>
 @endsection

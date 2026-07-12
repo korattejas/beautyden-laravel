@@ -171,6 +171,7 @@
                                 <tr>
                                     <th style="width: 50px;">#</th>
                                     <th>Category Name</th>
+                                    <th>Sub Category Name</th>
                                     <th data-search="false" style="width: 250px;">Digital Assets</th>
                                     <th data-stuff="Active,InActive" style="width: 150px;">Status</th>
                                     <th data-search="false" style="width: 150px;">Operations</th>
@@ -206,6 +207,13 @@
                 {
                     data: 'category_name',
                     name: 'category_name',
+                    render: function(data) {
+                        return `<span class="fw-bold text-dark" style="font-size: 1.05rem;">${data}</span>`;
+                    }
+                },
+                {
+                    data: 'sub_category_name',
+                    name: 'sub_category_name',
                     render: function(data) {
                         return `<span class="fw-bold text-dark" style="font-size: 1.05rem;">${data}</span>`;
                     }

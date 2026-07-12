@@ -3421,7 +3421,7 @@
 }</code></pre>
 
             <h3>Get Category Lookbook</h3>
-            <p>Fetches the list of active category lookbooks, optionally filtered by <code>category_id</code>.</p>
+            <p>Fetches the list of active category lookbooks, optionally filtered by <code>category_id</code> or <code>sub_category_id</code>.</p>
             <div class="endpoint-wrapper">
                 <span class="badge get">GET</span> /Test/V1/customer/categoryLookbook
             </div>
@@ -3439,6 +3439,11 @@
                         <td>Integer</td>
                         <td>Optional. Filter lookbooks by a specific category.</td>
                     </tr>
+                    <tr>
+                        <td>sub_category_id</td>
+                        <td>Integer</td>
+                        <td>Optional. Filter lookbooks by a specific sub category.</td>
+                    </tr>
                 </tbody>
             </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -3452,6 +3457,8 @@
             "id": 1,
             "category_id": 2,
             "category_name": "Bridal Makeup",
+            "sub_category_id": 5,
+            "sub_category_name": "Engagement Makeup",
             "photos": [
                 "https://yourdomain.com/uploads/portfolio/look1.jpg",
                 "https://yourdomain.com/uploads/portfolio/look2.jpg"
