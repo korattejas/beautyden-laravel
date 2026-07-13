@@ -241,6 +241,8 @@
                                             <th>User Info</th>
                                             <th>Contact</th>
                                             <th>Joined On</th>
+                                            <th>Wallet</th>
+                                            <th>Ref. Code</th>
                                             <th data-search="false">Appointments</th>
                                             <th data-stuff="App User,Web User">Role</th>
                                             <th data-stuff="Active,InActive">Status</th>
@@ -354,6 +356,20 @@
                 }
             },
             { data: 'created_at', name: 'created_at' },
+            { 
+                data: 'wallet_balance', 
+                name: 'wallet_balance', 
+                render: function(data) { 
+                    return '<span class="fw-bold text-success">₹' + (data || '0.00') + '</span>'; 
+                } 
+            },
+            { 
+                data: 'referral_code', 
+                name: 'referral_code', 
+                render: function(data) { 
+                    return data ? '<span class="badge bg-light-info text-dark">' + data + '</span>' : '-'; 
+                } 
+            },
             {
                 data: 'total_appointments',
                 name: 'total_appointments',
@@ -535,6 +551,44 @@
                         ${addressesHtml}
                     </div>
 
+                    <!-- Wallet Transactions History -->
+                    <div class="detail-section-label mt-2">
+                        <i class="bi bi-wallet2"></i> Wallet Transactions History
+                    </div>
+                    <div class="detail-info-card" style="padding: 15px; border-left: 4px solid #28c76f; max-height: 250px; overflow-y: auto;">
+                        <table class="table table-sm" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${(() => {
+                                    if (data.wallet_transactions && data.wallet_transactions.length > 0) {
+                                        return data.wallet_transactions.map(txn => {
+                                            let date = new Date(txn.created_at).toLocaleDateString();
+                                            let color = txn.type === 'credit' ? 'text-success' : 'text-danger';
+                                            let sign = txn.type === 'credit' ? '+' : '-';
+                                            return `
+                                                <tr>
+                                                    <td>${date}</td>
+                                                    <td><span class="badge bg-light-${txn.type === 'credit' ? 'success' : 'danger'}">${txn.type}</span></td>
+                                                    <td class="${color} fw-bold">${sign}₹${txn.amount}</td>
+                                                    <td>${txn.description || '-'}</td>
+                                                </tr>
+                                            `;
+                                        }).join('');
+                                    } else {
+                                        return `<tr><td colspan="4" class="text-center text-muted">No transactions found</td></tr>`;
+                                    }
+                                })()}
+                            </tbody>
+                        </table>
+                    </div>
+
                     <div class="summary-box">
                         <div class="summary-line">
                             <span>Total Appointments Booked</span>
@@ -543,6 +597,10 @@
                         <div class="summary-line">
                             <span>Coupons Claimed</span>
                             <span style="font-weight: 700; color: #1e293b;">${data.total_coupons || 0}</span>
+                        </div>
+                        <div class="summary-line">
+                            <span>Wallet Balance</span>
+                            <span style="font-weight: 700; color: #28c76f;">₹${parseFloat(user.wallet_balance || 0).toFixed(2)}</span>
                         </div>
                         <div class="summary-line summary-total">
                             <span>Total Lifetime Value</span>

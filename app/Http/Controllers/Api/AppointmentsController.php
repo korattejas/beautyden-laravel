@@ -245,6 +245,7 @@ class AppointmentsController extends Controller
                 'notes'                     => 'nullable|string',
                 'status'                    => 'nullable|in:0,1',
                 'coupon_id'                 => 'nullable|integer|exists:coupon_codes,id',
+                'use_wallet_balance'        => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -327,7 +328,19 @@ class AppointmentsController extends Controller
             }
 
             $travelCharges = 0;
-            $grandTotal = ($subTotal + $travelCharges) - $discountAmount;
+            $walletUsedAmount = 0;
+            
+            if ($request->use_wallet_balance && auth('user')->check()) {
+                $user = auth('user')->user();
+                $walletLimitPercent = \App\Models\AppSetting::where('key', 'wallet_usage_limit_percent')->value('value') ?? 10;
+                
+                $maxUsableFromWallet = ($subTotal * $walletLimitPercent) / 100;
+                
+                // Allow using max of their balance or the allowed limit
+                $walletUsedAmount = min($user->wallet_balance, $maxUsableFromWallet);
+            }
+            
+            $grandTotal = ($subTotal + $travelCharges) - $discountAmount - $walletUsedAmount;
 
             $servicesData = [
                 'client' => [
@@ -350,6 +363,7 @@ class AppointmentsController extends Controller
                     'discount_percent' => $request->discount_percent ?? 0,
                     'discount_amount'  => number_format($discountAmount, 2, '.', ''),
                     'coupon_code'      => $couponCode,
+                    'wallet_used'      => number_format($walletUsedAmount, 2, '.', ''),
                     'grand_total'      => number_format($grandTotal, 2, '.', ''),
                 ],
             ];
@@ -388,6 +402,20 @@ class AppointmentsController extends Controller
                     'user_id' => auth('user')->check() ? auth('user')->id() : null,
                     'appointment_id' => $appointment->id,
                     'discount_amount' => $discountAmount,
+                ]);
+            }
+            
+            // Record Wallet Usage
+            if ($appointment && $walletUsedAmount > 0 && auth('user')->check()) {
+                $user = auth('user')->user();
+                $user->decrement('wallet_balance', $walletUsedAmount);
+                
+                \App\Models\WalletTransaction::create([
+                    'user_id' => $user->id,
+                    'type' => 'debit',
+                    'amount' => $walletUsedAmount,
+                    'description' => 'Used for Booking ' . $orderNumber,
+                    'reference_id' => $appointment->id
                 ]);
             }
 

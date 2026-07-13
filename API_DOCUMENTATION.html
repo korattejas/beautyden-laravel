@@ -325,6 +325,11 @@
                         <td>Numeric</td>
                         <td><strong>Required</strong>. 6-digit OTP.</td>
                     </tr>
+                    <tr>
+                        <td>referral_code</td>
+                        <td>String</td>
+                        <td><strong>Optional</strong>. Friend's referral code to apply during sign up. (e.g., "9FIO03")</td>
+                    </tr>
                 </tbody>
             </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
@@ -383,8 +388,86 @@
             "mobile_number": "6352755075",
             "mobile_verified_at": "2026-04-24 04:20:40",
             "city_id": null,
+            "referral_code": "9FIO03",
+            "wallet_balance": 50,
             "addresses": []
         }
+    }
+}</code></pre>
+        </section>
+
+        <section>
+            <h3>Get Wallet History</h3>
+            <p>Retrieves the user's current wallet balance and transaction history (credits and debits).</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/getWalletHistory
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Wallet history fetched successfully.",
+    "data": {
+        "wallet_balance": 50,
+        "referral_code": "9FIO03",
+        "referral_settings": {
+            "signup_bonus_amount": "50",
+            "referral_reward_amount": "50",
+            "wallet_usage_limit_percent": "20",
+            "instructions": [
+                "Share your unique referral code with your friends and family.",
+                "When your friend registers using your code, they get ₹50 in their wallet instantly.",
+                "You will receive ₹50 in your wallet after your friend successfully completes their first service booking.",
+                "You can use your wallet balance to pay up to 20% of your total booking amount."
+            ],
+            "faqs": [
+                {
+                    "question": "How do I invite my friends?",
+                    "answer": "You can share your unique referral code with your friends via WhatsApp, SMS, or any other platform."
+                },
+                {
+                    "question": "When will I get my referral bonus?",
+                    "answer": "You will receive your ₹50 bonus in your wallet as soon as your referred friend successfully completes their first service booking."
+                },
+                {
+                    "question": "How can I use my wallet balance?",
+                    "answer": "You can use your wallet balance to pay up to 20% of the total billing amount on any service booking."
+                }
+            ],
+            "terms_and_conditions": [
+                "The signup bonus of ₹50 is applicable only for new users registering for the first time.",
+                "The referral reward of ₹50 will only be credited once the referred friend completes their first service.",
+                "Wallet balance cannot be transferred to another account or withdrawn as cash.",
+                "A maximum of 20% of the total booking amount can be paid using the wallet balance per booking.",
+                "BeautyDen reserves the right to modify or cancel the referral program at any time without prior notice.",
+                "Any fraudulent activity will result in the suspension of the account and forfeiture of the wallet balance."
+            ]
+        },
+        "my_referrals": {
+            "total_count": 1,
+            "users": [
+                {
+                    "name": "Rajesh Kumar",
+                    "joined_at": "2026-07-13 10:15:30",
+                    "has_completed_first_booking": false
+                }
+            ]
+        },
+        "transactions": [
+            {
+                "id": 1,
+                "user_id": 4,
+                "type": "credit",
+                "amount": "50.00",
+                "description": "Signup Referral Bonus",
+                "reference_id": 2,
+                "reference_name": "Ravi Patel",
+                "created_at": "2026-07-13T10:00:00.000000Z",
+                "updated_at": "2026-07-13T10:00:00.000000Z"
+            }
+        ]
     }
 }</code></pre>
         </section>
@@ -1360,8 +1443,22 @@
                             `[{"service_master_id": 10, "variant_id": 5, "qty": 1}, {"service_master_id": 12, "qty":
                             1}]`</td>
                     </tr>
+                    <tr>
+                        <td>use_wallet_balance</td>
+                        <td>Boolean</td>
+                        <td>Optional. Set to true/1 if the user wants to apply their wallet balance towards the booking.</td>
+                    </tr>
                 </tbody>
             </table>
+
+            <div class="note" style="margin: 15px 0; background: #f0fdf4; border-left: 5px solid #22c55e; padding: 15px; border-radius: 8px;">
+                <strong>💡 Frontend Developer Note: Wallet Logic Calculation (Checkout Page)</strong><br>
+                If <code>use_wallet_balance</code> is true, the backend automatically deducts the exact amount and applies it to the final bill. If you want to show the exact discounted amount to the user on the UI <i>before</i> they hit book, calculate it as follows:<br><br>
+                <code>Max Usable Limit = (Subtotal * 20) / 100</code> <i>// 20% limit</i><br>
+                <code>Wallet Discount Applied = Min(Wallet Balance, Max Usable Limit)</code><br>
+                <code>Grand Total = Subtotal - Coupon Discount - Wallet Discount Applied</code><br><br>
+                <b>Note:</b> Do not call any separate API. Simply calculate this locally and pass <code>use_wallet_balance: true</code> to this booking API.
+            </div>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
 <code>{
@@ -1393,7 +1490,11 @@
                     "sub_total": "2500.00",
                     "total_duration": 90,
                     "travel_charges": "0.00",
-                    "grand_total": "2500.00"
+                    "discount_percent": 0,
+                    "discount_amount": "0.00",
+                    "coupon_code": null,
+                    "wallet_used": "50.00",
+                    "grand_total": "2450.00"
                 }
             }
         },

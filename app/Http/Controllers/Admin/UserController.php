@@ -70,6 +70,10 @@ class UserController extends Controller
                 return (float) ($appointment->services_data['summary']['grand_total'] ?? 0);
             });
 
+            $wallet_transactions = \App\Models\WalletTransaction::where('user_id', $user->id)
+                ->orderBy('id', 'desc')
+                ->get();
+
             return response()->json([
                 'data' => [
                     'user' => $user,
@@ -78,6 +82,7 @@ class UserController extends Controller
                     'total_spent' => $total_spent,
                     'addresses' => $user->addresses,
                     'subscription' => $user->subscriptions->first(),
+                    'wallet_transactions' => $wallet_transactions,
                 ]
             ], 200);
         } catch (\Exception $e) {

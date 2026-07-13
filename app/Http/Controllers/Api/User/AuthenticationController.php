@@ -268,6 +268,7 @@ class AuthenticationController extends Controller
             $validator = Validator::make($request->all(), [
                 'otp' => 'required|numeric|digits:6',
                 'mobile_number' => 'required|numeric|exists:users,mobile_number',
+                'referral_code' => 'nullable|string|exists:users,referral_code',
             ]);
 
             if ($validator->fails()) {
@@ -292,11 +293,46 @@ class AuthenticationController extends Controller
                 return $this->sendError('Invalid OTP.', $this->backend_error_status);
             }
 
-            $user->update([
+            $isFirstVerification = is_null($user->mobile_verified_at);
+            
+            $updateData = [
                 'mobile_verified_at' => now(),
                 'otp' => null,
                 'otp_expiration_at' => null
-            ]);
+            ];
+
+            if ($isFirstVerification) {
+                // Generate a unique 6-character alphanumeric referral code (e.g., 9FIO03)
+                do {
+                    $newReferralCode = strtoupper(\Illuminate\Support\Str::random(6));
+                } while (\App\Models\User::where('referral_code', $newReferralCode)->exists());
+                
+                $updateData['referral_code'] = $newReferralCode;
+
+                // Handle if they applied someone else's referral code
+                if ($request->has('referral_code') && !empty($request->referral_code)) {
+                    $referrer = \App\Models\User::where('referral_code', $request->referral_code)->first();
+                    if ($referrer && $referrer->id != $user->id) {
+                        $updateData['referred_by'] = $referrer->id;
+                        
+                        // Give signup bonus to the new user (Referee)
+                        $refereeBonus = \App\Models\AppSetting::where('key', 'signup_bonus_amount')->value('value') ?? 10;
+                        if ($refereeBonus > 0) {
+                            $updateData['wallet_balance'] = $user->wallet_balance + $refereeBonus;
+                            
+                            \App\Models\WalletTransaction::create([
+                                'user_id' => $user->id,
+                                'type' => 'credit',
+                                'amount' => $refereeBonus,
+                                'description' => 'Signup Referral Bonus',
+                                'reference_id' => $referrer->id
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            $user->update($updateData);
 
             $token = JWTAuth::fromUser($user);
 
@@ -400,11 +436,116 @@ class AuthenticationController extends Controller
                     'mobile_number' => $authUser->mobile_number,
                     'mobile_verified_at' => $authUser->mobile_verified_at,
                     'city_id' => $authUser->city_id,
+                    'referral_code' => $authUser->referral_code,
+                    'wallet_balance' => $authUser->wallet_balance,
                     'addresses' => $authUser->addresses()->orderBy('is_default', 'desc')->orderBy('id', 'desc')->get(),
                 ],
             ];
 
             return $this->sendResponse($success, 'Profile fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function getWalletHistory(Request $request): JsonResponse
+    {
+        $function_name = 'getWalletHistory';
+
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            $transactions = \App\Models\WalletTransaction::where('user_id', $authUser->id)
+                ->orderBy('id', 'desc')
+                ->get()
+                ->map(function ($transaction) {
+                    $referenceName = null;
+                    if (str_contains($transaction->description, 'Referral Bonus') || str_contains($transaction->description, 'Signup Bonus')) {
+                        $referenceUser = \App\Models\User::find($transaction->reference_id);
+                        if ($referenceUser) {
+                            $referenceName = $referenceUser->name;
+                        }
+                    } else if (str_contains($transaction->description, 'Booking')) {
+                        $appointment = \App\Models\Appointment::find($transaction->reference_id);
+                        if ($appointment) {
+                            $referenceName = $appointment->order_number;
+                        } else {
+                            $referenceName = "Booking #" . $transaction->reference_id;
+                        }
+                    }
+
+                    $data = $transaction->toArray();
+                    $data['reference_name'] = $referenceName;
+                    return $data;
+                });
+
+            $signupBonus = \App\Models\AppSetting::where('key', 'signup_bonus_amount')->value('value') ?? 50;
+            $referrerBonus = \App\Models\AppSetting::where('key', 'referral_reward_amount')->value('value') ?? 50;
+            $walletLimitPercent = \App\Models\AppSetting::where('key', 'wallet_usage_limit_percent')->value('value') ?? 20;
+
+            $success = [
+                'wallet_balance' => $authUser->wallet_balance,
+                'referral_code' => $authUser->referral_code,
+                'referral_settings' => [
+                    'signup_bonus_amount' => $signupBonus,
+                    'referral_reward_amount' => $referrerBonus,
+                    'wallet_usage_limit_percent' => $walletLimitPercent,
+                    'instructions' => [
+                        "Share your unique referral code with your friends and family.",
+                        "When your friend registers using your code, they get ₹{$signupBonus} in their wallet instantly.",
+                        "You will receive ₹{$referrerBonus} in your wallet after your friend successfully completes their first service booking.",
+                        "You can use your wallet balance to pay up to {$walletLimitPercent}% of your total booking amount."
+                    ],
+                    'faqs' => [
+                        [
+                            'question' => 'How do I invite my friends?',
+                            'answer' => 'You can share your unique referral code with your friends via WhatsApp, SMS, or any other platform.'
+                        ],
+                        [
+                            'question' => 'When will I get my referral bonus?',
+                            'answer' => "You will receive your ₹{$referrerBonus} bonus in your wallet as soon as your referred friend successfully completes their first service booking."
+                        ],
+                        [
+                            'question' => 'How can I use my wallet balance?',
+                            'answer' => "You can use your wallet balance to pay up to {$walletLimitPercent}% of the total billing amount on any service booking."
+                        ]
+                    ],
+                    'terms_and_conditions' => [
+                        "The signup bonus of ₹{$signupBonus} is applicable only for new users registering for the first time.",
+                        "The referral reward of ₹{$referrerBonus} will only be credited once the referred friend completes their first service.",
+                        "Wallet balance cannot be transferred to another account or withdrawn as cash.",
+                        "A maximum of {$walletLimitPercent}% of the total booking amount can be paid using the wallet balance per booking.",
+                        "BeautyDen reserves the right to modify or cancel the referral program at any time without prior notice.",
+                        "Any fraudulent activity will result in the suspension of the account and forfeiture of the wallet balance."
+                    ]
+                ],
+                'my_referrals' => [
+                    'total_count' => \App\Models\User::where('referred_by', $authUser->id)->count(),
+                    'users' => \App\Models\User::where('referred_by', $authUser->id)
+                        ->orderBy('id', 'desc')
+                        ->get()
+                        ->map(function($user) {
+                            $hasCompletedBooking = \App\Models\Appointment::where('phone', $user->mobile_number)
+                                ->where('status', 3)
+                                ->where('created_at', '>=', $user->created_at)
+                                ->exists();
+                                
+                            return [
+                                'name' => $user->name,
+                                'joined_at' => $user->created_at ? $user->created_at->format('Y-m-d H:i:s') : null,
+                                'has_completed_first_booking' => $hasCompletedBooking
+                            ];
+                        })
+                ],
+                'transactions' => $transactions
+            ];
+
+            return $this->sendResponse($success, 'Wallet history fetched successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);

@@ -978,6 +978,35 @@ class BeauticianController extends Controller
                 return $this->sendError('Appointment not assigned to you.', 403);
             }
 
+            if ($request->status == 3 && $appointment->status != 3) {
+                // If it's being marked completed
+                $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
+                if ($user && $user->referred_by) {
+                    // Check if this is their very first completed appointment after joining the app
+                    $completedCount = Appointment::where('phone', $appointment->phone)
+                        ->where('status', 3)
+                        ->where('created_at', '>=', $user->created_at)
+                        ->count();
+                    if ($completedCount == 0) {
+                        // Give referrer bonus
+                        $referrer = \App\Models\User::find($user->referred_by);
+                        if ($referrer) {
+                            $referrerBonus = \App\Models\AppSetting::where('key', 'referral_reward_amount')->value('value') ?? 50;
+                            if ($referrerBonus > 0) {
+                                $referrer->increment('wallet_balance', $referrerBonus);
+                                \App\Models\WalletTransaction::create([
+                                    'user_id' => $referrer->id,
+                                    'type' => 'credit',
+                                    'amount' => $referrerBonus,
+                                    'description' => 'Referral Bonus for ' . $user->name,
+                                    'reference_id' => $user->id
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
             $appointment->status = $request->status;
             $appointment->save();
 

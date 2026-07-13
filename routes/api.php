@@ -75,6 +75,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
     Route::prefix('V1/customer')->group(function () {
         Route::post('profileUpdate', [AuthenticationController::class, 'profileUpdate']);
         Route::post('getProfile', [AuthenticationController::class, 'getProfile']);
+        Route::post('getWalletHistory', [AuthenticationController::class, 'getWalletHistory']);
         Route::post('getTotalBookService', [AuthenticationController::class, 'getTotalBookService']);
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
         Route::post('updateFcmToken', [AuthenticationController::class, 'updateFcmToken']);
@@ -194,6 +195,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
     Route::prefix('Test/V1/customer')->group(function () {
         Route::post('profileUpdate', [AuthenticationController::class, 'profileUpdate']);
         Route::post('getProfile', [AuthenticationController::class, 'getProfile']);
+        Route::post('getWalletHistory', [AuthenticationController::class, 'getWalletHistory']);
         Route::post('getTotalBookService', [AuthenticationController::class, 'getTotalBookService']);
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
         Route::post('updateFcmToken', [AuthenticationController::class, 'updateFcmToken']);
