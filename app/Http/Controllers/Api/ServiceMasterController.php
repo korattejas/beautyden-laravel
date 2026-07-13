@@ -240,6 +240,208 @@ class ServiceMasterController extends Controller
         }
     }
 
+    public function getServiceMastersType(Request $request): JsonResponse
+    {
+        $function_name = 'getServiceMastersType';
+
+        try {
+            $cityId = $request->city_id;
+            $serviceTypeId = $request->service_type_id ?? $request->service_type;
+
+            if (!$cityId) {
+                return $this->sendError('City ID is required.', $this->validation_error_status);
+            }
+
+            if (!$serviceTypeId) {
+                return $this->sendError('Service Type is required.', $this->validation_error_status);
+            }
+
+            $categories = DB::table('service_categories')
+                ->select(
+                    'id',
+                    'name',
+                    DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'),
+                    'description',
+                    'is_popular',
+                    'is_new'
+                )
+                ->where('service_type_id', $serviceTypeId)
+                ->where('status', 1)
+                ->orderByDesc('is_popular')
+                ->get();
+
+            $categoryIds = $categories->pluck('id')->toArray();
+
+            $subCategories = collect([]);
+            if (!empty($categoryIds)) {
+                $subCategories = DB::table('service_subcategories')
+                    ->select(
+                        'id',
+                        'name',
+                        'service_category_id',
+                        DB::raw('CONCAT("' . asset('uploads/service-subcategory') . '/", icon) AS icon')
+                    )
+                    ->whereIn('service_category_id', $categoryIds)
+                    ->where('status', 1)
+                    ->get();
+            }
+
+            $query = DB::table('service_city_masters as scm')
+                ->join('service_masters as sm', 'scm.service_master_id', '=', 'sm.id')
+                ->join('service_categories as c', 'sm.category_id', '=', 'c.id')
+                ->leftJoin('service_subcategories as csc', 'sm.sub_category_id', '=', 'csc.id')
+                ->select(
+                    'sm.id',
+                    'sm.category_id',
+                    'sm.sub_category_id',
+                    'c.name as category_name',
+                    'csc.name as sub_category_name',
+                    'sm.name',
+                    'sm.skin_type',
+                    'scm.price as price',
+                    DB::raw('ROUND(scm.price + (scm.price * scm.discount_price / 100)) as discount_price'),
+                    'scm.discount_price as discount_percentage',
+                    'sm.duration',
+                    'sm.rating',
+                    'sm.reviews',
+                    'sm.description',
+                    DB::raw('CONCAT("' . asset('uploads/service') . '/", sm.icon) AS icon'),
+                    DB::raw('IF(sm.icon LIKE "%.mp4" OR sm.icon LIKE "%.mov" OR sm.icon LIKE "%.avi" OR sm.icon LIKE "%.wmv", "video", "image") AS icon_type'),
+                    'sm.is_popular',
+                    'sm.has_variants',
+                    'sm.banner_media',
+                    'sm.catalog_lookbook',
+                    'sm.portfolio'
+                )
+                ->where('scm.status', 1)
+                ->where('sm.status', 1);
+
+            $query->where('scm.city_id', $cityId);
+            $query->where('c.service_type_id', $serviceTypeId);
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('sm.name', 'like', "%$search%")
+                        ->orWhere('sm.description', 'like', "%$search%")
+                        ->orWhere('c.name', 'like', "%$search%")
+                        ->orWhere('sm.duration', 'like', "%$search%")
+                        ->orWhere('sm.skin_type', 'like', "%$search%");
+                });
+            }
+
+            if ($request->filled('category_id')) {
+                $query->where('sm.category_id', $request->category_id);
+            }
+
+            if ($request->filled('sub_category_id')) {
+                $query->where('sm.sub_category_id', $request->sub_category_id);
+            }
+
+            $perPage = $request->per_page ?? 24;
+            $page = $request->page ?? 1;
+
+            $services = $query->orderByDesc('sm.is_popular')
+                ->paginate($perPage, ['*'], 'page', $page);
+
+            $categoryStatsCache = [];
+
+            $serviceIdsWithVariants = collect($services->items())->filter(function ($service) {
+                return $service->has_variants == 1;
+            })->pluck('id')->toArray();
+
+            $variantPrices = collect();
+
+            if (!empty($serviceIdsWithVariants)) {
+                $variantPrices = \App\Models\ServiceCityVariantPrice::whereIn('service_master_id', $serviceIdsWithVariants)
+                    ->where('city_id', $cityId)
+                    ->where('is_available', 1)
+                    ->get()
+                    ->groupBy('service_master_id');
+            }
+
+            $services->getCollection()->transform(function ($service) use (&$categoryStatsCache, $variantPrices) {
+                $service->price = (int) $service->price;
+                $service->discount_price = (int) $service->discount_price;
+                $service->discount_percentage = (int) $service->discount_percentage;
+
+                $service->is_popular = (int) $service->is_popular;
+                $service->has_variants = (int) $service->has_variants;
+                $service->catalog_lookbook = (int) $service->catalog_lookbook;
+                $service->portfolio = (int) $service->portfolio;
+
+                if (!isset($categoryStatsCache[$service->category_id])) {
+                    $categoryStatsCache[$service->category_id] = $this->getCategoryReviewStats($service->category_id);
+                }
+
+                $service->rating = (string) $categoryStatsCache[$service->category_id]['rating'];
+                $service->reviews = (string) $categoryStatsCache[$service->category_id]['reviews'];
+
+                $banner_media = $service->banner_media ? json_decode($service->banner_media, true) : [];
+                $formatted_banner = [];
+
+                if (!empty($banner_media) && count($banner_media) > 0) {
+                    $formatted_banner = collect($banner_media)->map(function ($media) {
+                        $media['url'] = asset('uploads/service-media/' . $media['url']);
+                        if (!isset($media['type'])) {
+                            $ext = strtolower(pathinfo($media['url'], PATHINFO_EXTENSION));
+                            $media['type'] = in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image';
+                        }
+                        $media['is_scroll_banner_image'] = isset($media['is_scroll_banner_image']) ? (int) $media['is_scroll_banner_image'] : 0;
+                        return $media;
+                    })->toArray();
+                }
+
+                $service->banner_section = empty($formatted_banner) ? null : [
+                    'type' => 'banner_section',
+                    'data' => array_values($formatted_banner)
+                ];
+
+                unset($service->banner_media);
+
+                if ($service->has_variants == 1) {
+                    $cityPrices = $variantPrices->get($service->id, collect());
+
+                    if ($cityPrices->isNotEmpty()) {
+                        $service->starts_at   = (int) $cityPrices->min('price');
+                        $service->total_option = $cityPrices->count();
+                    } else {
+                        $dbVariants = \App\Models\ServiceMasterVariant::where('service_master_id', $service->id)->get();
+                        if ($dbVariants->isNotEmpty()) {
+                            $service->starts_at   = (int) $dbVariants->min('price');
+                            $service->total_option = $dbVariants->count();
+                        } else {
+                            $service->has_variants = 0;
+                        }
+                    }
+
+                    unset($service->price, $service->discount_price, $service->discount_percentage, $service->duration);
+                }
+
+                return $service;
+            });
+
+            $responseData = [
+                'categories' => $categories,
+                'sub_categories' => $subCategories,
+                'services' => $services
+            ];
+
+            return $this->sendResponse(
+                $responseData,
+                'Data retrieved successfully',
+                $this->success_status
+            );
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
+
     public function getServiceMasterDetails(Request $request): JsonResponse
     {
         $function_name = 'getServiceMasterDetails';

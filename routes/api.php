@@ -59,6 +59,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::get('serviceType', [ServiceController::class, 'getServiceType']);
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
+        Route::post('serviceMastersType', [ServiceMasterController::class, 'getServiceMastersType']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::post('serviceVariantDetails', [ServiceMasterController::class, 'getServiceVariantDetails']);
         Route::post('categoryReviews', [ReviewApiController::class, 'getCategoryReviews']);
@@ -178,6 +179,7 @@ Route::middleware([])->group(function () {
         Route::get('serviceType', [ServiceController::class, 'getServiceType']);
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
+        Route::post('serviceMastersType', [ServiceMasterController::class, 'getServiceMastersType']);
         Route::post('serviceMasterDetails', [ServiceMasterController::class, 'getServiceMasterDetails']);
         Route::post('serviceVariantDetails', [ServiceMasterController::class, 'getServiceVariantDetails']);
         Route::post('categoryReviews', [ReviewApiController::class, 'getCategoryReviews']);
