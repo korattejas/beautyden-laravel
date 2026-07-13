@@ -366,12 +366,10 @@ class AuthenticationController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
                 'dob' => 'nullable|date',
-                'city_id' => 'required|integer',
             ];
 
             $validateMessage = [
                 'email.email' => 'Enter a valid email address.',
-                'city_id.required' => 'City is required.',
                 'dob.date' => 'Enter a valid date of birth.',
             ];
 
@@ -396,7 +394,6 @@ class AuthenticationController extends Controller
 
             $authUser->name = $request->name ?? $authUser->name;
             $authUser->dob = $request->dob ?? $authUser->dob;
-            $authUser->city_id = $request->city_id ?? $authUser->city_id;
             if ($request->has('address')) {
                 $authUser->address = $request->address;
             }
