@@ -248,8 +248,15 @@ class ServiceMasterController extends Controller
             $cityId = $request->city_id;
             $serviceTypeId = $request->service_type_id ?? $request->service_type;
 
-            if (!$cityId) {
+            if (!isset($request->city_id) || $request->city_id === '') {
                 return $this->sendError('City ID is required.', $this->validation_error_status);
+            }
+
+            if ($cityId == 0) {
+                $ahmedabad = DB::table('cities')->where('name', 'like', '%Ahmedabad%')->first();
+                if ($ahmedabad) {
+                    $cityId = $ahmedabad->id;
+                }
             }
 
             if (!$serviceTypeId) {
@@ -262,6 +269,7 @@ class ServiceMasterController extends Controller
                     'name',
                     DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'),
                     'description',
+                    'media_json',
                     'is_popular',
                     'is_new'
                 )
@@ -269,6 +277,18 @@ class ServiceMasterController extends Controller
                 ->where('status', 1)
                 ->orderByDesc('is_popular')
                 ->get();
+
+            $categories->transform(function ($category) {
+                if ($category->media_json) {
+                    $media = json_decode($category->media_json, true);
+                    $media['images'] = array_map(fn($img) => asset('uploads/service-media/' . $img), $media['images'] ?? []);
+                    $media['videos'] = array_map(fn($vid) => asset('uploads/service-media/' . $vid), $media['videos'] ?? []);
+                    $category->media_json = $media;
+                } else {
+                    $category->media_json = null;
+                }
+                return $category;
+            });
 
             $categoryIds = $categories->pluck('id')->toArray();
 
