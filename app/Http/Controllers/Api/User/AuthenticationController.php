@@ -111,6 +111,54 @@ class AuthenticationController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
+            // --- CUSTOM OTP PROGRESSIVE DELAY LOGIC START ---
+            // IP based check (Max 20 OTP requests per IP per 15 minutes)
+            $ipAddress = $request->ip();
+            $cacheKeyIpAttempts = 'otp_ip_attempts_' . $ipAddress;
+
+            $ipAttempts = \Illuminate\Support\Facades\Cache::get($cacheKeyIpAttempts, 0);
+            if ($ipAttempts >= 20) {
+                return $this->sendError("Too many requests from your network. Please try again after 15 minutes.", $this->validation_error_status);
+            }
+
+            $cacheKeyAttempts = 'otp_attempts_' . date('Y-m-d') . '_' . $mobile_number;
+            $cacheKeyBlock = 'otp_block_' . $mobile_number;
+
+            if (\Illuminate\Support\Facades\Cache::has($cacheKeyBlock)) {
+                $unblockTime = \Illuminate\Support\Facades\Cache::get($cacheKeyBlock);
+                $secondsLeft = $unblockTime - time();
+                
+                if ($secondsLeft > 0) {
+                    if ($secondsLeft < 60) {
+                        $timeMsg = $secondsLeft . ' seconds';
+                    } elseif ($secondsLeft < 3600) {
+                        $timeMsg = ceil($secondsLeft / 60) . ' minutes';
+                    } else {
+                        $timeMsg = ceil($secondsLeft / 3600) . ' hours';
+                    }
+                    return $this->sendError("Too many OTP requests. Please wait $timeMsg.", $this->validation_error_status);
+                }
+            }
+
+            // Increment IP attempts ONLY when the mobile block check is passed
+            $ipAttempts++;
+            \Illuminate\Support\Facades\Cache::put($cacheKeyIpAttempts, $ipAttempts, now()->addMinutes(15));
+
+            $attempts = \Illuminate\Support\Facades\Cache::get($cacheKeyAttempts, 0);
+            $attempts++;
+            \Illuminate\Support\Facades\Cache::put($cacheKeyAttempts, $attempts, now()->endOfDay());
+
+            if ($attempts == 3) {
+                \Illuminate\Support\Facades\Cache::put($cacheKeyBlock, time() + 120, 120); // 2 minutes
+            } elseif ($attempts == 4) {
+                \Illuminate\Support\Facades\Cache::put($cacheKeyBlock, time() + 900, 900); // 15 minutes
+            } elseif ($attempts == 5) {
+                \Illuminate\Support\Facades\Cache::put($cacheKeyBlock, time() + 21600, 21600); // 6 hours
+            } elseif ($attempts >= 6) {
+                \Illuminate\Support\Facades\Cache::put($cacheKeyBlock, time() + 86400, 86400); // 24 hours
+            }
+            // --- CUSTOM OTP PROGRESSIVE DELAY LOGIC END ---
+
             $user = User::where('mobile_number', $mobile_number)->first();
 
             $otp = rand(100000, 999999);

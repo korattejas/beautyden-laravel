@@ -279,6 +279,12 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="note" style="margin: 15px 0; background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; border-radius: 8px; font-size: 0.9rem;">
+                <i class="bi bi-shield-exclamation text-warning" style="font-size: 1.1rem; margin-right: 5px;"></i> <strong>Rate Limiting & Security (Progressive Delay):</strong><br><br>
+                • <strong>IP Limit:</strong> Max 20 OTP requests per 15 minutes per IP address. Exceeding this returns HTTP 400 with message: <code>"Too many requests from your network. Please try again after 15 minutes."</code><br>
+                • <strong>Mobile Number Limit (Exponential Backoff):</strong> 1st, 2nd, and 3rd OTPs are sent immediately. The 4th attempt requires a 2-minute wait, 5th requires 15 minutes, 6th requires 6 hours, and 7th+ requires 24 hours. Early requests return HTTP 400 with a dynamic message (e.g., <code>"Too many OTP requests. Please wait 2 minutes."</code>).
+            </div>
+            
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
 <code>{
