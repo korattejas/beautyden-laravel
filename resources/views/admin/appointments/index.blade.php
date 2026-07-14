@@ -260,10 +260,15 @@
     }
 
     .premium-table tbody td {
-        padding: 14px 16px;
+        padding: 10px 8px;
         border-bottom: 1px solid #edf2f7;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         color: #1e293b;
+    }
+
+    .premium-table thead th {
+        padding: 10px 8px;
+        font-size: 0.75rem;
     }
 
     .premium-table tbody tr:last-child td {
@@ -631,16 +636,16 @@
                                             <th>Id</th>
                                             {{-- <th>Service Category</th> --}}
                                             {{-- <th>Service</th> --}}
-                                            <th>Order Number</th>
+                                            <th>Order No</th>
                                             <th>Client</th>
                                             <th>Phone</th>
                                             <th>Schedule</th>
                                             <th>Assigned To</th>
-                                            <th>Grand Total</th>
-                                            <th>Company Amount</th>
-                                            <th data-search="false">Payment Type</th>
-                                            <th data-search="false">User Payment</th>
-                                            <th data-search="false">Beautician Payment</th>
+                                            <th>Total</th>
+                                            <th>Comp. Amt</th>
+                                            <th data-search="false">Pay Type</th>
+                                            <th data-search="false">User Pay</th>
+                                            <th data-search="false">Beaut. Pay</th>
                                             <th data-search="false">Status</th>
                                             <th data-search="false">Action</th>
                                         </tr>

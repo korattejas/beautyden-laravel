@@ -370,12 +370,10 @@ class AppointmentsController extends Controller
 
                 return DataTables::of($appointments)
                     ->editColumn('order_number', function ($appointment) {
+                        $shortOrder = substr($appointment->order_number, 0, 4) . '...' . substr($appointment->order_number, -3);
                         return '<div class="d-flex align-items-center gap-1">
-                                    <span class="d-none order-search-text">' . $appointment->order_number . '</span>
-                                    <button class="btn btn-sm btn-icon btn-light-primary rounded-circle toggle-order-btn" title="View Order Number">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <span class="order-number-text fw-bolder text-primary d-none" style="letter-spacing: 0.5px; font-size: 0.9rem;">' . $appointment->order_number . '</span>
+                                    <span class="d-none">' . $appointment->order_number . '</span>
+                                    <span class="fw-bolder text-primary" title="' . $appointment->order_number . '" style="letter-spacing: 0.5px; font-size: 0.9rem; cursor:help;">' . $shortOrder . '</span>
                                 </div>';
                     })
                     ->addColumn('service_name', function ($appointment) {
