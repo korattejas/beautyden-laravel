@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use Spatie\DbDumper\Databases\MySql;
 use ZipArchive;
 use Illuminate\Support\Facades\File;
 
@@ -41,12 +40,9 @@ class EmailDatabaseBackup extends Command
 
         $this->info("Creating database dump...");
         try {
-            MySql::create()
-                ->setDbName($dbName)
-                ->setUserName($userName)
-                ->setPassword($password)
-                ->setHost($host)
-                ->dumpToFile($sqlPath);
+            $dsn = "mysql:host={$host};dbname={$dbName}";
+            $dump = new \Ifsnop\Mysqldump\Mysqldump($dsn, $userName, $password);
+            $dump->start($sqlPath);
         } catch (\Exception $e) {
             $this->error("Failed to dump database: " . $e->getMessage());
             return;
