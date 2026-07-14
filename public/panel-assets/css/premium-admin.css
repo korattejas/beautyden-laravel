@@ -938,15 +938,15 @@ body:has(.pa-list-page) .pa-page-title {
     background: var(--pa-surface);
     border: 1px solid var(--pa-border);
     border-radius: var(--pa-radius);
-    padding: 1.25rem 1.35rem;
+    padding: 1.5rem 1.6rem;
     box-shadow: var(--pa-shadow-card);
     transition: all var(--pa-transition);
     height: 100%;
 }
 
 .pa-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--pa-shadow);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 }
 
 .pa-stat-label {
@@ -959,10 +959,10 @@ body:has(.pa-list-page) .pa-page-title {
 }
 
 .pa-stat-value {
-    font-size: 1.65rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 800;
     color: var(--pa-text);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     line-height: 1.2;
     margin-bottom: 0.35rem;
 }
@@ -984,13 +984,19 @@ body:has(.pa-list-page) .pa-page-title {
 }
 
 .pa-stat-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
+    font-size: 1.65rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: transform var(--pa-transition);
+}
+
+.pa-stat-card:hover .pa-stat-icon {
+    transform: scale(1.08) rotate(5deg);
 }
 
 .pa-stat-icon.primary {
@@ -1843,13 +1849,13 @@ body:has(.pa-list-page) .pa-page-title {
 }
 
 .pa-da-report-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     flex-shrink: 0;
 }
 

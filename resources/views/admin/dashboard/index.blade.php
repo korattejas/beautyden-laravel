@@ -4,6 +4,57 @@
 @section('page_heading', 'Analytics Overview')
 
 @section('content')
+<style>
+/* Sleek Date Filter Styles */
+.pa-date-filter {
+    display: flex;
+    align-items: center;
+    background: var(--pa-surface);
+    border: 1px solid var(--pa-border);
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    transition: all 0.3s ease;
+}
+.pa-date-filter:hover {
+    border-color: var(--pa-primary-light);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+}
+.pa-date-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+}
+.pa-date-input-wrap i {
+    color: var(--pa-text-muted);
+    font-size: 0.9rem;
+}
+.pa-date-input {
+    border: none;
+    background: transparent;
+    width: 85px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--pa-text);
+    outline: none;
+    cursor: pointer;
+    font-family: var(--pa-font);
+}
+.pa-date-divider {
+    color: var(--pa-border);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+.pa-date-refresh {
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+    margin-left: 4px;
+}
+</style>
 <div class="pa-dashboard">
 
     {{-- Header --}}
@@ -12,17 +63,26 @@
             <h1>Analytics Overview</h1>
             <p>Your business performance at a glance</p>
         </div>
-        <div class="pa-page-actions">
-            <div class="d-flex align-items-center gap-2 bg-white border rounded-3 px-3 py-1" style="border-color:var(--pa-border)!important;">
-                <input type="text" id="global_start_date" class="form-control form-control-sm border-0 shadow-none" style="width:110px;font-size:0.82rem;" value="{{ now()->startOfMonth()->format('d-m-Y') }}">
-                <span class="text-muted small">—</span>
-                <input type="text" id="global_end_date" class="form-control form-control-sm border-0 shadow-none" style="width:110px;font-size:0.82rem;" value="{{ now()->endOfMonth()->format('d-m-Y') }}">
-                <button class="pa-btn pa-btn-primary pa-btn-icon" id="btn-refresh-dashboard" type="button" title="Refresh">
-                    <i class="bi bi-arrow-repeat"></i>
+        <div class="pa-page-actions d-flex align-items-center gap-3">
+            <div class="pa-date-filter">
+                <div class="pa-date-input-wrap">
+                    <i class="bi bi-calendar-event"></i>
+                    <input type="text" id="global_start_date" class="pa-date-input" value="{{ now()->startOfMonth()->format('d-m-Y') }}">
+                </div>
+                <div class="pa-date-divider"><i class="bi bi-arrow-right-short"></i></div>
+                <div class="pa-date-input-wrap">
+                    <i class="bi bi-calendar-check"></i>
+                    <input type="text" id="global_end_date" class="pa-date-input" value="{{ now()->endOfMonth()->format('d-m-Y') }}">
+                </div>
+                <button class="pa-btn pa-btn-primary pa-btn-icon pa-date-refresh" id="btn-refresh-dashboard" type="button" title="Apply Filter">
+                    <i class="bi bi-search"></i>
                 </button>
             </div>
-            <a href="{{ route('admin.reports.index') }}" class="pa-btn pa-btn-outline"><i class="bi bi-clock-history"></i> History</a>
-            <a href="{{ route('admin.dashboard.export-analytics') }}" class="pa-btn pa-btn-outline"><i class="bi bi-download"></i> Export</a>
+            
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ route('admin.reports.index') }}" class="pa-btn pa-btn-outline"><i class="bi bi-clock-history"></i> History</a>
+                <a href="{{ route('admin.dashboard.export-analytics') }}" class="pa-btn pa-btn-outline"><i class="bi bi-file-earmark-excel"></i> Export</a>
+            </div>
         </div>
     </div>
 
@@ -395,9 +455,9 @@
                     <div class="pa-da-report pa-da-report--customers">
                         <div class="pa-da-report-head">
                             <div class="pa-da-report-title">
-                                <span class="pa-da-report-icon"><i class="bi bi-star-fill text-warning"></i></span>
+                                <span class="pa-da-report-icon" style="background:#fef3c7; color:#d97706;"><i class="bi bi-star-fill"></i></span>
                                 <div>
-                                    <h6>Top 10 Customers</h6>
+                                    <h6>Top 20 Customers</h6>
                                     <span>Highest spenders (Completed Orders)</span>
                                 </div>
                             </div>
@@ -431,7 +491,7 @@
                     <div class="pa-da-report pa-da-report--repeat-customers">
                         <div class="pa-da-report-head">
                             <div class="pa-da-report-title">
-                                <span class="pa-da-report-icon"><i class="bi bi-arrow-repeat text-success"></i></span>
+                                <span class="pa-da-report-icon" style="background:#dcfce7; color:#16a34a;"><i class="bi bi-arrow-repeat"></i></span>
                                 <div>
                                     <h6>Top Repeat Customers</h6>
                                     <span>Most frequent bookers</span>
@@ -463,11 +523,11 @@
                 </div>
 
                 {{-- Top Popular Services --}}
-                <div class="col-lg-12">
+                <div class="col-lg-7">
                     <div class="pa-da-report pa-da-report--services">
                         <div class="pa-da-report-head">
                             <div class="pa-da-report-title">
-                                <span class="pa-da-report-icon"><i class="bi bi-fire text-danger"></i></span>
+                                <span class="pa-da-report-icon" style="background:#fee2e2; color:#dc2626;"><i class="bi bi-fire"></i></span>
                                 <div>
                                     <h6>Most Popular Services</h6>
                                     <span>Top trending and most booked services</span>
@@ -497,6 +557,38 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Upcoming Birthdays --}}
+                <div class="col-lg-5">
+                    <div class="pa-da-report">
+                        <div class="pa-da-report-head">
+                            <div class="pa-da-report-title">
+                                <span class="pa-da-report-icon" style="background:#fce7f3; color:#db2777;"><i class="bi bi-gift-fill"></i></span>
+                                <div>
+                                    <h6>Upcoming Birthdays</h6>
+                                    <span>In the next 7 days</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pa-da-report-body">
+                            <table class="pa-da-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th class="text-end">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="upcoming-birthdays-body">
+                                    <tr><td colspan="2"><div class="pa-da-empty"><i class="bi bi-hourglass-split"></i><p>Loading data...</p></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pa-da-report-footer">
+                            <span>Total Upcoming</span>
+                            <strong id="upcoming-birthdays-count">—</strong>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -507,11 +599,13 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     let dailyChart = null;
+    let isDateManuallyChanged = false;
 
     if (typeof flatpickr !== 'undefined') {
         flatpickr("#global_start_date", { dateFormat: "d-m-Y" });
         flatpickr("#global_end_date", { dateFormat: "d-m-Y" });
         $('#global_start_date, #global_end_date').on('change', function() {
+            isDateManuallyChanged = true;
             $('#report_start_date').val($('#global_start_date').val());
             $('#report_end_date').val($('#global_end_date').val());
             refreshAnalytics();
@@ -554,10 +648,15 @@ document.addEventListener('DOMContentLoaded', function () {
         let end = $('#global_end_date').val();
         $('#btn-refresh-dashboard i').addClass('fa-spin');
 
+        let dataPayload = { start_date: start, end_date: end };
+        if (!isDateManuallyChanged) {
+            dataPayload.all_time_for_bottom = 1;
+        }
+
         $.ajax({
             url: "{{ route('admin.dashboard.analytics') }}",
             type: 'GET',
-            data: { start_date: start, end_date: end },
+            data: dataPayload,
             success: function(res) {
                 $('#btn-refresh-dashboard i').removeClass('fa-spin');
                 $('#stat-revenue').text('₹' + res.stats.total_revenue);
@@ -664,6 +763,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 $('#top-services-body').html(tsHtml || emptyRow(3, 'No service data found'));
                 $('#top-services-count').text((res.top_services ? res.top_services.length : 0) + ' services');
+
+                let ubHtml = '';
+                if(res.upcoming_birthdays && res.upcoming_birthdays.length > 0) {
+                    res.upcoming_birthdays.forEach(item => {
+                        let daysText = item.days_left === 0 ? '<span class="text-danger fw-bold">Today!</span>' : (item.days_left === 1 ? 'Tomorrow' : `In ${item.days_left} days`);
+                        ubHtml += `<tr>
+                            <td>
+                                <strong style="font-size:0.85rem;color:var(--pa-text);">${item.name}</strong>
+                                <div style="font-size:0.75rem;color:var(--pa-text-muted);">${item.phone}</div>
+                            </td>
+                            <td class="text-end">
+                                <span class="td-badge" style="background:#fce7f3;color:#db2777;">${item.dob}</span>
+                                <div style="font-size:0.7rem;margin-top:2px;">${daysText}</div>
+                            </td>
+                        </tr>`;
+                    });
+                }
+                $('#upcoming-birthdays-body').html(ubHtml || emptyRow(2, 'No upcoming birthdays'));
+                $('#upcoming-birthdays-count').text((res.upcoming_birthdays ? res.upcoming_birthdays.length : 0) + ' customers');
             },
             error: function() { $('#btn-refresh-dashboard i').removeClass('fa-spin'); }
         });
@@ -675,7 +793,8 @@ document.addEventListener('DOMContentLoaded', function () {
     window.downloadReport = function(type) {
         let start = $('#global_start_date').val();
         let end = $('#global_end_date').val();
-        window.location.href = "{{ route('admin.dashboard.export-analytics') }}?type=" + type + "&start_date=" + start + "&end_date=" + end;
+        let allTime = isDateManuallyChanged ? 0 : 1;
+        window.location.href = "{{ route('admin.dashboard.export-analytics') }}?type=" + type + "&start_date=" + start + "&end_date=" + end + "&all_time=" + allTime;
     };
 });
 </script>

@@ -243,9 +243,12 @@ class DashboardController extends Controller
             usort($staffServices, fn($a, $b) => $b['services'] <=> $a['services']);
             usort($staffRevenue, fn($a, $b) => $b['revenue'] <=> $a['revenue']);
 
+            $isAllTimeForBottom = $request->all_time_for_bottom == 1;
+            $bottomQuery = $isAllTimeForBottom ? Appointment::where('status', 3)->get() : $revenueQuery;
+
             // 4. Top 10 Customers
             $customerStats = [];
-            foreach ($revenueQuery as $app) {
+            foreach ($bottomQuery as $app) {
                 $phone = $app->phone;
                 if(empty($phone)) continue;
                 
@@ -264,16 +267,16 @@ class DashboardController extends Controller
                 $customerStats[$phone]['total_orders'] += 1;
             }
             usort($customerStats, fn($a, $b) => $b['total_amount'] <=> $a['total_amount']);
-            $topCustomers = array_slice($customerStats, 0, 10);
+            $topCustomers = array_slice($customerStats, 0, 20);
 
             // 5. Top Repeat Customers
             $repeatCustomerStats = $customerStats;
             usort($repeatCustomerStats, fn($a, $b) => $b['total_orders'] <=> $a['total_orders']);
-            $topRepeatCustomers = array_slice($repeatCustomerStats, 0, 10);
+            $topRepeatCustomers = array_slice($repeatCustomerStats, 0, 20);
 
             // 6. Top Popular Services
             $serviceStats = [];
-            foreach ($revenueQuery as $app) {
+            foreach ($bottomQuery as $app) {
                 $services = $app->services_data['services'] ?? [];
                 if (is_array($services)) {
                     foreach ($services as $svc) {
@@ -294,7 +297,35 @@ class DashboardController extends Controller
                 }
             }
             usort($serviceStats, fn($a, $b) => $b['qty'] <=> $a['qty']);
-            $topServices = array_slice($serviceStats, 0, 10);
+            $topServices = array_slice($serviceStats, 0, 50);
+
+            // 7. Upcoming Birthdays (Next 7 Days)
+            $users = User::whereNotNull('dob')->get(['name', 'mobile_number', 'dob']);
+            $upcomingBirthdays = [];
+            $today = now()->startOfDay();
+            
+            foreach ($users as $u) {
+                if (!$u->dob || $u->dob == '0000-00-00') continue;
+                try {
+                    $dob = \Carbon\Carbon::parse($u->dob);
+                    $bdayThisYear = \Carbon\Carbon::create($today->year, $dob->month, $dob->day);
+                    
+                    if ($bdayThisYear->copy()->endOfDay()->isPast()) {
+                        $bdayThisYear->addYear();
+                    }
+                    
+                    $diff = $today->diffInDays($bdayThisYear, false);
+                    if ($diff >= 0 && $diff <= 7) {
+                        $upcomingBirthdays[] = [
+                            'name' => $u->name ?: 'Unknown',
+                            'phone' => $u->mobile_number,
+                            'dob' => $dob->format('d M'),
+                            'days_left' => $diff
+                        ];
+                    }
+                } catch (\Exception $e) {}
+            }
+            usort($upcomingBirthdays, fn($a, $b) => $a['days_left'] <=> $b['days_left']);
 
             return response()->json([
                 'daily_revenue' => array_slice($dailyRevenue, 0, 5),
@@ -319,6 +350,7 @@ class DashboardController extends Controller
                 'top_customers' => $topCustomers,
                 'top_repeat_customers' => $topRepeatCustomers,
                 'top_services' => $topServices,
+                'upcoming_birthdays' => $upcomingBirthdays,
             ]);
 
         } catch (\Exception $e) {
@@ -380,7 +412,7 @@ class DashboardController extends Controller
                 }
             } elseif ($type === 'top_customers') {
                 fputcsv($file, ['Customer Name', 'Phone', 'Total Orders', 'Total Spent (INR)']);
-                $apps = Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
+                $apps = $request->all_time == 1 ? Appointment::where('status', 3)->get() : Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
                 $customerStats = [];
                 foreach ($apps as $app) {
                     $phone = $app->phone;
@@ -395,14 +427,14 @@ class DashboardController extends Controller
                     $customerStats[$phone]['orders'] += 1;
                 }
                 usort($customerStats, fn($a, $b) => $b['amount'] <=> $a['amount']);
-                $topCustomers = array_slice($customerStats, 0, 10);
+                $topCustomers = array_slice($customerStats, 0, 20);
                 
                 foreach ($topCustomers as $c) {
                     fputcsv($file, [$c['name'], $c['phone'], $c['orders'], $c['amount']]);
                 }
             } elseif ($type === 'top_repeat_customers') {
                 fputcsv($file, ['Customer Name', 'Phone', 'Total Orders', 'Total Spent (INR)']);
-                $apps = Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
+                $apps = $request->all_time == 1 ? Appointment::where('status', 3)->get() : Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
                 $customerStats = [];
                 foreach ($apps as $app) {
                     $phone = $app->phone;
@@ -417,14 +449,14 @@ class DashboardController extends Controller
                     $customerStats[$phone]['orders'] += 1;
                 }
                 usort($customerStats, fn($a, $b) => $b['orders'] <=> $a['orders']);
-                $topRepeatCustomers = array_slice($customerStats, 0, 10);
+                $topRepeatCustomers = array_slice($customerStats, 0, 20);
                 
                 foreach ($topRepeatCustomers as $c) {
                     fputcsv($file, [$c['name'], $c['phone'], $c['orders'], $c['amount']]);
                 }
             } elseif ($type === 'top_services') {
                 fputcsv($file, ['Service Name', 'Total Booked (Qty)', 'Total Revenue (INR)']);
-                $apps = Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
+                $apps = $request->all_time == 1 ? Appointment::where('status', 3)->get() : Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
                 $serviceStats = [];
                 foreach ($apps as $app) {
                     $services = $app->services_data['services'] ?? [];
@@ -443,7 +475,7 @@ class DashboardController extends Controller
                     }
                 }
                 usort($serviceStats, fn($a, $b) => $b['qty'] <=> $a['qty']);
-                $topServices = array_slice($serviceStats, 0, 10);
+                $topServices = array_slice($serviceStats, 0, 50);
                 
                 foreach ($topServices as $s) {
                     fputcsv($file, [$s['name'], $s['qty'], $s['revenue']]);
