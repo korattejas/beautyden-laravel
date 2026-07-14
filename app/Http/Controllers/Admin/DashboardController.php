@@ -364,7 +364,7 @@ class DashboardController extends Controller
                 foreach ($data as $row) {
                     fputcsv($file, [$row->appointment_date, $row->total]);
                 }
-            } else {
+            } elseif (in_array($type, ['staff_revenue', 'staff_services'])) {
                 fputcsv($file, ['Staff Name', 'Total Services', 'Total Revenue']);
                 $staff = TeamMember::where('status', 1)->get();
                 foreach ($staff as $s) {
