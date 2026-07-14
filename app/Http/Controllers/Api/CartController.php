@@ -30,17 +30,14 @@ class CartController extends Controller
     public function addToCart(Request $request): JsonResponse
     {
         try {
-            // Assuming auth middleware sets the user id
-            $userId = $request->user_id; 
+            $userId = auth('user')->id(); 
 
             if (!$userId) {
                 return $this->sendError('User ID is required.', $this->validation_error_status);
             }
 
             $validator = Validator::make($request->all(), [
-                'service_id' => 'required|exists:service_masters,id',
-                'variant_id' => 'nullable|exists:service_master_variants,id',
-                'qty' => 'nullable|integer|min:1',
+                'service_id' => 'required',
                 'city_id' => 'required|exists:cities,id'
             ]);
 
@@ -48,33 +45,51 @@ class CartController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
-            $service = ServiceMaster::find($request->service_id);
-            if ($service->has_variants == 1 && !$request->variant_id) {
-                return $this->sendError('This service has variants. Please select a variant.', $this->validation_error_status);
+            // Convert to array whether it's a comma-separated string or already an array
+            $serviceIds = is_array($request->service_id) ? $request->service_id : explode(',', $request->service_id);
+            
+            $variantIds = [];
+            if ($request->has('variant_id') && $request->variant_id !== null && $request->variant_id !== '') {
+                $variantIds = is_array($request->variant_id) ? $request->variant_id : explode(',', $request->variant_id);
             }
 
-            $qty = $request->qty ?? 1;
-
-            $cartItem = Cart::where('user_id', $userId)
-                ->where('service_master_id', $request->service_id)
-                ->where('variant_id', $request->variant_id)
-                ->where('city_id', $request->city_id)
-                ->first();
-
-            if ($cartItem) {
-                $cartItem->qty += $qty;
-                $cartItem->save();
-            } else {
-                Cart::create([
-                    'user_id' => $userId,
-                    'service_master_id' => $request->service_id,
-                    'variant_id' => $request->variant_id,
-                    'city_id' => $request->city_id,
-                    'qty' => $qty
-                ]);
+            $qtys = [];
+            if ($request->has('qty') && $request->qty !== null && $request->qty !== '') {
+                $qtys = is_array($request->qty) ? $request->qty : explode(',', $request->qty);
             }
 
-            return $this->sendResponse([], 'Item added to cart successfully', $this->success_status);
+            foreach ($serviceIds as $index => $sId) {
+                $vId = isset($variantIds[$index]) && $variantIds[$index] !== '' ? $variantIds[$index] : null;
+                $qty = isset($qtys[$index]) && $qtys[$index] !== '' ? (int)$qtys[$index] : 1;
+
+                $service = ServiceMaster::find($sId);
+                if (!$service) continue; // Skip invalid services
+
+                if ($service->has_variants == 1 && !$vId) {
+                    return $this->sendError("Service '{$service->name}' requires a variant.", $this->validation_error_status);
+                }
+
+                $cartItem = Cart::where('user_id', $userId)
+                    ->where('service_master_id', $sId)
+                    ->where('variant_id', $vId)
+                    ->where('city_id', $request->city_id)
+                    ->first();
+
+                if ($cartItem) {
+                    $cartItem->qty += $qty;
+                    $cartItem->save();
+                } else {
+                    Cart::create([
+                        'user_id' => $userId,
+                        'service_master_id' => $sId,
+                        'variant_id' => $vId,
+                        'city_id' => $request->city_id,
+                        'qty' => $qty
+                    ]);
+                }
+            }
+
+            return $this->sendResponse([], 'Item(s) added to cart successfully', $this->success_status);
 
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, 'addToCart');
@@ -85,7 +100,7 @@ class CartController extends Controller
     public function getCart(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user_id;
+            $userId = auth('user')->id();
             $cityId = $request->city_id;
 
             if (!$userId || !$cityId) {
@@ -179,7 +194,7 @@ class CartController extends Controller
     public function updateCartItem(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user_id;
+            $userId = auth('user')->id();
             
             $validator = Validator::make($request->all(), [
                 'cart_id' => 'required|exists:carts,id',

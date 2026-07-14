@@ -2399,7 +2399,7 @@
             </div>
 
             <h3>13.1 Add to Cart</h3>
-            <p>Adds a service or variant to the customer's cart.</p>
+            <p>Adds a single service or multiple services (like a combo package) to the customer's cart.</p>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customer/cart/add
                 <span class="badge auth">Token Required</span>
@@ -2415,18 +2415,18 @@
                 <tbody>
                     <tr>
                         <td>service_id</td>
-                        <td>Integer</td>
-                        <td><strong>Required</strong>. The main service ID.</td>
+                        <td>Integer / String</td>
+                        <td><strong>Required</strong>. The main service ID. Can be a single ID or multiple comma-separated IDs (e.g. <code>1,2,3</code>) for combos.</td>
                     </tr>
                     <tr>
                         <td>variant_id</td>
-                        <td>Integer / Null</td>
-                        <td>Optional (<strong>Required</strong> if the service has variants).</td>
+                        <td>Integer / String / Null</td>
+                        <td>Optional (<strong>Required</strong> if the service has variants). Can be a single ID or comma-separated IDs matching the service_ids. Use empty values if some services don't have variants (e.g. <code>10,,12</code>).</td>
                     </tr>
                     <tr>
                         <td>qty</td>
-                        <td>Integer</td>
-                        <td>Optional. Default is 1. Number of items to add.</td>
+                        <td>Integer / String</td>
+                        <td>Optional. Default is 1. Number of items to add. Can be a single quantity or comma-separated for multiple items (e.g. <code>1,2,1</code>).</td>
                     </tr>
                     <tr>
                         <td>city_id</td>
@@ -2440,7 +2440,7 @@
 <code>{
     "code": 200,
     "status": true,
-    "message": "Item added to cart successfully",
+    "message": "Item(s) added to cart successfully",
     "data": []
 }</code></pre>
 
