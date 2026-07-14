@@ -2421,7 +2421,7 @@
                     <tr>
                         <td>variant_id</td>
                         <td>Integer / String / Null</td>
-                        <td>Optional (<strong>Required</strong> if the service has variants). Can be a single ID or comma-separated IDs matching the service_ids. Use empty values if some services don't have variants (e.g. <code>10,,12</code>).</td>
+                        <td>Optional (<strong>Required</strong> if the service has variants). Can be a single ID or comma-separated IDs matching the service_ids. Use <code>0</code> or an empty value if a service doesn't have a variant (e.g. <code>10,0,12</code> or <code>10,,12</code>).</td>
                     </tr>
                     <tr>
                         <td>qty</td>

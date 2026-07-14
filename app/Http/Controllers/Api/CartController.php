@@ -59,7 +59,7 @@ class CartController extends Controller
             }
 
             foreach ($serviceIds as $index => $sId) {
-                $vId = isset($variantIds[$index]) && $variantIds[$index] !== '' ? $variantIds[$index] : null;
+                $vId = isset($variantIds[$index]) && $variantIds[$index] !== '' && $variantIds[$index] != '0' ? $variantIds[$index] : null;
                 $qty = isset($qtys[$index]) && $qtys[$index] !== '' ? (int)$qtys[$index] : 1;
 
                 $service = ServiceMaster::find($sId);
