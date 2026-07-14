@@ -58,16 +58,25 @@ class EmailDatabaseBackup extends Command
             return;
         }
 
-        $this->info("Sending email to {$email}...");
+        $this->info("Uploading to Google Drive...");
         try {
-            Mail::raw("Hello,\n\nPlease find attached the daily database backup for your application.\n\nDate: " . now()->format('d M Y, h:i A') . "\n\nThanks,\nBeautyDen System", function ($msg) use ($email, $zipPath, $date) {
-                $msg->to($email)
-                    ->subject("Daily Database Backup - BeautyDen - " . $date)
-                    ->attach($zipPath);
-            });
-            $this->info('Database backup emailed successfully.');
+            \Illuminate\Support\Facades\Storage::disk('google')->put("database_backup_{$date}.zip", file_get_contents($zipPath));
+            $this->info('Database backup uploaded to Google Drive successfully.');
+
+            // Cleanup old backups from Google Drive (older than 7 days)
+            $files = \Illuminate\Support\Facades\Storage::disk('google')->files();
+            $now = now();
+            foreach ($files as $file) {
+                if (str_starts_with($file, 'database_backup_')) {
+                    $lastModified = \Illuminate\Support\Facades\Storage::disk('google')->lastModified($file);
+                    if (\Carbon\Carbon::createFromTimestamp($lastModified)->diffInDays($now) > 7) {
+                        \Illuminate\Support\Facades\Storage::disk('google')->delete($file);
+                        $this->info("Deleted old backup from Google Drive: {$file}");
+                    }
+                }
+            }
         } catch (\Exception $e) {
-            $this->error("Failed to send email: " . $e->getMessage());
+            $this->error("Failed to upload to Google Drive: " . $e->getMessage());
         }
 
         // Cleanup
