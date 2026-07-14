@@ -9,4 +9,6 @@ Artisan::command('inspire', function () {
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('backup:email-db korattejas01@gmail.com')->everyFiveMinutes();
+Schedule::call(function () {
+    Artisan::call('backup:email-db', ['email' => 'korattejas01@gmail.com']);
+})->everyFiveMinutes();
