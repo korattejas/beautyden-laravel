@@ -14,6 +14,8 @@
         "league/flysystem-aws-s3-v3": "^3.28",
         "maatwebsite/excel": "^3.1",
         "rap2hpoutre/laravel-log-viewer": "^2.4",
+        "razorpay/razorpay": "^2.9",
+        "spatie/laravel-backup": "^9.3",
         "twilio/sdk": "*",
         "tymon/jwt-auth": "^2.1",
         "yajra/laravel-datatables-oracle": "^11.1"
