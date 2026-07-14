@@ -63,15 +63,15 @@ class EmailDatabaseBackup extends Command
             \Illuminate\Support\Facades\Storage::disk('google')->put("database_backup_{$date}.zip", file_get_contents($zipPath));
             $this->info('Database backup uploaded to Google Drive successfully.');
 
-            // Cleanup old backups from Google Drive (older than 7 days)
+            // Cleanup old backups from Google Drive (older than 3 days)
             $files = \Illuminate\Support\Facades\Storage::disk('google')->files();
             $now = now();
             foreach ($files as $file) {
                 if (str_starts_with($file, 'database_backup_')) {
                     $lastModified = \Illuminate\Support\Facades\Storage::disk('google')->lastModified($file);
-                    if (\Carbon\Carbon::createFromTimestamp($lastModified)->diffInDays($now) > 7) {
+                    if (\Carbon\Carbon::createFromTimestamp($lastModified)->diffInDays($now) > 3) {
                         \Illuminate\Support\Facades\Storage::disk('google')->delete($file);
-                        $this->info("Deleted old backup from Google Drive: {$file}");
+                        \Illuminate\Support\Facades\Log::info("Deleted old backup from Google Drive (older than 3 days): {$file}");
                     }
                 }
             }

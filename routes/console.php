@@ -11,4 +11,4 @@ use Illuminate\Support\Facades\Schedule;
 
 Schedule::call(function () {
     Artisan::call('backup:email-db', ['email' => 'korattejas01@gmail.com']);
-})->everyFiveMinutes();
+})->dailyAt('01:00');
