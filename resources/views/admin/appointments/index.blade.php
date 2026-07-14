@@ -1810,6 +1810,7 @@ $(document).ready(function() {
             }
         });
     });
+    
     $(document).on('click', '.toggle-order-btn', function(e) {
         e.preventDefault();
         let $icon = $(this).find('i');
