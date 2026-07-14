@@ -243,6 +243,59 @@ class DashboardController extends Controller
             usort($staffServices, fn($a, $b) => $b['services'] <=> $a['services']);
             usort($staffRevenue, fn($a, $b) => $b['revenue'] <=> $a['revenue']);
 
+            // 4. Top 10 Customers
+            $customerStats = [];
+            foreach ($revenueQuery as $app) {
+                $phone = $app->phone;
+                if(empty($phone)) continue;
+                
+                $amount = (float)($app->services_data['summary']['grand_total'] ?? 0);
+                $name = trim($app->first_name . ' ' . $app->last_name);
+                
+                if (!isset($customerStats[$phone])) {
+                    $customerStats[$phone] = [
+                        'name' => $name ?: 'Unknown',
+                        'phone' => $phone,
+                        'total_amount' => 0,
+                        'total_orders' => 0
+                    ];
+                }
+                $customerStats[$phone]['total_amount'] += $amount;
+                $customerStats[$phone]['total_orders'] += 1;
+            }
+            usort($customerStats, fn($a, $b) => $b['total_amount'] <=> $a['total_amount']);
+            $topCustomers = array_slice($customerStats, 0, 10);
+
+            // 5. Top Repeat Customers
+            $repeatCustomerStats = $customerStats;
+            usort($repeatCustomerStats, fn($a, $b) => $b['total_orders'] <=> $a['total_orders']);
+            $topRepeatCustomers = array_slice($repeatCustomerStats, 0, 10);
+
+            // 6. Top Popular Services
+            $serviceStats = [];
+            foreach ($revenueQuery as $app) {
+                $services = $app->services_data['services'] ?? [];
+                if (is_array($services)) {
+                    foreach ($services as $svc) {
+                        $name = $svc['name'] ?? 'Unknown Service';
+                        $qty = (int)($svc['qty'] ?? 1);
+                        $total = (float)($svc['total'] ?? 0);
+
+                        if (!isset($serviceStats[$name])) {
+                            $serviceStats[$name] = [
+                                'name' => $name,
+                                'qty' => 0,
+                                'revenue' => 0
+                            ];
+                        }
+                        $serviceStats[$name]['qty'] += $qty;
+                        $serviceStats[$name]['revenue'] += $total;
+                    }
+                }
+            }
+            usort($serviceStats, fn($a, $b) => $b['qty'] <=> $a['qty']);
+            $topServices = array_slice($serviceStats, 0, 10);
+
             return response()->json([
                 'daily_revenue' => array_slice($dailyRevenue, 0, 5),
                 'total_revenue' => $totalRevenue,
@@ -263,6 +316,9 @@ class DashboardController extends Controller
                 ],
                 'top_staff_services' => array_slice($staffServices, 0, 5),
                 'top_staff_revenue' => array_slice($staffRevenue, 0, 5),
+                'top_customers' => $topCustomers,
+                'top_repeat_customers' => $topRepeatCustomers,
+                'top_services' => $topServices,
             ]);
 
         } catch (\Exception $e) {
@@ -321,6 +377,76 @@ class DashboardController extends Controller
                     if ($apps->count() > 0) {
                         fputcsv($file, [$s->name, $apps->count(), $rev]);
                     }
+                }
+            } elseif ($type === 'top_customers') {
+                fputcsv($file, ['Customer Name', 'Phone', 'Total Orders', 'Total Spent (INR)']);
+                $apps = Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
+                $customerStats = [];
+                foreach ($apps as $app) {
+                    $phone = $app->phone;
+                    if(empty($phone)) continue;
+                    $amount = (float)($app->services_data['summary']['grand_total'] ?? 0);
+                    $name = trim($app->first_name . ' ' . $app->last_name);
+                    
+                    if (!isset($customerStats[$phone])) {
+                        $customerStats[$phone] = ['name' => $name ?: 'Unknown', 'phone' => $phone, 'amount' => 0, 'orders' => 0];
+                    }
+                    $customerStats[$phone]['amount'] += $amount;
+                    $customerStats[$phone]['orders'] += 1;
+                }
+                usort($customerStats, fn($a, $b) => $b['amount'] <=> $a['amount']);
+                $topCustomers = array_slice($customerStats, 0, 10);
+                
+                foreach ($topCustomers as $c) {
+                    fputcsv($file, [$c['name'], $c['phone'], $c['orders'], $c['amount']]);
+                }
+            } elseif ($type === 'top_repeat_customers') {
+                fputcsv($file, ['Customer Name', 'Phone', 'Total Orders', 'Total Spent (INR)']);
+                $apps = Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
+                $customerStats = [];
+                foreach ($apps as $app) {
+                    $phone = $app->phone;
+                    if(empty($phone)) continue;
+                    $amount = (float)($app->services_data['summary']['grand_total'] ?? 0);
+                    $name = trim($app->first_name . ' ' . $app->last_name);
+                    
+                    if (!isset($customerStats[$phone])) {
+                        $customerStats[$phone] = ['name' => $name ?: 'Unknown', 'phone' => $phone, 'amount' => 0, 'orders' => 0];
+                    }
+                    $customerStats[$phone]['amount'] += $amount;
+                    $customerStats[$phone]['orders'] += 1;
+                }
+                usort($customerStats, fn($a, $b) => $b['orders'] <=> $a['orders']);
+                $topRepeatCustomers = array_slice($customerStats, 0, 10);
+                
+                foreach ($topRepeatCustomers as $c) {
+                    fputcsv($file, [$c['name'], $c['phone'], $c['orders'], $c['amount']]);
+                }
+            } elseif ($type === 'top_services') {
+                fputcsv($file, ['Service Name', 'Total Booked (Qty)', 'Total Revenue (INR)']);
+                $apps = Appointment::where('status', 3)->whereBetween('appointment_date', [$startDate, $endDate])->get();
+                $serviceStats = [];
+                foreach ($apps as $app) {
+                    $services = $app->services_data['services'] ?? [];
+                    if (is_array($services)) {
+                        foreach ($services as $svc) {
+                            $name = $svc['name'] ?? 'Unknown Service';
+                            $qty = (int)($svc['qty'] ?? 1);
+                            $total = (float)($svc['total'] ?? 0);
+                            
+                            if (!isset($serviceStats[$name])) {
+                                $serviceStats[$name] = ['name' => $name, 'qty' => 0, 'revenue' => 0];
+                            }
+                            $serviceStats[$name]['qty'] += $qty;
+                            $serviceStats[$name]['revenue'] += $total;
+                        }
+                    }
+                }
+                usort($serviceStats, fn($a, $b) => $b['qty'] <=> $a['qty']);
+                $topServices = array_slice($serviceStats, 0, 10);
+                
+                foreach ($topServices as $s) {
+                    fputcsv($file, [$s['name'], $s['qty'], $s['revenue']]);
                 }
             }
 

@@ -389,6 +389,114 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Top 10 Customers --}}
+                <div class="col-lg-6">
+                    <div class="pa-da-report pa-da-report--customers">
+                        <div class="pa-da-report-head">
+                            <div class="pa-da-report-title">
+                                <span class="pa-da-report-icon"><i class="bi bi-star-fill text-warning"></i></span>
+                                <div>
+                                    <h6>Top 10 Customers</h6>
+                                    <span>Highest spenders (Completed Orders)</span>
+                                </div>
+                            </div>
+                            <button type="button" class="pa-da-download" onclick="downloadReport('top_customers')" title="Export CSV">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
+                        <div class="pa-da-report-body">
+                            <table class="pa-da-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th class="text-center">Total Orders</th>
+                                        <th class="text-end">Total Spent</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="top-customers-body">
+                                    <tr><td colspan="3"><div class="pa-da-empty"><i class="bi bi-hourglass-split"></i><p>Loading data...</p></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pa-da-report-footer">
+                            <span>Top Spenders</span>
+                            <strong id="top-customers-count">—</strong>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Top Repeat Customers --}}
+                <div class="col-lg-6">
+                    <div class="pa-da-report pa-da-report--repeat-customers">
+                        <div class="pa-da-report-head">
+                            <div class="pa-da-report-title">
+                                <span class="pa-da-report-icon"><i class="bi bi-arrow-repeat text-success"></i></span>
+                                <div>
+                                    <h6>Top Repeat Customers</h6>
+                                    <span>Most frequent bookers</span>
+                                </div>
+                            </div>
+                            <button type="button" class="pa-da-download" onclick="downloadReport('top_repeat_customers')" title="Export CSV">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
+                        <div class="pa-da-report-body">
+                            <table class="pa-da-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th class="text-center">Total Orders</th>
+                                        <th class="text-end">Total Spent</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="top-repeat-customers-body">
+                                    <tr><td colspan="3"><div class="pa-da-empty"><i class="bi bi-hourglass-split"></i><p>Loading data...</p></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pa-da-report-footer">
+                            <span>Loyal Customers</span>
+                            <strong id="top-repeat-customers-count">—</strong>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Top Popular Services --}}
+                <div class="col-lg-12">
+                    <div class="pa-da-report pa-da-report--services">
+                        <div class="pa-da-report-head">
+                            <div class="pa-da-report-title">
+                                <span class="pa-da-report-icon"><i class="bi bi-fire text-danger"></i></span>
+                                <div>
+                                    <h6>Most Popular Services</h6>
+                                    <span>Top trending and most booked services</span>
+                                </div>
+                            </div>
+                            <button type="button" class="pa-da-download" onclick="downloadReport('top_services')" title="Export CSV">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
+                        <div class="pa-da-report-body">
+                            <table class="pa-da-table">
+                                <thead>
+                                    <tr>
+                                        <th>Service Name</th>
+                                        <th class="text-center">Times Booked</th>
+                                        <th class="text-end">Total Revenue Generated</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="top-services-body">
+                                    <tr><td colspan="3"><div class="pa-da-empty"><i class="bi bi-hourglass-split"></i><p>Loading data...</p></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pa-da-report-footer">
+                            <span>Unique Trending Services</span>
+                            <strong id="top-services-count">—</strong>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -496,6 +604,66 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 $('#staff-revenue-body').html(srHtml || emptyRow(2, 'No staff revenue data'));
                 $('#staff-revenue-count').text(res.top_staff_revenue.length + ' staff');
+
+                let tcHtml = '';
+                if(res.top_customers && res.top_customers.length > 0) {
+                    res.top_customers.forEach(item => {
+                        tcHtml += `<tr>
+                            <td>
+                                <div class="pa-da-staff-name">
+                                    <span class="pa-da-staff-avatar">${staffInitials(item.name)}</span>
+                                    <div>
+                                        <div class="mb-0" style="line-height:1.2;">${item.name}</div>
+                                        <small class="text-muted" style="font-size:0.75rem;">${item.phone}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="td-badge">${item.total_orders}</span></td>
+                            <td class="text-end td-value">₹${parseFloat(item.total_amount).toLocaleString()}</td>
+                        </tr>`;
+                    });
+                }
+                $('#top-customers-body').html(tcHtml || emptyRow(3, 'No customer data found'));
+                $('#top-customers-count').text((res.top_customers ? res.top_customers.length : 0) + ' customers');
+
+                let trcHtml = '';
+                if(res.top_repeat_customers && res.top_repeat_customers.length > 0) {
+                    res.top_repeat_customers.forEach(item => {
+                        trcHtml += `<tr>
+                            <td>
+                                <div class="pa-da-staff-name">
+                                    <span class="pa-da-staff-avatar">${staffInitials(item.name)}</span>
+                                    <div>
+                                        <div class="mb-0" style="line-height:1.2;">${item.name}</div>
+                                        <small class="text-muted" style="font-size:0.75rem;">${item.phone}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="td-badge text-white" style="background:var(--pa-success);">${item.total_orders}</span></td>
+                            <td class="text-end td-value">₹${parseFloat(item.total_amount).toLocaleString()}</td>
+                        </tr>`;
+                    });
+                }
+                $('#top-repeat-customers-body').html(trcHtml || emptyRow(3, 'No customer data found'));
+                $('#top-repeat-customers-count').text((res.top_repeat_customers ? res.top_repeat_customers.length : 0) + ' customers');
+
+                let tsHtml = '';
+                if(res.top_services && res.top_services.length > 0) {
+                    res.top_services.forEach(item => {
+                        tsHtml += `<tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="pa-stat-icon" style="width:32px;height:32px;font-size:0.8rem;background:var(--pa-primary-light);color:var(--pa-primary);"><i class="bi bi-scissors"></i></div>
+                                    <strong style="font-size:0.85rem;">${item.name}</strong>
+                                </div>
+                            </td>
+                            <td class="text-center"><span class="td-badge" style="background:var(--pa-warning);color:#fff;">${item.qty}</span></td>
+                            <td class="text-end td-value text-success">₹${parseFloat(item.revenue).toLocaleString()}</td>
+                        </tr>`;
+                    });
+                }
+                $('#top-services-body').html(tsHtml || emptyRow(3, 'No service data found'));
+                $('#top-services-count').text((res.top_services ? res.top_services.length : 0) + ' services');
             },
             error: function() { $('#btn-refresh-dashboard i').removeClass('fa-spin'); }
         });
