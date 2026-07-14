@@ -1459,6 +1459,31 @@
                 <code>Grand Total = Subtotal - Coupon Discount - Wallet Discount Applied</code><br><br>
                 <b>Note:</b> Do not call any separate API. Simply calculate this locally and pass <code>use_wallet_balance: true</code> to this booking API.
             </div>
+
+            <div class="response-title"><i class="bi bi-box-arrow-in-right"></i> Sample Request Payload</div>
+            <p>Notice that the frontend does <strong>not</strong> send <code>sub_total</code>, <code>discount_amount</code>, or <code>grand_total</code>. The backend calculates the final billing amount based on the provided items, coupon, and wallet selection to ensure security.</p>
+            <pre>
+<code>{
+    "city_id": 24,
+    "first_name": "Tejas",
+    "last_name": "Patel",
+    "phone": "9876543210",
+    "email": "tejas@example.com",
+    "appointment_date": "2026-07-20",
+    "appointment_time": "10:30 AM",
+    "service_address": "123, Mota Varachha, Surat",
+    
+    "items": [
+        {
+            "service_master_id": 10,
+            "variant_id": 5,
+            "qty": 1
+        }
+    ],
+
+    "coupon_id": 3,
+    "use_wallet_balance": true 
+}</code></pre>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
 <code>{
