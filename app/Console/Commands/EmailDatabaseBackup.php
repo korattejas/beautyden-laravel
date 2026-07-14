@@ -75,3 +75,4 @@ class EmailDatabaseBackup extends Command
         File::delete($zipPath);
     }
 }
+
