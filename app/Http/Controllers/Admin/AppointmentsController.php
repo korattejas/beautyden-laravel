@@ -373,7 +373,7 @@ class AppointmentsController extends Controller
                         $shortOrder = substr($appointment->order_number, 0, 4) . '...' . substr($appointment->order_number, -3);
                         return '<div class="d-flex align-items-center gap-1">
                                     <span class="d-none">' . $appointment->order_number . '</span>
-                                    <span class="fw-bolder text-primary" title="' . $appointment->order_number . '" style="letter-spacing: 0.5px; font-size: 0.9rem; cursor:help;">' . $shortOrder . '</span>
+                                    <span class="fw-bolder text-primary copy-order-btn" data-order="' . $appointment->order_number . '" title="Click to copy: ' . $appointment->order_number . '" style="letter-spacing: 0.5px; font-size: 0.9rem; cursor:pointer;">' . $shortOrder . '</span>
                                 </div>';
                     })
                     ->addColumn('service_name', function ($appointment) {

@@ -1816,18 +1816,14 @@ $(document).ready(function() {
         });
     });
     
-    $(document).on('click', '.toggle-order-btn', function(e) {
+    $(document).on('click', '.copy-order-btn', function(e) {
         e.preventDefault();
-        let $icon = $(this).find('i');
-        let $text = $(this).siblings('.order-number-text');
-
-        if ($text.hasClass('d-none')) {
-            $text.removeClass('d-none');
-            $icon.removeClass('bi-eye').addClass('bi-eye-slash');
-        } else {
-            $text.addClass('d-none');
-            $icon.removeClass('bi-eye-slash').addClass('bi-eye');
-        }
+        let orderNum = $(this).data('order');
+        navigator.clipboard.writeText(orderNum).then(() => {
+            toastr.success('Copied: ' + orderNum);
+        }).catch(() => {
+            toastr.error('Failed to copy');
+        });
     });
 
 });
