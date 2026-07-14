@@ -639,6 +639,8 @@
                                             <th>Grand Total</th>
                                             <th>Company Amount</th>
                                             <th data-search="false">Payment Type</th>
+                                            <th data-search="false">User Payment</th>
+                                            <th data-search="false">Beautician Payment</th>
                                             <th data-search="false">Status</th>
                                             <th data-search="false">Action</th>
                                         </tr>
@@ -1121,6 +1123,14 @@
                 data: 'payment_type',
                 name: 'payment_type',
                 orderable: false
+            },
+            {
+                data: 'user_payment_status',
+                name: 'user_payment_status'
+            },
+            {
+                data: 'beautician_payment_status',
+                name: 'beautician_payment_status'
             },
             {
                 data: 'status',
@@ -1758,6 +1768,62 @@ $(document).ready(function() {
         
         $(this).append($dropdownMenu.detach());
     });
+    $(document).on('click', '.status-change-user, .status-change-beautician', function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+        let status = $(this).data('status');
+        let type = $(this).hasClass('status-change-user') ? 'user' : 'beautician';
+        
+        let label = type == 'user' ? 'User Payment Status' : 'Beautician Payment Status';
+
+        Swal.fire({
+            title: `Change ${label}?`,
+            text: `Are you sure you want to change it to ${status}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, change it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("admin.appointments.updatePaymentStatus") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id,
+                        status: status,
+                        type: type
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Updated!', response.message, 'success');
+                            $('#table-appointments').DataTable().ajax.reload(null, false);
+                        } else {
+                            Swal.fire('Error!', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error!', 'Something went wrong!', 'error');
+                    }
+                });
+            }
+        });
+    });
+    $(document).on('click', '.toggle-order-btn', function(e) {
+        e.preventDefault();
+        let $icon = $(this).find('i');
+        let $text = $(this).siblings('.order-number-text');
+
+        if ($text.hasClass('d-none')) {
+            $text.removeClass('d-none');
+            $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+        } else {
+            $text.addClass('d-none');
+            $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+        }
+    });
+
 });
 </script>
 @endsection

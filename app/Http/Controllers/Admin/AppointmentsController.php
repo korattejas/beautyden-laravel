@@ -369,6 +369,15 @@ class AppointmentsController extends Controller
                 }
 
                 return DataTables::of($appointments)
+                    ->editColumn('order_number', function ($appointment) {
+                        return '<div class="d-flex align-items-center gap-1">
+                                    <span class="d-none order-search-text">' . $appointment->order_number . '</span>
+                                    <button class="btn btn-sm btn-icon btn-light-primary rounded-circle toggle-order-btn" title="View Order Number">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <span class="order-number-text fw-bolder text-primary d-none" style="letter-spacing: 0.5px; font-size: 0.9rem;">' . $appointment->order_number . '</span>
+                                </div>';
+                    })
                     ->addColumn('service_name', function ($appointment) {
                         $serviceNames = [];
                         if (!empty($appointment->service_id)) {
@@ -477,6 +486,44 @@ class AppointmentsController extends Controller
                                     <i class="bi bi-cash-coin"></i> Cash
                                 </span>';
                     })
+                    ->addColumn('user_payment_status', function ($appointment) {
+                        $statusBadge = '';
+                        switch ($appointment->user_payment_status) {
+                            case 'paid':
+                                $statusBadge = '<span class="badge badge-glow bg-success">Paid</span>';
+                                break;
+                            case 'failed':
+                                $statusBadge = '<span class="badge badge-glow bg-danger">Failed</span>';
+                                break;
+                            default:
+                                $statusBadge = '<span class="badge badge-glow bg-warning text-dark">Pending</span>';
+                        }
+                        return '<div class="dropdown">
+                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false">
+                                ' . $statusBadge . '
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end shadow" style="background-color: #ffffff !important; z-index: 9999;">
+                                <a class="dropdown-item status-change-user" href="javascript:void(0);" data-id="' . $appointment->id . '" data-status="pending"><i class="bi bi-clock me-50 text-warning"></i><span>Pending</span></a>
+                                <a class="dropdown-item status-change-user" href="javascript:void(0);" data-id="' . $appointment->id . '" data-status="paid"><i class="bi bi-check-circle me-50 text-success"></i><span>Paid</span></a>
+                                <a class="dropdown-item status-change-user" href="javascript:void(0);" data-id="' . $appointment->id . '" data-status="failed"><i class="bi bi-x-circle me-50 text-danger"></i><span>Failed</span></a>
+                            </div>
+                        </div>';
+                    })
+                    ->addColumn('beautician_payment_status', function ($appointment) {
+                        $statusBadge = ($appointment->beautician_payment_status == 'paid') 
+                                        ? '<span class="badge badge-glow bg-success">Paid</span>' 
+                                        : '<span class="badge badge-glow bg-warning text-dark">Pending</span>';
+
+                        return '<div class="dropdown">
+                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown" data-bs-boundary="viewport" aria-expanded="false">
+                                ' . $statusBadge . '
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end shadow" style="background-color: #ffffff !important; z-index: 9999;">
+                                <a class="dropdown-item status-change-beautician" href="javascript:void(0);" data-id="' . $appointment->id . '" data-status="pending"><i class="bi bi-clock me-50 text-warning"></i><span>Pending</span></a>
+                                <a class="dropdown-item status-change-beautician" href="javascript:void(0);" data-id="' . $appointment->id . '" data-status="paid"><i class="bi bi-check-circle me-50 text-success"></i><span>Paid</span></a>
+                            </div>
+                        </div>';
+                    })
                     ->addColumn('action', function ($appointment) {
                         $action_array = [
                             'is_simple_action' => 1,
@@ -494,7 +541,7 @@ class AppointmentsController extends Controller
                             'action_array' => $action_array
                         ])->render();
                     })
-                    ->rawColumns(['action', 'service_name', 'status', 'assigned_to_name', 'company_amount', 'grand_total', 'schedule', 'payment_type'])
+                    ->rawColumns(['action', 'order_number', 'service_name', 'status', 'assigned_to_name', 'company_amount', 'grand_total', 'schedule', 'payment_type', 'user_payment_status', 'beautician_payment_status'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -758,6 +805,24 @@ class AppointmentsController extends Controller
         }
     }
 
+    public function updatePaymentStatus(Request $request)
+    {
+        try {
+            $appointment = Appointment::find($request->id);
+            if ($appointment) {
+                if ($request->type == 'user') {
+                    $appointment->user_payment_status = $request->status;
+                } elseif ($request->type == 'beautician') {
+                    $appointment->beautician_payment_status = $request->status;
+                }
+                $appointment->save();
+                return response()->json(['success' => true, 'message' => "Payment status updated successfully"]);
+            }
+            return response()->json(['success' => false, 'message' => "Appointment not found"]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
     public function export(Request $request)
     {
         try {

@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Exception;
+use Razorpay\Api\Api;
 
 class AppointmentsController extends Controller
 {
@@ -246,6 +247,7 @@ class AppointmentsController extends Controller
                 'status'                    => 'nullable|in:0,1',
                 'coupon_id'                 => 'nullable|integer|exists:coupon_codes,id',
                 'use_wallet_balance'        => 'nullable|boolean',
+                'payment_type'              => 'required|in:online,cash',
             ]);
 
             if ($validator->fails()) {
@@ -392,7 +394,8 @@ class AppointmentsController extends Controller
                 'appointment_time'    => $request->appointment_time,
                 'special_notes'       => $request->notes,
                 'services_data'       => $servicesData,
-                'status'              => '1',
+                'status'              => '1', // 1=Confirmed or Pending based on your logic
+                'payment_type'        => $request->payment_type
             ]);
 
             // Record Coupon Usage
@@ -450,10 +453,35 @@ class AppointmentsController extends Controller
                         </div>
                     ';
 
+            $razorpayOrderId = null;
+            $razorpayKey = env('RAZORPAY_KEY');
+
+            // If there's an amount to pay and user selected online payment, create Razorpay Order
+            if ($grandTotal > 0 && $request->payment_type == 'online') {
+                try {
+                    $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+                    $orderData = [
+                        'receipt'         => (string)$orderNumber,
+                        'amount'          => round($grandTotal * 100), // convert to paisa
+                        'currency'        => 'INR',
+                        'payment_capture' => 1 // auto capture
+                    ];
+                    
+                    $razorpayOrder = $api->order->create($orderData);
+                    $razorpayOrderId = $razorpayOrder['id'];
+                } catch (\Exception $e) {
+                    // Log Razorpay error but don't fail the whole booking, just let them pay by cash or retry
+                    logger()->error('Razorpay Order Creation Failed: ' . $e->getMessage());
+                }
+            }
+
             return $this->sendResponse(
                 [
                     'appointment'  => $appointment,
                     'order_number' => $orderNumber,
+                    'grand_total'  => $grandTotal,
+                    'razorpay_order_id' => $razorpayOrderId,
+                    'razorpay_key' => $razorpayKey
                 ],
                 $message,
                 $this->success_status
@@ -560,6 +588,74 @@ class AppointmentsController extends Controller
             */
         } catch (\Exception $e) {
             Log::error("MSG91 WhatsApp Booking send exception: " . $e->getMessage());
+        }
+    }
+
+    public function verifyRazorpayPayment(Request $request): JsonResponse
+    {
+        $function_name = 'verifyRazorpayPayment';
+        try {
+            $validator = Validator::make($request->all(), [
+                'appointment_id' => 'required|exists:appointments,id',
+                'razorpay_order_id' => 'required|string',
+                'razorpay_payment_id' => 'required|string',
+                'razorpay_signature' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+            
+            $attributes = [
+                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_payment_id' => $request->razorpay_payment_id,
+                'razorpay_signature' => $request->razorpay_signature
+            ];
+
+            // Verify the signature, will throw exception if invalid
+            $api->utility->verifyPaymentSignature($attributes);
+
+            // Fetch payment details to get the amount (optional, but good practice)
+            $payment = $api->payment->fetch($request->razorpay_payment_id);
+            $amount = $payment['amount'] / 100; // Convert paisa back to INR
+
+            // Record transaction in DB
+            \App\Models\RazorpayTransaction::create([
+                'user_id' => auth('user')->check() ? auth('user')->id() : null,
+                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_payment_id' => $request->razorpay_payment_id,
+                'razorpay_signature' => $request->razorpay_signature,
+                'amount' => $amount,
+                'currency' => 'INR',
+                'status' => 'success',
+                'meta_data' => json_encode(['appointment_id' => $request->appointment_id]),
+                'method' => $payment['method'] ?? 'online',
+            ]);
+
+            // Update user payment status to paid
+            $appointment = \App\Models\Appointment::find($request->appointment_id);
+            if ($appointment) {
+                $appointment->user_payment_status = 'paid';
+                $appointment->save();
+            }
+
+            return $this->sendResponse([], 'Payment verified successfully.', $this->success_status);
+
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            // Update user payment status to failed if appointment exists
+            if ($request->has('appointment_id')) {
+                $appointment = \App\Models\Appointment::find($request->appointment_id);
+                if ($appointment) {
+                    $appointment->user_payment_status = 'failed';
+                    $appointment->save();
+                }
+            }
+
+            return $this->sendError('Payment verification failed: ' . $e->getMessage(), $this->backend_error_status);
         }
     }
 }

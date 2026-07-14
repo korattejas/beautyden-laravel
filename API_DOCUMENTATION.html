@@ -1448,6 +1448,11 @@
                         <td>Boolean</td>
                         <td>Optional. Set to true/1 if the user wants to apply their wallet balance towards the booking.</td>
                     </tr>
+                    <tr>
+                        <td>payment_type</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. Must be `"online"` or `"cash"`. If "cash", it skips generating Razorpay Order ID.</td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -1482,7 +1487,8 @@
     ],
 
     "coupon_id": 3,
-    "use_wallet_balance": true 
+    "use_wallet_balance": true,
+    "payment_type": "online" 
 }</code></pre>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
@@ -1523,8 +1529,68 @@
                 }
             }
         },
-        "order_number": "#BDXYZ123"
+        "order_number": "#BDXYZ123",
+        "grand_total": 2450.00,
+        "razorpay_order_id": "order_PiXYZ123",
+        "razorpay_key": "rzp_test_YourKeyHere"
     }
+}</code></pre>
+
+            <h3>Verify Razorpay Payment</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/verifyRazorpayPayment
+                <span class="badge auth">Token Required</span>
+            </div>
+            <p>Verifies the payment signature returned by the Razorpay mobile SDK and updates the appointment status to Paid/Confirmed.</p>
+
+            <div class="note" style="margin: 15px 0; background: #e0f2fe; border-left: 5px solid #0284c7; padding: 15px; border-radius: 8px;">
+                <strong>💳 Mobile Developer Guide: When & How to use this API?</strong><br>
+                <ol style="margin-top: 10px; margin-bottom: 0;">
+                    <li>When the user clicks "Book Now" in the app, you first call the <code>bookAppointmentForApp</code> API with <code>"payment_type": "online"</code>.</li>
+                    <li>The backend will return a <code>razorpay_order_id</code> (e.g., <i>order_xyz123</i>) and <code>razorpay_key</code>.</li>
+                    <li>You pass this Order ID and Key to the <b>Razorpay Mobile SDK</b> (Checkout popup) to collect the payment from the user.</li>
+                    <li>Once the user pays successfully, the Razorpay SDK returns a success callback with three variables: <code>razorpay_payment_id</code>, <code>razorpay_order_id</code>, and <code>razorpay_signature</code>.</li>
+                    <li><strong>Immediately after the SDK success callback</strong>, you must call this <code>verifyRazorpayPayment</code> API and pass those three variables along with the <code>appointment_id</code>. Only then will the backend mark the booking as "Paid"!</li>
+                </ol>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. The ID of the appointment returned from `bookAppointmentForApp`.</td>
+                    </tr>
+                    <tr>
+                        <td>razorpay_order_id</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. The order ID returned from the Razorpay SDK.</td>
+                    </tr>
+                    <tr>
+                        <td>razorpay_payment_id</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. The payment ID returned from the Razorpay SDK.</td>
+                    </tr>
+                    <tr>
+                        <td>razorpay_signature</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. The signature returned from the Razorpay SDK.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Payment verified successfully.",
+    "data": []
 }</code></pre>
 
             <h3>Get My Bookings</h3>
