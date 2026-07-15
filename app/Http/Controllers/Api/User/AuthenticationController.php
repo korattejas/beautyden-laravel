@@ -630,7 +630,7 @@ class AuthenticationController extends Controller
                 ->orderBy('id', 'desc')
                 ->get();
 
-            return $this->sendResponse($addresses, 'Addresses fetched successfully.', $this->success_status);
+            return $this->sendResponse($addresses, 'Addresses fetched successfully.', $this->success_status, ['city_id' => $authUser->city_id]);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);
