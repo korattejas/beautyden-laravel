@@ -228,23 +228,20 @@ class AppointmentsController extends Controller
 
         try {
             $validator = Validator::make($request->all(), [
-                'city_id'                   => 'required|integer',
-                'service_category_id'       => 'nullable|integer',
-                'service_sub_category_id'   => 'nullable|integer',
+                'city_id'                   => 'nullable|integer',
                 'items'                     => 'required|array|min:1',
                 'items.*.service_master_id' => 'required|integer',
                 'items.*.variant_id'        => 'nullable|integer',
                 'items.*.qty'               => 'required|integer|min:1',
-                'first_name'                => 'required|string|max:50',
+                'first_name'                => 'nullable|string|max:50',
                 'last_name'                 => 'nullable|string|max:50',
                 'email'                     => 'nullable|email|max:100',
-                'phone'                     => 'required|string|max:20',
+                'phone'                     => 'nullable|string|max:20',
                 'discount_price'            => 'nullable|numeric',
-                'service_address'           => 'nullable|string',
+                'service_address'           => 'required|integer|exists:user_addresses,id',
                 'appointment_date'          => 'nullable|date',
                 'appointment_time'          => 'nullable',
                 'notes'                     => 'nullable|string',
-                'status'                    => 'nullable|in:0,1',
                 'coupon_id'                 => 'nullable|integer|exists:coupon_codes,id',
                 'use_wallet_balance'        => 'nullable|boolean',
                 'payment_type'              => 'required|in:online,cash',
@@ -253,6 +250,46 @@ class AppointmentsController extends Controller
             if ($validator->fails()) {
                 logValidationException($this->controller_name, $function_name, $validator);
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $cityId = $request->city_id;
+            $firstName = $request->first_name;
+            $lastName = $request->last_name;
+            $email = $request->email;
+            $phone = $request->phone;
+
+            $addressObj = \App\Models\UserAddress::where('id', $request->service_address)
+                ->where('user_id', auth('user')->id())
+                ->first();
+
+            if (!$addressObj) {
+                return $this->sendError('Invalid address selected.', $this->validation_error_status);
+            }
+            $serviceAddressText = $addressObj->address;
+
+            if ($cityId === 0 || $cityId === '0') {
+                $ahmedabad = \Illuminate\Support\Facades\DB::table('cities')->where('name', 'like', '%Ahmedabad%')->first();
+                if ($ahmedabad) {
+                    $cityId = $ahmedabad->id;
+                }
+            }
+
+            if (auth('user')->check()) {
+                $authUser = auth('user')->user();
+                $cityId = $cityId ?: $authUser->city_id;
+                $firstName = $firstName ?: $authUser->name;
+                $email = $email ?: $authUser->email;
+                $phone = $phone ?: $authUser->mobile_number;
+            }
+
+            if (empty($cityId)) {
+                return $this->sendError('City ID is required.', $this->validation_error_status);
+            }
+            if (empty($firstName)) {
+                return $this->sendError('First name is required.', $this->validation_error_status);
+            }
+            if (empty($phone)) {
+                return $this->sendError('Phone number is required.', $this->validation_error_status);
             }
 
             $orderNumber = '#BD' . Str::upper(Str::random(8));
@@ -274,7 +311,7 @@ class AppointmentsController extends Controller
                     if (!empty($item['variant_id'])) {
                         $variantPriceObj = \App\Models\ServiceCityVariantPrice::where('service_master_id', $item['service_master_id'])
                             ->where('variant_id', $item['variant_id'])
-                            ->where('city_id', $request->city_id)
+                            ->where('city_id', $cityId)
                             ->first();
 
                         if ($variantPriceObj) {
@@ -287,7 +324,7 @@ class AppointmentsController extends Controller
 
                     } else {
                         $cityMaster = \App\Models\ServiceCityMaster::where('service_master_id', $item['service_master_id'])
-                            ->where('city_id', $request->city_id)
+                            ->where('city_id', $cityId)
                             ->first();
 
                         if ($cityMaster) {
@@ -317,6 +354,31 @@ class AppointmentsController extends Controller
             if ($request->filled('coupon_id')) {
                 $coupon = \App\Models\CouponCode::find($request->coupon_id);
                 if ($coupon) {
+                    $now = now()->toDateString();
+                    if ($coupon->status != 1 || ($coupon->start_date && $now < $coupon->start_date) || ($coupon->end_date && $now > $coupon->end_date)) {
+                        return $this->sendError('This coupon is inactive or expired.', $this->validation_error_status);
+                    }
+                    if ($coupon->min_purchase_amount > 0 && $subTotal < $coupon->min_purchase_amount) {
+                        return $this->sendError("Minimum order amount of {$coupon->min_purchase_amount} is required for this coupon.", $this->validation_error_status);
+                    }
+                    if ($coupon->usage_limit !== null && \App\Models\CouponUsage::where('coupon_id', $coupon->id)->count() >= $coupon->usage_limit) {
+                        return $this->sendError('This coupon usage limit has been reached.', $this->validation_error_status);
+                    }
+
+                    if (auth('user')->check()) {
+                        $userUsage = \App\Models\CouponUsage::where('coupon_id', $coupon->id)->where('user_id', auth('user')->id())->count();
+                        if ($userUsage >= $coupon->usage_per_user) {
+                            return $this->sendError("You can only use this coupon {$coupon->usage_per_user} time(s).", $this->validation_error_status);
+                        }
+                        
+                        if ($coupon->is_first_order_only) {
+                            $userOrdersCount = \App\Models\Appointment::where('phone', auth('user')->user()->mobile_number)->count();
+                            if ($userOrdersCount > 0) {
+                                return $this->sendError('This coupon is valid for first-time orders only.', $this->validation_error_status);
+                            }
+                        }
+                    }
+
                     $couponCode = $coupon->code;
                     if ($coupon->discount_type == 'percentage') {
                         $discountAmount = ($subTotal * $coupon->discount_value) / 100;
@@ -334,6 +396,11 @@ class AppointmentsController extends Controller
             
             if ($request->use_wallet_balance && auth('user')->check()) {
                 $user = auth('user')->user();
+                
+                if ($user->wallet_balance <= 0) {
+                    return $this->sendError('Your wallet balance is zero.', $this->validation_error_status);
+                }
+
                 $walletLimitPercent = \App\Models\AppSetting::where('key', 'wallet_usage_limit_percent')->value('value') ?? 10;
                 
                 $maxUsableFromWallet = ($subTotal * $walletLimitPercent) / 100;
@@ -346,15 +413,15 @@ class AppointmentsController extends Controller
 
             $servicesData = [
                 'client' => [
-                    'first_name' => $request->first_name,
-                    'last_name'  => $request->last_name,
-                    'email'      => $request->email,
-                    'phone'      => $request->phone,
+                    'first_name' => $firstName,
+                    'last_name'  => $lastName,
+                    'email'      => $email,
+                    'phone'      => $phone,
                 ],
                 'appointment' => [
                     'date'    => $request->appointment_date,
                     'time'    => $request->appointment_time,
-                    'address' => $request->service_address,
+                    'address' => $serviceAddressText,
                     'notes'   => $request->notes,
                 ],
                 'services' => $services,
@@ -376,25 +443,26 @@ class AppointmentsController extends Controller
                 $totalQuantity += $item['qty'];
             }
 
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
             $appointment = \App\Models\Appointment::create([
+                'user_id'             => auth('user')->check() ? auth('user')->id() : null,
                 'order_number'        => $orderNumber,
-                'city_id'             => $request->city_id,
-                'first_name'          => $request->first_name,
-                'last_name'           => $request->last_name,
-                'email'               => $request->email,
-                'phone'               => $request->phone,
+                'city_id'             => $cityId,
+                'first_name'          => $firstName,
+                'last_name'           => $lastName,
+                'email'               => $email,
+                'phone'               => $phone,
                 'service_id'          => implode(',', $serviceIdsForDB),
-                'service_category_id' => $request->service_category_id,
-                'service_sub_category_id' => $request->service_sub_category_id,
                 'quantity'            => $totalQuantity,
                 'price'               => $subTotal,
                 'discount_price'      => $discountAmount,
-                'service_address'     => $request->service_address,
+                'service_address'     => $serviceAddressText,
                 'appointment_date'    => $request->appointment_date,
                 'appointment_time'    => $request->appointment_time,
                 'special_notes'       => $request->notes,
                 'services_data'       => $servicesData,
-                'status'              => '1', // 1=Confirmed or Pending based on your logic
+                'status'              => '1',
                 'payment_type'        => $request->payment_type
             ]);
 
@@ -422,8 +490,19 @@ class AppointmentsController extends Controller
                 ]);
             }
 
-            if (!empty($request->phone)) {
-                $this->sendWhatsAppBooking($request->phone, $request->first_name, $orderNumber, $request->appointment_date, $request->appointment_time);
+            \Illuminate\Support\Facades\DB::commit();
+
+            if (!empty($phone)) {
+                $appointmentDate = $request->appointment_date;
+                $appointmentTime = $request->appointment_time;
+                
+                dispatch(function () use ($phone, $firstName, $orderNumber, $appointmentDate, $appointmentTime) {
+                    try {
+                        $this->sendWhatsAppBooking($phone, $firstName, $orderNumber, $appointmentDate, $appointmentTime);
+                    } catch (\Exception $e) {
+                        logger()->error('WhatsApp error: ' . $e->getMessage());
+                    }
+                })->afterResponse();
             }
 
             $message = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -470,8 +549,12 @@ class AppointmentsController extends Controller
                     $razorpayOrder = $api->order->create($orderData);
                     $razorpayOrderId = $razorpayOrder['id'];
                 } catch (\Exception $e) {
-                    // Log Razorpay error but don't fail the whole booking, just let them pay by cash or retry
+                    // Log Razorpay error and fail the booking payment status
                     logger()->error('Razorpay Order Creation Failed: ' . $e->getMessage());
+                    $appointment->user_payment_status = 'failed';
+                    $appointment->save();
+                    
+                    return $this->sendError('Payment gateway is currently down. Please try again or choose Cash on Delivery.', $this->exception_status);
                 }
             }
 
@@ -487,6 +570,7 @@ class AppointmentsController extends Controller
                 $this->success_status
             );
         } catch (Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
             logCatchException($e, $this->controller_name, $function_name);
 
             return $this->sendError(
@@ -656,6 +740,87 @@ class AppointmentsController extends Controller
             }
 
             return $this->sendError('Payment verification failed: ' . $e->getMessage(), $this->backend_error_status);
+        }
+    }
+
+    public function retryRazorpayPayment(Request $request): JsonResponse
+    {
+        $function_name = 'retryRazorpayPayment';
+        try {
+            $validator = Validator::make($request->all(), [
+                'appointment_id' => 'required|exists:appointments,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            if (!auth('user')->check()) {
+                return $this->sendError('Unauthenticated user.', 401);
+            }
+
+            $user = auth('user')->user();
+            $appointment = \App\Models\Appointment::where('id', $request->appointment_id)
+                ->where('phone', $user->mobile_number)
+                ->first();
+
+            if (!$appointment) {
+                return $this->sendError('Appointment not found or does not belong to you.', $this->backend_error_status);
+            }
+
+            if ($appointment->user_payment_status == 'paid') {
+                return $this->sendError('Payment is already completed for this appointment.', $this->validation_error_status);
+            }
+
+            if ($appointment->payment_type != 'online') {
+                return $this->sendError('This is not an online payment appointment.', $this->validation_error_status);
+            }
+
+            $servicesData = $appointment->services_data ? (is_string($appointment->services_data) ? json_decode($appointment->services_data, true) : $appointment->services_data) : null;
+            $grandTotal = $servicesData['summary']['grand_total'] ?? 0;
+
+            if ($grandTotal <= 0) {
+                return $this->sendError('No amount to be paid.', $this->validation_error_status);
+            }
+
+            $razorpayOrderId = null;
+            $razorpayKey = env('RAZORPAY_KEY');
+
+            try {
+                $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+                $orderData = [
+                    'receipt'         => (string)$appointment->order_number,
+                    'amount'          => round($grandTotal * 100), // convert to paisa
+                    'currency'        => 'INR',
+                    'payment_capture' => 1 // auto capture
+                ];
+                
+                $razorpayOrder = $api->order->create($orderData);
+                $razorpayOrderId = $razorpayOrder['id'];
+                
+                // Keep it pending
+                $appointment->user_payment_status = 'pending';
+                $appointment->save();
+            } catch (\Exception $e) {
+                logger()->error('Retry Razorpay Order Creation Failed: ' . $e->getMessage());
+                return $this->sendError('Payment gateway is currently down. Please try again later.', $this->exception_status);
+            }
+
+            return $this->sendResponse(
+                [
+                    'appointment_id' => $appointment->id,
+                    'order_number' => $appointment->order_number,
+                    'grand_total'  => $grandTotal,
+                    'razorpay_order_id' => $razorpayOrderId,
+                    'razorpay_key' => $razorpayKey
+                ],
+                'New Razorpay order created successfully.',
+                $this->success_status
+            );
+
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
 }

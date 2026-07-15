@@ -657,6 +657,30 @@ class AppointmentsController extends Controller
                     }
                 }
             }
+            
+            if ($appointment && $status == 4 && $appointment->status != 4) {
+                // Check if wallet was used
+                $walletTx = \App\Models\WalletTransaction::where('reference_id', $appointment->id)
+                    ->where('type', 'debit')
+                    ->where('description', 'like', '%Booking ' . $appointment->order_number . '%')
+                    ->first();
+                    
+                if ($walletTx) {
+                    $user = \App\Models\User::find($walletTx->user_id);
+                    if ($user) {
+                        $refundAmount = $walletTx->amount;
+                        $user->increment('wallet_balance', $refundAmount);
+                        \App\Models\WalletTransaction::create([
+                            'user_id' => $user->id,
+                            'type' => 'credit',
+                            'amount' => $refundAmount,
+                            'description' => 'Refund for Cancelled Booking ' . $appointment->order_number,
+                            'reference_id' => $appointment->id
+                        ]);
+                    }
+                }
+            }
+            
             if ($appointment) {
                 $appointment->status = $status;
                 $appointment->save();

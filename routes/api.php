@@ -90,8 +90,9 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post("getAppointmentReview", [ReviewApiController::class, "getAppointmentReview"]);
         Route::post("getAppointmentSummaryForReview", [ReviewApiController::class, "getAppointmentSummaryForReview"]);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
-        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
+        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp'])->middleware('throttle:5,1');
         Route::post('verifyRazorpayPayment', [AppointmentsController::class, 'verifyRazorpayPayment']);
+        Route::post('retryRazorpayPayment', [AppointmentsController::class, 'retryRazorpayPayment'])->middleware('throttle:5,1');
         Route::post('cart/add', [CartController::class, 'addToCart']);
         Route::post('cart/get', [CartController::class, 'getCart']);
         Route::post('cart/update', [CartController::class, 'updateCartItem']);
@@ -118,8 +119,9 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
         Route::get('settings', [SettingController::class, 'getsettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
-        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
+        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp'])->middleware('throttle:5,1');
         Route::post('verifyRazorpayPayment', [AppointmentsController::class, 'verifyRazorpayPayment']);
+        Route::post('retryRazorpayPayment', [AppointmentsController::class, 'retryRazorpayPayment'])->middleware('throttle:5,1');
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
@@ -212,8 +214,9 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post("getAppointmentReview", [ReviewApiController::class, "getAppointmentReview"]);
         Route::post("getAppointmentSummaryForReview", [ReviewApiController::class, "getAppointmentSummaryForReview"]);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
-        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
+        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp'])->middleware('throttle:5,1');
         Route::post('verifyRazorpayPayment', [AppointmentsController::class, 'verifyRazorpayPayment']);
+        Route::post('retryRazorpayPayment', [AppointmentsController::class, 'retryRazorpayPayment'])->middleware('throttle:5,1');
         Route::post('cart/add', [CartController::class, 'addToCart']);
         Route::post('cart/get', [CartController::class, 'getCart']);
         Route::post('cart/update', [CartController::class, 'updateCartItem']);
@@ -239,8 +242,9 @@ Route::middleware([])->group(function () {
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
         Route::get('settings', [SettingController::class, 'getsettings']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
-        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp']);
+        Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp'])->middleware('throttle:5,1');
         Route::post('verifyRazorpayPayment', [AppointmentsController::class, 'verifyRazorpayPayment']);
+        Route::post('retryRazorpayPayment', [AppointmentsController::class, 'retryRazorpayPayment'])->middleware('throttle:5,1');
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);

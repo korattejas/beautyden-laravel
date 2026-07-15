@@ -1414,17 +1414,17 @@
                     <tr>
                         <td>city_id</td>
                         <td>Integer</td>
-                        <td><strong>Required</strong>. ID of the selected city.</td>
+                        <td>Optional. ID of the selected city. If `0` is passed, it defaults to Ahmedabad. If completely empty and logged in, it takes the profile's city.</td>
                     </tr>
                     <tr>
                         <td>first_name</td>
                         <td>String</td>
-                        <td><strong>Required</strong>. Customer's first name.</td>
+                        <td>Optional. Customer's first name (taken from profile if empty and logged in).</td>
                     </tr>
                     <tr>
                         <td>phone</td>
                         <td>String</td>
-                        <td><strong>Required</strong>. Customer's phone number.</td>
+                        <td>Optional. Customer's phone number (taken from profile if empty and logged in).</td>
                     </tr>
                     <tr>
                         <td>appointment_date</td>
@@ -1438,8 +1438,8 @@
                     </tr>
                     <tr>
                         <td>service_address</td>
-                        <td>String</td>
-                        <td>Optional. Address for home services.</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. The ID of the saved address (`user_address_id`) where the service is to be delivered.</td>
                     </tr>
                     <tr>
                         <td>items</td>
@@ -1462,6 +1462,18 @@
                 </tbody>
             </table>
 
+            <div class="note" style="margin: 15px 0; background: #e0f2fe; border-left: 5px solid #0ea5e9; padding: 15px; border-radius: 8px;">
+                <strong>💳 Online Payment & Razorpay Flow (Important)</strong><br>
+                When a user selects "Online Payment" (<code>payment_type: "online"</code>), the backend initiates the online payment process. Here is the strict integration flow:<br>
+                <ol style="margin-top: 10px;">
+                    <li><strong>Step 1 (Create Booking):</strong> Frontend calls this <code>bookAppointmentForApp</code> API. The backend saves the appointment with <code>user_payment_status = 'pending'</code>.</li>
+                    <li><strong>Step 2 (Razorpay Order):</strong> If successful, this API returns a <code>razorpay_order_id</code> in the response.</li>
+                    <li><strong>Step 3 (Payment Popup):</strong> Frontend opens the Razorpay SDK screen using this <code>razorpay_order_id</code> so the user can enter UPI/Card details.</li>
+                    <li><strong>Step 4 (Success Verification):</strong> Upon successful payment in the SDK, Razorpay gives 3 keys: <code>razorpay_payment_id</code>, <code>razorpay_order_id</code>, and <code>razorpay_signature</code>. Frontend <b>MUST</b> call the <code>verifyRazorpayPayment</code> API with these 3 keys to mark the order as "Paid".</li>
+                    <li><strong>Step 5 (Payment Failure):</strong> If the payment fails on the Razorpay screen or the user closes the popup, <b>do not delete the booking</b>. The booking remains saved in the DB. In the "My Bookings" screen API, you will receive <code>user_payment_status: "pending"</code>. Show a <b>"Retry Payment"</b> button to allow them to re-initiate payment. If the Razorpay API itself is down during booking, this API will return an error and set <code>user_payment_status: "failed"</code>.</li>
+                </ol>
+            </div>
+
             <div class="note" style="margin: 15px 0; background: #f0fdf4; border-left: 5px solid #22c55e; padding: 15px; border-radius: 8px;">
                 <strong>💡 Frontend Developer Note: Wallet Logic Calculation (Checkout Page)</strong><br>
                 If <code>use_wallet_balance</code> is true, the backend automatically deducts the exact amount and applies it to the final bill. If you want to show the exact discounted amount to the user on the UI <i>before</i> they hit book, calculate it as follows:<br><br>
@@ -1475,20 +1487,20 @@
             <p>Notice that the frontend does <strong>not</strong> send <code>sub_total</code>, <code>discount_amount</code>, or <code>grand_total</code>. The backend calculates the final billing amount based on the provided items, coupon, and wallet selection to ensure security.</p>
             <pre>
 <code>{
-    "city_id": 24,
-    "first_name": "Tejas",
-    "last_name": "Patel",
-    "phone": "9876543210",
-    "email": "tejas@example.com",
     "appointment_date": "2026-07-20",
     "appointment_time": "10:30 AM",
-    "service_address": "123, Mota Varachha, Surat",
+    "service_address": 12,
     
     "items": [
         {
             "service_master_id": 10,
             "variant_id": 5,
             "qty": 1
+        },
+        {
+            "service_master_id": 18,
+            "variant_id": null,
+            "qty": 2
         }
     ],
 
@@ -1599,12 +1611,57 @@
     "data": []
 }</code></pre>
 
+            <h3>Retry Razorpay Payment</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/retryRazorpayPayment
+                <span class="badge auth">Token Required</span>
+            </div>
+            <p>Generates a new Razorpay order ID for an existing unpaid (or failed) online appointment. Use this when the user clicks "Retry Payment" from their My Bookings screen.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. The ID of the appointment.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "New Razorpay order created successfully.",
+    "data": {
+        "appointment_id": 12,
+        "order_number": "ORD-12345",
+        "grand_total": 450,
+        "razorpay_order_id": "order_QwertY123456",
+        "razorpay_key": "rzp_test_xxxxxx"
+    }
+}</code></pre>
+
             <h3>Get My Bookings</h3>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customer/getTotalBookService
                 <span class="badge auth">Token Required</span>
             </div>
             <p>Returns summary list of all previous and upcoming appointments for the user.</p>
+            <div class="note" style="margin: 15px 0; background: #fef3c7; border-left: 5px solid #f59e0b; padding: 15px; border-radius: 8px;">
+                <strong>UI Logic for Retry / Pay Now Button:</strong><br>
+                The frontend <b>MUST</b> display a <b>"Pay Now"</b> (or "Retry Payment") button on the booking list and details page if <code>user_payment_status == 'pending'</code> (or <code>failed</code>).<br>
+                <ul style="margin-top: 8px; margin-bottom: 0;">
+                    <li>Even if the user originally selected <b>"Cash"</b> at checkout, their status remains "pending". Show the "Pay Now" button so they can change their mind and pay online anytime (before, during, or after the service).</li>
+                    <li>When clicked, call the <code>retryRazorpayPayment</code> API to generate a fresh Razorpay order and open the payment gateway.</li>
+                </ul>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -1637,6 +1694,7 @@
                 "id": 12,
                 "order_number": "ORD-12345",
                 "status": 3,
+                "user_payment_status": "pending",
                 "appointment_date": "2026-05-01",
                 "appointment_time": "10:30 AM",
                 "city_name": "Ahmedabad",
@@ -1677,6 +1735,8 @@
     "data": {
         "id": 12,
         "order_number": "ORD-12345",
+        "status": 3,
+        "user_payment_status": "pending",
         "appointment_date": "2026-05-01",
         "appointment_time": "10:30 AM",
         "status": 1,
