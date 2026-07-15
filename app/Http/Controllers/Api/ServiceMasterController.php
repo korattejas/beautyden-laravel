@@ -66,8 +66,15 @@ class ServiceMasterController extends Controller
         try {
             $cityId = $request->city_id;
 
-            if (!$cityId) {
+            if (!isset($request->city_id) || $request->city_id === '') {
                 return $this->sendError('City ID is required.', $this->validation_error_status);
+            }
+
+            if ($cityId == 0) {
+                $ahmedabad = DB::table('cities')->where('name', 'like', '%Ahmedabad%')->first();
+                if ($ahmedabad) {
+                    $cityId = $ahmedabad->id;
+                }
             }
 
             $query = DB::table('service_city_masters as scm')
@@ -111,6 +118,11 @@ class ServiceMasterController extends Controller
                         ->orWhere('sm.duration', 'like', "%$search%")
                         ->orWhere('sm.skin_type', 'like', "%$search%");
                 });
+            }
+
+            if ($request->filled('service_type') || $request->filled('service_type_id')) {
+                $serviceType = $request->service_type_id ?? $request->service_type;
+                $query->where('c.service_type_id', $serviceType);
             }
 
             if ($request->filled('category_id')) {
