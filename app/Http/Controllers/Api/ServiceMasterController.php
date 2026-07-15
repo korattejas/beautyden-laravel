@@ -71,6 +71,10 @@ class ServiceMasterController extends Controller
             }
 
             if ($cityId == 0) {
+                if (!$request->filled('service_type') && !$request->filled('service_type_id')) {
+                    return $this->sendError('Service Type is required when City ID is 0.', $this->validation_error_status);
+                }
+
                 $ahmedabad = DB::table('cities')->where('name', 'like', '%Ahmedabad%')->first();
                 if ($ahmedabad) {
                     $cityId = $ahmedabad->id;
