@@ -210,6 +210,22 @@ class AppointmentsController extends Controller
                 })
                 ->toArray();
 
+            $walletTx = \App\Models\WalletTransaction::where('reference_id', $appointment->id)
+                ->where('type', 'debit')
+                ->where('description', 'like', '%Booking%')
+                ->first();
+            $walletUsed = $walletTx ? $walletTx->amount : 0;
+            
+            $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
+            $walletBalance = $user ? $user->wallet_balance : 0;
+            
+            $couponCode = null;
+            $couponUsage = \App\Models\CouponUsage::where('appointment_id', $appointment->id)->first();
+            if ($couponUsage) {
+                $coupon = \App\Models\CouponCode::find($couponUsage->coupon_id);
+                $couponCode = $coupon ? $coupon->code : null;
+            }
+
             return response()->json([
                 'data' => [
                     'id'              => $appointment->id,
@@ -227,6 +243,9 @@ class AppointmentsController extends Controller
                     'city_name'       => $appointment->city_name,
                     'created_at'      => $appointment->created_at,
                     'updated_at'      => $appointment->updated_at,
+                    'payment_type'              => $appointment->payment_type,
+                    'user_payment_status'       => $appointment->user_payment_status,
+                    'beautician_payment_status' => $appointment->beautician_payment_status,
 
                     'client'          => $client,
                     'appointment'     => $appData,
@@ -234,6 +253,9 @@ class AppointmentsController extends Controller
                     'summary'         => $summary,
 
                     'team_members'    => $teamMembers,
+                    'wallet_used'     => $walletUsed,
+                    'wallet_balance'  => $walletBalance,
+                    'coupon_code'     => $couponCode,
                 ]
             ], 200);
         } catch (\Exception $e) {

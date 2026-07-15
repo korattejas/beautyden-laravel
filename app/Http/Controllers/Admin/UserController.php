@@ -30,8 +30,8 @@ class UserController extends Controller
         $totalUsers = (clone $query)->count();
         $activeUsers = (clone $query)->where('status', 1)->count();
         $suspendedUsers = (clone $query)->where('status', 0)->count();
-        $appUsers = (clone $query)->where('role', 1)->count();
-        $webUsers = (clone $query)->where('role', 0)->count();
+        $appUsers = (clone $query)->where('role', 1)->count(); // User
+        $webUsers = (clone $query)->where('role', 2)->count(); // Beautician
 
         return view('admin.user.index', compact(
             'totalUsers',
@@ -58,11 +58,17 @@ class UserController extends Controller
             $user->city_name = $cityName;
 
             // Fetch appointments linked to this user's ID primarily, with fallback to phone/email
-            $appointments = Appointment::where('user_id', $user->id)
-                ->orWhere('phone', $user->mobile_number)
-                ->orWhere('email', $user->email)
-                ->orderBy('appointment_date', 'desc')
-                ->get();
+            $appointments = Appointment::where(function($q) use ($user) {
+                $q->where('user_id', $user->id);
+                if (!empty($user->mobile_number)) {
+                    $q->orWhere('phone', $user->mobile_number);
+                }
+                if (!empty($user->email)) {
+                    $q->orWhere('email', $user->email);
+                }
+            })
+            ->orderBy('appointment_date', 'desc')
+            ->get();
 
             $total_appointments = $appointments->count();
             $total_coupons = CouponUsage::where('user_id', $user->id)->count();
@@ -73,6 +79,16 @@ class UserController extends Controller
             $wallet_transactions = \App\Models\WalletTransaction::where('user_id', $user->id)
                 ->orderBy('id', 'desc')
                 ->get();
+                
+            $referred_by_user = null;
+            if (!empty($user->referred_by)) {
+                $referred_by_user = User::where('referral_code', $user->referred_by)->select('id', 'name', 'mobile_number', 'referral_code')->first();
+            }
+            
+            $total_referrals_made = 0;
+            if (!empty($user->referral_code)) {
+                $total_referrals_made = User::where('referred_by', $user->referral_code)->count();
+            }
 
             return response()->json([
                 'data' => [
@@ -83,6 +99,9 @@ class UserController extends Controller
                     'addresses' => $user->addresses,
                     'subscription' => $user->subscriptions->first(),
                     'wallet_transactions' => $wallet_transactions,
+                    'referred_by_user' => $referred_by_user,
+                    'total_referrals_made' => $total_referrals_made,
+                    'recent_appointments' => $appointments->take(5)
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -109,16 +128,21 @@ class UserController extends Controller
                     } elseif ($request->filter_type == 'app') {
                         $users->where('role', 1);
                     } elseif ($request->filter_type == 'web') {
-                        $users->where('role', 0);
+                        $users->where('role', 2);
                     }
                 }
 
                 return DataTables::of($users)
                     ->addColumn('total_appointments', function ($row) {
-                        return \App\Models\Appointment::where('user_id', $row->id)
-                            ->orWhere('phone', $row->mobile_number)
-                            ->orWhere('email', $row->email)
-                            ->count();
+                        return \App\Models\Appointment::where(function($q) use ($row) {
+                            $q->where('user_id', $row->id);
+                            if (!empty($row->mobile_number)) {
+                                $q->orWhere('phone', $row->mobile_number);
+                            }
+                            if (!empty($row->email)) {
+                                $q->orWhere('email', $row->email);
+                            }
+                        })->count();
                     })
                     ->addColumn('status', function ($row) {
                         return view('admin.render-view.datable-label', [

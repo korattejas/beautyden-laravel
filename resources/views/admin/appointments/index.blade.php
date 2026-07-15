@@ -729,7 +729,7 @@
 </div>
 
 <div id="c-viewAppointmentModal" class="c-modal">
-    <div class="c-modal-dialog" style="max-width: 850px;">
+    <div class="c-modal-dialog" style="max-width: 1050px;">
         <div class="c-modal-content">
 
             <!-- Header -->
@@ -1243,13 +1243,13 @@
                 }
 
                 $("#c-appointment-details").html(`
-                    <div class="row">
+                    <div class="row align-items-stretch">
                         <!-- Client Contact Card -->
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3 d-flex flex-column">
                             <div class="detail-section-label">
                                 <i class="bi bi-person-circle"></i> Client Information
                             </div>
-                            <div class="detail-info-card">
+                            <div class="detail-info-card" style="flex: 1;">
                                 <div class="info-item">
                                     <div class="info-icon"><i class="bi bi-person"></i></div>
                                     <div class="info-content">
@@ -1275,11 +1275,11 @@
                         </div>
 
                         <!-- Schedule & Location Card -->
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3 d-flex flex-column">
                             <div class="detail-section-label">
                                 <i class="bi bi-geo-alt-fill"></i> Schedule & Logistics
                             </div>
-                            <div class="detail-info-card" style="border-left: 4px solid #7367f0;">
+                            <div class="detail-info-card" style="border-left: 4px solid #7367f0; flex: 1;">
                                 <div class="info-item">
                                     <div class="info-icon" style="background: rgba(115, 103, 240, 0.2);"><i class="bi bi-calendar-check"></i></div>
                                     <div class="info-content">
@@ -1303,6 +1303,50 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Financial & Payment Card -->
+                        <div class="col-md-4 mb-3 d-flex flex-column">
+                            <div class="detail-section-label" style="color: #059669;">
+                                <i class="bi bi-wallet2"></i> Payment Details
+                            </div>
+                            <div class="detail-info-card" style="border-left: 4px solid #10b981; flex: 1; background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);">
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(16, 185, 129, 0.15);"><i class="bi bi-credit-card-2-front" style="color:#059669;"></i></div>
+                                    <div class="info-content">
+                                        <label>Payment Method</label>
+                                        <p style="text-transform: capitalize; font-weight:700; color: #065f46;">${data.payment_type ?? 'N/A'}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(16, 185, 129, 0.15);"><i class="bi bi-patch-check" style="color:#059669;"></i></div>
+                                    <div class="info-content">
+                                        <label>User Status</label>
+                                        <p style="text-transform: capitalize; color: ${data.user_payment_status == 'paid' ? '#10b981' : (data.user_payment_status == 'failed' ? '#ef4444' : '#f59e0b')}; font-weight:800; display:flex; align-items:center; gap:4px;">
+                                            ${data.user_payment_status == 'paid' ? '<i class="bi bi-check-circle-fill"></i> ' : (data.user_payment_status == 'failed' ? '<i class="bi bi-x-circle-fill"></i> ' : '<i class="bi bi-clock-fill"></i> ')} 
+                                            ${data.user_payment_status ?? 'Pending'}
+                                        </p>
+                                    </div>
+                                </div>
+                                ${data.wallet_used > 0 ? `
+                                <div class="info-item" style="margin-top: auto;">
+                                    <div class="info-icon" style="background: rgba(16, 185, 129, 0.15);"><i class="bi bi-coin" style="color:#059669;"></i></div>
+                                    <div class="info-content">
+                                        <label>Wallet Used / Bal.</label>
+                                        <p style="font-weight:700; color:#059669;">₹${parseFloat(data.wallet_used).toFixed(2)} / ₹${parseFloat(data.wallet_balance).toFixed(2)}</p>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                ${data.coupon_code ? `
+                                <div class="info-item" style="margin-top: auto;">
+                                    <div class="info-icon" style="background: rgba(16, 185, 129, 0.15);"><i class="bi bi-ticket-perforated" style="color:#059669;"></i></div>
+                                    <div class="info-content">
+                                        <label>Coupon Applied</label>
+                                        <p style="color:#059669; font-weight:800;">${data.coupon_code}</p>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
                     </div>
 
                     ${servicesHtml}
@@ -1322,8 +1366,15 @@
                         </div>
                         ${parseFloat(summary.discount_amount || 0) > 0 ? `
                         <div class="summary-line text-danger">
-                            <span style="font-weight: 600;">Discount ${summary.coupon_code ? '(' + summary.coupon_code + ')' : (summary.discount_percent > 0 ? '(' + summary.discount_percent + '%)' : '')}</span>
+                            <span style="font-weight: 600;">Discount ${data.coupon_code ? '('+data.coupon_code+')' : (summary.discount_percent > 0 ? '(' + summary.discount_percent + '%)' : '')}</span>
                             <span style="font-weight: 700;">- ₹${parseFloat(summary.discount_amount || 0).toFixed(2)}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${parseFloat(data.wallet_used || 0) > 0 ? `
+                        <div class="summary-line text-danger">
+                            <span style="font-weight: 600;">Wallet Deducted</span>
+                            <span style="font-weight: 700;">- ₹${parseFloat(data.wallet_used || 0).toFixed(2)}</span>
                         </div>
                         ` : ''}
                         <div class="summary-line summary-total">
