@@ -429,6 +429,7 @@ class AuthenticationController extends Controller
                     'id' => $authUser->id,
                     'name' => $authUser->name,
                     'email' => $authUser->email,
+                    'dob' => $authUser->dob,
                     'address' => $authUser->address,
                     'mobile_number' => $authUser->mobile_number,
                     'mobile_verified_at' => $authUser->mobile_verified_at,
