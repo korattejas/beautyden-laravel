@@ -582,7 +582,7 @@ class AuthenticationController extends Controller
                     return $this->sendError('Address not found or doesn\'t belong to you.', $this->backend_error_status);
                 }
                 
-                $updateData = $request->only(['address', 'latitude', 'longitude', 'type']);
+                $updateData = $request->only(['address', 'latitude', 'longitude', 'type', 'city_id']);
                 if ($request->has('is_default')) {
                     $updateData['is_default'] = $isDefault;
                 }
@@ -597,6 +597,7 @@ class AuthenticationController extends Controller
                 $userAddress = UserAddress::create([
                     'user_id' => $authUser->id,
                     'address' => $request->address,
+                    'city_id' => $request->city_id,
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,
                     'type' => $request->type,
@@ -637,7 +638,7 @@ class AuthenticationController extends Controller
                 ->orderBy('id', 'desc')
                 ->get();
 
-            return $this->sendResponse($addresses, 'Addresses fetched successfully.', $this->success_status, ['city_id' => $authUser->city_id]);
+            return $this->sendResponse($addresses, 'Addresses fetched successfully.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);

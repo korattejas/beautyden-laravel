@@ -8,6 +8,7 @@ class UserAddress extends Model
 {
     protected $fillable = [
         'user_id',
+        'city_id',
         'address',
         'latitude',
         'longitude',
