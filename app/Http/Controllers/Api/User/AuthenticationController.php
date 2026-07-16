@@ -574,12 +574,19 @@ class AuthenticationController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
+            $isDefault = $request->boolean('is_default');
+
             if ($request->id) {
                 $userAddress = UserAddress::where('id', $request->id)->where('user_id', $authUser->id)->first();
                 if (!$userAddress) {
                     return $this->sendError('Address not found or doesn\'t belong to you.', $this->backend_error_status);
                 }
-                $userAddress->update($request->only(['address', 'latitude', 'longitude', 'type', 'is_default']));
+                
+                $updateData = $request->only(['address', 'latitude', 'longitude', 'type']);
+                if ($request->has('is_default')) {
+                    $updateData['is_default'] = $isDefault;
+                }
+                $userAddress->update($updateData);
             } else {
                 $addressCount = UserAddress::where('user_id', $authUser->id)->count();
 
@@ -593,11 +600,11 @@ class AuthenticationController extends Controller
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,
                     'type' => $request->type,
-                    'is_default' => $request->is_default ?? false,
+                    'is_default' => $request->has('is_default') ? $isDefault : false,
                 ]);
             }
 
-            if ($request->is_default) {
+            if ($request->has('is_default') && $isDefault) {
                 UserAddress::where('user_id', $authUser->id)
                     ->where('id', '!=', $userAddress->id)
                     ->update(['is_default' => false]);
