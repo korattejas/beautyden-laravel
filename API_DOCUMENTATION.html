@@ -300,6 +300,21 @@
 }</code></pre>
         </section>
 
+        <div class="note" style="margin: 15px 0; background: #e0e7ff; border-left: 5px solid #4f46e5; padding: 15px; border-radius: 8px;">
+            <strong>💡 Frontend Developer Note: Login & Referral Flow</strong><br><br>
+            Do not ask for the referral code on the very first screen before the mobile number is submitted, because the app does not know if the user is new or existing.<br><br>
+            <strong>Standard 2-Step Implementation:</strong>
+            <ul style="margin-top: 10px;">
+                <li><strong>Step 1:</strong> On the Login screen, ONLY ask for the Mobile Number and hit Continue to call <code>sendOtpOnMobileNumber</code>.</li>
+                <li><strong>Step 2:</strong> Check the <code>is_new_user</code> variable returned in the response:
+                    <ul>
+                        <li>If <code>is_new_user: true</code>, show the "Do you have a referral code?" text box on the OTP Verification screen (or a separate Profile Setup screen).</li>
+                        <li>If <code>is_new_user: false</code>, the user is already registered. Hide the referral code field completely and proceed with simple OTP login.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
         <section>
             <h3>Verify OTP</h3>
             <p>Validates the OTP and returns the JWT access token.</p>
