@@ -320,16 +320,24 @@ class AuthenticationController extends Controller
                         if ($refereeBonus > 0) {
                             $updateData['wallet_balance'] = $user->wallet_balance + $refereeBonus;
                             
-                            \App\Models\WalletTransaction::create([
+                            $wt = \App\Models\WalletTransaction::create([
                                 'user_id' => $user->id,
                                 'type' => 'credit',
                                 'amount' => $refereeBonus,
                                 'description' => 'Signup Referral Bonus',
                                 'reference_id' => $referrer->id
                             ]);
+
+                            // Notify referee about the wallet addition
+                            \App\Services\NotificationService::trigger($user->id, 'wallet_added', [
+                                '{amount}' => $refereeBonus
+                            ], $wt->id);
                         }
                     }
                 }
+
+                // Send Welcome Notification
+                \App\Services\NotificationService::trigger($user->id, 'welcome');
             }
 
             $user->update($updateData);

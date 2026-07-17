@@ -505,6 +505,15 @@ class AppointmentsController extends Controller
                 })->afterResponse();
             }
 
+            if (auth('user')->check()) {
+                \App\Services\NotificationService::trigger(
+                    auth('user')->id(),
+                    'order_placed',
+                    ['{order_id}' => $orderNumber],
+                    $appointment->id
+                );
+            }
+
             $message = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                             <p>Thank you for booking with <strong>BeautyDen</strong>! 💖</p>
 
@@ -736,6 +745,10 @@ class AppointmentsController extends Controller
                 if ($appointment) {
                     $appointment->user_payment_status = 'failed';
                     $appointment->save();
+
+                    \App\Services\NotificationService::trigger($appointment->user_id, 'payment_failed', [
+                        '{order_id}' => $appointment->order_number
+                    ], $appointment->id);
                 }
             }
 

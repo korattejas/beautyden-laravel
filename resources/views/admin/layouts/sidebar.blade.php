@@ -194,6 +194,9 @@
             <li class="pa-nav-item {{ Request::routeIs('admin.notifications.index') ? 'active' : '' }}">
                 <a class="pa-nav-link" href="{{ route('admin.notifications.index') }}"><i data-feather="bell"></i><span>Notifications</span></a>
             </li>
+            <li class="pa-nav-item {{ Request::routeIs('admin.notification-templates.*') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.notification-templates.index') }}"><i data-feather="layout"></i><span>Notif. Templates</span></a>
+            </li>
             @endif
 
             @if(hasMenuAccess('reviews', $isSuperAdmin, $userPermissions))

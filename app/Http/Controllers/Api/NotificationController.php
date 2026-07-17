@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
@@ -94,6 +95,92 @@ class NotificationController extends Controller
                 return $this->sendError("Firebase API Error: " . $errorMessage, $response->status());
             }
 
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    /**
+     * Get user notifications list
+     */
+    public function getNotifications(Request $request): JsonResponse
+    {
+        $function_name = 'getNotifications';
+        try {
+            $user = auth()->user();
+            if (!$user) {
+                return $this->sendError('Unauthorised.', $this->validation_error_status);
+            }
+
+            $page = $request->input('page', 1);
+            $limit = $request->input('limit', 15);
+
+            $notifications = Notification::where('user_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->paginate($limit, ['*'], 'page', $page);
+
+            $data = [
+                'list' => $notifications->items(),
+                'total_pages' => $notifications->lastPage(),
+                'current_page' => $notifications->currentPage(),
+                'total_records' => $notifications->total(),
+            ];
+
+            return $this->sendResponse($data, 'Notifications retrieved successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    /**
+     * Mark notification(s) as read
+     */
+    public function markAsRead(Request $request): JsonResponse
+    {
+        $function_name = 'markAsRead';
+        try {
+            $user = auth()->user();
+            if (!$user) {
+                return $this->sendError('Unauthorised.', $this->validation_error_status);
+            }
+
+            $notificationId = $request->input('notification_id');
+
+            if ($notificationId) {
+                // Mark single notification
+                Notification::where('user_id', $user->id)
+                    ->where('id', $notificationId)
+                    ->update(['is_read' => 1]);
+            } else {
+                // Mark all notifications
+                Notification::where('user_id', $user->id)
+                    ->update(['is_read' => 1]);
+            }
+
+            return $this->sendResponse((object)[], 'Notifications marked as read.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    /**
+     * Clear all user notifications
+     */
+    public function clearAll(Request $request): JsonResponse
+    {
+        $function_name = 'clearAll';
+        try {
+            $user = auth()->user();
+            if (!$user) {
+                return $this->sendError('Unauthorised.', $this->validation_error_status);
+            }
+
+            Notification::where('user_id', $user->id)->delete();
+
+            return $this->sendResponse((object)[], 'All notifications cleared.', $this->success_status);
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);

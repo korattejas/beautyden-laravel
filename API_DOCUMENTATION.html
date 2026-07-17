@@ -236,6 +236,7 @@
         <a href="#membership" class="nav-item">Membership</a>
         <a href="#home" class="nav-item">Home Content</a>
         <a href="#feedback" class="nav-item">Feedback & Reviews</a>
+        <a href="#notifications" class="nav-item">Push Notifications</a>
         <a href="#config" class="nav-item">App Settings</a>
         <a href="#beautician" class="nav-item">Beautician Portal</a>
         <a href="#media" class="nav-item">Media & Portfolios</a>
@@ -2488,6 +2489,200 @@
 }</code>
             </pre>
 
+        </section>
+
+        <h2 id="notifications"><i class="bi bi-bell-fill text-primary"></i> Push Notifications</h2>
+
+        <section>
+            <h3>Notification Event Triggers & Redirections</h3>
+            <p>The system automatically triggers push notifications for various events. Mobile developers must parse the <code>type</code> parameter from the notification payload to redirect the user to the appropriate screen.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Event / Action</th>
+                        <th>Payload <code>type</code></th>
+                        <th><code>reference_id</code> Passed</th>
+                        <th>Expected App Redirection</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>New User Registration</td>
+                        <td><code>welcome</code></td>
+                        <td><code>null</code></td>
+                        <td>Home Page / Dashboard</td>
+                    </tr>
+                    <tr>
+                        <td>Order Placed Successfully</td>
+                        <td><code>booking_detail</code></td>
+                        <td><code>{order_id}</code></td>
+                        <td>Appointment Details Screen</td>
+                    </tr>
+                    <tr>
+                        <td>Order Assigned to Beautician</td>
+                        <td><code>booking_detail</code></td>
+                        <td><code>{order_id}</code></td>
+                        <td>Appointment Details Screen</td>
+                    </tr>
+                    <tr>
+                        <td>Order Cancelled/Rejected</td>
+                        <td><code>booking_detail</code></td>
+                        <td><code>{order_id}</code></td>
+                        <td>Appointment Details Screen</td>
+                    </tr>
+                    <tr>
+                        <td>Order Completed</td>
+                        <td><code>add_review</code></td>
+                        <td><code>{order_id}</code></td>
+                        <td>Add Review Screen</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Failed (Razorpay)</td>
+                        <td><code>payment_status</code></td>
+                        <td><code>{order_id}</code></td>
+                        <td>Booking Details / Retry Payment</td>
+                    </tr>
+                    <tr>
+                        <td>Money Added to Wallet</td>
+                        <td><code>wallet_history</code></td>
+                        <td><code>null</code></td>
+                        <td>Wallet History Screen</td>
+                    </tr>
+                    <tr>
+                        <td>Referral Bonus Received</td>
+                        <td><code>wallet_history</code></td>
+                        <td><code>null</code></td>
+                        <td>Wallet History Screen</td>
+                    </tr>
+                    <tr>
+                        <td>Abandoned Cart (2 hours)</td>
+                        <td><code>cart_reminder</code></td>
+                        <td><code>null</code></td>
+                        <td>Cart / Checkout Screen</td>
+                    </tr>
+                    <tr>
+                        <td>Birthday Offer (Daily Cron)</td>
+                        <td><code>offer_detail</code></td>
+                        <td><code>null</code></td>
+                        <td>Offer / Coupon Details</td>
+                    </tr>
+                    <tr>
+                        <td>Admin Custom Notification</td>
+                        <td><em>(Defined by Admin)</em></td>
+                        <td><em>(Defined by Admin)</em></td>
+                        <td>Custom Screen based on JSON</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="note" style="margin-top: 15px; background: #e8f4fd; border-left: 4px solid #007bff; padding: 15px; border-radius: 4px;">
+                <strong>Developer Note:</strong> For <code>booking_detail</code> and <code>add_review</code>, use the <code>reference_id</code> as the Appointment ID to fetch details. For Admin custom notifications, parse the <code>custom_data</code> JSON object passed in the payload.
+            </div>
+        </section>
+
+        <section>
+            <h3>Get Notifications List</h3>
+            <p>Fetch the list of notifications sent to the authenticated user. Supports pagination.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/getNotifications
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>page</td>
+                        <td>Numeric</td>
+                        <td><strong>Optional</strong>. Default is 1. Page number for pagination.</td>
+                    </tr>
+                    <tr>
+                        <td>limit</td>
+                        <td>Numeric</td>
+                        <td><strong>Optional</strong>. Default is 15. Number of records per page.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Notifications retrieved successfully.",
+    "data": {
+        "list": [
+            {
+                "id": 1,
+                "user_id": 4,
+                "notification_template_id": 2,
+                "title": "Booking Confirmed! ✅",
+                "message": "Your booking #1234 has been confirmed successfully.",
+                "type": "booking_detail",
+                "reference_id": "1234",
+                "is_read": 0,
+                "created_at": "2026-07-17T06:00:00.000000Z",
+                "updated_at": "2026-07-17T06:00:00.000000Z"
+            }
+        ],
+        "total_pages": 1,
+        "current_page": 1,
+        "total_records": 1
+    }
+}</code></pre>
+        </section>
+
+        <section>
+            <h3>Mark Notification As Read</h3>
+            <p>Mark a specific notification as read. If no notification_id is provided, it marks ALL notifications as read.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/markNotificationAsRead
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>notification_id</td>
+                        <td>Numeric</td>
+                        <td><strong>Optional</strong>. Pass the notification ID to mark a specific one as read. If not passed, all notifications are marked read.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Notifications marked as read.",
+    "data": {}
+}</code></pre>
+        </section>
+
+        <section>
+            <h3>Clear All Notifications</h3>
+            <p>Delete all notification history for the authenticated user.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/clearAllNotifications
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "All notifications cleared.",
+    "data": {}
+}</code></pre>
         </section>
 
         <section id="config">

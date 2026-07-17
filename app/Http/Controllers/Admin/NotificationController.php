@@ -48,7 +48,8 @@ class NotificationController extends Controller
 
     public function create()
     {
-        return view('admin.notifications.create');
+        $users = \App\Models\User::where('status', 1)->get();
+        return view('admin.notifications.create', compact('users'));
     }
 
     public function store(Request $request)
@@ -71,19 +72,25 @@ class NotificationController extends Controller
                 $image->move(public_path('uploads/notifications'), $imageName);
             }
 
+            $customData = $request->custom_data ? (array)json_decode($request->custom_data) : [];
+            if ($request->target_type == 'specific') {
+                $customData['_specific_users'] = implode(',', $request->specific_users ?? []);
+            }
+
             $notification = PushNotification::create([
                 'title' => $request->title,
                 'message' => $request->message,
                 'image' => $imageName ? asset('uploads/notifications/' . $imageName) : null,
                 'target_type' => $request->target_type ?? 'all',
-                'custom_data' => $request->custom_data ? json_decode($request->custom_data) : null,
+                'custom_data' => !empty($customData) ? json_encode($customData) : null,
                 'scheduled_at' => $request->scheduled_at,
                 'is_sent' => 0
             ]);
 
             // If not scheduled, send immediately
             if (!$request->scheduled_at) {
-                $this->sendNotificationNow($notification);
+                $specificUsers = $request->target_type == 'specific' ? implode(',', $request->specific_users ?? []) : null;
+                $this->sendNotificationNow($notification, $specificUsers);
             }
 
             return response()->json(['success' => true, 'message' => 'Notification processed successfully']);
@@ -93,12 +100,29 @@ class NotificationController extends Controller
         }
     }
 
-    private function sendNotificationNow($notification)
+    private function sendNotificationNow($notification, $specificUsers = null)
     {
         $tokensQuery = UserFcmToken::query();
-        // Here you can add targeting logic if needed
+        
+        if ($notification->target_type == 'specific' && !empty($specificUsers)) {
+            $tokensQuery->whereIn('user_id', explode(',', $specificUsers));
+        } elseif ($notification->target_type == 'customers') {
+            $tokensQuery->whereHas('user', function($q) {
+                $q->where('role', '!=', 2); // Anyone who is not a beautician is a customer
+            });
+        } elseif ($notification->target_type == 'beauticians') {
+            $tokensQuery->whereHas('user', function($q) {
+                $q->where('role', 2);
+            });
+        }
+
         $tokens = $tokensQuery->pluck('fcm_token')->toArray();
         
+        if (empty($tokens)) {
+            $notification->update(['is_sent' => 2]); // Mark failed if no tokens
+            return;
+        }
+
         $response = FcmHelper::sendPushNotification(
             $tokens,
             $notification->title,

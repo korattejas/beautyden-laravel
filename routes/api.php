@@ -84,6 +84,9 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
+        Route::post('getNotifications', [NotificationController::class, 'getNotifications']);
+        Route::post('markNotificationAsRead', [NotificationController::class, 'markAsRead']);
+        Route::post('clearAllNotifications', [NotificationController::class, 'clearAll']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
@@ -208,6 +211,9 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('saveUserAddress', [AuthenticationController::class, 'saveUserAddress']);
         Route::post('getUserAddresses', [AuthenticationController::class, 'getUserAddresses']);
         Route::post('deleteUserAddress', [AuthenticationController::class, 'deleteUserAddress']);
+        Route::post('getNotifications', [NotificationController::class, 'getNotifications']);
+        Route::post('markNotificationAsRead', [NotificationController::class, 'markAsRead']);
+        Route::post('clearAllNotifications', [NotificationController::class, 'clearAll']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);

@@ -653,6 +653,10 @@ class AppointmentsController extends Controller
             $appointment = Appointment::find($id);
             if ($appointment && $status == 3 && $appointment->status != 3) {
                 // If it's being marked completed
+                \App\Services\NotificationService::trigger($appointment->user_id, 'order_completed', [
+                    '{order_id}' => $appointment->order_number
+                ], $appointment->id);
+
                 $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
                 if ($user && $user->referred_by) {
                     // Check if this is their very first completed appointment after joining the app
@@ -667,13 +671,17 @@ class AppointmentsController extends Controller
                             $referrerBonus = \App\Models\AppSetting::where('key', 'referral_reward_amount')->value('value') ?? 50;
                             if ($referrerBonus > 0) {
                                 $referrer->increment('wallet_balance', $referrerBonus);
-                                \App\Models\WalletTransaction::create([
+                                $wt = \App\Models\WalletTransaction::create([
                                     'user_id' => $referrer->id,
                                     'type' => 'credit',
                                     'amount' => $referrerBonus,
                                     'description' => 'Referral Bonus for ' . $user->name,
                                     'reference_id' => $user->id
                                 ]);
+
+                                \App\Services\NotificationService::trigger($referrer->id, 'referral_bonus', [
+                                    '{amount}' => $referrerBonus
+                                ], $wt->id);
                             }
                         }
                     }
@@ -681,6 +689,10 @@ class AppointmentsController extends Controller
             }
             
             if ($appointment && $status == 4 && $appointment->status != 4) {
+                \App\Services\NotificationService::trigger($appointment->user_id, 'order_cancelled', [
+                    '{order_id}' => $appointment->order_number
+                ], $appointment->id);
+
                 // Check if wallet was used
                 $walletTx = \App\Models\WalletTransaction::where('reference_id', $appointment->id)
                     ->where('type', 'debit')
@@ -746,6 +758,14 @@ class AppointmentsController extends Controller
                 'assigned_by' => 'Admin',
                 'status' => 2
             ]);
+
+            $appointment = Appointment::find($request->value_id);
+            if ($appointment) {
+                \App\Services\NotificationService::trigger($appointment->user_id, 'order_assigned', [
+                    '{order_id}' => $appointment->order_number
+                ], $appointment->id);
+            }
+
             return response()->json(['message' => 'Team member assign successfully']);
         } catch (\Exception $e) {
             logger()->error("$function_name: " . $e->getMessage());

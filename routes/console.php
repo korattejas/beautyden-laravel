@@ -12,3 +12,6 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::call(function () {
     Artisan::call('backup:email-db', ['email' => 'korattejas01@gmail.com']);
 })->dailyAt('01:00');
+
+// Process scheduled push notifications & daily birthday wishes
+Schedule::command('notifications:process')->everyMinute()->withoutOverlapping();

@@ -481,6 +481,15 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('roles/edit/{id}', [\App\Http\Controllers\Admin\RoleController::class, 'edit'])->name('admin.roles.edit');
         Route::delete('roles/{id}', [\App\Http\Controllers\Admin\RoleController::class, 'destroy'])->name('admin.roles.destroy');
 
+        /* Notification Templates Routes */
+        Route::get('notification-templates', [\App\Http\Controllers\Admin\NotificationTemplateController::class, 'index'])->name('admin.notification-templates.index');
+        Route::get('notification-templates/create', [\App\Http\Controllers\Admin\NotificationTemplateController::class, 'create'])->name('admin.notification-templates.create');
+        Route::get('getDataNotificationTemplates', [\App\Http\Controllers\Admin\NotificationTemplateController::class, 'getData'])->name('admin.notification-templates.data');
+        Route::post('notification-templates/store', [\App\Http\Controllers\Admin\NotificationTemplateController::class, 'store'])->name('admin.notification-templates.store');
+        Route::get('notification-templates/edit/{id}', [\App\Http\Controllers\Admin\NotificationTemplateController::class, 'edit'])->name('admin.notification-templates.edit');
+        Route::delete('notification-templates/{id}', [\App\Http\Controllers\Admin\NotificationTemplateController::class, 'destroy'])->name('admin.notification-templates.destroy');
+        Route::get('notification-templates/status/{id}/{status}', [\App\Http\Controllers\Admin\NotificationTemplateController::class, 'changeStatus'])->name('admin.notification-templates.change-status');
+
         /* Admin Staff Routes */
         Route::get('admin-staff', [\App\Http\Controllers\Admin\AdminStaffController::class, 'index'])->name('admin.admin-staff.index');
         Route::get('getDataAdminStaff', [\App\Http\Controllers\Admin\AdminStaffController::class, 'getDataAdminStaff'])->name('admin.admin-staff.data');

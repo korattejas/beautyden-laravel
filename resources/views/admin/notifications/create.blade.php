@@ -71,10 +71,23 @@
                                         <div class="col-md-6 mt-2">
                                             <div class="form-group">
                                                 <label>Target Audience</label>
-                                                <select name="target_type" class="form-control">
+                                                <select name="target_type" id="target_type" class="form-control">
                                                     <option value="all">All Registered Users</option>
                                                     <option value="beauticians">Beauticians Only</option>
                                                     <option value="customers">Customers Only</option>
+                                                    <option value="specific">Specific Users</option>
+                                                </select>
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12 mt-2" id="specific_users_div" style="display: none;">
+                                            <div class="form-group">
+                                                <label>Select Users</label>
+                                                <select name="specific_users[]" id="specific_users" class="form-control select2" multiple="multiple" data-placeholder=" Search and select multiple users...">
+                                                    @foreach($users as $user)
+                                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->mobile_number ?? $user->email }}) - {{ $user->role == 2 ? 'Beautician' : 'Customer' }}</option>
+                                                    @endforeach
                                                 </select>
                                                 <div class="valid-feedback"></div>
                                             </div>
@@ -114,5 +127,26 @@
 <script>
     var form_url = 'notifications/store';
     var redirect_url = 'notifications';
+
+    $(document).ready(function() {
+        if ($('.select2').length > 0) {
+            $('.select2').select2({
+                placeholder: "Search and select multiple users...",
+                allowClear: true,
+                width: '100%'
+            });
+        }
+
+        $('#target_type').change(function() {
+            if ($(this).val() == 'specific') {
+                $('#specific_users_div').slideDown();
+                $('#specific_users').attr('required', true);
+            } else {
+                $('#specific_users_div').slideUp();
+                $('#specific_users').removeAttr('required');
+                $('#specific_users').val(null).trigger('change');
+            }
+        });
+    });
 </script>
 @endsection
