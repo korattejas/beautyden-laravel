@@ -563,6 +563,12 @@ class AuthenticationController extends Controller
             $validator = Validator::make($request->all(), [
                 'id' => 'nullable|integer|exists:user_addresses,id',
                 'address' => 'required|string|max:500',
+                'home_number' => 'nullable|string|max:255',
+                'street_address' => 'nullable|string',
+                'landmark' => 'nullable|string|max:255',
+                'city_village_name' => 'nullable|string|max:255',
+                'state_name' => 'nullable|string|max:255',
+                'pincode' => 'nullable|string|max:20',
                 'city_id' => 'required|integer',
                 'latitude' => 'nullable|numeric',
                 'longitude' => 'nullable|numeric',
@@ -582,7 +588,7 @@ class AuthenticationController extends Controller
                     return $this->sendError('Address not found or doesn\'t belong to you.', $this->backend_error_status);
                 }
                 
-                $updateData = $request->only(['address', 'latitude', 'longitude', 'type', 'city_id']);
+                $updateData = $request->only(['address', 'home_number', 'street_address', 'landmark', 'city_village_name', 'state_name', 'pincode', 'latitude', 'longitude', 'type', 'city_id']);
                 if ($request->has('is_default')) {
                     $updateData['is_default'] = $isDefault;
                 }
@@ -597,6 +603,12 @@ class AuthenticationController extends Controller
                 $userAddress = UserAddress::create([
                     'user_id' => $authUser->id,
                     'address' => $request->address,
+                    'home_number' => $request->home_number,
+                    'street_address' => $request->street_address,
+                    'landmark' => $request->landmark,
+                    'city_village_name' => $request->city_village_name,
+                    'state_name' => $request->state_name,
+                    'pincode' => $request->pincode,
                     'city_id' => $request->city_id,
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,
