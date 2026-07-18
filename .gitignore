@@ -21,3 +21,6 @@ yarn-error.log
 composer.json
 composer.lock
 # /app/Helpers/ImageUploadHelper.php
+
+firebase-auth.json
+
