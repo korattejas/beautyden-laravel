@@ -4076,8 +4076,197 @@
 }</code></pre>
         </section>
 
+        <section id="offers">
+            <h2><i class="bi bi-tag text-primary"></i> 15. Offers & Coupons</h2>
+            
+            <h3>List Coupons</h3>
+            <p>Fetches a list of active coupons applicable for the user. Used for the Offers & Promo Codes UI.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/customer/listCoupons
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Coupons retrieved successfully",
+    "data": [
+        {
+            "id": 3,
+            "code": "WELCOME10",
+            "discount_type": "percentage",
+            "discount_value": "10",
+            "min_purchase_amount": "500",
+            "max_discount_amount": "200",
+            "description": "Get 10% off on your first booking.",
+            "is_first_order_only": 1,
+            "start_date": "2026-07-01",
+            "end_date": "2026-07-31",
+            "is_expire": false
+        }
+    ]
+}</code></pre>
+
+            <h3>Apply Coupon</h3>
+            <p>Validates a coupon code against a booking amount and returns the discount amount.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/applyCoupon
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>code</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. The coupon code to apply.</td>
+                    </tr>
+                    <tr>
+                        <td>amount</td>
+                        <td>Numeric</td>
+                        <td><strong>Required</strong>. The subtotal amount to apply the discount on.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Coupon applied successfully",
+    "data": {
+        "coupon_id": 3,
+        "code": "WELCOME10",
+        "discount_amount": 150.00,
+        "final_amount": 1350.00
+    }
+}</code></pre>
+        </section>
+
+        <section id="notifications">
+            <h2><i class="bi bi-bell text-primary"></i> 14. Push Notifications</h2>
+            
+            <h3>Get Notifications</h3>
+            <p>Fetches a paginated list of notifications for the logged-in user. Supports filtering by tab type.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/getNotifications
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>type</td>
+                        <td>String</td>
+                        <td>Optional. Filter by UI Tab. Allowed values: <code>bookings</code>, <code>wallet</code>, <code>offers</code>, <code>updates</code>, <code>All</code>. If 'All' or empty is passed, all notifications are returned.</td>
+                    </tr>
+                    <tr>
+                        <td>page</td>
+                        <td>Integer</td>
+                        <td>Optional. Default is 1.</td>
+                    </tr>
+                    <tr>
+                        <td>limit</td>
+                        <td>Integer</td>
+                        <td>Optional. Default is 15.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Notifications retrieved successfully.",
+    "data": {
+        "tabs": [
+            { "id": "All", "name": "All" },
+            { "id": "Bookings", "name": "Bookings" },
+            { "id": "Wallet", "name": "Wallet" },
+            { "id": "Offers", "name": "Offers" },
+            { "id": "Updates", "name": "Updates" }
+        ],
+        "list": [
+            {
+                "id": 1,
+                "user_id": 4,
+                "title": "Booking Confirmed",
+                "message": "Your Luxury Facial with Priya is confirmed for tomorrow at 2:00 PM.",
+                "type": "booking_detail",
+                "reference_id": "101",
+                "image": null,
+                "is_read": 0,
+                "created_at": "2026-07-18T10:00:00.000000Z",
+                "updated_at": "2026-07-18T10:00:00.000000Z"
+            }
+        ],
+        "total_pages": 1,
+        "current_page": 1,
+        "total_records": 1
+    }
+}</code></pre>
+
+            <h3>Mark Notification as Read</h3>
+            <p>Marks a specific notification as read, or all notifications if no ID is passed.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/markNotificationAsRead
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>notification_id</td>
+                        <td>Integer</td>
+                        <td>Optional. ID of the notification to mark as read. If not provided, ALL notifications will be marked as read.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Notifications marked as read.",
+    "data": {}
+}</code></pre>
+
+            <h3>Clear All Notifications</h3>
+            <p>Deletes all notifications for the logged-in user.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/clearAllNotifications
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "All notifications cleared.",
+    "data": {}
+}</code></pre>
+        </section>
+
         <section id="testing">
-            <h2><i class="bi bi-bug text-primary"></i> 14. Testing Utilities</h2>
             <h3>Send Test Notification</h3>
             <p>Sends a real-time push notification using Firebase HTTP v1 API. Use this to verify FCM integration on the
                 mobile app.</p>

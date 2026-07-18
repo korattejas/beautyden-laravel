@@ -116,11 +116,38 @@ class NotificationController extends Controller
             $page = $request->input('page', 1);
             $limit = $request->input('limit', 15);
 
-            $notifications = Notification::where('user_id', $user->id)
-                ->orderBy('created_at', 'desc')
+            $type = $request->input('type');
+
+            $query = Notification::where('user_id', $user->id);
+            
+            if ($type && strtolower($type) !== 'all') {
+                $requestedType = strtolower($type);
+                
+                // Map frontend tabs to backend template types
+                if ($requestedType === 'bookings') {
+                    $query->whereIn('type', ['booking_detail', 'payment_status', 'add_review', 'cart_reminder']);
+                } elseif ($requestedType === 'wallet') {
+                    $query->whereIn('type', ['wallet_history']);
+                } elseif ($requestedType === 'offers') {
+                    $query->whereIn('type', ['offer_detail', 'offer_list']);
+                } elseif ($requestedType === 'updates') {
+                    $query->whereIn('type', ['welcome', 'general']);
+                } else {
+                    $query->where('type', $requestedType);
+                }
+            }
+
+            $notifications = $query->orderBy('created_at', 'desc')
                 ->paginate($limit, ['*'], 'page', $page);
 
             $data = [
+                'tabs' => [
+                    ['id' => 'All', 'name' => 'All'],
+                    ['id' => 'Bookings', 'name' => 'Bookings'],
+                    ['id' => 'Wallet', 'name' => 'Wallet'],
+                    ['id' => 'Offers', 'name' => 'Offers'],
+                    ['id' => 'Updates', 'name' => 'Updates'],
+                ],
                 'list' => $notifications->items(),
                 'total_pages' => $notifications->lastPage(),
                 'current_page' => $notifications->currentPage(),

@@ -35,9 +35,6 @@ class CouponController extends Controller
                 ->where(function($query) use ($now) {
                     $query->whereNull('start_date')->orWhere('start_date', '<=', $now);
                 })
-                ->where(function($query) use ($now) {
-                    $query->whereNull('end_date')->orWhere('end_date', '>=', $now);
-                })
                 ->get();
 
             $validCoupons = [];
@@ -60,6 +57,11 @@ class CouponController extends Controller
                     ->count();
                 if ($userUsage >= $coupon->usage_per_user) continue;
 
+                $isExpire = false;
+                if ($coupon->end_date && $coupon->end_date->format('Y-m-d') < $now) {
+                    $isExpire = true;
+                }
+
                 $validCoupons[] = [
                     'id' => $coupon->id,
                     'code' => $coupon->code,
@@ -68,6 +70,10 @@ class CouponController extends Controller
                     'min_purchase_amount' => $coupon->min_purchase_amount,
                     'max_discount_amount' => $coupon->max_discount_amount,
                     'description' => $coupon->description,
+                    'is_first_order_only' => $coupon->is_first_order_only,
+                    'start_date' => $coupon->start_date ? $coupon->start_date->format('Y-m-d') : null,
+                    'end_date' => $coupon->end_date ? $coupon->end_date->format('Y-m-d') : null,
+                    'is_expire' => $isExpire,
                 ];
             }
 
