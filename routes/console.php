@@ -14,4 +14,6 @@ Schedule::call(function () {
 })->dailyAt('01:00');
 
 // Process scheduled push notifications & daily birthday wishes
-Schedule::command('notifications:process')->everyMinute()->withoutOverlapping();
+Schedule::call(function () {
+    Artisan::call('notifications:process');
+})->everyMinute()->name('notifications_process')->withoutOverlapping();
