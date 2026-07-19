@@ -30,7 +30,7 @@ class CouponCodeController extends Controller
 
     public function create()
     {
-        $users = User::where('status', 1)->select('id', 'name', 'mobile')->get();
+        $users = User::where('status', 1)->select('id', 'name', 'mobile_number')->get();
         return view('admin.coupon_codes.create', compact('users'));
     }
 
@@ -39,7 +39,7 @@ class CouponCodeController extends Controller
         try {
             $coupon = CouponCode::where('id', decryptId($id))->first();
             if ($coupon) {
-                $users = User::where('status', 1)->select('id', 'name', 'mobile')->get();
+                $users = User::where('status', 1)->select('id', 'name', 'mobile_number')->get();
                 return view('admin.coupon_codes.edit', [
                     'coupon' => $coupon,
                     'users' => $users

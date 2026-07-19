@@ -42,7 +42,7 @@
                                                 <select name="user_id" class="form-control select2">
                                                     <option value="">All Users</option>
                                                     @foreach($users as $user)
-                                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->mobile }})</option>
+                                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->mobile_number }})</option>
                                                     @endforeach
                                                 </select>
                                             </div>
