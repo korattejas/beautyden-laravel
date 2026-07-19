@@ -38,9 +38,8 @@
 
                                         <div class="col-md-4 mt-2">
                                             <div class="form-group">
-                                                <label>Specific User (Leave blank for All Users)</label>
-                                                <select name="user_id" class="form-control select2">
-                                                    <option value="">All Users</option>
+                                                <label>Specific Users (Leave blank for All Users)</label>
+                                                <select name="user_ids[]" class="form-control select2" multiple="multiple">
                                                     @foreach($users as $user)
                                                         <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->mobile_number }})</option>
                                                     @endforeach

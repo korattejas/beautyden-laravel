@@ -36,7 +36,9 @@ class CouponController extends Controller
                     $query->whereNull('start_date')->orWhere('start_date', '<=', $now);
                 })
                 ->where(function($query) use ($user) {
-                    $query->whereNull('user_id')->orWhere('user_id', $user->id);
+                    $query->whereNull('user_ids')
+                          ->orWhereJsonContains('user_ids', (string) $user->id)
+                          ->orWhereJsonContains('user_ids', $user->id);
                 })
                 ->get();
 
@@ -106,7 +108,9 @@ class CouponController extends Controller
             $coupon = CouponCode::where('code', strtoupper($request->code))
                 ->where('status', 1)
                 ->where(function($query) use ($user) {
-                    $query->whereNull('user_id')->orWhere('user_id', $user->id);
+                    $query->whereNull('user_ids')
+                          ->orWhereJsonContains('user_ids', (string) $user->id)
+                          ->orWhereJsonContains('user_ids', $user->id);
                 })
                 ->first();
 

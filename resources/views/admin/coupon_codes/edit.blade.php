@@ -38,11 +38,11 @@
 
                                         <div class="col-md-4 mt-2">
                                             <div class="form-group">
-                                                <label>Specific User (Leave blank for All Users)</label>
-                                                <select name="user_id" class="form-control select2">
-                                                    <option value="">All Users</option>
+                                                <label>Specific Users (Leave blank for All Users)</label>
+                                                <select name="user_ids[]" class="form-control select2" multiple="multiple">
+                                                    @php $selectedUsers = is_array($coupon->user_ids) ? $coupon->user_ids : json_decode($coupon->user_ids, true) ?? []; @endphp
                                                     @foreach($users as $user)
-                                                        <option value="{{ $user->id }}" {{ $coupon->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }} ({{ $user->mobile_number }})</option>
+                                                        <option value="{{ $user->id }}" {{ in_array($user->id, $selectedUsers) ? 'selected' : '' }}>{{ $user->name }} ({{ $user->mobile_number }})</option>
                                                     @endforeach
                                                 </select>
                                             </div>

@@ -125,7 +125,7 @@ class CouponCodeController extends Controller
             }
 
             $data = [
-                'user_id' => $request->user_id,
+                'user_ids' => $request->user_ids,
                 'code' => strtoupper($request->code),
                 'color_code' => $request->color_code,
                 'discount_type' => $request->discount_type,

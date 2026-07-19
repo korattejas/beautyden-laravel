@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class CouponCode extends Model
 {
     protected $fillable = [
-        'user_id',
+        'user_ids',
         'code',
         'color_code',
         'discount_type',
@@ -24,6 +24,7 @@ class CouponCode extends Model
     ];
 
     protected $casts = [
+        'user_ids' => 'array',
         'is_first_order_only' => 'boolean',
         'status' => 'integer',
         'start_date' => 'date',
