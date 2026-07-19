@@ -39,9 +39,10 @@
                                         <div class="col-md-4 mt-2">
                                             <div class="form-group">
                                                 <label>Specific Users (Leave blank for All Users)</label>
-                                                <select name="user_ids[]" class="form-control select2" multiple="multiple">
+                                                <select name="user_ids[]" class="form-control select2" multiple="multiple" data-placeholder="Search and select users...">
                                                     @foreach($users as $user)
-                                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->mobile_number }})</option>
+                                                        @php $roleName = $user->role == 2 ? 'Beautician' : 'User'; @endphp
+                                                        <option value="{{ $user->id }}">{{ $user->name }} - {{ $roleName }} ({{ $user->mobile_number }})</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -181,5 +182,14 @@
 <script>
     var form_url = 'coupon-codes/store';
     var redirect_url = 'coupon-codes';
+    
+    $(document).ready(function() {
+        if ($('.select2').length) {
+            $('.select2').select2({
+                placeholder: 'Search and select users...',
+                allowClear: true
+            });
+        }
+    });
 </script>
 @endsection
