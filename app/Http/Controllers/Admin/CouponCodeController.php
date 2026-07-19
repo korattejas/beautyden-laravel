@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\CouponCode;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
@@ -29,7 +30,8 @@ class CouponCodeController extends Controller
 
     public function create()
     {
-        return view('admin.coupon_codes.create');
+        $users = User::where('status', 1)->select('id', 'name', 'mobile')->get();
+        return view('admin.coupon_codes.create', compact('users'));
     }
 
     public function edit($id)
@@ -37,8 +39,10 @@ class CouponCodeController extends Controller
         try {
             $coupon = CouponCode::where('id', decryptId($id))->first();
             if ($coupon) {
+                $users = User::where('status', 1)->select('id', 'name', 'mobile')->get();
                 return view('admin.coupon_codes.edit', [
-                    'coupon' => $coupon
+                    'coupon' => $coupon,
+                    'users' => $users
                 ]);
             }
             return redirect()->route('admin.coupon-codes.index')->with('error', 'Coupon not found');
@@ -121,7 +125,9 @@ class CouponCodeController extends Controller
             }
 
             $data = [
+                'user_id' => $request->user_id,
                 'code' => strtoupper($request->code),
+                'color_code' => $request->color_code,
                 'discount_type' => $request->discount_type,
                 'discount_value' => $request->discount_value,
                 'min_purchase_amount' => $request->min_purchase_amount ?? 0,

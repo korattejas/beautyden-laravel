@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class CouponCode extends Model
 {
     protected $fillable = [
+        'user_id',
         'code',
+        'color_code',
         'discount_type',
         'discount_value',
         'min_purchase_amount',

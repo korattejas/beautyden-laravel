@@ -35,6 +35,9 @@ class CouponController extends Controller
                 ->where(function($query) use ($now) {
                     $query->whereNull('start_date')->orWhere('start_date', '<=', $now);
                 })
+                ->where(function($query) use ($user) {
+                    $query->whereNull('user_id')->orWhere('user_id', $user->id);
+                })
                 ->get();
 
             $validCoupons = [];
@@ -65,6 +68,7 @@ class CouponController extends Controller
                 $validCoupons[] = [
                     'id' => $coupon->id,
                     'code' => $coupon->code,
+                    'color_code' => $coupon->color_code,
                     'discount_type' => $coupon->discount_type,
                     'discount_value' => $coupon->discount_value,
                     'min_purchase_amount' => $coupon->min_purchase_amount,
@@ -101,6 +105,9 @@ class CouponController extends Controller
             $user = auth('user')->user();
             $coupon = CouponCode::where('code', strtoupper($request->code))
                 ->where('status', 1)
+                ->where(function($query) use ($user) {
+                    $query->whereNull('user_id')->orWhere('user_id', $user->id);
+                })
                 ->first();
 
             if (!$coupon) {

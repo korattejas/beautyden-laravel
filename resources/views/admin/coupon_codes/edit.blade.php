@@ -36,10 +36,30 @@
                                     <input type="hidden" id="form-method" value="edit">
                                     <div class="row row-sm">
 
-                                        <div class="col-md-6 mt-2">
+                                        <div class="col-md-4 mt-2">
+                                            <div class="form-group">
+                                                <label>Specific User (Leave blank for All Users)</label>
+                                                <select name="user_id" class="form-control select2">
+                                                    <option value="">All Users</option>
+                                                    @foreach($users as $user)
+                                                        <option value="{{ $user->id }}" {{ $coupon->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }} ({{ $user->mobile }})</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 mt-2">
                                             <div class="form-group">
                                                 <label>Coupon Code</label>
                                                 <input type="text" name="code" class="form-control" value="{{ $coupon->code }}" required>
+                                                <div class="valid-feedback"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 mt-2">
+                                            <div class="form-group">
+                                                <label>Color Code (Optional)</label>
+                                                <input type="color" name="color_code" class="form-control" value="{{ $coupon->color_code }}" style="height: 40px; padding: 2px;">
                                                 <div class="valid-feedback"></div>
                                             </div>
                                         </div>
