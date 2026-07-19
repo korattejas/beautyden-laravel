@@ -76,6 +76,38 @@
         </div>
     </div>
 
+    <div class="c-col-6">
+        <div class="c-detail-card">
+            <label>Color Code</label>
+            <p>
+                @if($coupon->color_code)
+                    <span style="display:inline-block; width:15px; height:15px; background-color:{{ $coupon->color_code }}; border-radius:50%; margin-right:5px; vertical-align:middle; border:1px solid #ccc;"></span>
+                    {{ $coupon->color_code }}
+                @else
+                    N/A
+                @endif
+            </p>
+        </div>
+    </div>
+    <div class="c-col-6">
+        <div class="c-detail-card">
+            <label>Assigned Users</label>
+            <p style="word-wrap: break-word; white-space: normal;">
+                @php 
+                    $selectedUserIds = is_array($coupon->user_ids) ? $coupon->user_ids : json_decode($coupon->user_ids, true) ?? [];
+                @endphp
+                @if(count($selectedUserIds) > 0)
+                    @php
+                        $assignedUsers = \App\Models\User::whereIn('id', $selectedUserIds)->pluck('name')->toArray();
+                    @endphp
+                    {{ implode(', ', $assignedUsers) }}
+                @else
+                    <span class="badge bg-light-success">All Users</span>
+                @endif
+            </p>
+        </div>
+    </div>
+
     <div class="c-col-12">
         <div class="c-detail-card">
             <label>Description</label>
