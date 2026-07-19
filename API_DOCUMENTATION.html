@@ -1453,6 +1453,69 @@
         <section id="booking">
             <h2><i class="bi bi-calendar-check text-primary"></i> 7. Booking & History</h2>
 
+            <h3>Get Booking Slots</h3>
+            <p>Fetches dates and time slots for booking an appointment, enforcing advance booking limits and store timings.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/getBookingSlots
+                <span class="badge get">POST</span> /Test/V1/customer/getBookingSlots
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>date</td>
+                        <td>String</td>
+                        <td><strong>Optional</strong>. Format Y-m-d (e.g. 2026-07-20). If empty, defaults to today.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Slots retrieved successfully",
+    "data": {
+        "urgent_contact": {
+            "text": "Need urgent service?",
+            "sub_text": "Please call or WhatsApp us on 9574758282",
+            "phone": "9574758282"
+        },
+        "dates": [
+            {
+                "date": "2026-07-20",
+                "display_label": "Today",
+                "day_name": "Mon",
+                "is_selected": true
+            },
+            {
+                "date": "2026-07-21",
+                "display_label": "Tomorrow",
+                "day_name": "Tue",
+                "is_selected": false
+            }
+        ],
+        "slots": [
+            {
+                "time": "08:15 AM",
+                "status": "disabled",
+                "offer_text": null
+            },
+            {
+                "time": "04:30 PM",
+                "status": "available",
+                "offer_text": null
+            }
+        ]
+    }
+}</code></pre>
+
             <h3>Book Appointment (App)</h3>
             <div class="endpoint-wrapper">
                 <span class="badge post">POST</span> /V1/customer/bookAppointmentForApp

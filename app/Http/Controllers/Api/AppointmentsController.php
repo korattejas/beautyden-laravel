@@ -836,4 +836,76 @@ class AppointmentsController extends Controller
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
+
+    public function getBookingSlots(Request $request): JsonResponse
+    {
+        $function_name = 'getBookingSlots';
+        try {
+            $advanceHours = (int) (\App\Models\AppSetting::where('key', 'advance_book_hours')->value('value') ?? 6);
+            $serviceTime = \App\Models\AppSetting::where('key', 'service_time')->value('value') ?? '04:00 AM - 07:00 PM';
+            
+            // Parse service time
+            $times = explode('-', $serviceTime);
+            $startTimeStr = trim($times[0]);
+            $endTimeStr = count($times) > 1 ? trim($times[1]) : '07:00 PM';
+        
+            // Target Date
+            $targetDate = $request->date ? \Carbon\Carbon::parse($request->date) : \Carbon\Carbon::today();
+            $now = \Carbon\Carbon::now();
+            $cutoffTime = $now->copy()->addHours($advanceHours);
+            
+            // Generate Dates (365 days as requested)
+            $dates = [];
+            for ($i = 0; $i < 365; $i++) {
+                $loopDate = \Carbon\Carbon::today()->addDays($i);
+                $dates[] = [
+                    'date' => $loopDate->format('Y-m-d'),
+                    'display_label' => $i == 0 ? 'Today' : ($i == 1 ? 'Tomorrow' : $loopDate->format('d M')),
+                    'day_name' => $loopDate->format('D'),
+                    'is_selected' => $loopDate->isSameDay($targetDate)
+                ];
+            }
+        
+            // Generate Slots (15 minutes interval)
+            $slots = [];
+            $slotStart = \Carbon\Carbon::parse($targetDate->format('Y-m-d') . ' ' . $startTimeStr);
+            $slotEnd = \Carbon\Carbon::parse($targetDate->format('Y-m-d') . ' ' . $endTimeStr);
+        
+            while ($slotStart <= $slotEnd) {
+                $slotTimeStr = $slotStart->format('h:i A'); // e.g. 08:15 AM
+                $status = 'available';
+                
+                if ($targetDate->isToday() && $slotStart->lessThan($cutoffTime)) {
+                    $status = 'disabled';
+                }
+                
+                $slots[] = [
+                    'time' => $slotTimeStr,
+                    'status' => $status,
+                    'offer_text' => null
+                ];
+        
+                $slotStart->addMinutes(15);
+            }
+        
+            $urgentContactPhone = \App\Models\AppSetting::where('key', 'whatsapp_phone_number')->value('value') ?? '9574758282';
+        
+            return $this->sendResponse(
+                [
+                    'urgent_contact' => [
+                        'text' => 'Need urgent service?',
+                        'sub_text' => 'Please call or WhatsApp us on ' . $urgentContactPhone,
+                        'phone' => $urgentContactPhone
+                    ],
+                    'dates' => $dates,
+                    'slots' => $slots
+                ],
+                'Slots retrieved successfully',
+                $this->success_status
+            );
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
 }

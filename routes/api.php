@@ -121,6 +121,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::get('productBrand', [ProductBrandController::class, 'getProductBrand']);
         Route::get('faqs', [FaqsController::class, 'getFaqs']);
         Route::get('settings', [SettingController::class, 'getsettings']);
+        Route::post('getBookingSlots', [AppointmentsController::class, 'getBookingSlots']);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp'])->middleware('throttle:5,1');
         Route::post('verifyRazorpayPayment', [AppointmentsController::class, 'verifyRazorpayPayment']);
@@ -180,6 +181,7 @@ Route::middleware([])->group(function () {
         Route::post('trendingServices', [ApplicationHomeController::class, 'getTrendingServices']);
         Route::post('serviceCombos', [ApplicationHomeController::class, 'getServiceCombos']);
         Route::post('getServiceSearchData', [ApplicationHomeController::class, 'getServiceSearchData']);
+        Route::post('getBookingSlots', [AppointmentsController::class, 'getBookingSlots']);
         Route::get('offerBanner', [OfferController::class, 'getOffers']);
         Route::get('listCoupons', [CouponController::class, 'listCoupons']);
         Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
