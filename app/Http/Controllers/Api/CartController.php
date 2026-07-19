@@ -120,6 +120,10 @@ class CartController extends Controller
             foreach ($cartItems as $item) {
                 $service = $item->service;
                 
+                if (!$service) {
+                    continue;
+                }
+
                 $price = 0;
                 $discountPrice = 0;
                 $discountPercentage = 0;
@@ -137,7 +141,7 @@ class CartController extends Controller
                         $discountPrice = (int) round($price + ($price * $variantPrice->discount_price / 100));
                         $discountPercentage = (int) $variantPrice->discount_price;
                     }
-                    $duration = $item->variant->duration ?? $service->duration;
+                    $duration = $item->variant?->duration ?? $service->duration;
                 } else {
                     $cityService = ServiceCityMaster::where('service_master_id', $item->service_master_id)
                         ->where('city_id', $cityId)
@@ -162,8 +166,8 @@ class CartController extends Controller
                     'cart_id' => $item->id,
                     'service_id' => $service->id,
                     'variant_id' => $item->variant_id,
-                    'name' => $item->variant_id ? $service->name . ' - ' . $item->variant->name : $service->name,
-                    'icon' => $item->variant_id && $item->variant->thumbnail_image 
+                    'name' => $item->variant_id ? $service->name . ($item->variant ? ' - ' . $item->variant->name : '') : $service->name,
+                    'icon' => $item->variant_id && $item->variant?->thumbnail_image 
                         ? asset('uploads/service-variant/' . $item->variant->thumbnail_image) 
                         : asset('uploads/service/' . $service->icon),
                     'duration' => $duration,
