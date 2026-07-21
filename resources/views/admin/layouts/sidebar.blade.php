@@ -26,7 +26,7 @@
 <aside class="pa-sidebar" id="paSidebar">
     <div class="pa-sidebar-header">
         <a class="pa-brand" href="{{ route('admin.dashboard') }}">
-            {{-- <img src="{{ URL::asset('panel-assets/admin-logo/sidebar-Logo.png') }}" class="sidebar-main-logo pa-sidebar-logo" alt="BeautyDen"> --}}
+            <img src="{{ URL::asset('panel-assets/admin-logo/sidebar-Logo.png') }}" class="sidebar-main-logo pa-sidebar-logo" alt="BeautyDen">
         </a>
         <button class="pa-sidebar-toggle" id="paSidebarToggle" type="button" aria-label="Toggle sidebar">
             <i data-feather="chevrons-left"></i>
