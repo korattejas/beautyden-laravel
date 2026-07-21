@@ -67,7 +67,7 @@ class ProcessNotifications extends Command
                 $tokens = $tokensQuery->pluck('fcm_token')->toArray();
 
                 if (!empty($tokens)) {
-                    FcmHelper::sendPushNotification(
+                    $response = FcmHelper::sendPushNotification(
                         $tokens,
                         $notification->title,
                         $notification->message,
@@ -75,13 +75,26 @@ class ProcessNotifications extends Command
                         $customData
                     );
                     
-                    // Mark as sent successfully
-                    $notification->update(['is_sent' => 1]);
-                    $this->info("Sent scheduled notification #{$notification->id}");
+                    if (isset($response['success']) && $response['success'] > 0) {
+                        $notification->update([
+                            'is_sent' => 1,
+                            'success_count' => $response['success'],
+                            'failure_count' => $response['failure'] ?? 0
+                        ]);
+                        $this->info("Sent scheduled notification #{$notification->id}");
+                    } else {
+                        $notification->update([
+                            'is_sent' => 2,
+                            'failure_count' => $response['failure'] ?? count($tokens)
+                        ]);
+                        $this->error("Failed to send scheduled notification #{$notification->id}");
+                        Log::error("Scheduled Notification failed.", ['response' => $response]);
+                    }
                 } else {
                     // No tokens found
-                    $notification->update(['is_sent' => 2]);
+                    $notification->update(['is_sent' => 2, 'failure_count' => 1]);
                     $this->info("No tokens found for scheduled notification #{$notification->id}");
+                    Log::warning("Scheduled Notification failed: No tokens found for notification #{$notification->id}");
                 }
 
             } catch (\Exception $e) {
