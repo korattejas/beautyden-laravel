@@ -37,30 +37,19 @@ class CartController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'service_id' => 'required',
-                'city_id' => 'required|exists:cities,id'
+                'city_id' => 'required|exists:cities,id',
+                'items' => 'required|array|min:1',
+                'items.*.service_id' => 'required'
             ]);
 
             if ($validator->fails()) {
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
-            // Convert to array whether it's a comma-separated string or already an array
-            $serviceIds = is_array($request->service_id) ? $request->service_id : explode(',', $request->service_id);
-            
-            $variantIds = [];
-            if ($request->has('variant_id') && $request->variant_id !== null && $request->variant_id !== '') {
-                $variantIds = is_array($request->variant_id) ? $request->variant_id : explode(',', $request->variant_id);
-            }
-
-            $qtys = [];
-            if ($request->has('qty') && $request->qty !== null && $request->qty !== '') {
-                $qtys = is_array($request->qty) ? $request->qty : explode(',', $request->qty);
-            }
-
-            foreach ($serviceIds as $index => $sId) {
-                $vId = isset($variantIds[$index]) && $variantIds[$index] !== '' && $variantIds[$index] != '0' ? $variantIds[$index] : null;
-                $qty = isset($qtys[$index]) && $qtys[$index] !== '' ? (int)$qtys[$index] : 1;
+            foreach ($request->items as $item) {
+                $sId = $item['service_id'];
+                $vId = isset($item['variant_id']) && $item['variant_id'] !== '' && $item['variant_id'] != '0' ? $item['variant_id'] : null;
+                $qty = isset($item['qty']) && $item['qty'] !== '' ? (int)$item['qty'] : 1;
 
                 $service = ServiceMaster::find($sId);
                 if (!$service) continue; // Skip invalid services
