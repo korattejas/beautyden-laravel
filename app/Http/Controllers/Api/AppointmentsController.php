@@ -317,7 +317,7 @@ class AppointmentsController extends Controller
                             ->first();
 
                         if ($variantPriceObj) {
-                            $priceToUse = $variantPriceObj->discount_price > 0 ? $variantPriceObj->discount_price : $variantPriceObj->price;
+                            $priceToUse = $variantPriceObj->price;
                         }
 
                         $variant = \Illuminate\Support\Facades\DB::table('service_master_variants')->where('id', $item['variant_id'])->first();
@@ -330,7 +330,7 @@ class AppointmentsController extends Controller
                             ->first();
 
                         if ($cityMaster) {
-                            $priceToUse = $cityMaster->discount_price > 0 ? $cityMaster->discount_price : $cityMaster->price;
+                            $priceToUse = $cityMaster->price;
                         }
                         $itemDuration = (int) $serviceMaster->duration;
                     }
