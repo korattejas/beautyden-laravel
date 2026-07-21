@@ -35,6 +35,13 @@ class NotificationController extends Controller
     {
         $function_name = 'sendTestNotification';
         try {
+            if ($request->has('data') && is_string($request->data)) {
+                $decodedData = json_decode($request->data, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $request->merge(['data' => $decodedData]);
+                }
+            }
+
             $validator = Validator::make($request->all(), [
                 'fcm_token' => 'required|string',
                 'title' => 'required|string|max:255',

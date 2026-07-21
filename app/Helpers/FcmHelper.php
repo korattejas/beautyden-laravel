@@ -9,41 +9,74 @@ class FcmHelper
      */
     public static function sendPushNotification($tokens, $title, $body, $image = null, $data = [])
     {
-        $url = 'https://fcm.googleapis.com/fcm/send';
-        $serverKey = env('FCM_SERVER_KEY'); // You need to add this in .env
+        $projectId = env('FIREBASE_PROJECT_ID');
+        $credentialsPath = base_path(env('FIREBASE_CREDENTIALS'));
 
-        if (empty($tokens)) return ['success' => false, 'message' => 'No tokens provided'];
+        if (!file_exists($credentialsPath) || !$projectId) {
+            \Illuminate\Support\Facades\Log::error('Firebase credentials or Project ID missing');
+            return ['success' => 0, 'failure' => count(is_array($tokens) ? $tokens : [$tokens]), 'message' => 'Firebase credentials missing'];
+        }
 
-        $notification = [
-            'title' => $title,
-            'body' => $body,
-            'image' => $image,
-            'sound' => 'default',
-            'badge' => '1',
+        try {
+            $credentials = new \Google\Auth\Credentials\ServiceAccountCredentials(
+                ['https://www.googleapis.com/auth/firebase.messaging'],
+                $credentialsPath
+            );
+
+            $authToken = $credentials->fetchAuthToken()['access_token'];
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error fetching Firebase auth token: ' . $e->getMessage());
+            return ['success' => 0, 'failure' => count(is_array($tokens) ? $tokens : [$tokens]), 'message' => 'Auth token error'];
+        }
+
+        $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+
+        $tokensArray = is_array($tokens) ? $tokens : [$tokens];
+        
+        $successCount = 0;
+        $failureCount = 0;
+        
+        // Convert all values in $data to strings as required by FCM v1
+        $dataMap = [];
+        if (!empty($data)) {
+            foreach ($data as $key => $val) {
+                $dataMap[(string)$key] = (string)$val;
+            }
+        }
+
+        foreach ($tokensArray as $fcmToken) {
+            $payload = [
+                'message' => [
+                    'token' => $fcmToken,
+                    'notification' => [
+                        'title' => (string) $title,
+                        'body' => (string) $body,
+                    ]
+                ]
+            ];
+            
+            if ($image) {
+                $payload['message']['notification']['image'] = $image;
+            }
+            
+            if (!empty($dataMap)) {
+                $payload['message']['data'] = $dataMap;
+            }
+
+            $response = \Illuminate\Support\Facades\Http::withToken($authToken)->post($url, $payload);
+            
+            if ($response->successful()) {
+                $successCount++;
+            } else {
+                $failureCount++;
+                \Illuminate\Support\Facades\Log::error('FCM Send Error: ' . $response->body());
+            }
+        }
+
+        return [
+            'success' => $successCount,
+            'failure' => $failureCount,
+            'message' => "Successfully sent {$successCount}, failed {$failureCount}"
         ];
-
-        $payload = [
-            'registration_ids' => is_array($tokens) ? $tokens : [$tokens],
-            'notification' => $notification,
-            'data' => $data, // Custom data for redirection in app
-            'priority' => 'high',
-        ];
-
-        $headers = [
-            'Authorization: key=' . $serverKey,
-            'Content-Type: application/json',
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        $result = curl_exec($ch);
-        curl_close($ch);
-
-        return json_decode($result, true);
     }
 }
