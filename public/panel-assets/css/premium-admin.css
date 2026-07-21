@@ -267,7 +267,7 @@ body:has(.pa-list-page) .pa-page-title {
 .pa-sidebar-logo,
 .pa-brand .sidebar-main-logo {
     width: 100%;
-    max-width: 200px;
+    max-width: 180px;
     max-height: 72px;
     height: auto;
     object-fit: contain;
@@ -991,7 +991,7 @@ body:has(.pa-list-page) .pa-page-title {
     align-items: center;
     justify-content: center;
     font-size: 1.65rem;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
     transition: transform var(--pa-transition);
 }
 
