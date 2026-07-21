@@ -82,7 +82,7 @@ class NotificationController extends Controller
                 'message' => $request->message,
                 'image' => $imageName ? asset('uploads/notifications/' . $imageName) : null,
                 'target_type' => $request->target_type ?? 'all',
-                'custom_data' => !empty($customData) ? json_encode($customData) : null,
+                'custom_data' => !empty($customData) ? $customData : null,
                 'scheduled_at' => $request->scheduled_at,
                 'is_sent' => 0
             ]);
