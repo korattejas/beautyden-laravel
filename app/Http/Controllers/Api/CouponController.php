@@ -10,6 +10,7 @@ use App\Models\CouponUsage;
 use App\Models\Appointment;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class CouponController extends Controller
 {

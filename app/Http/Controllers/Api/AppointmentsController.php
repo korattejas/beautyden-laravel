@@ -142,6 +142,8 @@ class AppointmentsController extends Controller
                 ],
             ];
 
+            $appointmentTimeForDb = $request->appointment_time ? date("H:i:s", strtotime($request->appointment_time)) : null;
+
             $appointment = Appointment::create([
                 'order_number'        => $orderNumber,
                 'city_id'             => $request->city_id,
@@ -157,7 +159,7 @@ class AppointmentsController extends Controller
                 'discount_price'      => $discountAmount,
                 'service_address'     => $request->service_address,
                 'appointment_date'    => $request->appointment_date,
-                'appointment_time'    => $request->appointment_time,
+                'appointment_time'    => $appointmentTimeForDb,
                 'special_notes'       => $request->notes,
                 'services_data'       => $servicesData,
                 'status'              => '1',
@@ -445,6 +447,8 @@ class AppointmentsController extends Controller
 
             \Illuminate\Support\Facades\DB::beginTransaction();
 
+            $appointmentTimeForDb = $request->appointment_time ? date("H:i:s", strtotime($request->appointment_time)) : null;
+
             $appointment = \App\Models\Appointment::create([
                 'user_id'             => auth('user')->check() ? auth('user')->id() : null,
                 'order_number'        => $orderNumber,
@@ -459,7 +463,7 @@ class AppointmentsController extends Controller
                 'discount_price'      => $discountAmount,
                 'service_address'     => $serviceAddressText,
                 'appointment_date'    => $request->appointment_date,
-                'appointment_time'    => $request->appointment_time,
+                'appointment_time'    => $appointmentTimeForDb,
                 'special_notes'       => $request->notes,
                 'services_data'       => $servicesData,
                 'status'              => '1',
