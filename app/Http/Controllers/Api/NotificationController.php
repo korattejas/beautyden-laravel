@@ -74,10 +74,18 @@ class NotificationController extends Controller
                     "notification" => [
                         "title" => $request->title,
                         "body" => $request->body
-                    ],
-                    "data" => array_map('strval', $request->data ?? []) // Ensure all data values are strings for FCM v1
+                    ]
                 ]
             ];
+
+            if (!empty($request->data)) {
+                // Ensure all data values are strings for FCM v1 and it's an associative array
+                $dataMap = [];
+                foreach ($request->data as $key => $value) {
+                    $dataMap[(string)$key] = (string)$value;
+                }
+                $payload['message']['data'] = $dataMap;
+            }
 
             $response = Http::withToken($token)->post($url, $payload);
 
