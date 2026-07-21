@@ -21,6 +21,10 @@ class NotificationService
      */
     public static function trigger($userId, $eventName, $variables = [], $referenceId = null)
     {
+        if (empty($userId)) {
+            return false;
+        }
+
         try {
             // 1. Fetch active template
             $template = NotificationTemplate::where('event_name', $eventName)

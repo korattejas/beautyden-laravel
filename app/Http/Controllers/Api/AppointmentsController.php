@@ -506,6 +506,8 @@ class AppointmentsController extends Controller
             }
 
             if (auth('user')->check()) {
+                \App\Models\Cart::where('user_id', auth('user')->id())->delete();
+
                 \App\Services\NotificationService::trigger(
                     auth('user')->id(),
                     'order_placed',
