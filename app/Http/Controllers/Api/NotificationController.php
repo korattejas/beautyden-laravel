@@ -116,7 +116,7 @@ class NotificationController extends Controller
     {
         $function_name = 'getNotifications';
         try {
-            $user = auth()->user();
+            $user = auth('user')->user();
             if (!$user) {
                 return $this->sendError('Unauthorised.', $this->validation_error_status);
             }
