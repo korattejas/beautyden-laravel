@@ -2797,46 +2797,48 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>service_id</td>
-                        <td>Integer / String</td>
-                        <td><strong>Required</strong>. The main service ID. Can be a single ID or multiple comma-separated IDs (e.g. <code>1,2,3</code>) for combos.</td>
-                    </tr>
-                    <tr>
-                        <td>variant_id</td>
-                        <td>Integer / String / Null</td>
-                        <td>Optional (<strong>Required</strong> if the service has variants). Can be a single ID or comma-separated IDs matching the service_ids. Use <code>0</code> or an empty value if a service doesn't have a variant (e.g. <code>10,0,12</code> or <code>10,,12</code>).</td>
-                    </tr>
-                    <tr>
-                        <td>qty</td>
-                        <td>Integer / String</td>
-                        <td>Optional. Default is 1. Number of items to add. Can be a single quantity or comma-separated for multiple items (e.g. <code>1,2,1</code>).</td>
-                    </tr>
-                    <tr>
                         <td>city_id</td>
                         <td>Integer</td>
                         <td><strong>Required</strong>. Current city ID.</td>
+                    </tr>
+                    <tr>
+                        <td>items</td>
+                        <td>Array</td>
+                        <td><strong>Required</strong>. Array of objects to add (e.g. <code>items[0][service_id]</code>, <code>items[0][variant_id]</code>, <code>items[0][qty]</code>).</td>
+                    </tr>
+                    <tr>
+                        <td>items[n][service_id]</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. The ID of the service to add.</td>
+                    </tr>
+                    <tr>
+                        <td>items[n][variant_id]</td>
+                        <td>Integer</td>
+                        <td>Optional. <strong>Required</strong> only if the service has variants.</td>
+                    </tr>
+                    <tr>
+                        <td>items[n][qty]</td>
+                        <td>Integer</td>
+                        <td>Optional. Default is 1. The quantity of the service/variant to add.</td>
                     </tr>
                 </tbody>
             </table>
             <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
             <pre>
 <code>{
-    "code": 200,
-    "status": true,
-    "message": "Item(s) added to cart successfully",
-    "data": []
+    // Returns the exact same response as the "Get Cart" API after adding the items.
 }</code></pre>
 
             <h3>13.2 Get Cart</h3>
             <p>Retrieves the user's cart items, current live pricing, and bill summary.</p>
             <div class="endpoint-wrapper">
-                <span class="badge post">POST</span> /V1/customer/cart/get
+                <span class="badge post">POST</span> /V1/customer/cart/get?city_id={city_id}
                 <span class="badge auth">Token Required</span>
             </div>
             <table>
                 <thead>
                     <tr>
-                        <th>Field</th>
+                        <th>Query Parameter</th>
                         <th>Type</th>
                         <th>Description</th>
                     </tr>
@@ -2901,7 +2903,12 @@
                     <tr>
                         <td>action</td>
                         <td>String</td>
-                        <td><strong>Required</strong>. Options: <code>increment</code>, <code>decrement</code>, <code>delete</code>.</td>
+                        <td><strong>Required</strong>. Options: <code>increment</code>, <code>decrement</code>, <code>delete</code>, <code>update</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>qty</td>
+                        <td>Integer</td>
+                        <td>Optional. Default is 1. The specific target quantity to set, or amount to increment/decrement by.</td>
                     </tr>
                 </tbody>
             </table>

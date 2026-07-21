@@ -78,7 +78,8 @@ class CartController extends Controller
                 }
             }
 
-            return $this->sendResponse([], 'Item(s) added to cart successfully', $this->success_status);
+            // Return updated cart directly
+            return $this->getCart($request);
 
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, 'addToCart');
@@ -191,7 +192,8 @@ class CartController extends Controller
             
             $validator = Validator::make($request->all(), [
                 'cart_id' => 'required|exists:carts,id',
-                'action' => 'required|in:increment,decrement,delete'
+                'action' => 'required|in:increment,decrement,delete,update',
+                'qty' => 'nullable|integer|min:1'
             ]);
 
             if ($validator->fails()) {
@@ -203,17 +205,22 @@ class CartController extends Controller
                 return $this->sendError('Cart item not found', $this->validation_error_status);
             }
 
+            $qty = $request->input('qty', 1);
+
             if ($request->action == 'delete') {
                 $cartItem->delete();
+            } elseif ($request->action == 'update' && $request->has('qty')) {
+                $cartItem->qty = $request->qty;
+                $cartItem->save();
             } elseif ($request->action == 'decrement') {
-                if ($cartItem->qty > 1) {
-                    $cartItem->qty -= 1;
+                if ($cartItem->qty > $qty) {
+                    $cartItem->qty -= $qty;
                     $cartItem->save();
                 } else {
                     $cartItem->delete();
                 }
             } elseif ($request->action == 'increment') {
-                $cartItem->qty += 1;
+                $cartItem->qty += $qty;
                 $cartItem->save();
             }
 
