@@ -60,7 +60,7 @@ class FcmHelper
             }
             
             if (!empty($dataMap)) {
-                $payload['message']['data'] = $dataMap;
+                $payload['message']['data'] = (object)$dataMap;
             }
 
             $response = \Illuminate\Support\Facades\Http::withToken($authToken)->post($url, $payload);

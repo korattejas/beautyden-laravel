@@ -119,16 +119,19 @@ class NotificationController extends Controller
         $tokens = $tokensQuery->pluck('fcm_token')->toArray();
         
         if (empty($tokens)) {
-            $notification->update(['is_sent' => 2]); // Mark failed if no tokens
+            \Illuminate\Support\Facades\Log::warning("Notification failed: No FCM tokens found for the selected users.");
+            $notification->update(['is_sent' => 2, 'failure_count' => 1]); // Mark failed if no tokens
             return;
         }
+
+        $customDataArray = is_string($notification->custom_data) ? json_decode($notification->custom_data, true) : (array)$notification->custom_data;
 
         $response = FcmHelper::sendPushNotification(
             $tokens,
             $notification->title,
             $notification->message,
             $notification->image,
-            (array)$notification->custom_data
+            $customDataArray
         );
 
         if (isset($response['success']) && $response['success'] > 0) {
@@ -138,7 +141,11 @@ class NotificationController extends Controller
                 'failure_count' => $response['failure'] ?? 0
             ]);
         } else {
-            $notification->update(['is_sent' => 2]);
+            $notification->update([
+                'is_sent' => 2,
+                'failure_count' => $response['failure'] ?? count($tokens)
+            ]);
+            \Illuminate\Support\Facades\Log::error("Notification failed completely.", ['response' => $response]);
         }
     }
 }
