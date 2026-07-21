@@ -176,7 +176,7 @@ class NotificationController extends Controller
     {
         $function_name = 'markAsRead';
         try {
-            $user = auth()->user();
+            $user = auth('user')->user();
             if (!$user) {
                 return $this->sendError('Unauthorised.', $this->validation_error_status);
             }
@@ -208,7 +208,7 @@ class NotificationController extends Controller
     {
         $function_name = 'clearAll';
         try {
-            $user = auth()->user();
+            $user = auth('user')->user();
             if (!$user) {
                 return $this->sendError('Unauthorised.', $this->validation_error_status);
             }
