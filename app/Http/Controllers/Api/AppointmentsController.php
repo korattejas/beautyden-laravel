@@ -891,15 +891,22 @@ class AppointmentsController extends Controller
                 $slotStart->addMinutes(15);
             }
         
-            $urgentContactPhone = \App\Models\AppSetting::where('key', 'whatsapp_phone_number')->value('value') ?? '9574758282';
+            $urgentContactCountDay = (int) (\App\Models\AppSetting::where('key', 'advance_urgent_contact_count_day')->value('value') ?? 1);
+            $diffDays = \Carbon\Carbon::today($tz)->diffInDays($targetDate);
+            
+            $urgentContactData = null;
+            if ($diffDays < $urgentContactCountDay) {
+                $urgentContactPhone = \App\Models\AppSetting::where('key', 'whatsapp_phone_number')->value('value') ?? '9574758282';
+                $urgentContactData = [
+                    'text' => 'Need urgent service?',
+                    'sub_text' => 'Please call or WhatsApp us on ' . $urgentContactPhone,
+                    'phone' => $urgentContactPhone
+                ];
+            }
         
             return $this->sendResponse(
                 [
-                    'urgent_contact' => [
-                        'text' => 'Need urgent service?',
-                        'sub_text' => 'Please call or WhatsApp us on ' . $urgentContactPhone,
-                        'phone' => $urgentContactPhone
-                    ],
+                    'urgent_contact' => $urgentContactData,
                     'dates' => $dates,
                     'slots' => $slots
                 ],
