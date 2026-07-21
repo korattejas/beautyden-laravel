@@ -849,15 +849,18 @@ class AppointmentsController extends Controller
             $startTimeStr = trim($times[0]);
             $endTimeStr = count($times) > 1 ? trim($times[1]) : '07:00 PM';
         
+            // Use IST for all time calculations
+            $tz = 'Asia/Kolkata';
+
             // Target Date
-            $targetDate = $request->date ? \Carbon\Carbon::parse($request->date) : \Carbon\Carbon::today();
-            $now = \Carbon\Carbon::now();
+            $targetDate = $request->date ? \Carbon\Carbon::parse($request->date, $tz) : \Carbon\Carbon::today($tz);
+            $now = \Carbon\Carbon::now($tz);
             $cutoffTime = $now->copy()->addHours($advanceHours);
             
             // Generate Dates (365 days as requested)
             $dates = [];
             for ($i = 0; $i < 365; $i++) {
-                $loopDate = \Carbon\Carbon::today()->addDays($i);
+                $loopDate = \Carbon\Carbon::today($tz)->addDays($i);
                 $dates[] = [
                     'date' => $loopDate->format('Y-m-d'),
                     'display_label' => $i == 0 ? 'Today' : ($i == 1 ? 'Tomorrow' : $loopDate->format('d M')),
@@ -868,8 +871,8 @@ class AppointmentsController extends Controller
         
             // Generate Slots (15 minutes interval)
             $slots = [];
-            $slotStart = \Carbon\Carbon::parse($targetDate->format('Y-m-d') . ' ' . $startTimeStr);
-            $slotEnd = \Carbon\Carbon::parse($targetDate->format('Y-m-d') . ' ' . $endTimeStr);
+            $slotStart = \Carbon\Carbon::parse($targetDate->format('Y-m-d') . ' ' . $startTimeStr, $tz);
+            $slotEnd = \Carbon\Carbon::parse($targetDate->format('Y-m-d') . ' ' . $endTimeStr, $tz);
         
             while ($slotStart <= $slotEnd) {
                 $slotTimeStr = $slotStart->format('h:i A'); // e.g. 08:15 AM
