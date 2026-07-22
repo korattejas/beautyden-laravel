@@ -801,7 +801,7 @@ class AuthenticationController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'appointment_id' => 'required|integer',
+                'appointment_id' => 'required',
             ], [
                 'appointment_id.required' => 'Appointment ID is required.',
             ]);
@@ -827,7 +827,7 @@ class AuthenticationController extends Controller
             }
 
             // Decode the structured services_data
-            $servicesData = $appointment->services_data ? json_decode($appointment->services_data, true) : null;
+            $servicesData = is_string($appointment->services_data) ? json_decode($appointment->services_data, true) : $appointment->services_data;
 
             $beauticianNames = null;
             $beauticianDetails = null;
