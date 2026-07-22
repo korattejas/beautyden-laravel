@@ -356,21 +356,37 @@ class AppointmentsController extends Controller
             if ($request->filled('coupon_id')) {
                 $coupon = \App\Models\CouponCode::find($request->coupon_id);
                 if ($coupon) {
-                    $now = now()->toDateString();
-                    if ($coupon->status != 1 || ($coupon->start_date && $now < $coupon->start_date) || ($coupon->end_date && $now > $coupon->end_date)) {
-                        return $this->sendError('This coupon is inactive or expired.', $this->validation_error_status);
+                    $now = \Carbon\Carbon::now();
+                    if ($coupon->status != 1) {
+                        return $this->sendError('This coupon is inactive.', $this->validation_error_status);
                     }
-                    if ($coupon->min_purchase_amount > 0 && $subTotal < $coupon->min_purchase_amount) {
-                        return $this->sendError("Minimum order amount of {$coupon->min_purchase_amount} is required for this coupon.", $this->validation_error_status);
+                    if ($coupon->start_date && $now->lt($coupon->start_date)) {
+                        return $this->sendError('This coupon is not yet active.', $this->validation_error_status);
                     }
-                    if ($coupon->usage_limit !== null && \App\Models\CouponUsage::where('coupon_id', $coupon->id)->count() >= $coupon->usage_limit) {
-                        return $this->sendError('This coupon usage limit has been reached.', $this->validation_error_status);
+                    if ($coupon->end_date && $now->gt($coupon->end_date)) {
+                        return $this->sendError('This coupon has expired.', $this->validation_error_status);
+                    }
+                    
+                    $minPurchase = (float) $coupon->min_purchase_amount;
+                    if ($minPurchase > 0 && $subTotal < $minPurchase) {
+                        return $this->sendError("Minimum order amount of {$minPurchase} is required for this coupon.", $this->validation_error_status);
+                    }
+                    
+                    if ($coupon->usage_limit !== null && $coupon->usage_limit > 0) {
+                        $totalUsed = \App\Models\CouponUsage::where('coupon_id', $coupon->id)->count();
+                        if ($totalUsed >= $coupon->usage_limit) {
+                            return $this->sendError('This coupon usage limit has been reached.', $this->validation_error_status);
+                        }
                     }
 
                     if (auth('user')->check()) {
-                        $userUsage = \App\Models\CouponUsage::where('coupon_id', $coupon->id)->where('user_id', auth('user')->id())->count();
-                        if ($userUsage >= $coupon->usage_per_user) {
-                            return $this->sendError("You can only use this coupon {$coupon->usage_per_user} time(s).", $this->validation_error_status);
+                        if ($coupon->usage_per_user > 0) {
+                            $userUsage = \App\Models\CouponUsage::where('coupon_id', $coupon->id)
+                                ->where('user_id', auth('user')->id())
+                                ->count();
+                            if ($userUsage >= $coupon->usage_per_user) {
+                                return $this->sendError("You can only use this coupon {$coupon->usage_per_user} time(s).", $this->validation_error_status);
+                            }
                         }
                         
                         if ($coupon->is_first_order_only) {
@@ -384,11 +400,15 @@ class AppointmentsController extends Controller
                     $couponCode = $coupon->code;
                     if ($coupon->discount_type == 'percentage') {
                         $discountAmount = ($subTotal * $coupon->discount_value) / 100;
-                        if ($coupon->max_discount_amount && $discountAmount > $coupon->max_discount_amount) {
-                            $discountAmount = $coupon->max_discount_amount;
+                        $maxDiscount = (float) $coupon->max_discount_amount;
+                        if ($maxDiscount > 0 && $discountAmount > $maxDiscount) {
+                            $discountAmount = $maxDiscount;
                         }
                     } else {
-                        $discountAmount = $coupon->discount_value;
+                        $discountAmount = (float) $coupon->discount_value;
+                        if ($discountAmount > $subTotal) {
+                            $discountAmount = $subTotal;
+                        }
                     }
                 }
             }
@@ -739,7 +759,8 @@ class AppointmentsController extends Controller
                 'amount' => $amount,
                 'currency' => 'INR',
                 'status' => 'success',
-                'meta_data' => json_encode(['appointment_id' => $request->appointment_id]),
+                'meta_data' => ['appointment_id' => $request->appointment_id],
+                'payment_details' => $payment->toArray(),
                 'method' => $payment['method'] ?? 'online',
             ]);
 

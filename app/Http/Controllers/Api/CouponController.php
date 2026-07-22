@@ -129,12 +129,14 @@ class CouponController extends Controller
             }
 
             // Check Min Amount
-            if ($request->amount < $coupon->min_purchase_amount) {
+            $amount = (float) $request->amount;
+            $minPurchase = (float) $coupon->min_purchase_amount;
+            if ($minPurchase > 0 && $amount < $minPurchase) {
                 return $this->sendError('Minimum amount required: ₹' . $coupon->min_purchase_amount, $this->validation_error_status);
             }
 
             // Check usage limit
-            if ($coupon->usage_limit !== null) {
+            if ($coupon->usage_limit !== null && $coupon->usage_limit > 0) {
                 $totalUsed = CouponUsage::where('coupon_id', $coupon->id)->count();
                 if ($totalUsed >= $coupon->usage_limit) {
                     return $this->sendError('Coupon usage limit reached', $this->validation_error_status);
@@ -142,11 +144,13 @@ class CouponController extends Controller
             }
 
             // Check per user limit
-            $userUsage = CouponUsage::where('coupon_id', $coupon->id)
-                ->where('user_id', $user->id)
-                ->count();
-            if ($userUsage >= $coupon->usage_per_user) {
-                return $this->sendError('You have already used this coupon maximum times', $this->validation_error_status);
+            if ($coupon->usage_per_user > 0) {
+                $userUsage = CouponUsage::where('coupon_id', $coupon->id)
+                    ->where('user_id', $user->id)
+                    ->count();
+                if ($userUsage >= $coupon->usage_per_user) {
+                    return $this->sendError('You have already used this coupon maximum times', $this->validation_error_status);
+                }
             }
 
             // Check first order only
@@ -160,12 +164,16 @@ class CouponController extends Controller
             // Calculate Discount
             $discount = 0;
             if ($coupon->discount_type == 'percentage') {
-                $discount = ($request->amount * $coupon->discount_value) / 100;
-                if ($coupon->max_discount_amount && $discount > $coupon->max_discount_amount) {
-                    $discount = $coupon->max_discount_amount;
+                $discount = ($amount * $coupon->discount_value) / 100;
+                $maxDiscount = (float) $coupon->max_discount_amount;
+                if ($maxDiscount > 0 && $discount > $maxDiscount) {
+                    $discount = $maxDiscount;
                 }
             } else {
-                $discount = $coupon->discount_value;
+                $discount = (float) $coupon->discount_value;
+                if ($discount > $amount) {
+                    $discount = $amount;
+                }
             }
 
             $data = [

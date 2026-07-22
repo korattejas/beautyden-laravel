@@ -48,9 +48,9 @@
             <label>First Order Only?</label>
             <p>
                 @if($coupon->is_first_order_only)
-                    <span class="badge bg-light-info">Yes</span>
+                    <p>Yes</p>
                 @else
-                    <span class="badge bg-light-secondary">No</span>
+                    <p>No</p>
                 @endif
             </p>
         </div>

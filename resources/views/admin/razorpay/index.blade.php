@@ -33,6 +33,7 @@
                                             <th>ID</th>
                                             <th>User</th>
                                             <th>Order ID</th>
+                                            <th>Appt ID</th>
                                             <th>Payment ID</th>
                                             <th>Amount</th>
                                             <th data-stuff="captured,success,failed,pending">Status</th>
@@ -85,6 +86,7 @@
             { data: 'id', name: 'id' },
             { data: 'user_name', name: 'user.name' },
             { data: 'razorpay_order_id', name: 'razorpay_order_id' },
+            { data: 'appointment_link', name: 'appointment_link', orderable: false, searchable: false },
             { data: 'razorpay_payment_id', name: 'razorpay_payment_id' },
             { 
                 data: 'amount', 
@@ -109,6 +111,58 @@
             $('#metadata-payload').text(JSON.stringify(res.meta_data, null, 4));
             $('#detailsModal').modal('show');
         });
+    }
+
+    function refundTransaction(id, maxAmount) {
+        Swal.fire({
+            title: 'Refund Amount',
+            text: "Enter the amount to refund. Leave unchanged for full refund (Max: ₹" + maxAmount + ")",
+            input: 'number',
+            inputValue: maxAmount,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, refund it!',
+            inputAttributes: {
+                min: 1,
+                max: maxAmount,
+                step: 0.01
+            },
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'You need to enter an amount!'
+                }
+                if (value > maxAmount) {
+                    return 'Amount cannot exceed the total transaction amount (₹' + maxAmount + ')!'
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                loaderView();
+                $.ajax({
+                    url: "{{ url('admin/razorpay/refund') }}/" + id,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        amount: result.value
+                    },
+                    success: function(res) {
+                        loaderHide();
+                        if (res.success) {
+                            Swal.fire('Refunded!', res.message, 'success');
+                            $('.dataTable').DataTable().ajax.reload();
+                        } else {
+                            Swal.fire('Error!', res.message, 'error');
+                        }
+                    },
+                    error: function(err) {
+                        loaderHide();
+                        Swal.fire('Error!', 'Something went wrong.', 'error');
+                    }
+                });
+            }
+        })
     }
 </script>
 <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
