@@ -224,7 +224,7 @@ class ReviewApiController extends Controller
                     'id_number' => $firstBeautician->id_number,
                     'role' => $firstBeautician->role ?? 'Beautician',
                     'experience_years' => $firstBeautician->experience_years,
-                    'photo' => $firstBeautician->icon ? asset('uploads/team-members/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
+                    'photo' => $firstBeautician->icon ? asset('uploads/team-member/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
                 ];
             }
         }

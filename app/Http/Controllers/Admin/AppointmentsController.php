@@ -301,7 +301,7 @@ class AppointmentsController extends Controller
                     $beautician = [
                         'name' => $firstBeautician->name,
                         'role' => $firstBeautician->role ?? 'Beautician',
-                        'photo' => $firstBeautician->icon ? asset('uploads/team-members/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
+                        'photo' => $firstBeautician->icon ? asset('uploads/team-member/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
                     ];
                 }
             }

@@ -845,7 +845,7 @@ class AuthenticationController extends Controller
                         'id_number' => $firstBeautician->id_number,
                         'role' => $firstBeautician->role ?? 'Beautician',
                         'experience_years' => $firstBeautician->experience_years,
-                        'photo' => $firstBeautician->icon ? asset('uploads/team-members/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
+                        'photo' => $firstBeautician->icon ? asset('uploads/team-member/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
                     ];
                 }
             }
@@ -862,7 +862,7 @@ class AuthenticationController extends Controller
                 'beautician_details'     => $beauticianDetails,
                 'special_notes'          => $appointment->special_notes,
                 'booking_details'        => $servicesData, // This contains client, appointment, services, and summary
-                'booked_on'              => date('D, d M Y - h:i A', strtotime($appointment->created_at)),
+                'booked_on'              => \Carbon\Carbon::parse($appointment->created_at)->timezone('Asia/Kolkata')->format('D, d M Y - h:i A'),
                 'created_at'             => $appointment->created_at,
                 'updated_at'             => $appointment->updated_at,
             ];
