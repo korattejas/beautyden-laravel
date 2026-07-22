@@ -370,6 +370,10 @@ class AppointmentsController extends Controller
                     $appointments->where('appointments.status', $request->status);
                 }
 
+                if ($request->has('order') && $request->order != '') {
+                    $appointments->where('appointments.order_number', 'like', '%' . $request->order . '%');
+                }
+
                 if ($request->appointment_date) {
                     $appointments->whereDate('appointments.appointment_date', $request->appointment_date);
                 }

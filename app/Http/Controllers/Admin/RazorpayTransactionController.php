@@ -54,7 +54,8 @@ class RazorpayTransactionController extends Controller
                         $appointment = \App\Models\Appointment::find($appointmentId);
                         if ($appointment) {
                             $orderNo = $appointment->order_number;
-                            return '<a href="'.url('admin/appointments?order='.$orderNo).'" class="fw-bold" target="_blank">#'.$orderNo.'</a>';
+                            $encodedOrder = urlencode($orderNo);
+                            return '<a href="'.url('admin/appointments?order='.$encodedOrder).'" class="fw-bold" target="_blank">'.$orderNo.'</a>';
                         }
                     }
                     return '-';
@@ -67,11 +68,13 @@ class RazorpayTransactionController extends Controller
                     return '<span class="badge '.$class.'">'.ucfirst($row->status).'</span>';
                 })
                 ->addColumn('action', function($row) {
-                    $buttons = '<button class="btn btn-sm btn-info" onclick="viewDetails('.$row->id.')">View JSON</button>';
+                    $buttons = '<div class="d-flex gap-1">';
+                    $buttons .= '<button class="btn btn-sm btn-info text-nowrap" onclick="viewDetails('.$row->id.')">View JSON</button>';
                     
                     if (in_array(strtolower($row->status), ['captured', 'success'])) {
-                        $buttons .= ' <button class="btn btn-sm btn-danger ms-1" onclick="refundTransaction('.$row->id.', '.$row->amount.')">Refund</button>';
+                        $buttons .= '<button class="btn btn-sm btn-danger text-nowrap" onclick="refundTransaction('.$row->id.', '.$row->amount.')">Refund</button>';
                     }
+                    $buttons .= '</div>';
                     
                     return $buttons;
                 })

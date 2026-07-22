@@ -642,7 +642,7 @@
                                                 return `
                                                     <tr>
                                                         <td style="padding: 10px 16px;">${date}</td>
-                                                        <td style="padding: 10px 16px;"><a href="/admin/appointments?order=${appt.order_number}" class="fw-bold text-primary">#${appt.order_number || appt.id}</a></td>
+                                                        <td style="padding: 10px 16px;"><a href="/admin/appointments?order=${encodeURIComponent(appt.order_number)}" class="fw-bold text-primary">${appt.order_number || appt.id}</a></td>
                                                         <td class="fw-bold" style="padding: 10px 16px;">₹${parseFloat(amt).toFixed(2)}</td>
                                                         <td style="padding: 10px 16px;">${statusBadge}</td>
                                                     </tr>

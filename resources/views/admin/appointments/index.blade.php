@@ -1017,7 +1017,7 @@
         $('#table-appointments').DataTable().ajax.reload();
     });
 
-    datatable_url = '/getDataAppointments';
+    datatable_url = '/getDataAppointments' + window.location.search;
     
     // Member Selection Logic
     $(document).on('click', '.member-card', function() {
