@@ -243,6 +243,18 @@
             </tr>
             @endif
 
+            {{-- ✅ Show Wallet Used Only If > 0 --}}
+            @if(!empty($summary['wallet_used']) && $summary['wallet_used'] > 0)
+            <tr>
+                <td style="color: #d9534f;">
+                    Wallet Used
+                </td>
+                <td align="right" style="color: #d9534f;">
+                    - ₹{{ number_format($summary['wallet_used'], 2) }}
+                </td>
+            </tr>
+            @endif
+
             <tr>
                 <td>Travel Fee</td>
                 <td align="right">
