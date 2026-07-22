@@ -83,7 +83,7 @@ class AppointmentsController extends Controller
                         ->where('service_id', $id)
                         ->first();
 
-                    $priceToUse = $cityPrice ? $cityPrice->price : 0;
+                    $priceToUse = $cityPrice ? $cityPrice->price : $service->price;
 
                     $services[] = [
                         'type'  => 'service',
@@ -316,11 +316,14 @@ class AppointmentsController extends Controller
                             ->where('city_id', $cityId)
                             ->first();
 
+                        $variant = \Illuminate\Support\Facades\DB::table('service_master_variants')->where('id', $item['variant_id'])->first();
+
                         if ($variantPriceObj) {
                             $priceToUse = $variantPriceObj->price;
+                        } else if ($variant) {
+                            $priceToUse = $variant->price;
                         }
 
-                        $variant = \Illuminate\Support\Facades\DB::table('service_master_variants')->where('id', $item['variant_id'])->first();
                         $variantName = $variant ? $variant->name : '';
                         $itemDuration = $variant ? (int) $variant->duration : 0;
 
@@ -331,6 +334,8 @@ class AppointmentsController extends Controller
 
                         if ($cityMaster) {
                             $priceToUse = $cityMaster->price;
+                        } else {
+                            $priceToUse = $serviceMaster->price;
                         }
                         $itemDuration = (int) $serviceMaster->duration;
                     }
