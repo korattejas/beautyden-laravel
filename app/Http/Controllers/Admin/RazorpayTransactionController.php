@@ -55,7 +55,7 @@ class RazorpayTransactionController extends Controller
                         if ($appointment) {
                             $orderNo = $appointment->order_number;
                             $encodedOrder = urlencode($orderNo);
-                            return '<a href="'.url('admin/appointments?order='.$encodedOrder).'" class="fw-bold" target="_blank">'.$orderNo.'</a>';
+                            return '<a href="'.url('admin/appointments?order_no='.$encodedOrder).'" class="fw-bold" target="_blank">'.$orderNo.'</a>';
                         }
                     }
                     return '-';

@@ -1017,7 +1017,15 @@
         $('#table-appointments').DataTable().ajax.reload();
     });
 
-    datatable_url = '/getDataAppointments' + window.location.search;
+    let searchParams = new URLSearchParams(window.location.search);
+    // Convert legacy 'order' parameter to 'order_no' to avoid DataTables conflict
+    if (searchParams.has('order')) {
+        let val = searchParams.get('order');
+        searchParams.delete('order');
+        searchParams.set('order_no', val);
+    }
+    let queryStr = searchParams.toString();
+    datatable_url = '/getDataAppointments' + (queryStr ? '?' + queryStr : '');
     
     // Member Selection Logic
     $(document).on('click', '.member-card', function() {

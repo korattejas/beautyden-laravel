@@ -470,6 +470,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('razorpay/{id}', [RazorpayTransactionController::class, 'show'])->name('admin.razorpay.show');
         Route::post('razorpay/refund/{id}', [RazorpayTransactionController::class, 'refund'])->name('admin.razorpay.refund');
 
+
+
         /* Settlement Routes */
         Route::get('settlements', [SettlementController::class, 'index'])->name('admin.settlement.index');
         Route::post('settlements/update', [SettlementController::class, 'update'])->name('admin.settlement.update');
