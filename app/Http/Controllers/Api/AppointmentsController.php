@@ -933,18 +933,8 @@ class AppointmentsController extends Controller
             $now = \Carbon\Carbon::now($tz);
             $cutoffTime = $now->copy()->addHours($advanceHours);
             
-            // Generate Dates (365 days as requested)
+            // Generate Dates
             $dates = [];
-            for ($i = 0; $i < 365; $i++) {
-                $loopDate = \Carbon\Carbon::today($tz)->addDays($i);
-                $dates[] = [
-                    'date' => $loopDate->format('Y-m-d'),
-                    'display_label' => $i == 0 ? 'Today' : ($i == 1 ? 'Tomorrow' : $loopDate->format('d M')),
-                    'day_name' => $loopDate->format('D'),
-                    'is_selected' => $loopDate->isSameDay($targetDate)
-                ];
-            }
-        
             // Generate Slots (15 minutes interval)
             $slots = [];
             $slotStart = \Carbon\Carbon::parse($targetDate->format('Y-m-d') . ' ' . $startTimeStr, $tz);
