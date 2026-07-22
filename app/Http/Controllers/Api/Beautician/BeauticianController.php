@@ -978,9 +978,28 @@ class BeauticianController extends Controller
                 return $this->sendError('Appointment not assigned to you.', 403);
             }
 
+            if ($request->status == 2 && $appointment->status != 2) {
+                $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
+                $userId = $user ? $user->id : null;
+                $userName = $user ? $user->name : 'User';
+
+                \App\Services\NotificationService::trigger($userId, 'order_assigned', [
+                    '{order_id}' => $appointment->order_number,
+                    '{user_name}' => $userName
+                ], $appointment->id);
+            }
+
             if ($request->status == 3 && $appointment->status != 3) {
                 // If it's being marked completed
                 $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
+                $userId = $user ? $user->id : null;
+                $userName = $user ? $user->name : 'User';
+
+                \App\Services\NotificationService::trigger($userId, 'order_completed', [
+                    '{order_id}' => $appointment->order_number,
+                    '{user_name}' => $userName
+                ], $appointment->id);
+
                 if ($user && $user->referred_by) {
                     // Check if this is their very first completed appointment after joining the app
                     $completedCount = Appointment::where('phone', $appointment->phone)
@@ -994,15 +1013,52 @@ class BeauticianController extends Controller
                             $referrerBonus = \App\Models\AppSetting::where('key', 'referral_reward_amount')->value('value') ?? 50;
                             if ($referrerBonus > 0) {
                                 $referrer->increment('wallet_balance', $referrerBonus);
-                                \App\Models\WalletTransaction::create([
+                                $wt = \App\Models\WalletTransaction::create([
                                     'user_id' => $referrer->id,
                                     'type' => 'credit',
                                     'amount' => $referrerBonus,
                                     'description' => 'Referral Bonus for ' . $user->name,
                                     'reference_id' => $user->id
                                 ]);
+
+                                \App\Services\NotificationService::trigger($referrer->id, 'referral_bonus', [
+                                    '{amount}' => $referrerBonus,
+                                    '{user_name}' => $referrer->name
+                                ], $wt->id);
                             }
                         }
+                    }
+                }
+            }
+            
+            if ($request->status == 4 && $appointment->status != 4) {
+                $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
+                $userId = $user ? $user->id : null;
+                $userName = $user ? $user->name : 'User';
+
+                \App\Services\NotificationService::trigger($userId, 'order_cancelled', [
+                    '{order_id}' => $appointment->order_number,
+                    '{user_name}' => $userName
+                ], $appointment->id);
+
+                // Check if wallet was used
+                $walletTx = \App\Models\WalletTransaction::where('reference_id', $appointment->id)
+                    ->where('type', 'debit')
+                    ->where('description', 'like', '%Booking ' . $appointment->order_number . '%')
+                    ->first();
+                    
+                if ($walletTx) {
+                    $walletUser = \App\Models\User::find($walletTx->user_id);
+                    if ($walletUser) {
+                        $refundAmount = $walletTx->amount;
+                        $walletUser->increment('wallet_balance', $refundAmount);
+                        \App\Models\WalletTransaction::create([
+                            'user_id' => $walletUser->id,
+                            'type' => 'credit',
+                            'amount' => $refundAmount,
+                            'description' => 'Refund for Cancelled Booking ' . $appointment->order_number,
+                            'reference_id' => $appointment->id
+                        ]);
                     }
                 }
             }

@@ -653,11 +653,15 @@ class AppointmentsController extends Controller
             $appointment = Appointment::find($id);
             if ($appointment && $status == 3 && $appointment->status != 3) {
                 // If it's being marked completed
-                \App\Services\NotificationService::trigger($appointment->user_id, 'order_completed', [
-                    '{order_id}' => $appointment->order_number
+                $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
+                $userId = $user ? $user->id : null;
+                $userName = $user ? $user->name : 'User';
+
+                \App\Services\NotificationService::trigger($userId, 'order_completed', [
+                    '{order_id}' => $appointment->order_number,
+                    '{user_name}' => $userName
                 ], $appointment->id);
 
-                $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
                 if ($user && $user->referred_by) {
                     // Check if this is their very first completed appointment after joining the app
                     $completedCount = Appointment::where('phone', $appointment->phone)
@@ -680,7 +684,8 @@ class AppointmentsController extends Controller
                                 ]);
 
                                 \App\Services\NotificationService::trigger($referrer->id, 'referral_bonus', [
-                                    '{amount}' => $referrerBonus
+                                    '{amount}' => $referrerBonus,
+                                    '{user_name}' => $referrer->name
                                 ], $wt->id);
                             }
                         }
@@ -689,8 +694,13 @@ class AppointmentsController extends Controller
             }
             
             if ($appointment && $status == 4 && $appointment->status != 4) {
-                \App\Services\NotificationService::trigger($appointment->user_id, 'order_cancelled', [
-                    '{order_id}' => $appointment->order_number
+                $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
+                $userId = $user ? $user->id : null;
+                $userName = $user ? $user->name : 'User';
+
+                \App\Services\NotificationService::trigger($userId, 'order_cancelled', [
+                    '{order_id}' => $appointment->order_number,
+                    '{user_name}' => $userName
                 ], $appointment->id);
 
                 // Check if wallet was used
@@ -761,8 +771,13 @@ class AppointmentsController extends Controller
 
             $appointment = Appointment::find($request->value_id);
             if ($appointment) {
-                \App\Services\NotificationService::trigger($appointment->user_id, 'order_assigned', [
-                    '{order_id}' => $appointment->order_number
+                $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
+                $userId = $user ? $user->id : null;
+                $userName = $user ? $user->name : 'User';
+
+                \App\Services\NotificationService::trigger($userId, 'order_assigned', [
+                    '{order_id}' => $appointment->order_number,
+                    '{user_name}' => $userName
                 ], $appointment->id);
             }
 

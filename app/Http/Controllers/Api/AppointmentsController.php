@@ -496,28 +496,38 @@ class AppointmentsController extends Controller
 
             \Illuminate\Support\Facades\DB::commit();
 
-            if (!empty($phone)) {
-                $appointmentDate = $request->appointment_date;
-                $appointmentTime = $request->appointment_time;
-                
-                dispatch(function () use ($phone, $firstName, $orderNumber, $appointmentDate, $appointmentTime) {
-                    try {
-                        $this->sendWhatsAppBooking($phone, $firstName, $orderNumber, $appointmentDate, $appointmentTime);
-                    } catch (\Exception $e) {
-                        logger()->error('WhatsApp error: ' . $e->getMessage());
-                    }
-                })->afterResponse();
-            }
+            if ($request->payment_type != 'online') {
+                if (!empty($phone)) {
+                    $appointmentDate = $request->appointment_date;
+                    $appointmentTime = $request->appointment_time;
+                    
+                    dispatch(function () use ($phone, $firstName, $orderNumber, $appointmentDate, $appointmentTime) {
+                        try {
+                            $this->sendWhatsAppBooking($phone, $firstName, $orderNumber, $appointmentDate, $appointmentTime);
+                        } catch (\Exception $e) {
+                            logger()->error('WhatsApp error: ' . $e->getMessage());
+                        }
+                    })->afterResponse();
+                }
 
-            if (auth('user')->check()) {
-                \App\Models\Cart::where('user_id', auth('user')->id())->delete();
+                if (auth('user')->check()) {
+                    \App\Models\Cart::where('user_id', auth('user')->id())->delete();
 
-                \App\Services\NotificationService::trigger(
-                    auth('user')->id(),
-                    'order_placed',
-                    ['{order_id}' => $orderNumber],
-                    $appointment->id
-                );
+                    $user = auth('user')->user();
+                    \App\Services\NotificationService::trigger(
+                        $user->id,
+                        'order_placed',
+                        [
+                            '{order_id}' => $orderNumber,
+                            '{user_name}' => $user->name ?? 'User'
+                        ],
+                        $appointment->id
+                    );
+                }
+            } else {
+                if (auth('user')->check()) {
+                    \App\Models\Cart::where('user_id', auth('user')->id())->delete();
+                }
             }
 
             $message = '<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -738,6 +748,35 @@ class AppointmentsController extends Controller
             if ($appointment) {
                 $appointment->user_payment_status = 'paid';
                 $appointment->save();
+
+                $phone = $appointment->phone;
+                $firstName = $appointment->first_name;
+                $orderNumber = $appointment->order_number;
+                $appointmentDate = $appointment->appointment_date;
+                $appointmentTime = $appointment->appointment_time;
+                
+                if (!empty($phone)) {
+                    dispatch(function () use ($phone, $firstName, $orderNumber, $appointmentDate, $appointmentTime) {
+                        try {
+                            $this->sendWhatsAppBooking($phone, $firstName, $orderNumber, $appointmentDate, $appointmentTime);
+                        } catch (\Exception $e) {
+                            logger()->error('WhatsApp error: ' . $e->getMessage());
+                        }
+                    })->afterResponse();
+                }
+
+                $user = \App\Models\User::where('mobile_number', $phone)->first();
+                if ($user) {
+                    \App\Services\NotificationService::trigger(
+                        $user->id,
+                        'order_placed',
+                        [
+                            '{order_id}' => $orderNumber,
+                            '{user_name}' => $user->name ?? 'User'
+                        ],
+                        $appointment->id
+                    );
+                }
             }
 
             return $this->sendResponse([], 'Payment verified successfully.', $this->success_status);
@@ -752,8 +791,13 @@ class AppointmentsController extends Controller
                     $appointment->user_payment_status = 'failed';
                     $appointment->save();
 
-                    \App\Services\NotificationService::trigger($appointment->user_id, 'payment_failed', [
-                        '{order_id}' => $appointment->order_number
+                    $user = \App\Models\User::where('mobile_number', $appointment->phone)->first();
+                    $userId = $user ? $user->id : null;
+                    $userName = $user ? $user->name : 'User';
+
+                    \App\Services\NotificationService::trigger($userId, 'payment_failed', [
+                        '{order_id}' => $appointment->order_number,
+                        '{user_name}' => $userName
                     ], $appointment->id);
                 }
             }
