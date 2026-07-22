@@ -940,10 +940,13 @@ class ServiceMasterController extends Controller
                             if ($variantPrices[$variant->id]->is_available == 0) {
                                 continue; // Skip this variant
                             }
-                            $variant->price = $variantPrices[$variant->id]->price;
-                            $variant->discount_price = $variantPrices[$variant->id]->discount_price;
+                            $variant->price = (int) $variantPrices[$variant->id]->price;
+                            $variant->discount_percentage = (int) $variantPrices[$variant->id]->discount_price;
+                            $variant->discount_price = (int) round($variant->price + ($variant->price * $variant->discount_percentage / 100));
                         } else {
-                            $variant->discount_price = 0; // Default if not found
+                            $variant->price = (int) $variant->price;
+                            $variant->discount_percentage = (int) $variant->discount_percentage;
+                            $variant->discount_price = (int) round($variant->price + ($variant->price * $variant->discount_percentage / 100));
                         }
 
                         // Format thumbnail image URL

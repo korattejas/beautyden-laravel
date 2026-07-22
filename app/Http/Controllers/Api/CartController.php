@@ -130,6 +130,10 @@ class CartController extends Controller
                         $price = (int) $variantPrice->price;
                         $discountPrice = (int) round($price + ($price * $variantPrice->discount_price / 100));
                         $discountPercentage = (int) $variantPrice->discount_price;
+                    } else if ($item->variant) {
+                        $price = (int) $item->variant->price;
+                        $discountPercentage = (int) $item->variant->discount_percentage;
+                        $discountPrice = (int) round($price + ($price * $discountPercentage / 100));
                     }
                     $duration = $item->variant?->duration ?? $service->duration;
                 } else {
@@ -142,6 +146,11 @@ class CartController extends Controller
                         $price = (int) $cityService->price;
                         $discountPrice = (int) round($price + ($price * $cityService->discount_price / 100));
                         $discountPercentage = (int) $cityService->discount_price;
+                    } else {
+                        $price = (int) $service->price;
+                        $discountPercentage = $service->discount_price > $service->price ? 
+                            (int) round((($service->discount_price - $service->price) / $service->discount_price) * 100) : 0;
+                        $discountPrice = (int) $service->discount_price;
                     }
                     $duration = $service->duration;
                 }

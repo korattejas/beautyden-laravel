@@ -96,6 +96,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp'])->middleware('throttle:5,1');
         Route::post('verifyRazorpayPayment', [AppointmentsController::class, 'verifyRazorpayPayment']);
         Route::post('retryRazorpayPayment', [AppointmentsController::class, 'retryRazorpayPayment'])->middleware('throttle:5,1');
+        Route::post('getBookingSlots', [AppointmentsController::class, 'getBookingSlots']);
         Route::post('cart/add', [CartController::class, 'addToCart']);
         Route::post('cart/get', [CartController::class, 'getCart']);
         Route::post('cart/update', [CartController::class, 'updateCartItem']);
