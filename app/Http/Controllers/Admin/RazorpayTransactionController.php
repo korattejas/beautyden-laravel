@@ -72,7 +72,8 @@ class RazorpayTransactionController extends Controller
                     $buttons .= '<button class="btn btn-sm btn-info text-nowrap" onclick="viewDetails('.$row->id.')">View JSON</button>';
                     
                     if (in_array(strtolower($row->status), ['captured', 'success'])) {
-                        $buttons .= '<button class="btn btn-sm btn-danger text-nowrap" onclick="refundTransaction('.$row->id.', '.$row->amount.')">Refund</button>';
+                        // Refund functionality temporarily commented out for security reasons.
+                        // $buttons .= '<button class="btn btn-sm btn-danger text-nowrap" onclick="refundTransaction('.$row->id.', '.$row->amount.')">Refund</button>';
                     }
                     $buttons .= '</div>';
                     
