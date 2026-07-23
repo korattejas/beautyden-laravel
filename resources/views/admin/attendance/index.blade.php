@@ -224,9 +224,11 @@
                                     @php 
                                         $currentDateStr = Carbon\Carbon::create($year, $month, $i)->format('Y-m-d');
                                         $leave = $unavailabilities->filter(function($u) use ($member, $currentDateStr) {
+                                            $startDateStr = \Carbon\Carbon::parse($u->start_date)->format('Y-m-d');
+                                            $endDateStr = \Carbon\Carbon::parse($u->end_date)->format('Y-m-d');
                                             return $u->team_member_id == $member->id && 
-                                                   $currentDateStr >= $u->start_date && 
-                                                   $currentDateStr <= $u->end_date;
+                                                   $currentDateStr >= $startDateStr && 
+                                                   $currentDateStr <= $endDateStr;
                                         })->first();
                                     @endphp
                                     <td class="day-col {{ Carbon\Carbon::create($year, $month, $i)->isToday() ? 'today-highlight' : '' }} add-leave-cell" 
@@ -237,7 +239,7 @@
                                             <div class="leave-block type-{{ $leave->type }} {{ $leave->status == 0 ? 'pending-leave' : '' }} {{ $leave->status == 2 ? 'rejected-leave' : '' }}" 
                                                  title="{{ $leave->reason ?? $leave->type_text }} {{ $leave->status == 0 ? '(Pending)' : ($leave->status == 2 ? '(Rejected)' : '') }}"
                                                  onclick="showLeaveDetails({{ $leave->id }}, '{{ addslashes($member->name) }}', '{{ Carbon\Carbon::parse($leave->start_date)->format('d M Y') }} to {{ Carbon\Carbon::parse($leave->end_date)->format('d M Y') }}', '{{ $leave->type_text }}', '{{ addslashes(preg_replace("/\r|\n/", " ", $leave->reason)) }}', {{ $leave->status }})">
-                                                {{ $leave->start_date == $currentDateStr ? $leave->type_text : '' }}
+                                                {{ \Carbon\Carbon::parse($leave->start_date)->format('Y-m-d') == $currentDateStr ? $leave->type_text : '' }}
                                             </div>
                                         @endif
                                     </td>
