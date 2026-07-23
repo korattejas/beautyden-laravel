@@ -45,7 +45,7 @@
                 <div class="invoice-title">INVOICE</div>
                 <div class="invoice-meta">
                     <strong>Order:</strong> {{ $orderNumber ?? '' }}<br>
-                    <strong>Date:</strong> {{ $order->created_at ? $order->created_at->format('d-M-Y h:i A') : '' }}<br>
+                    <strong>Date:</strong> {{ $order->created_at ? $order->created_at->timezone('Asia/Kolkata')->format('d-M-Y h:i A') : '' }}<br>
                     <strong>Status:</strong> {{ $order->order_status }}
                 </div>
             </td>

@@ -139,7 +139,7 @@
                                         <small class="text-muted">Beautician to Company</small>
                                     </td>
                                     <td class="last-updated-{{ $member->id }} last-updated-text">
-                                        {{ $member->settlement->updated_at->format('d M Y, h:i A') }}
+                                        {{ $member->settlement->updated_at->timezone('Asia/Kolkata')->format('d M Y, h:i A') }}
                                     </td>
                                     <td>
                                         <button class="btn btn-update btn-sm btn-open-modal" 

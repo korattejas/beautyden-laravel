@@ -477,7 +477,7 @@ class ProductController extends Controller
                     'total_products' => $totalProducts,
                     'payment_status' => $order->payment_status,
                     'order_status' => $order->order_status,
-                    'date' => $order->created_at ? $order->created_at->format('d-M-Y h:i A') : '',
+                    'date' => $order->created_at ? $order->created_at->timezone('Asia/Kolkata')->format('d-M-Y h:i A') : '',
                     'items' => $items,
                 ];
             });
@@ -561,7 +561,7 @@ class ProductController extends Controller
                 'total_products' => $totalProducts,
                 'payment_status' => $order->payment_status,
                 'order_status' => $order->order_status,
-                'date' => $order->created_at ? $order->created_at->format('d-M-Y h:i A') : '',
+                'date' => $order->created_at ? $order->created_at->timezone('Asia/Kolkata')->format('d-M-Y h:i A') : '',
                 'address' => $order->address ?? null,
                 'items' => $items,
             ];

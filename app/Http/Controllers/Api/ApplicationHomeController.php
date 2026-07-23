@@ -116,6 +116,8 @@ class ApplicationHomeController extends Controller
                     'mobile_number' => $user->mobile_number,
                     'city_id' => (int) $user->city_id,
                     'address' => $user->address,
+                    'latitude' => $addresses->where('is_default', 1)->first() ? $addresses->where('is_default', 1)->first()->latitude : null,
+                    'longitude' => $addresses->where('is_default', 1)->first() ? $addresses->where('is_default', 1)->first()->longitude : null,
                     'active_address' => $addresses->where('is_default', 1)->first(),
                     'addresses' => $addresses,
                     // 'active_subscription' => $subscription

@@ -282,7 +282,7 @@
                                     <td>{{ Carbon\Carbon::parse($req->end_date)->format('d M Y') }}</td>
                                     <td><span class="badge bg-secondary">{{ $req->type_text }}</span></td>
                                     <td>{{ $req->reason }}</td>
-                                    <td>{{ $req->created_at->format('d M Y h:i A') }}</td>
+                                    <td>{{ $req->created_at->timezone('Asia/Kolkata')->format('d M Y h:i A') }}</td>
                                     <td>
                                         <button class="btn btn-sm btn-success" onclick="updateLeaveStatus({{ $req->id }}, 1)"><i class="bi bi-check-circle"></i> Approve</button>
                                         <button class="btn btn-sm btn-danger ms-1" onclick="updateLeaveStatus({{ $req->id }}, 2)"><i class="bi bi-x-circle"></i> Reject</button>

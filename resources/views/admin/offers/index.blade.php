@@ -255,7 +255,7 @@
                                     <span class="priority-badge">
                                         <i class="bi bi-sort-numeric-down"></i> Priority: {{ $offer->priority }}
                                     </span>
-                                    <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> {{ $offer->created_at->format('d M') }}</small>
+                                    <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> {{ $offer->created_at->timezone('Asia/Kolkata')->format('d M') }}</small>
                                 </div>
 
                                 <div class="card-actions">

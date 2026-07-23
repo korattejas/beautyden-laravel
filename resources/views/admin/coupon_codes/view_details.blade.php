@@ -118,13 +118,13 @@
     <div class="c-col-6">
         <div class="c-detail-card">
             <label>Created At</label>
-            <p>{{ $coupon->created_at->format('d-m-Y H:i') }}</p>
+            <p>{{ $coupon->created_at->timezone('Asia/Kolkata')->format('d-m-Y H:i') }}</p>
         </div>
     </div>
     <div class="c-col-6">
         <div class="c-detail-card">
             <label>Last Updated</label>
-            <p>{{ $coupon->updated_at->format('d-m-Y H:i') }}</p>
+            <p>{{ $coupon->updated_at->timezone('Asia/Kolkata')->format('d-m-Y H:i') }}</p>
         </div>
     </div>
 </div>

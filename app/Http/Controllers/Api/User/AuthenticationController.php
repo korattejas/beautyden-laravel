@@ -432,6 +432,9 @@ class AuthenticationController extends Controller
                 return $this->sendError('User not authenticated.', 401);
             }
 
+            $addresses = $authUser->addresses()->orderBy('is_default', 'desc')->orderBy('id', 'desc')->get();
+            $defaultAddress = $addresses->first();
+
             $success = [
                 'customer' => [
                     'id' => $authUser->id,
@@ -439,12 +442,14 @@ class AuthenticationController extends Controller
                     'email' => $authUser->email,
                     'dob' => $authUser->dob,
                     'address' => $authUser->address,
+                    'latitude' => $defaultAddress ? $defaultAddress->latitude : null,
+                    'longitude' => $defaultAddress ? $defaultAddress->longitude : null,
                     'mobile_number' => $authUser->mobile_number,
                     'mobile_verified_at' => $authUser->mobile_verified_at,
                     'city_id' => $authUser->city_id,
                     'referral_code' => $authUser->referral_code,
                     'wallet_balance' => $authUser->wallet_balance,
-                    'addresses' => $authUser->addresses()->orderBy('is_default', 'desc')->orderBy('id', 'desc')->get(),
+                    'addresses' => $addresses,
                 ],
             ];
 
@@ -543,7 +548,7 @@ class AuthenticationController extends Controller
                                 
                             return [
                                 'name' => $user->name,
-                                'joined_at' => $user->created_at ? $user->created_at->format('Y-m-d H:i:s') : null,
+                                'joined_at' => $user->created_at ? $user->created_at->timezone('Asia/Kolkata')->format('Y-m-d H:i:s') : null,
                                 'has_completed_first_booking' => $hasCompletedBooking
                             ];
                         })

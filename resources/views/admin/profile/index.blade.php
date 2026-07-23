@@ -35,7 +35,7 @@
                             <span class="pa-profile-stat-label">Status</span>
                         </div>
                         <div class="pa-profile-stat">
-                            <span class="pa-profile-stat-value">{{ $admin->created_at ? $admin->created_at->format('M Y') : '—' }}</span>
+                            <span class="pa-profile-stat-value">{{ $admin->created_at ? $admin->created_at->timezone('Asia/Kolkata')->format('M Y') : '—' }}</span>
                             <span class="pa-profile-stat-label">Joined</span>
                         </div>
                         <div class="pa-profile-stat">

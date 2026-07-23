@@ -60,8 +60,8 @@ class CouponUsageController extends Controller
                     })
                     ->addColumn('used_at', function ($usage) {
                         return '<div class="d-flex flex-column">
-                                    <span class="text-dark fw-bold">' . $usage->created_at->format('d-m-Y') . '</span>
-                                    <span class="text-muted small">' . $usage->created_at->format('h:i A') . '</span>
+                                    <span class="text-dark fw-bold">' . $usage->created_at->timezone('Asia/Kolkata')->format('d-m-Y') . '</span>
+                                    <span class="text-muted small">' . $usage->created_at->timezone('Asia/Kolkata')->format('h:i A') . '</span>
                                 </div>';
                     })
                     ->addColumn('action', function ($usage) {

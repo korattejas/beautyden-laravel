@@ -117,15 +117,15 @@ class RazorpayTransactionController extends Controller
 
             // If a specific amount is requested for partial refund
             if ($request->filled('amount') && $request->amount > 0) {
-                // Razorpay expects amount in paise
-                $refundData['amount'] = $request->amount * 100;
+                // Razorpay expects amount in paise (must be integer)
+                $refundData['amount'] = (int) round($request->amount * 100);
             }
 
             // Initiate refund
             $refund = $api->payment->fetch($transaction->razorpay_payment_id)->refund($refundData);
 
-            if ($refund && $refund->status == 'processed') {
-                $transaction->status = 'refunded';
+            if ($refund && in_array($refund->status, ['processed', 'pending'])) {
+                $transaction->status = 'refunded'; // Or create a 'refund_pending' status if needed
                 $transaction->save();
 
                 return response()->json(['success' => true, 'message' => 'Refund processed successfully.']);

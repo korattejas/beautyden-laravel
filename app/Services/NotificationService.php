@@ -77,11 +77,14 @@ class NotificationService
     {
         if (empty($variables)) return $text;
 
-        // Ensure keys have curly braces, e.g., if passed as 'user_name' instead of '{user_name}'
         $parsedVariables = [];
         foreach ($variables as $key => $value) {
-            $formattedKey = strpos($key, '{') === false ? '{' . $key . '}' : $key;
-            $parsedVariables[$formattedKey] = $value;
+            // Clean the key from any existing braces or hashes
+            $cleanKey = str_replace(['{', '}', '#'], '', $key);
+            
+            // Add replacements for both formats
+            $parsedVariables['{' . $cleanKey . '}'] = $value;
+            $parsedVariables['##' . $cleanKey . '##'] = $value;
         }
 
         return str_replace(array_keys($parsedVariables), array_values($parsedVariables), $text);

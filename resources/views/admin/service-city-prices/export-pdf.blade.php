@@ -85,7 +85,7 @@
                     {{-- <td>{{ number_format($totalPrice, 2) }}</td>
                     <td>{{ number_format($discountPercent, 2) }}%</td> --}}
                     <td>{{ $p->status == 1 ? 'Active' : 'Inactive' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($p->created_at)->format('d-m-Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($p->created_at)->timezone('Asia/Kolkata')->format('d-m-Y') }}</td>
                 </tr>
             @endforeach
         </tbody>
