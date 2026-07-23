@@ -38,14 +38,13 @@ class AttendanceController extends Controller
             
             $teamMembers = TeamMember::where('status', 1)->get();
             
+            $startDateStr = $startDate->format('Y-m-d');
+            $endDateStr = $endDate->format('Y-m-d');
+            
             $unavailabilities = StaffUnavailability::whereIn('status', [0, 1, 2])
-                ->where(function($query) use ($startDate, $endDate) {
-                    $query->whereBetween('start_date', [$startDate, $endDate])
-                          ->orWhereBetween('end_date', [$startDate, $endDate])
-                          ->orWhere(function($q) use ($startDate, $endDate) {
-                              $q->where('start_date', '<=', $startDate)
-                                ->where('end_date', '>=', $endDate);
-                          });
+                ->where(function($query) use ($startDateStr, $endDateStr) {
+                    $query->whereDate('start_date', '<=', $endDateStr)
+                          ->whereDate('end_date', '>=', $startDateStr);
                 })
                 ->get();
 
