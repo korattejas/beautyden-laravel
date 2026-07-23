@@ -9,6 +9,8 @@ use App\Models\City;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use Exception;
 
@@ -124,64 +126,74 @@ class ApplicationHomeController extends Controller
                 ];
             }
 
-            // 2. Offers (Sliders/Banners)
-            $offers = Offer::where('status', 1)
-                ->select(
-                    'id',
-                    'title',
-                    'offer_short_description',
-                    'media',
-                    'position',
-                    'media_type',
-                    'video_thumbnail',
-                    'priority',
-                    'link',
-                    'created_at'
-                )
-                ->orderBy('priority', 'asc')
-                ->get()
-                ->map(function ($offer) {
-                    $media = [];
-                    if (!empty($offer->media)) {
-                        $dir = $offer->media_type == 'image' ? 'uploads/offers/images/' : 'uploads/offers/videos/';
-                        foreach ($offer->media as $file) {
-                            $media[] = asset($dir . $file);
+            // 2. Offers (Sliders/Banners) - Cached for 1 hour
+            $offers = Cache::remember('api_home_offers', 3600, function () {
+                return Offer::where('status', 1)
+                    ->select(
+                        'id',
+                        'title',
+                        'offer_short_description',
+                        'media',
+                        'position',
+                        'media_type',
+                        'video_thumbnail',
+                        'priority',
+                        'link',
+                        'created_at'
+                    )
+                    ->orderBy('priority', 'asc')
+                    ->get()
+                    ->map(function ($offer) {
+                        $media = [];
+                        if (!empty($offer->media)) {
+                            $dir = $offer->media_type == 'image' ? 'uploads/offers/images/' : 'uploads/offers/videos/';
+                            foreach ($offer->media as $file) {
+                                $media[] = asset($dir . $file);
+                            }
                         }
-                    }
-                    $offer->media_urls = $media;
-                    if ($offer->video_thumbnail) {
-                        $offer->video_thumbnail_url = asset('uploads/offers/images/' . $offer->video_thumbnail);
-                    } else {
-                        $offer->video_thumbnail_url = null;
-                    }
-                    return $offer;
-                });
+                        $offer->media_urls = $media;
+                        if ($offer->video_thumbnail) {
+                            $offer->video_thumbnail_url = asset('uploads/offers/images/' . $offer->video_thumbnail);
+                        } else {
+                            $offer->video_thumbnail_url = null;
+                        }
+                        return $offer;
+                    });
+            });
 
-            // 3. Service Types (New Feature)
-            $serviceTypes = \App\Models\ServiceType::where('status', 1)
-                ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/service-types') . '/", icon) AS icon'), 'description', 'is_popular', 'is_new')
-                ->orderByDesc('is_popular')
-                ->get();
+            // 3. Service Types (New Feature) - Cached for 1 hour
+            $serviceTypes = Cache::remember('api_home_service_types', 3600, function () {
+                return \App\Models\ServiceType::where('status', 1)
+                    ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/service-types') . '/", icon) AS icon'), 'description', 'is_popular', 'is_new')
+                    ->orderByDesc('is_popular')
+                    ->get();
+            });
 
-            $cities = DB::table('cities')
-                ->select('id', 'name', 'status')
-                ->whereIn('status', [0, 1])
-                ->orderBy('name', 'asc')
-                ->get();
+            // Cached Cities
+            $cities = Cache::remember('api_home_cities', 3600, function () {
+                return DB::table('cities')
+                    ->select('id', 'name', 'status')
+                    ->whereIn('status', [0, 1])
+                    ->orderBy('name', 'asc')
+                    ->get();
+            });
 
             $activeCities = $cities->where('status', 0)->values();
             $comingSoonCities = $cities->where('status', 1)->values();
 
-            $coupons = DB::table('coupon_codes')
-                ->select('id', 'code', 'discount_type', 'discount_value', 'description', 'start_date', 'end_date')
-                ->where('status', 1)
-                ->where(function($query) {
-                    $query->whereNull('start_date')->orWhere('start_date', '<=', now());
-                })
-                ->where(function($query) {
-                    $query->whereNull('end_date')->orWhere('end_date', '>=', now());
-                })
-                ->get();
+            // Cached Coupons
+            $coupons = Cache::remember('api_home_coupons', 3600, function () {
+                return DB::table('coupon_codes')
+                    ->select('id', 'code', 'discount_type', 'discount_value', 'description', 'start_date', 'end_date')
+                    ->where('status', 1)
+                    ->where(function($query) {
+                        $query->whereNull('start_date')->orWhere('start_date', '<=', now());
+                    })
+                    ->where(function($query) {
+                        $query->whereNull('end_date')->orWhere('end_date', '>=', now());
+                    })
+                    ->get();
+            });
 
             if ($cityId == 0) {
                 return $this->sendResponse(
@@ -199,20 +211,22 @@ class ApplicationHomeController extends Controller
             }
 
 
-            // 4. Category List (Service Categories)
-            $categories = DB::table('service_categories')
-                ->select(
-                    'id', 
-                    'name', 
-                    DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'), 
-                    'description', 
-                    'is_popular',
-                    'is_new'
-                )
-                ->where('status', 1)
-                ->where('is_popular', 1)
-                ->orderByDesc('is_popular')
-                ->get();
+            // 4. Category List (Service Categories) - Cached for 1 hour
+            $categories = Cache::remember('api_home_categories', 3600, function () {
+                return DB::table('service_categories')
+                    ->select(
+                        'id', 
+                        'name', 
+                        DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'), 
+                        'description', 
+                        'is_popular',
+                        'is_new'
+                    )
+                    ->where('status', 1)
+                    ->where('is_popular', 1)
+                    ->orderByDesc('is_popular')
+                    ->get();
+            });
 
             // Trending services logic extracted to getTrendingServices API
 
