@@ -173,10 +173,8 @@ class ReviewApiController extends Controller
                     $categoryId = $serviceRecord->category_id;
                     if ($categoryId && !in_array($categoryId, $seenCategories)) {
                         $rateServices[] = [
-                            'service_name' => $serviceRecord->name,
                             'category_name' => $serviceRecord->category ? $serviceRecord->category->name : '',
                             'category_id' => $categoryId,
-                            'service_id' => $serviceRecord->id,
                         ];
                         $seenCategories[] = $categoryId;
                     }
@@ -211,10 +209,8 @@ class ReviewApiController extends Controller
 
                     if ($categoryId && !in_array($categoryId, $seenCategories)) {
                         $rateServices[] = [
-                            // 'service_name' => $serviceName,
                             'category_name' => $categoryName,
                             'category_id' => $categoryId,
-                            // 'service_id' => $serviceId,
                         ];
                         $seenCategories[] = $categoryId;
                     }
@@ -239,13 +235,7 @@ class ReviewApiController extends Controller
                     return asset('uploads/review/photos/' . $photo);
                 }, $photos);
 
-                $categoryRatings = [];
                 foreach ($reviews as $review) {
-                    $categoryRatings[] = [
-                        'category_id' => $review->category_id,
-                        'category_name' => $review->category_name,
-                        'rating' => (float) $review->rating,
-                    ];
                     $existingRatings[$review->category_id] = (float) $review->rating;
                 }
 
@@ -253,7 +243,6 @@ class ReviewApiController extends Controller
                     'overall_rating' => (float) $firstReview->overall_rating,
                     'review' => $firstReview->review,
                     'photos' => $fullPhotoUrls,
-                    'category_ratings' => $categoryRatings,
                 ];
             }
 
