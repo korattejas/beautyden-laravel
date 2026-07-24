@@ -1112,6 +1112,10 @@ class BeauticianController extends Controller
                 'taluko', 'village', 'address'
             ]);
 
+            if (!empty($updateData['dob'])) {
+                $updateData['dob'] = \Carbon\Carbon::parse($updateData['dob'])->format('Y-m-d');
+            }
+
             if ($request->hasFile('icon')) {
                 // Delete old icon if exists
                 if ($teamMember->icon && file_exists(public_path('uploads/team-member/' . $teamMember->icon))) {
