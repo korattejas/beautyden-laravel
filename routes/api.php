@@ -78,6 +78,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('getWalletHistory', [AuthenticationController::class, 'getWalletHistory']);
         Route::post('getTotalBookService', [AuthenticationController::class, 'getTotalBookService']);
         Route::post('getBookServiceDetails', [AuthenticationController::class, 'getBookServiceDetails']);
+        Route::post('exportAppointmentDetails', [AuthenticationController::class, 'exportAppointmentDetails']);
         Route::post('updateFcmToken', [AuthenticationController::class, 'updateFcmToken']);
         Route::get('logout', [AuthenticationController::class, 'logout']);
         Route::post('deleteAccount', [AuthenticationController::class, 'deleteAccount']);

@@ -21,7 +21,7 @@ use App\Models\UserFcmToken;
 use App\Models\UserAddress;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class AuthenticationController extends Controller
 {
     protected mixed $success_status, $exception_status, $backend_error_status, $validation_error_status, $pin_code_validation_error_status, $common_error_message;
@@ -855,12 +855,55 @@ class AuthenticationController extends Controller
                 }
             }
 
+            $paymentMethodDetails = null;
+            if (in_array(strtolower($appointment->payment_type), ['online', 'razorpay'])) {
+                $transaction = \App\Models\RazorpayTransaction::where('meta_data->appointment_id', $appointment->id)
+                    ->where('status', 'success')
+                    ->latest()
+                    ->first();
+
+                if ($transaction && !empty($transaction->payment_details)) {
+                    $details = is_string($transaction->payment_details) ? json_decode($transaction->payment_details, true) : $transaction->payment_details;
+                    
+                    if ($details) {
+                        $method = strtoupper($details['method'] ?? '');
+                        $bank = $details['bank'] ?? '';
+                        $wallet = $details['wallet'] ?? '';
+                        $network = $details['card']['network'] ?? '';
+                        $issuer = $details['card']['issuer'] ?? '';
+                        $vpa = $details['vpa'] ?? '';
+
+                        $methodString = "Paid via " . $method;
+
+                        if ($method == 'UPI' && $vpa) {
+                            $methodString .= " . " . $vpa;
+                        } elseif ($method == 'CARD') {
+                            if ($network) $methodString .= " . " . $network;
+                            if ($issuer) $methodString .= " . " . $issuer;
+                        } elseif ($method == 'NETBANKING' && $bank) {
+                            $methodString .= " . " . $bank;
+                        } elseif ($method == 'WALLET' && $wallet) {
+                            $methodString .= " . " . $wallet;
+                        }
+                        
+                        $paidAt = isset($details['created_at']) 
+                            ? \Carbon\Carbon::createFromTimestamp($details['created_at'])->format('d M h:i A') 
+                            : $transaction->created_at->format('d M h:i A');
+
+                        $methodString .= " . " . $paidAt;
+                        
+                        $paymentMethodDetails = $methodString;
+                    }
+                }
+            }
+
             $data = [
                 'id'                     => $appointment->id,
                 'order_number'           => $appointment->order_number,
                 'status'                 => (int) $appointment->status,
                 'user_payment_status'    => $appointment->user_payment_status,
                 'payment_type'           => $appointment->payment_type,
+                'payment_method_details' => $paymentMethodDetails,
                 'company_amount'         => $appointment->company_amount,
                 'city_name'              => $appointment->city_name,
                 'assigned_beautician'    => $beauticianNames,
@@ -873,6 +916,69 @@ class AuthenticationController extends Controller
             ];
 
             return $this->sendResponse($data, 'Booking details fetched successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
+    public function exportAppointmentDetails(Request $request): JsonResponse
+    {
+        $function_name = 'exportAppointmentDetails';
+        try {
+            $authUser = auth('user')->user();
+
+            if (!$authUser) {
+                return $this->sendError('User not authenticated.', 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'appointment_id' => 'required|integer|exists:appointments,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $appointment = Appointment::leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
+                ->select('appointments.*', 'ct.name as city_name')
+                ->where('appointments.id', $request->appointment_id)
+                ->where('appointments.phone', $authUser->mobile_number)
+                ->first();
+
+            if (!$appointment) {
+                return $this->sendError('Appointment not found.', 404);
+            }
+
+            $servicesData = is_string($appointment->services_data) ? json_decode($appointment->services_data, true) : $appointment->services_data;
+            
+            $services = [];
+            $summary = [];
+            if (isset($servicesData['services'])) {
+                $services = $servicesData['services'];
+            }
+            if (isset($servicesData['summary'])) {
+                $summary = $servicesData['summary'];
+            }
+
+            $orderNumber = $appointment->order_number ?? 'BDAPP-' . str_pad($appointment->id, 6, '0', STR_PAD_LEFT);
+            $safeOrderNumber = str_replace('#', '', $orderNumber);
+            $fileName = 'customer_appointment_' . $safeOrderNumber . '_' . $authUser->id . '.pdf';
+            $directory = public_path('uploads/exports');
+
+            if (!file_exists($directory)) {
+                mkdir($directory, 0777, true);
+            }
+
+            $pdf = Pdf::loadView('admin.appointments.pdf', compact('appointment', 'services', 'summary'));
+            $pdf->save($directory . '/' . $fileName);
+
+            $fileUrl = asset('uploads/exports/' . $fileName) . '?v=' . time();
+
+            return $this->sendResponse([
+                'file_url' => $fileUrl
+            ], 'Appointment details exported successfully.', $this->success_status);
+
         } catch (Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->common_error_message, $this->exception_status);

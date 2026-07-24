@@ -1878,6 +1878,38 @@
         }
     }
 }</code></pre>
+            <h3>Export Appointment Details</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/exportAppointmentDetails
+                <span class="badge auth">Token Required</span>
+            </div>
+            <p>Generates a PDF invoice for a specific booking and returns the downloadable URL.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. The ID of the appointment.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Appointment details exported successfully.",
+    "data": {
+        "file_url": "https://yourdomain.com/uploads/exports/customer_appointment_123456_1.pdf?v=1734538800"
+    }
+}</code></pre>
         </section>
 
         <section id="offers">
