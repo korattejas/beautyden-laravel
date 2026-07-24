@@ -792,7 +792,7 @@ class AuthenticationController extends Controller
                 'total_pending'   => $totalPending,
                 'total_assigned'  => $totalAssigned,
                 'total_rejected'  => $totalRejected,
-                'bookings'        => $dataList,
+                'bookings'        => $dataList->values(),
             ];
 
             return $this->sendResponse($responseData, 'All booking details fetched successfully.', $this->success_status);
