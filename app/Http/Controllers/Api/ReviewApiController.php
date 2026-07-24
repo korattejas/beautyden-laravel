@@ -40,7 +40,11 @@ class ReviewApiController extends Controller
                 'category_ratings.*.category_id' => 'required|integer',
                 'category_ratings.*.rating' => 'required|numeric|min:1|max:5',
                 'review' => 'nullable|string',
+                'photos' => 'nullable|array|max:10',
                 'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            ], [
+                'photos.max' => 'You can upload a maximum of 10 photos.',
+                'photos.*.max' => 'Each photo must not be greater than 2MB.',
             ]);
 
             if ($validator->fails()) {
