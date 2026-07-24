@@ -4421,6 +4421,119 @@
 }</code></pre>
         </section>
 
+        <section id="reviews">
+            <h2><i class="bi bi-star-fill text-warning"></i> 15. Reviews & Ratings</h2>
+            
+            <h3>Get Appointment Review Data</h3>
+            <p>Fetches all required data to show the "Write a Review" screen, including appointment summary, beautician details, list of services to rate, and any previously submitted review.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/getAppointmentReview
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. The ID of the appointment.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Review screen data fetched successfully.",
+    "data": {
+        "appointment_id": 12,
+        "appointment_summary": {
+            "appointment_date": "16 Dec, 2024",
+            "appointment_time": "08:34 PM",
+            "order_number": "#BDXYZ123",
+            "status_text": "Completed",
+            "total_services": 6,
+            "assigned_beautician_name": "Kamalben",
+            "booked_on": "Mon, 16 Dec 2024 - 08:34 PM",
+            "payment_mode": "Cash",
+            "beautician_details": {
+                "name": "Kamalben",
+                "id_number": "BC-101",
+                "role": "Senior Beautician",
+                "experience_years": 6,
+                "photo": "https://domain.com/uploads/team-member/avatar.png"
+            }
+        },
+        "services_to_rate": [
+            {
+                "service_name": "Full Arms Korean Waxing",
+                "category_name": "Korean Wax",
+                "category_id": 1,
+                "service_id": 12
+            }
+        ],
+        "submitted_review": null
+    }
+}</code></pre>
+
+            <h3>Submit Review</h3>
+            <p>Submit a new review from the App.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/submitReview
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>appointment_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td>overall_rating</td>
+                        <td>Numeric</td>
+                        <td><strong>Required</strong>. Rating from 1 to 5.</td>
+                    </tr>
+                    <tr>
+                        <td>category_ratings</td>
+                        <td>String</td>
+                        <td>JSON string array of category ratings. Example: <code>[{"category_id":1,"rating":4.5}]</code></td>
+                    </tr>
+                    <tr>
+                        <td>review</td>
+                        <td>String</td>
+                        <td>Optional text review.</td>
+                    </tr>
+                    <tr>
+                        <td>photos[]</td>
+                        <td>File</td>
+                        <td>Optional array of image files.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Review submitted successfully",
+    "data": null
+}</code></pre>
+        </section>
         <p style="text-align: center; color: var(--text-light); margin: 60px 0;">
 
             &copy; 2026 Beautyden. For any API issues, contact the Backend Team.

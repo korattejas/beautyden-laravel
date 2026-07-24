@@ -100,77 +100,11 @@ class ReviewApiController extends Controller
     }
 
     /**
-     * Get submitted review for a specific appointment
+     * Get data for the "Write a Review" screen (Appointment Summary, Beautician Details, Services, and Submitted Review)
      */
     public function getAppointmentReview(Request $request)
     {
         $function_name = 'getAppointmentReview';
-        try {
-            $user = auth('user')->user();
-            if (!$user) {
-                return $this->sendError('Unauthorized', 401);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'appointment_id' => 'required|exists:customer_reviews,appointment_id',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->sendError($validator->errors()->first(), $this->validator_error_code);
-            }
-
-            $reviews = \App\Models\CustomerReview::query()
-                ->leftJoin('service_categories as sc', 'sc.id', '=', 'customer_reviews.category_id')
-                ->where('customer_reviews.appointment_id', $request->appointment_id)
-                ->where('customer_reviews.user_id', $user->id)
-                ->select('customer_reviews.*', 'sc.name as category_name')
-                ->get();
-
-            if ($reviews->isEmpty()) {
-                return $this->sendError('No review found for this appointment.', 404);
-            }
-
-            $firstReview = $reviews->first();
-            
-            $summary = $this->getAppointmentSummaryData($firstReview->appointment_id);
-
-            $photos = $firstReview->photos ? $firstReview->photos : [];
-            $fullPhotoUrls = array_map(function ($photo) {
-                return asset('uploads/review/photos/' . $photo);
-            }, $photos);
-
-            $categoryRatings = [];
-            foreach ($reviews as $review) {
-                $categoryRatings[] = [
-                    'category_id' => $review->category_id,
-                    'category_name' => $review->category_name,
-                    'rating' => (float) $review->rating,
-                ];
-            }
-
-            $data = [
-                'appointment_id' => $firstReview->appointment_id,
-                'appointment_summary' => $summary,
-                'overall_rating' => (float) $firstReview->overall_rating,
-                'review' => $firstReview->review,
-                'photos' => $fullPhotoUrls,
-                'category_ratings' => $categoryRatings,
-            ];
-
-            return $this->sendResponse($data, 'Review details fetched successfully.');
-
-        } catch (\Exception $e) {
-            logCatchException($e, $this->controller_name, $function_name);
-            return $this->sendError($this->error_message, $this->exception_error_code);
-        }
-    }
-
-    /**
-     * Get Appointment Summary for Review Screen
-     */
-    public function getAppointmentSummaryForReview(Request $request)
-    {
-        $function_name = 'getAppointmentSummaryForReview';
         try {
             $user = auth('user')->user();
             if (!$user) {
@@ -185,64 +119,106 @@ class ReviewApiController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validator_error_code);
             }
 
-            $summary = $this->getAppointmentSummaryData($request->appointment_id);
-            if (!$summary) {
-                return $this->sendError('Appointment not found.', 404);
+            $appointment = \App\Models\Appointment::find($request->appointment_id);
+
+            // 1. Appointment Summary & Beautician Details
+            $totalServices = 0;
+            $servicesData = is_string($appointment->services_data) ? json_decode($appointment->services_data, true) : $appointment->services_data;
+            
+            $servicesList = [];
+            if (isset($servicesData['services'])) {
+                $totalServices = count($servicesData['services']);
+                $servicesList = $servicesData['services'];
             }
 
-            return $this->sendResponse($summary, 'Appointment summary fetched successfully.');
+            $beautician = null;
+            $beauticianName = 'N/A';
+            if (!empty($appointment->assigned_to)) {
+                $assignedIds = explode(',', $appointment->assigned_to);
+                $firstBeautician = \App\Models\TeamMember::find($assignedIds[0]);
+                if ($firstBeautician) {
+                    $beauticianName = $firstBeautician->name;
+                    $beautician = [
+                        'name' => $firstBeautician->name,
+                        'id_number' => $firstBeautician->id_number,
+                        'role' => $firstBeautician->role ?? 'Beautician',
+                        'experience_years' => $firstBeautician->experience_years,
+                        'photo' => $firstBeautician->icon ? asset('uploads/team-member/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
+                    ];
+                }
+            }
+
+            $paymentMode = ucfirst($appointment->payment_type ?? 'Cash');
+
+            $summary = [
+                'appointment_date' => date('d M, Y', strtotime($appointment->appointment_date)),
+                'appointment_time' => date('h:i A', strtotime($appointment->appointment_time)),
+                'order_number' => $appointment->order_number,
+                'status_text' => 'Completed',
+                'total_services' => $totalServices,
+                'assigned_beautician_name' => $beauticianName,
+                'booked_on' => date('D, d M Y - h:i A', strtotime($appointment->created_at)),
+                'payment_mode' => $paymentMode,
+                'beautician_details' => $beautician,
+            ];
+
+            // 2. Services List for Rating
+            $rateServices = [];
+            foreach ($servicesList as $s) {
+                $rateServices[] = [
+                    'service_name' => $s['name'] ?? 'Service',
+                    'category_name' => $s['category_name'] ?? '',
+                    'category_id' => $s['category_id'] ?? 0,
+                    'service_id' => $s['service_id'] ?? 0,
+                ];
+            }
+
+            // 3. Submitted Review Data (if exists)
+            $reviews = \App\Models\CustomerReview::query()
+                ->leftJoin('service_categories as sc', 'sc.id', '=', 'customer_reviews.category_id')
+                ->where('customer_reviews.appointment_id', $request->appointment_id)
+                ->where('customer_reviews.user_id', $user->id)
+                ->select('customer_reviews.*', 'sc.name as category_name')
+                ->get();
+
+            $submittedReview = null;
+            if ($reviews->isNotEmpty()) {
+                $firstReview = $reviews->first();
+                $photos = $firstReview->photos ? $firstReview->photos : [];
+                $fullPhotoUrls = array_map(function ($photo) {
+                    return asset('uploads/review/photos/' . $photo);
+                }, $photos);
+
+                $categoryRatings = [];
+                foreach ($reviews as $review) {
+                    $categoryRatings[] = [
+                        'category_id' => $review->category_id,
+                        'category_name' => $review->category_name,
+                        'rating' => (float) $review->rating,
+                    ];
+                }
+
+                $submittedReview = [
+                    'overall_rating' => (float) $firstReview->overall_rating,
+                    'review' => $firstReview->review,
+                    'photos' => $fullPhotoUrls,
+                    'category_ratings' => $categoryRatings,
+                ];
+            }
+
+            $data = [
+                'appointment_id' => $request->appointment_id,
+                'appointment_summary' => $summary,
+                'services_to_rate' => $rateServices,
+                'submitted_review' => $submittedReview,
+            ];
+
+            return $this->sendResponse($data, 'Review screen data fetched successfully.');
 
         } catch (\Exception $e) {
             logCatchException($e, $this->controller_name, $function_name);
             return $this->sendError($this->error_message, $this->exception_error_code);
         }
-    }
-
-    /**
-     * Helper method to get appointment summary data
-     */
-    private function getAppointmentSummaryData($appointmentId)
-    {
-        $appointment = \App\Models\Appointment::find($appointmentId);
-        if (!$appointment) return null;
-
-        $totalServices = 0;
-        $servicesData = is_string($appointment->services_data) ? json_decode($appointment->services_data, true) : $appointment->services_data;
-        if (isset($servicesData['services'])) {
-            $totalServices = count($servicesData['services']);
-        }
-
-        $beautician = null;
-        $beauticianName = 'N/A';
-        if (!empty($appointment->assigned_to)) {
-            $assignedIds = explode(',', $appointment->assigned_to);
-            $firstBeautician = \App\Models\TeamMember::find($assignedIds[0]);
-            if ($firstBeautician) {
-                $beauticianName = $firstBeautician->name;
-                $beautician = [
-                    'name' => $firstBeautician->name,
-                    'id_number' => $firstBeautician->id_number,
-                    'role' => $firstBeautician->role ?? 'Beautician',
-                    'experience_years' => $firstBeautician->experience_years,
-                    'photo' => $firstBeautician->icon ? asset('uploads/team-member/' . $firstBeautician->icon) : asset('assets/images/default-avatar.png'),
-                ];
-            }
-        }
-
-        $paymentMode = ucfirst($appointment->payment_type ?? 'Cash');
-
-        return [
-            'appointment_date' => date('d M, Y', strtotime($appointment->appointment_date)),
-            'appointment_time' => date('h:i A', strtotime($appointment->appointment_time)),
-            'order_number' => $appointment->order_number,
-            'status_text' => 'Completed',
-            'total_services' => $totalServices,
-            'assigned_beautician_name' => $beauticianName,
-            'booked_on' => date('D, d M Y - h:i A', strtotime($appointment->created_at)),
-            'payment_mode' => $paymentMode,
-            'beautician_details' => $beautician,
-        ];
-        return $summary;
     }
 
 

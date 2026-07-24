@@ -92,7 +92,6 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
         Route::post("getAppointmentReview", [ReviewApiController::class, "getAppointmentReview"]);
-        Route::post("getAppointmentSummaryForReview", [ReviewApiController::class, "getAppointmentSummaryForReview"]);
         Route::post('bookAppointment', [AppointmentsController::class, 'bookAppointment']);
         Route::post('bookAppointmentForApp', [AppointmentsController::class, 'bookAppointmentForApp'])->middleware('throttle:5,1');
         Route::post('verifyRazorpayPayment', [AppointmentsController::class, 'verifyRazorpayPayment']);
