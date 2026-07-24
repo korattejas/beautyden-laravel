@@ -741,8 +741,14 @@ class AuthenticationController extends Controller
             $totalAssigned = $appointments->where('status', 2)->count();
             $totalRejected = $appointments->where('status', 4)->count();
 
+            $filteredAppointments = $appointments;
+            if ($request->has('status') && $request->status !== null && $request->status !== '') {
+                $statusFilter = is_array($request->status) ? $request->status : array_map('trim', explode(',', $request->status));
+                $filteredAppointments = $appointments->whereIn('status', $statusFilter);
+            }
+
             $allAssignedIds = [];
-            foreach ($appointments as $app) {
+            foreach ($filteredAppointments as $app) {
                 if (!empty($app->assigned_to)) {
                     $ids = explode(',', $app->assigned_to);
                     $allAssignedIds = array_merge($allAssignedIds, $ids);
@@ -751,7 +757,7 @@ class AuthenticationController extends Controller
             $allAssignedIds = array_unique($allAssignedIds);
             $teamMembers = \App\Models\TeamMember::whereIn('id', $allAssignedIds)->pluck('name', 'id')->toArray();
 
-            $dataList = $appointments->map(function ($appointment) use ($teamMembers) {
+            $dataList = $filteredAppointments->map(function ($appointment) use ($teamMembers) {
                 $serviceIds = $appointment->service_id ? explode(',', $appointment->service_id) : [];
                 $totalServices = count(array_filter($serviceIds));
 
