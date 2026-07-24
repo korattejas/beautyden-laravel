@@ -162,15 +162,63 @@ class ReviewApiController extends Controller
                 'beautician_details' => $beautician,
             ];
 
-            // 2. Services List for Rating
+            // 2. Services List for Rating (Unique by Category)
             $rateServices = [];
-            foreach ($servicesList as $s) {
-                $rateServices[] = [
-                    'service_name' => $s['name'] ?? 'Service',
-                    'category_name' => $s['category_name'] ?? '',
-                    'category_id' => $s['category_id'] ?? 0,
-                    'service_id' => $s['service_id'] ?? 0,
-                ];
+            $seenCategories = [];
+
+            if (!empty($appointment->service_id)) {
+                $serviceIds = array_unique(explode(',', $appointment->service_id));
+                $services = \App\Models\ServiceMaster::whereIn('id', $serviceIds)->with('category')->get();
+                foreach ($services as $serviceRecord) {
+                    $categoryId = $serviceRecord->category_id;
+                    if ($categoryId && !in_array($categoryId, $seenCategories)) {
+                        $rateServices[] = [
+                            'service_name' => $serviceRecord->name,
+                            'category_name' => $serviceRecord->category ? $serviceRecord->category->name : '',
+                            'category_id' => $categoryId,
+                            'service_id' => $serviceRecord->id,
+                        ];
+                        $seenCategories[] = $categoryId;
+                    }
+                }
+            } else {
+                // Fallback in case service_id column is empty
+                foreach ($servicesList as $s) {
+                    $serviceId = $s['service_id'] ?? ($s['id'] ?? 0);
+                    $categoryId = $s['category_id'] ?? 0;
+                    $categoryName = $s['category_name'] ?? '';
+                    $serviceName = $s['name'] ?? 'Service';
+
+                    if (empty($categoryId) || empty($categoryName)) {
+                        $serviceRecord = null;
+                        if (!empty($serviceId)) {
+                            $serviceRecord = \App\Models\ServiceMaster::find($serviceId);
+                        } else if (!empty($serviceName)) {
+                            $serviceRecord = \App\Models\ServiceMaster::where('name', $serviceName)->first();
+                            if ($serviceRecord) {
+                                $serviceId = $serviceRecord->id;
+                            }
+                        }
+
+                        if ($serviceRecord) {
+                            $categoryId = $serviceRecord->category_id;
+                            $cat = \App\Models\ServiceCategory::find($categoryId);
+                            if ($cat) {
+                                $categoryName = $cat->name;
+                            }
+                        }
+                    }
+
+                    if ($categoryId && !in_array($categoryId, $seenCategories)) {
+                        $rateServices[] = [
+                            'service_name' => $serviceName,
+                            'category_name' => $categoryName,
+                            'category_id' => $categoryId,
+                            'service_id' => $serviceId,
+                        ];
+                        $seenCategories[] = $categoryId;
+                    }
+                }
             }
 
             // 3. Submitted Review Data (if exists)
@@ -210,6 +258,7 @@ class ReviewApiController extends Controller
                 'appointment_id' => $request->appointment_id,
                 'appointment_summary' => $summary,
                 'services_to_rate' => $rateServices,
+                'submitted_review_status' => $reviews->isNotEmpty(),
                 'submitted_review' => $submittedReview,
             ];
 
