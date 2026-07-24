@@ -757,7 +757,11 @@ class AuthenticationController extends Controller
             $allAssignedIds = array_unique($allAssignedIds);
             $teamMembers = \App\Models\TeamMember::whereIn('id', $allAssignedIds)->pluck('name', 'id')->toArray();
 
-            $dataList = $filteredAppointments->map(function ($appointment) use ($teamMembers) {
+            $appointmentIds = $filteredAppointments->pluck('id')->toArray();
+            $reviewedAppointmentIds = \App\Models\CustomerReview::whereIn('appointment_id', $appointmentIds)->pluck('appointment_id')->toArray();
+            $reviewedAppointmentIds = array_unique($reviewedAppointmentIds);
+
+            $dataList = $filteredAppointments->map(function ($appointment) use ($teamMembers, $reviewedAppointmentIds) {
                 $serviceIds = $appointment->service_id ? explode(',', $appointment->service_id) : [];
                 $totalServices = count(array_filter($serviceIds));
 
@@ -773,6 +777,8 @@ class AuthenticationController extends Controller
                     $beauticianNames = implode(', ', $names);
                 }
 
+                $isReviewed = in_array($appointment->id, $reviewedAppointmentIds);
+
                 return [
                     'id'                => $appointment->id,
                     'order_number'      => $appointment->order_number,
@@ -784,6 +790,7 @@ class AuthenticationController extends Controller
                     'city_name'         => $appointment->city_name,
                     'total_services'    => $totalServices,
                     'assigned_beautician' => $beauticianNames,
+                    'is_reviewed'       => $isReviewed,
                 ];
             });
 
