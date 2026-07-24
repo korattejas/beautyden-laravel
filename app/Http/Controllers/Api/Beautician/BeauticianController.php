@@ -791,12 +791,12 @@ class BeauticianController extends Controller
                     $hours = floor($totalDuration / 60);
                     $minutes = $totalDuration % 60;
                     if ($minutes > 0) {
-                        $summary['total_duration'] = $hours . ' Hr ' . $minutes . ' Min';
+                        $summary['total_duration'] = $hours . ' Hr ' . $minutes;
                     } else {
                         $summary['total_duration'] = $hours . ' Hr';
                     }
                 } else {
-                    $summary['total_duration'] = $totalDuration . ' Min';
+                    $summary['total_duration'] = $totalDuration;
                 }
             }
 
