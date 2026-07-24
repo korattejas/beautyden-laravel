@@ -800,6 +800,48 @@ class BeauticianController extends Controller
                 }
             }
 
+            $paymentMethodDetails = null;
+            if (in_array(strtolower($appointment->payment_type), ['online', 'razorpay'])) {
+                $transaction = \App\Models\RazorpayTransaction::where('meta_data->appointment_id', $appointment->id)
+                    ->where('status', 'success')
+                    ->latest()
+                    ->first();
+
+                if ($transaction && !empty($transaction->payment_details)) {
+                    $details = is_string($transaction->payment_details) ? json_decode($transaction->payment_details, true) : $transaction->payment_details;
+                    
+                    if ($details) {
+                        $method = strtoupper($details['method'] ?? '');
+                        $bank = $details['bank'] ?? '';
+                        $wallet = $details['wallet'] ?? '';
+                        $network = $details['card']['network'] ?? '';
+                        $issuer = $details['card']['issuer'] ?? '';
+                        $vpa = $details['vpa'] ?? '';
+
+                        $methodString = "Paid via " . $method;
+
+                        if ($method == 'UPI' && $vpa) {
+                            $methodString .= " . " . $vpa;
+                        } elseif ($method == 'CARD') {
+                            if ($network) $methodString .= " . " . $network;
+                            if ($issuer) $methodString .= " . " . $issuer;
+                        } elseif ($method == 'NETBANKING' && $bank) {
+                            $methodString .= " . " . $bank;
+                        } elseif ($method == 'WALLET' && $wallet) {
+                            $methodString .= " . " . $wallet;
+                        }
+                        
+                        $paidAt = isset($details['created_at']) 
+                            ? \Carbon\Carbon::createFromTimestamp($details['created_at'])->format('d M h:i A') 
+                            : $transaction->created_at->format('d M h:i A');
+
+                        $methodString .= " . " . $paidAt;
+                        
+                        $paymentMethodDetails = $methodString;
+                    }
+                }
+            }
+
             $data = [
                 'id' => $appointment->id,
                 'order_number' => $appointment->order_number,
@@ -819,6 +861,7 @@ class BeauticianController extends Controller
                 'company_amount' => $appointment->company_amount,
                 'status' => $appointment->status,
                 'payment_type' => $appointment->payment_type,
+                'payment_method_details' => $paymentMethodDetails,
                 'review_details' => $reviewDetails,
             ];
 
