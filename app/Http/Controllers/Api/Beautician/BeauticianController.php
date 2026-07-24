@@ -784,6 +784,22 @@ class BeauticianController extends Controller
 
             $averageRating = $reviewDetails ? $reviewDetails['average_rating'] : 0;
 
+            $summary = $appointment->services_data['summary'] ?? null;
+            if ($summary && isset($summary['total_duration'])) {
+                $totalDuration = (int) $summary['total_duration'];
+                if ($totalDuration >= 60) {
+                    $hours = floor($totalDuration / 60);
+                    $minutes = $totalDuration % 60;
+                    if ($minutes > 0) {
+                        $summary['total_duration'] = $hours . ' Hr ' . $minutes . ' Min';
+                    } else {
+                        $summary['total_duration'] = $hours . ' Hr';
+                    }
+                } else {
+                    $summary['total_duration'] = $totalDuration . ' Min';
+                }
+            }
+
             $data = [
                 'id' => $appointment->id,
                 'order_number' => $appointment->order_number,
@@ -799,7 +815,7 @@ class BeauticianController extends Controller
                     'notes' => $appointment->special_notes,
                 ],
                 'services' => $services,
-                'summary' => $appointment->services_data['summary'] ?? null,
+                'summary' => $summary,
                 'company_amount' => $appointment->company_amount,
                 'status' => $appointment->status,
                 'payment_type' => $appointment->payment_type,
