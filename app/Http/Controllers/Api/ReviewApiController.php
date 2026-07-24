@@ -211,10 +211,10 @@ class ReviewApiController extends Controller
 
                     if ($categoryId && !in_array($categoryId, $seenCategories)) {
                         $rateServices[] = [
-                            'service_name' => $serviceName,
+                            // 'service_name' => $serviceName,
                             'category_name' => $categoryName,
                             'category_id' => $categoryId,
-                            'service_id' => $serviceId,
+                            // 'service_id' => $serviceId,
                         ];
                         $seenCategories[] = $categoryId;
                     }
@@ -230,6 +230,8 @@ class ReviewApiController extends Controller
                 ->get();
 
             $submittedReview = null;
+            $existingRatings = [];
+            
             if ($reviews->isNotEmpty()) {
                 $firstReview = $reviews->first();
                 $photos = $firstReview->photos ? $firstReview->photos : [];
@@ -244,6 +246,7 @@ class ReviewApiController extends Controller
                         'category_name' => $review->category_name,
                         'rating' => (float) $review->rating,
                     ];
+                    $existingRatings[$review->category_id] = (float) $review->rating;
                 }
 
                 $submittedReview = [
@@ -252,6 +255,11 @@ class ReviewApiController extends Controller
                     'photos' => $fullPhotoUrls,
                     'category_ratings' => $categoryRatings,
                 ];
+            }
+
+            // Append rating to services_to_rate
+            foreach ($rateServices as &$rs) {
+                $rs['rating'] = isset($existingRatings[$rs['category_id']]) ? $existingRatings[$rs['category_id']] : null;
             }
 
             $data = [
