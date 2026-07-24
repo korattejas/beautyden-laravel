@@ -887,8 +887,8 @@ class AuthenticationController extends Controller
                         }
                         
                         $paidAt = isset($details['created_at']) 
-                            ? \Carbon\Carbon::createFromTimestamp($details['created_at'])->format('d M h:i A') 
-                            : $transaction->created_at->format('d M h:i A');
+                            ? \Carbon\Carbon::createFromTimestamp($details['created_at'])->timezone('Asia/Kolkata')->format('d M h:i A') 
+                            : $transaction->created_at->timezone('Asia/Kolkata')->format('d M h:i A');
 
                         $methodString .= " . " . $paidAt;
                         
