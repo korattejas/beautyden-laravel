@@ -201,6 +201,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('users/show/{id}', [UserController::class, 'show'])->name('admin.user.show');
         Route::get('user-view/{id}', [UserController::class, 'view'])->name('admin.user.view');
         Route::get('getDataUser', [UserController::class, 'getDataUser'])->name('admin.user.getDataUser');
+        Route::delete('user/{id}', [UserController::class, 'destroy'])->name('admin.user.destroy');
+        Route::get('user/status/{id}/{status}', [UserController::class, 'changeStatus'])->name('admin.user.changeStatus');
 
         /* Offers */
         Route::get('offers', [OfferController::class, 'index'])->name('admin.offers.index');
