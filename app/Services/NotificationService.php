@@ -82,6 +82,11 @@ class NotificationService
             // Clean the key from any existing braces or hashes
             $cleanKey = str_replace(['{', '}', '#'], '', $key);
             
+            // Clean the value for order_id to prevent double hashes since templates include the #
+            if ($cleanKey === 'order_id' && is_string($value)) {
+                $value = ltrim($value, '#');
+            }
+            
             // Add replacements for both formats
             $parsedVariables['{' . $cleanKey . '}'] = $value;
             $parsedVariables['##' . $cleanKey . '##'] = $value;
