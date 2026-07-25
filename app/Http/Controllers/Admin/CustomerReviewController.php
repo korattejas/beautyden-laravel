@@ -112,21 +112,22 @@ class CustomerReviewController extends Controller
                 }
 
                 return DataTables::of($reviews)
+                    ->addColumn('review', function($r) {
+                        return $r->review ? (\Illuminate\Support\Str::limit($r->review, 50)) : '-';
+                    })
                     ->addColumn('status', function ($r) {
-                        $status_array = [
-                            'is_simple_active' => 1,
-                            'current_status'   => $r->status,
-                            'is_review'        => 1
-                        ];
-                        return view('admin.render-view.datable-label', compact('status_array'))->render();
+                        if ($r->status == 1) {
+                            return '<span class="badge badge-glow bg-success status-change" style="cursor:pointer" data-id="'.$r->id.'" data-change-status="0">Active</span>';
+                        } else {
+                            return '<span class="badge badge-glow bg-warning text-dark status-change" style="cursor:pointer" data-id="'.$r->id.'" data-change-status="1">Approval Pending</span>';
+                        }
                     })
                     ->addColumn('is_popular', function ($r) {
-                        $status_array = [
-                            'is_simple_active' => 1,
-                            'current_status'   => 3,
-                            'current_is_popular_priority_status' => $r->is_popular
-                        ];
-                        return view('admin.render-view.datable-label', compact('status_array'))->render();
+                        if ($r->is_popular == 1) {
+                            return '<span class="badge badge-glow bg-danger priority-status-change" style="cursor:pointer" data-id="'.$r->id.'" data-priority-change-status="0">High Priority</span>';
+                        } else {
+                            return '<span class="badge badge-glow bg-secondary priority-status-change" style="cursor:pointer" data-id="'.$r->id.'" data-priority-change-status="1">Low Priority</span>';
+                        }
                     })
                     ->addColumn('action', function ($r) {
                         $action_array = [

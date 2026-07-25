@@ -82,6 +82,7 @@
                                                 <th>Category</th>
                                                 <th>Rating</th>
                                                 <th>Customer Name</th>
+                                                <th>Review</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-stuff="High Priority,Low Priority">Is Popular</th>
                                                 <th data-search="false">Action</th>
@@ -158,6 +159,11 @@
                 {
                     data: 'customer_name',
                     name: 'customer_name'
+                },
+                {
+                    data: 'review',
+                    name: 'review',
+                    orderable: false
                 },
                 {
                     data: 'status',
