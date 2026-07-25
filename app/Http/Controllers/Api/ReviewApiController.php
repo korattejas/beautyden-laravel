@@ -234,10 +234,10 @@ class ReviewApiController extends Controller
             
             if ($reviews->isNotEmpty()) {
                 $firstReview = $reviews->first();
-                $photos = $firstReview->photos ? $firstReview->photos : [];
+                $approved_photos = $firstReview->approved_photos ? (is_string($firstReview->approved_photos) ? json_decode($firstReview->approved_photos, true) : $firstReview->approved_photos) : [];
                 $fullPhotoUrls = array_map(function ($photo) {
                     return asset('uploads/review/photos/' . $photo);
-                }, $photos);
+                }, $approved_photos);
 
                 foreach ($reviews as $review) {
                     $existingRatings[$review->category_id] = (float) $review->rating;

@@ -50,7 +50,7 @@ class CustomerReviewController extends Controller
                     'r.status',
                     'r.created_at',
                     'r.updated_at',
-                    'r.photos'
+                    'r.approved_photos'
                 )
                 ->where('r.status', 1);
 
@@ -71,8 +71,8 @@ class CustomerReviewController extends Controller
             }
 
             if ($request->has('with_photos') && $request->with_photos) {
-                $query->whereNotNull('r.photos')
-                    ->where('r.photos', '!=', '[]');
+                $query->whereNotNull('r.approved_photos')
+                    ->where('r.approved_photos', '!=', '[]');
             }
 
             if ($request->has('with_video') && $request->with_video) {
@@ -92,10 +92,11 @@ class CustomerReviewController extends Controller
                 ->orderByDesc('r.id')
                 ->paginate($perPage, ['*'], 'page', $page)
                 ->through(function ($review) {
-                    $photos = $review->photos ? json_decode($review->photos, true) : [];
+                    $photos = $review->approved_photos ? json_decode($review->approved_photos, true) : [];
                     $review->photos = array_map(function ($photo) {
                         return asset('uploads/review/photos/' . $photo);
                     }, $photos);
+                    unset($review->approved_photos);
                     return $review;
                 });
 

@@ -305,6 +305,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('getDataReviews', [CustomerReviewController::class, 'getDataReviews'])->name('getDataReviews');
         Route::get('reviews/status/{id}/{status}', [CustomerReviewController::class, 'changeStatus'])->name('admin.reviews.changeStatus');
         Route::get('reviews/priority-status/{id}/{status}', [CustomerReviewController::class, 'changePopularStatus'])->name('admin.reviews.changePopularStatus');
+        Route::post('reviews/approve-photos', [CustomerReviewController::class, 'approvePhotos'])->name('admin.reviews.approvePhotos');
         Route::get('reviews-view/{id}', [CustomerReviewController::class, 'view']);
 
         // Blogs

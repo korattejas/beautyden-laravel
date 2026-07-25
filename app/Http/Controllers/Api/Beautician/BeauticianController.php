@@ -575,7 +575,7 @@ class BeauticianController extends Controller
                     $appReviews = $reviewsData[$appointment->id];
                     $firstReview = $appReviews->first();
                     
-                    $photos = is_string($firstReview->photos) ? json_decode($firstReview->photos, true) : (is_array($firstReview->photos) ? $firstReview->photos : []);
+                    $photos = is_string($firstReview->approved_photos) ? json_decode($firstReview->approved_photos, true) : (is_array($firstReview->approved_photos) ? $firstReview->approved_photos : []);
                     $photoUrls = array_map(function($photo) {
                         return asset('uploads/review/photos/' . $photo);
                     }, $photos);
@@ -761,7 +761,7 @@ class BeauticianController extends Controller
             $reviewDetails = null;
             if ($reviewRows->isNotEmpty()) {
                 $firstReview = $reviewRows->first();
-                $photos = is_string($firstReview->photos) ? json_decode($firstReview->photos, true) : (is_array($firstReview->photos) ? $firstReview->photos : []);
+                $photos = is_string($firstReview->approved_photos) ? json_decode($firstReview->approved_photos, true) : (is_array($firstReview->approved_photos) ? $firstReview->approved_photos : []);
                 $photoUrls = array_map(function($photo) {
                     return asset('uploads/review/photos/' . $photo);
                 }, $photos);

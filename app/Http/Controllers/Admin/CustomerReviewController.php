@@ -112,6 +112,17 @@ class CustomerReviewController extends Controller
                 }
 
                 return DataTables::of($reviews)
+                    ->addColumn('photos_count', function($r) {
+                        $photos = is_string($r->photos) ? json_decode($r->photos, true) : (is_array($r->photos) ? $r->photos : []);
+                        $count = count($photos);
+                        if ($count > 0) {
+                            $encodedPhotos = htmlspecialchars(json_encode($photos), ENT_QUOTES, 'UTF-8');
+                            $approvedPhotos = is_string($r->approved_photos) ? json_decode($r->approved_photos, true) : (is_array($r->approved_photos) ? $r->approved_photos : []);
+                            $encodedApproved = htmlspecialchars(json_encode($approvedPhotos), ENT_QUOTES, 'UTF-8');
+                            return '<span class="badge badge-glow bg-info view-photos-modal" style="cursor:pointer" data-id="'.$r->id.'" data-photos="'.$encodedPhotos.'" data-approved="'.$encodedApproved.'">'.$count.' Photos</span>';
+                        }
+                        return '-';
+                    })
                     ->addColumn('review', function($r) {
                         return $r->review ? (\Illuminate\Support\Str::limit($r->review, 50)) : '-';
                     })
@@ -141,7 +152,7 @@ class CustomerReviewController extends Controller
                         ];
                         return view('admin.render-view.datable-action', compact('action_array'))->render();
                     })
-                    ->rawColumns(['action', 'status', 'is_popular'])
+                    ->rawColumns(['action', 'status', 'is_popular', 'photos_count'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -301,6 +312,27 @@ class CustomerReviewController extends Controller
             return response()->json(['error' => 'Review not found.'], 404);
         } catch (\Exception $e) {
             return response()->json(['error' => $this->error_message], 500);
+        }
+    }
+
+    public function approvePhotos(Request $request)
+    {
+        try {
+            $id = $request->id;
+            $approved_photos = $request->approved_photos ?? [];
+            
+            $review = CustomerReview::find($id);
+            if (!$review) {
+                return response()->json(['error' => 'Review not found.'], 404);
+            }
+            
+            $review->approved_photos = $approved_photos;
+            $review->save();
+
+            return response()->json(['success' => 'Photos approval status updated successfully.']);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, 'approvePhotos');
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
         }
     }
 }

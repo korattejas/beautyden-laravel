@@ -22,6 +22,7 @@ class CustomerReview extends Model
         'review_date',
         'helpful_count',
         'photos',
+        'approved_photos',
         'video',
         'is_popular',
         'status',
@@ -29,6 +30,7 @@ class CustomerReview extends Model
 
     protected $casts = [
         'photos' => 'array',
+        'approved_photos' => 'array',
         'review_date' => 'date',
     ];
 

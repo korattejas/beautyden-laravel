@@ -85,6 +85,7 @@
                                                 <th>Review</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-stuff="High Priority,Low Priority">Is Popular</th>
+                                                <th>Photos</th>
                                                 <th data-search="false">Action</th>
                                             </tr>
                                         </thead>
@@ -114,6 +115,28 @@
                 <div class="c-modal-footer">
                     <small><i class="bi bi-clock"></i> Updated just now</small>
                     <button class="c-btn" data-c-close><i class="bi bi-x-circle"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photos Modal -->
+    <div class="modal fade" id="photosApprovalModal" tabindex="-1" aria-labelledby="photosApprovalModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="photosApprovalModalLabel">Review Photos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="photo_review_id" value="">
+                    <div class="row" id="photos_container">
+                        <!-- Photos will be appended here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save_approved_photos">Save Approval Status</button>
                 </div>
             </div>
         </div>
@@ -172,6 +195,12 @@
                 {
                     data: 'is_popular',
                     name: 'is_popular'
+                },
+                {
+                    data: 'photos_count',
+                    name: 'photos_count',
+                    orderable: false,
+                    searchable: false
                 },
                 {
                     data: 'action',
@@ -285,6 +314,70 @@
 
         $(document).on("click", "[data-c-close]", function() {
             $("#c-viewReviewModal").removeClass("show");
+        });
+
+        $(document).on('click', '.view-photos-modal', function() {
+            let id = $(this).data('id');
+            let photos = $(this).data('photos');
+            let approved = $(this).data('approved') || [];
+            if(typeof photos === 'string') photos = JSON.parse(photos);
+            if(typeof approved === 'string') approved = JSON.parse(approved);
+            
+            $('#photo_review_id').val(id);
+            let html = '';
+            let baseUrlCustomerPhotos = "{{ asset('uploads/review/photos') }}/";
+            
+            if (photos && photos.length > 0) {
+                photos.forEach(function(photo) {
+                    let isChecked = approved.includes(photo) ? 'checked' : '';
+                    html += `
+                        <div class="col-md-4 mb-2 text-center">
+                            <img src="${baseUrlCustomerPhotos + photo}" class="img-thumbnail mb-1" style="max-height: 150px; object-fit: cover;">
+                            <div class="form-check d-flex justify-content-center">
+                                <input class="form-check-input photo-approval-checkbox" type="checkbox" value="${photo}" id="photo_${photo}" ${isChecked}>
+                                <label class="form-check-label ms-1" for="photo_${photo}">Approve</label>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            $('#photos_container').html(html);
+            $('#photosApprovalModal').modal('show');
+        });
+
+        $('#save_approved_photos').on('click', function() {
+            let id = $('#photo_review_id').val();
+            let approved_photos = [];
+            $('.photo-approval-checkbox:checked').each(function() {
+                approved_photos.push($(this).val());
+            });
+
+            let btn = $(this);
+            let originalText = btn.html();
+            btn.html('Saving...').prop('disabled', true);
+
+            $.ajax({
+                url: "{{ route('admin.reviews.approvePhotos') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id,
+                    approved_photos: approved_photos
+                },
+                success: function(response) {
+                    btn.html(originalText).prop('disabled', false);
+                    $('#photosApprovalModal').modal('hide');
+                    if (response.success) {
+                        $('#datatable_table').DataTable().ajax.reload(null, false);
+                    } else {
+                        alert(response.error || 'Something went wrong');
+                    }
+                },
+                error: function() {
+                    btn.html(originalText).prop('disabled', false);
+                    alert('Failed to save approval status.');
+                }
+            });
         });
     </script>
     <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
