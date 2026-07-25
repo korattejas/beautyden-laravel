@@ -337,24 +337,37 @@ class ServiceMasterController extends Controller
 
             // Handle Variants
             if ($request->has_variants == 1 && $request->variants) {
-                // Collect old thumbnail images for cleanup
+                // Collect old variants for cleanup
                 $old_variants = ServiceMasterVariant::where('service_master_id', $service_id)->get()->keyBy('id');
 
+                $submittedVariantIds = [];
                 $new_variant_thumbnails = [];
                 foreach ($request->variants as $variant) {
+                    if (!empty($variant['id'])) {
+                        $submittedVariantIds[] = $variant['id'];
+                    }
                     if (!empty($variant['old_thumbnail_image'])) {
                         $new_variant_thumbnails[] = $variant['old_thumbnail_image'];
                     }
                 }
 
-                // Delete old thumbnail images that are no longer used
+                // Delete old thumbnail images for variants that are removed, or where thumbnail changed
                 foreach ($old_variants as $oldVariant) {
-                    if ($oldVariant->thumbnail_image && !in_array($oldVariant->thumbnail_image, $new_variant_thumbnails)) {
-                        File::delete(public_path('uploads/service-variant/' . $oldVariant->thumbnail_image));
+                    if (!in_array($oldVariant->id, $submittedVariantIds) || ($oldVariant->thumbnail_image && !in_array($oldVariant->thumbnail_image, $new_variant_thumbnails))) {
+                        if ($oldVariant->thumbnail_image && File::exists(public_path('uploads/service-variant/' . $oldVariant->thumbnail_image))) {
+                            File::delete(public_path('uploads/service-variant/' . $oldVariant->thumbnail_image));
+                        }
                     }
                 }
 
-                ServiceMasterVariant::where('service_master_id', $service_id)->delete();
+                // Delete variants that were removed
+                if (!empty($submittedVariantIds)) {
+                    ServiceMasterVariant::where('service_master_id', $service_id)
+                        ->whereNotIn('id', $submittedVariantIds)
+                        ->delete();
+                } else {
+                    ServiceMasterVariant::where('service_master_id', $service_id)->delete();
+                }
 
                 foreach ($request->variants as $vKey => $variant) {
                     if (!empty($variant['name'])) {
@@ -367,8 +380,8 @@ class ServiceMasterController extends Controller
                         } elseif (!empty($variant['old_thumbnail_image'])) {
                             $thumbnail_image = $variant['old_thumbnail_image'];
                         }
-
-                        ServiceMasterVariant::create([
+                        
+                        $variantData = [
                             'service_master_id'   => $service_id,
                             'name'                => $variant['name'],
                             'description'         => $variant['description'] ?? null,
@@ -378,14 +391,20 @@ class ServiceMasterController extends Controller
                             'reviews'             => $variant['reviews'] ?? 0,
                             'thumbnail_image'     => $thumbnail_image,
                             'discount_percentage' => $variant['discount_percentage'] ?? null,
-                        ]);
+                        ];
+
+                        if (!empty($variant['id'])) {
+                            ServiceMasterVariant::where('id', $variant['id'])->update($variantData);
+                        } else {
+                            ServiceMasterVariant::create($variantData);
+                        }
                     }
                 }
             } else {
                 // Cleanup variant thumbnail images before deleting
                 $variants_to_delete = ServiceMasterVariant::where('service_master_id', $service_id)->get();
                 foreach ($variants_to_delete as $v) {
-                    if ($v->thumbnail_image) {
+                    if ($v->thumbnail_image && File::exists(public_path('uploads/service-variant/' . $v->thumbnail_image))) {
                         File::delete(public_path('uploads/service-variant/' . $v->thumbnail_image));
                     }
                 }

@@ -132,6 +132,7 @@
                                     <div class="variant-row border p-2 mb-2 rounded bg-white shadow-sm position-relative">
                                         <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 remove-row">×</button>
                                         <div class="row g-1">
+                                            <input type="hidden" name="variants[{{$vIdx}}][id]" value="{{ $variant->id }}">
                                             <div class="col-md-12 mb-1"><label class="form-label small fw-bold">Variant Name</label><input type="text" name="variants[{{$vIdx}}][name]" class="form-control form-control-sm" value="{{ $variant->name }}" required></div>
                                             <div class="col-md-12 mb-1"><label class="form-label small">Description</label><textarea name="variants[{{$vIdx}}][description]" class="form-control form-control-sm" rows="2" placeholder="Short description of this variant...">{{ $variant->description }}</textarea></div>
                                             <div class="col-md-6 mb-1"><label class="form-label small">Price (₹)</label><div class="input-group input-group-sm"><span class="input-group-text">₹</span><input type="number" name="variants[{{$vIdx}}][price]" class="form-control" value="{{ $variant->price }}" required></div></div>
