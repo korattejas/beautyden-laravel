@@ -29,6 +29,29 @@ class ApplicationHomeController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
+    private function getCategoryReviewStats($categoryId)
+    {
+        $realReviewsCount = DB::table('customer_reviews')->where('category_id', $categoryId)->where('status', 1)->count();
+        $realRatingAvg = DB::table('customer_reviews')->where('category_id', $categoryId)->where('status', 1)->avg('rating');
+
+        $totalReviews = $realReviewsCount;
+        
+        $totalRatingPoints = 0;
+        $pointsCount = 0;
+        
+        if ($realReviewsCount > 0 && $realRatingAvg > 0) {
+            $totalRatingPoints += ($realRatingAvg * $realReviewsCount);
+            $pointsCount += $realReviewsCount;
+        }
+        
+        $finalRating = $pointsCount > 0 ? round($totalRatingPoints / $pointsCount, 1) : 0;
+        
+        return [
+            'reviews' => (int) $totalReviews,
+            'rating' => (string) $finalRating
+        ];
+    }
+
     public function getHomePageData(Request $request): JsonResponse
     {
         $function_name = 'getHomePageData';
@@ -414,11 +437,17 @@ class ApplicationHomeController extends Controller
             $trendingServices = $trendingServicesRaw->groupBy('category_id');
 
             $trendingData = [];
+            $categoryStatsCache = [];
             foreach ($trendingServices as $catId => $items) {
                 $category = $allCategoriesMap->get($catId);
                 if ($category) {
-                    $items->transform(function ($item) use ($trendingVariants, $trendingVariantPrices, $cityId) {
+                    if (!isset($categoryStatsCache[$catId])) {
+                        $categoryStatsCache[$catId] = $this->getCategoryReviewStats($catId);
+                    }
+                    $items->transform(function ($item) use ($trendingVariants, $trendingVariantPrices, $cityId, $categoryStatsCache, $catId) {
                         $item->has_variants = (int) $item->has_variants;
+                        $item->rating = (string) $categoryStatsCache[$catId]['rating'];
+                        $item->reviews = (string) $categoryStatsCache[$catId]['reviews'];
                         
                         if ($item->has_variants == 1) {
                             $serviceVariants = $trendingVariants->get($item->id, collect());
@@ -740,6 +769,18 @@ class ApplicationHomeController extends Controller
                     ->select('id', 'name', 'service_category_id as category_id', DB::raw('CONCAT("' . asset('uploads/service-subcategory') . '/", icon) AS icon'))
                     ->where('service_category_id', $categoryId)->where('status', 1)->orderBy('name')->get();
                 $responseType = 'subcategories';
+            }
+
+            if ($responseType === 'services') {
+                $categoryStatsCache = [];
+                $responseData->transform(function ($item) use (&$categoryStatsCache) {
+                    if (!isset($categoryStatsCache[$item->category_id])) {
+                        $categoryStatsCache[$item->category_id] = $this->getCategoryReviewStats($item->category_id);
+                    }
+                    $item->rating = (string) $categoryStatsCache[$item->category_id]['rating'];
+                    $item->reviews = (string) $categoryStatsCache[$item->category_id]['reviews'];
+                    return $item;
+                });
             }
 
             return $this->sendResponse(

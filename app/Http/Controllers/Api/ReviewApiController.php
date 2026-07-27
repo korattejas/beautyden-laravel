@@ -273,6 +273,14 @@ class ReviewApiController extends Controller
 
 
     /**
+     * Get Appointment Summary For Review
+     */
+    public function getAppointmentSummaryForReview(Request $request)
+    {
+        return $this->getAppointmentReview($request);
+    }
+
+    /**
      * Get reviews for a specific category
      */
     public function getCategoryReviews(Request $request)

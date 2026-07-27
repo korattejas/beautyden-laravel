@@ -155,6 +155,29 @@ class NotificationController extends Controller
             $notifications = $query->orderBy('created_at', 'desc')
                 ->paginate($limit, ['*'], 'page', $page);
 
+            // Fetch order_ids for booking related notifications
+            $appointmentIds = collect($notifications->items())
+                ->filter(function($n) {
+                    return in_array($n->type, ['booking_detail', 'payment_status', 'add_review']) && !empty($n->reference_id);
+                })
+                ->pluck('reference_id')
+                ->unique()
+                ->toArray();
+                
+            $orderNumbers = [];
+            if (!empty($appointmentIds)) {
+                $orderNumbers = \App\Models\Appointment::whereIn('id', $appointmentIds)->pluck('order_number', 'id')->toArray();
+            }
+
+            $notifications->getCollection()->transform(function ($notification) use ($orderNumbers) {
+                if (in_array($notification->type, ['booking_detail', 'payment_status', 'add_review'])) {
+                    $notification->order_id = $orderNumbers[$notification->reference_id] ?? null;
+                } else {
+                    $notification->order_id = null;
+                }
+                return $notification;
+            });
+
             $data = [
                 'tabs' => [
                     ['id' => 'All', 'name' => 'All'],
