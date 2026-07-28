@@ -232,6 +232,8 @@ class ServiceMasterController extends Controller
 
                     // Remove per-service price fields; card only shows starts_at
                     unset($service->price, $service->discount_price, $service->discount_percentage, $service->duration);
+                } else {
+                    $service->duration = $this->formatDuration($service->duration);
                 }
 
                 return $service;
@@ -452,6 +454,8 @@ class ServiceMasterController extends Controller
                     }
 
                     unset($service->price, $service->discount_price, $service->discount_percentage, $service->duration);
+                } else {
+                    $service->duration = $this->formatDuration($service->duration);
                 }
 
                 return $service;
@@ -564,6 +568,7 @@ class ServiceMasterController extends Controller
                         $variant->description         = $variant->description ?? null;
                         $variant->rating             = (string) $catStats['rating'];
                         $variant->reviews            = (string) $catStats['reviews'];
+                        $variant->duration           = $this->formatDuration($variant->duration);
 
                         $availableVariants[] = $variant;
 
@@ -749,11 +754,13 @@ class ServiceMasterController extends Controller
                         $item->price = (int) $item->price;
                         $item->discount_price = (int) $item->discount_price;
                         $item->discount_percentage = (int) $item->discount_percentage;
+                        $item->duration = $this->formatDuration($item->duration);
                     }
                 } else {
                     $item->price = (int) $item->price;
                     $item->discount_price = (int) $item->discount_price;
                     $item->discount_percentage = (int) $item->discount_percentage;
+                    $item->duration = $this->formatDuration($item->duration);
                 }
                 return $item;
             });
@@ -784,7 +791,7 @@ class ServiceMasterController extends Controller
                 $serviceInfoData['price'] = $service->price ?? 0;
                 $serviceInfoData['discount_price'] = $service->discount_price ?? 0;
                 $serviceInfoData['discount_percentage'] = $service->discount_percentage ?? 0;
-                $serviceInfoData['duration'] = $service->duration;
+                $serviceInfoData['duration'] = $this->formatDuration($service->duration);
             }
 
             $pageLayout[] = [

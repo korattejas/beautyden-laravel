@@ -469,6 +469,8 @@ class ApplicationHomeController extends Controller
                                 $variant->thumbnail_image = $variant->thumbnail_image
                                     ? asset('uploads/service-variant/' . $variant->thumbnail_image)
                                     : null;
+                                
+                                $variant->duration = $this->formatDuration($variant->duration);
                                     
                                 $availableVariants[] = $variant;
                             }
@@ -483,11 +485,13 @@ class ApplicationHomeController extends Controller
                                 $item->price = (int) $item->price;
                                 $item->discount_price = (int) $item->discount_price;
                                 $item->discount_percentage = (int) $item->discount_percentage;
+                                $item->duration = $this->formatDuration($item->duration);
                             }
                         } else {
                             $item->price = (int) $item->price;
                             $item->discount_price = (int) $item->discount_price;
                             $item->discount_percentage = (int) $item->discount_percentage;
+                            $item->duration = $this->formatDuration($item->duration);
                         }
                         
                         return $item;
@@ -642,17 +646,7 @@ class ApplicationHomeController extends Controller
                     
                     $combo->total_duration = $totalDuration;
                     
-                    if ($totalDuration >= 60) {
-                        $hours = floor($totalDuration / 60);
-                        $minutes = $totalDuration % 60;
-                        if ($minutes > 0) {
-                            $combo->total_duration_formatted = $hours . ' hr ' . $minutes . ' min.';
-                        } else {
-                            $combo->total_duration_formatted = $hours . ' hr.';
-                        }
-                    } else {
-                        $combo->total_duration_formatted = $totalDuration . ' min.';
-                    }
+                    $combo->total_duration_formatted = $this->formatDuration($totalDuration);
                     $combo->total_price = (int) $items->where('is_default', 1)->sum(function ($item) {
                         return $item->price;
                     });
@@ -779,6 +773,7 @@ class ApplicationHomeController extends Controller
                     }
                     $item->rating = (string) $categoryStatsCache[$item->category_id]['rating'];
                     $item->reviews = (string) $categoryStatsCache[$item->category_id]['reviews'];
+                    $item->duration = $this->formatDuration($item->duration);
                     return $item;
                 });
             }
