@@ -137,20 +137,31 @@ class ProcessNotifications extends Command
      */
     private function processAbandonedCarts()
     {
-        // Check for users who have items in cart updated exactly 2 hours ago
-        // To prevent multiple sends, we only send when the cart was last updated between 120 and 125 mins ago
-        $twoHoursAgoStart = Carbon::now()->subMinutes(125);
-        $twoHoursAgoEnd = Carbon::now()->subMinutes(120);
-
-        // Group by user_id to send one notification per user
-        $abandonedUsers = \App\Models\Cart::whereBetween('updated_at', [$twoHoursAgoStart, $twoHoursAgoEnd])
-            ->select('user_id')
+        // Get all unique users who have items in their cart
+        $userIdsWithCart = \App\Models\Cart::select('user_id')
             ->distinct()
-            ->get();
+            ->pluck('user_id');
 
-        foreach ($abandonedUsers as $cart) {
-            NotificationService::trigger($cart->user_id, 'abandoned_cart');
-            $this->info("Sent abandoned cart reminder to user #{$cart->user_id}");
+        foreach ($userIdsWithCart as $userId) {
+            // Find the latest updated_at for this user's cart
+            $latestUpdate = \App\Models\Cart::where('user_id', $userId)->max('updated_at');
+            
+            if ($latestUpdate) {
+                $latestUpdate = Carbon::parse($latestUpdate);
+                $diffInMinutes = $latestUpdate->diffInMinutes(Carbon::now());
+                
+                // If the cart's latest update was between 2 to 3 hours ago (120 - 180 mins)
+                if ($diffInMinutes >= 120 && $diffInMinutes <= 180) {
+                    $cacheKey = 'abandoned_cart_notified_' . $userId;
+                    
+                    // Ensure we only send one notification per user every 24 hours
+                    if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+                        NotificationService::trigger($userId, 'abandoned_cart');
+                        \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addHours(24));
+                        $this->info("Sent abandoned cart reminder to user #{$userId}");
+                    }
+                }
+            }
         }
     }
 }
