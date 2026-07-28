@@ -404,6 +404,8 @@ class ApplicationHomeController extends Controller
                 's.duration', 
                 's.rating', 
                 's.reviews', 
+                's.is_popular',
+                's.description',
                 DB::raw('CONCAT("' . asset('uploads/service') . '/", s.icon) AS icon'),
                 's.has_variants'
             );
@@ -448,6 +450,8 @@ class ApplicationHomeController extends Controller
                         $item->has_variants = (int) $item->has_variants;
                         $item->rating = (string) $categoryStatsCache[$catId]['rating'];
                         $item->reviews = (string) $categoryStatsCache[$catId]['reviews'];
+                        $item->is_popular = (int) $item->is_popular;
+                        $item->description = (string) $item->description;
                         
                         if ($item->has_variants == 1) {
                             $serviceVariants = $trendingVariants->get($item->id, collect());
