@@ -25,6 +25,33 @@ class CouponController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
+    private function isUserInBirthdayWindow($user)
+    {
+        if (empty($user->dob)) {
+            return false;
+        }
+
+        try {
+            $dob = Carbon::parse($user->dob);
+            $birthdayThisYear = Carbon::create(date('Y'), $dob->month, $dob->day)->startOfDay();
+            
+            $diffDays = Carbon::today()->diffInDays($birthdayThisYear, false);
+            
+            if ($diffDays > 180) {
+                $birthdayThisYear->subYear();
+            } elseif ($diffDays < -180) {
+                $birthdayThisYear->addYear();
+            }
+            
+            $diffDays = Carbon::today()->diffInDays($birthdayThisYear, false);
+            
+            // Birthday window is 7 days before up to their birthday (0 to 7 days remaining)
+            return ($diffDays >= 0 && $diffDays <= 7);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public function listCoupons(): JsonResponse
     {
         $function_name = 'listCoupons';
@@ -37,14 +64,24 @@ class CouponController extends Controller
                     $query->whereNull('start_date')->orWhere('start_date', '<=', $now);
                 })
                 ->where(function($query) use ($user) {
-                    $query->whereNull('user_ids')
+                    $query->where(function($q) use ($user) {
+                        $q->whereNull('user_ids')
                           ->orWhereJsonContains('user_ids', (string) $user->id)
                           ->orWhereJsonContains('user_ids', $user->id);
+                    })
+                    ->orWhere('code', 'BDAY50');
                 })
                 ->get();
 
             $validCoupons = [];
             foreach ($coupons as $coupon) {
+                // If this is the birthday coupon, check if user is in their birthday window
+                if ($coupon->code === 'BDAY50') {
+                    if (!$this->isUserInBirthdayWindow($user)) {
+                        continue;
+                    }
+                }
+
                 // Check usage limit
                 if ($coupon->usage_limit !== null) {
                     $totalUsed = CouponUsage::where('coupon_id', $coupon->id)->count();
@@ -109,14 +146,23 @@ class CouponController extends Controller
             $coupon = CouponCode::where('code', strtoupper($request->code))
                 ->where('status', 1)
                 ->where(function($query) use ($user) {
-                    $query->whereNull('user_ids')
+                    $query->where(function($q) use ($user) {
+                        $q->whereNull('user_ids')
                           ->orWhereJsonContains('user_ids', (string) $user->id)
                           ->orWhereJsonContains('user_ids', $user->id);
+                    })
+                    ->orWhere('code', 'BDAY50');
                 })
                 ->first();
 
             if (!$coupon) {
                 return $this->sendError('Invalid coupon code', $this->validation_error_status);
+            }
+
+            if ($coupon->code === 'BDAY50') {
+                if (!$this->isUserInBirthdayWindow($user)) {
+                    return $this->sendError('This coupon is only valid around your birthday', $this->validation_error_status);
+                }
             }
 
             // Check Dates

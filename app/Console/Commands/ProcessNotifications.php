@@ -116,19 +116,47 @@ class ProcessNotifications extends Command
 
         $this->info("Processing daily birthdays...");
 
-        $today = Carbon::today()->format('m-d');
-        
-        // Find users with birthday today
-        $birthdayUsers = User::whereRaw("DATE_FORMAT(dob, '%m-%d') = ?", [$today])
-            ->where('status', 1)
-            ->get();
+        // Fetch BDAY50 coupon to check if user has used it
+        $bdayCoupon = \App\Models\CouponCode::where('code', 'BDAY50')->first();
+        $bdayCouponId = $bdayCoupon ? $bdayCoupon->id : null;
 
-        foreach ($birthdayUsers as $user) {
-            NotificationService::trigger($user->id, 'birthday_offer', [
-                '{user_name}' => $user->name,
-                '{coupon_code}' => 'BDAY50'
-            ]);
-            $this->info("Sent birthday wish to user #{$user->id}");
+        // Birthday offsets and their corresponding templates
+        $schedules = [
+            7  => 'birthday_advance_7',
+            3  => 'birthday_advance_3',
+            2  => 'birthday_advance_3',
+            1  => 'birthday_advance_3',
+            0  => 'birthday_offer',
+        ];
+
+        foreach ($schedules as $days => $eventName) {
+            // Check users born on today + days offset
+            $targetDate = Carbon::today()->addDays($days)->format('m-d');
+            
+            $users = User::whereRaw("DATE_FORMAT(dob, '%m-%d') = ?", [$targetDate])
+                ->where('status', 1)
+                ->get();
+
+            foreach ($users as $user) {
+                // If the coupon exists and the user has already used it, skip notifications
+                if ($bdayCouponId) {
+                    $hasUsed = \App\Models\CouponUsage::where('coupon_id', $bdayCouponId)
+                        ->where('user_id', $user->id)
+                        ->exists();
+                    if ($hasUsed) {
+                        continue;
+                    }
+                }
+
+                $daysLeftText = $days . ($days == 1 ? ' day' : ' days');
+
+                NotificationService::trigger($user->id, $eventName, [
+                    '{user_name}' => $user->name,
+                    '{coupon_code}' => 'BDAY50',
+                    '{days_left}' => $daysLeftText
+                ]);
+                $this->info("Sent birthday notification ({$eventName}) to user #{$user->id} (offset: {$days} days)");
+            }
         }
     }
 
@@ -156,7 +184,9 @@ class ProcessNotifications extends Command
                     
                     // Ensure we only send one notification per user every 24 hours
                     if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
-                        NotificationService::trigger($userId, 'abandoned_cart');
+                        NotificationService::trigger($userId, 'abandoned_cart', [
+                            '{coupon_code}' => 'CART15'
+                        ]);
                         \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addHours(24));
                         $this->info("Sent abandoned cart reminder to user #{$userId}");
                     }

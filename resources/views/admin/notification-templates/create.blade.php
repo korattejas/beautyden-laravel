@@ -26,8 +26,9 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-body">
-                                <form id="main_form" class="form" method="POST" action="javascript:void(0);">
+                                <form id="addEditForm" class="form" method="POST" action="javascript:void(0);" data-parsley-validate="">
                                     @csrf
+                                    <input type="hidden" id="form-method" value="add">
                                     <input type="hidden" name="edit_value" value="{{ $template->id }}">
                                     <div class="row">
                                         <div class="col-md-6 mb-2">
@@ -89,8 +90,8 @@
 
 @section('footer_script_content')
 <script>
-    var form_url = '/notification-templates/store';
-    var redirect_url = '/notification-templates';
+    var form_url = 'notification-templates/store';
+    var redirect_url = 'notification-templates';
+    var is_one_image_and_multiple_image_status = '';
 </script>
-<script src="{{ URL::asset('panel-assets/js/core/submit-ajax.js') }}?v={{ time() }}"></script>
 @endsection

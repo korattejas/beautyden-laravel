@@ -337,7 +337,10 @@ class AuthenticationController extends Controller
                 }
 
                 // Send Welcome Notification
-                \App\Services\NotificationService::trigger($user->id, 'welcome');
+                $userName = $request->name ?? $user->name ?? 'Gorgeous';
+                \App\Services\NotificationService::trigger($user->id, 'welcome', [
+                    '{user_name}' => $userName
+                ]);
             }
 
             $user->update($updateData);

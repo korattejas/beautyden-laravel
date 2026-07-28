@@ -110,10 +110,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-6 mb-1"><label class="form-label">Rating</label><input type="number" step="0.1" name="rating" class="form-control" value="{{ $service->rating }}"></div>
-                                    <div class="col-6 mb-1"><label class="form-label">Reviews</label><input type="number" name="reviews" class="form-control" value="{{ $service->reviews }}"></div>
-                                </div>
+
                                 <div class="mb-1">
                                     <label class="form-label">Search Keywords / Short Description</label>
                                     <textarea name="description" class="form-control" rows="2" placeholder="Brief info for meta data...">{{ $service->description }}</textarea>
@@ -138,8 +135,7 @@
                                             <div class="col-md-6 mb-1"><label class="form-label small">Price (₹)</label><div class="input-group input-group-sm"><span class="input-group-text">₹</span><input type="number" name="variants[{{$vIdx}}][price]" class="form-control" value="{{ $variant->price }}" required></div></div>
                                             <div class="col-md-6 mb-1"><label class="form-label small">Discount %</label><div class="input-group input-group-sm"><input type="number" step="0.01" name="variants[{{$vIdx}}][discount_percentage]" class="form-control" value="{{ $variant->discount_percentage }}" placeholder="e.g. 10"><span class="input-group-text">%</span></div></div>
                                             <div class="col-md-6 mb-1"><label class="form-label small">Duration</label><input type="text" name="variants[{{$vIdx}}][duration]" class="form-control form-control-sm" value="{{ $variant->duration }}"></div>
-                                            <div class="col-md-3 mb-1"><label class="form-label small">Rating</label><input type="number" step="0.1" min="0" max="5" name="variants[{{$vIdx}}][rating]" class="form-control form-control-sm" value="{{ $variant->rating }}" placeholder="4.5"></div>
-                                            <div class="col-md-3 mb-1"><label class="form-label small">Reviews #</label><input type="number" name="variants[{{$vIdx}}][reviews]" class="form-control form-control-sm" value="{{ $variant->reviews }}" placeholder="150"></div>
+
                                             <div class="col-md-12 mb-1">
                                                 <label class="form-label small">Thumbnail Image</label>
                                                 <input type="hidden" name="variants[{{$vIdx}}][old_thumbnail_image]" value="{{ $variant->thumbnail_image }}">
@@ -667,8 +663,7 @@
             html += '<div class="col-md-6 mb-1"><label class="form-label small">Price (₹)</label><div class="input-group input-group-sm"><span class="input-group-text">₹</span><input type="number" name="variants['+variantIndex+'][price]" class="form-control" required></div></div>';
             html += '<div class="col-md-6 mb-1"><label class="form-label small">Discount %</label><div class="input-group input-group-sm"><input type="number" step="0.01" name="variants['+variantIndex+'][discount_percentage]" class="form-control" placeholder="e.g. 10"><span class="input-group-text">%</span></div></div>';
             html += '<div class="col-md-6 mb-1"><label class="form-label small">Duration</label><input type="text" name="variants['+variantIndex+'][duration]" class="form-control form-control-sm" placeholder="e.g. 30 Min"></div>';
-            html += '<div class="col-md-3 mb-1"><label class="form-label small">Rating</label><input type="number" step="0.1" min="0" max="5" name="variants['+variantIndex+'][rating]" class="form-control form-control-sm" placeholder="4.5"></div>';
-            html += '<div class="col-md-3 mb-1"><label class="form-label small">Reviews #</label><input type="number" name="variants['+variantIndex+'][reviews]" class="form-control form-control-sm" placeholder="150"></div>';
+
             html += '<div class="col-md-12 mb-1"><label class="form-label small">Thumbnail Image</label><div class="variant-thumb-upload" style="border:2px dashed #d1d5db;border-radius:8px;padding:8px;text-align:center;cursor:pointer;position:relative;"><p class="mb-0 small text-muted"><i data-feather="image" style="width:14px"></i> Upload Thumbnail</p><input type="file" name="variants['+variantIndex+'][thumbnail_image]" accept="image/*" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;" onchange="handleVariantThumbPreview(this)"></div><div class="variant-thumb-preview mt-1" style="display:none;"><img style="max-height:60px;border-radius:6px;border:1px solid #ddd;" src=""><button type="button" class="btn btn-sm btn-link text-danger p-0 ms-1 clear-variant-thumb">Remove</button></div></div>';
             html += '</div></div>';
             $('#variants-container').append(html);

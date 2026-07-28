@@ -36,6 +36,21 @@ class NotificationService
                 return false;
             }
 
+            // Auto-populate {user_name} if not provided or if it's generic (Customer/User/Guest)
+            $user = \App\Models\User::find($userId);
+            $userName = 'Gorgeous';
+            if ($user) {
+                $userName = $user->name ?? 'Gorgeous';
+                if (empty($userName) || in_array(strtolower($userName), ['customer', 'user', 'guest'])) {
+                    $userName = 'Gorgeous';
+                }
+            }
+            if (!isset($variables['{user_name}'])) {
+                $variables['{user_name}'] = $userName;
+            } elseif (empty($variables['{user_name}']) || in_array(strtolower($variables['{user_name}']), ['customer', 'user', 'guest'])) {
+                $variables['{user_name}'] = $userName;
+            }
+
             // 2. Parse title and message with variables
             $title = self::parseVariables($template->title, $variables);
             $message = self::parseVariables($template->message, $variables);

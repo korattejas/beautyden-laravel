@@ -39,7 +39,7 @@
                     <div class="card mb-2">
                         <div class="card-header border-bottom"><h4 class="card-title">Quick Stats</h4></div>
                         <div class="card-body pt-2">
-                            <div class="d-flex justify-content-between mb-1"><span>Rating:</span> <span class="fw-bold">{{ $service->rating ?? '0' }} ⭐ ({{ $service->reviews ?? 0 }} Reviews)</span></div>
+
                             <div class="d-flex justify-content-between mb-1"><span>Skin Type:</span> <span class="badge bg-light-primary text-primary">{{ $service->skin_type }}</span></div>
                             <div class="d-flex justify-content-between mb-1"><span>Popular:</span> <span class="badge bg-{{ $service->is_popular ? 'success' : 'light' }}">{{ $service->is_popular ? 'Yes' : 'No' }}</span></div>
                             <div class="d-flex justify-content-between"><span>Status:</span> <span class="badge bg-{{ $service->status ? 'primary' : 'danger' }}">{{ $service->status ? 'Active' : 'Inactive' }}</span></div>
@@ -81,17 +81,7 @@
                                                     <span class="badge bg-danger ms-1">{{ $variant->discount_percentage }}% OFF</span>
                                                 @endif
                                             </div>
-                                            {{-- Rating + Reviews --}}
-                                            <div class="text-end">
-                                                @if($variant->rating > 0)
-                                                    <span class="badge bg-warning text-dark">
-                                                        ⭐ {{ number_format($variant->rating, 1) }}
-                                                    </span>
-                                                @endif
-                                                @if($variant->reviews > 0)
-                                                    <span class="text-muted small ms-1">({{ $variant->reviews }} reviews)</span>
-                                                @endif
-                                            </div>
+
                                         </div>
                                     </div>
                                 @endforeach

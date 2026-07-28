@@ -81,6 +81,7 @@ class ServiceMasterController extends Controller
         try {
             if ($request->ajax()) {
                 $services = ServiceMaster::query()
+                    ->with('variants')
                     ->leftJoin('service_categories as sc', 'sc.id', '=', 'service_masters.category_id')
                     ->leftJoin('service_subcategories as ssc', 'ssc.id', '=', 'service_masters.sub_category_id')
                     ->select('service_masters.*', 'sc.name as category_name', 'ssc.name as subcategory_name');
@@ -90,6 +91,20 @@ class ServiceMasterController extends Controller
                 }
 
                 return DataTables::of($services)
+                    ->editColumn('price', function ($s) {
+                        if ($s->has_variants == 1) {
+                            $minPrice = $s->variants->min('price');
+                            return 'Starts at ₹' . ($minPrice ?: 0);
+                        }
+                        return $s->price ? '₹' . $s->price : '-';
+                    })
+                    ->editColumn('discount_price', function ($s) {
+                        if ($s->has_variants == 1) {
+                            $count = $s->variants->count();
+                            return '<span class="badge badge-glow bg-info">' . $count . ' Variants</span>';
+                        }
+                        return $s->discount_price > 0 ? '₹' . $s->discount_price : '-';
+                    })
                     ->editColumn('is_popular', function ($s) {
                         return $s->is_popular 
                             ? '<span class="badge badge-glow bg-success">Popular</span>' 
@@ -117,7 +132,7 @@ class ServiceMasterController extends Controller
                     ->addColumn('view_url', function($s) {
                         return route('admin.service-master.show', encryptId($s->id));
                     })
-                    ->rawColumns(['action', 'status', 'is_popular'])
+                    ->rawColumns(['price', 'discount_price', 'action', 'status', 'is_popular'])
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -260,8 +275,7 @@ class ServiceMasterController extends Controller
                 'price'               => $request->price,
                 'discount_price'      => $request->discount_price,
                 'duration'            => $request->duration,
-                'rating'              => $request->rating,
-                'reviews'             => $request->reviews,
+
                 'description'         => $request->description,
                 'icon'                => $icon,
                 'banner_media'        => $banner_media,
@@ -387,8 +401,7 @@ class ServiceMasterController extends Controller
                             'description'         => $variant['description'] ?? null,
                             'price'               => $variant['price'] ?? 0,
                             'duration'            => $variant['duration'] ?? null,
-                            'rating'              => $variant['rating'] ?? 0,
-                            'reviews'             => $variant['reviews'] ?? 0,
+
                             'thumbnail_image'     => $thumbnail_image,
                             'discount_percentage' => $variant['discount_percentage'] ?? null,
                         ];
