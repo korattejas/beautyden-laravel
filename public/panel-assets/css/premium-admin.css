@@ -1158,7 +1158,7 @@ body:has(.pa-list-page) .pa-page-title {
 }
 
 /* ── Tables ── */
-.pa-content .card {
+/* .pa-content .card {
     border: 1px solid var(--pa-border) !important;
     border-radius: var(--pa-radius) !important;
     box-shadow: var(--pa-shadow-card) !important;
@@ -1166,9 +1166,9 @@ body:has(.pa-list-page) .pa-page-title {
 
 .pa-content .table {
     font-size: 0.85rem;
-}
+} */
 
-.pa-content .table thead th {
+/* .pa-content .table thead th {
     background: var(--pa-surface-2) !important;
     border-bottom: 1px solid var(--pa-border) !important;
     font-size: 0.72rem;
@@ -1178,9 +1178,9 @@ body:has(.pa-list-page) .pa-page-title {
     color: var(--pa-text-muted) !important;
     padding: 0.85rem 1rem !important;
     white-space: nowrap;
-}
+} */
 
-.pa-content .table tbody td {
+/* .pa-content .table tbody td {
     padding: 0.85rem 1rem !important;
     vertical-align: middle;
     border-color: var(--pa-border-light) !important;
@@ -1193,7 +1193,7 @@ body:has(.pa-list-page) .pa-page-title {
 
 .pa-content .table tbody tr:hover {
     background: var(--pa-surface-2);
-}
+} */
 
 /* DataTables — see premium-datatables.css */
 

@@ -15,10 +15,10 @@ use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
 use App\Models\TeamMember;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Exports\AppointmentsExport;
+use App\Exports\AdvanceAppointmentsExport;
 use Maatwebsite\Excel\Facades\Excel;
 
-class AppointmentsController extends Controller
+class AdvanceAppointmentsController extends Controller
 {
     protected $error_message, $exception_error_code, $validator_error_code, $controller_name;
 
@@ -27,7 +27,7 @@ class AppointmentsController extends Controller
         $this->error_message = config('custom.common_error_message');
         $this->exception_error_code = config('custom.exception_error_code');
         $this->validator_error_code = config('custom.validator_error_code');
-        $this->controller_name = "Admin/AppointmentsController";
+        $this->controller_name = "Admin/AdvanceAppointmentsController";
     }
 
     public function index(Request $request)
@@ -35,7 +35,7 @@ class AppointmentsController extends Controller
         $function_name = 'index';
         try {
             $teamMembers = TeamMember::where('status', 1)->get();
-            $cities = City::select('id', 'name')->get();
+            $cities = City::select('id', 'name')->where('status', 0)->get();
 
             $month = $request->has('month') ? $request->month : date('m');
             $year = $request->has('year') ? $request->year : date('Y');
@@ -65,7 +65,7 @@ class AppointmentsController extends Controller
             // Calculate company revenue for filtered completed appointments
             $companyRevenue = (clone $query)->where('status', 3)->sum('company_amount');
 
-            return view('admin.appointments.index', compact(
+            return view('admin.advance-appointments.index', compact(
                 'teamMembers',
                 'cities',
                 'totalAppointments',
@@ -90,9 +90,9 @@ class AppointmentsController extends Controller
     {
         try {
 
-            $cities = City::select('id', 'name')->get();
+            $cities = City::select('id', 'name')->where('status', 0)->get();
 
-            return view('admin.appointments.create', compact('cities'));
+            return view('admin.advance-appointments.create', compact('cities'));
         } catch (\Exception $e) {
             dd($e->getMessage());
         }
@@ -100,7 +100,7 @@ class AppointmentsController extends Controller
 
     public function getCityServices($cityId)
     {
-        $records = ServiceCityPrice::where('city_id', $cityId)
+        $records = \App\Models\ServiceCityMaster::where('city_id', $cityId)
             ->where('status', 1)
             ->get();
 
@@ -108,14 +108,18 @@ class AppointmentsController extends Controller
             return response()->json([]);
         }
 
-        $categories = ServiceCategory::whereIn('id', $records->pluck('category_id'))->get();
-        $subCategories = ServiceSubCategory::whereIn('id', $records->pluck('sub_category_id')->filter())->get();
-        $services = Service::whereIn('id', $records->pluck('service_id'))->get();
+        $categories = \App\Models\ServiceCategory::whereIn('id', $records->pluck('category_id'))->get();
+        $subCategories = \App\Models\ServiceSubcategory::whereIn('id', $records->pluck('sub_category_id')->filter())->get();
+        $services = \App\Models\ServiceMaster::whereIn('id', $records->pluck('service_master_id'))->get();
+
+        $variants = \App\Models\ServiceMasterVariant::whereIn('service_master_id', $services->pluck('id'))->get();
+        $variantPrices = \App\Models\ServiceCityVariantPrice::where('city_id', $cityId)
+            ->whereIn('service_master_id', $services->pluck('id'))
+            ->get();
 
         $data = [];
 
         foreach ($categories as $category) {
-
             $data[$category->id] = [
                 'id' => $category->id,
                 'name' => $category->name,
@@ -125,23 +129,37 @@ class AppointmentsController extends Controller
         }
 
         foreach ($records as $record) {
-
-            $service = $services->where('id', $record->service_id)->first();
+            $service = $services->where('id', $record->service_master_id)->first();
             if (!$service) continue;
 
+            $serviceData = [
+                'id' => $service->id,
+                'name' => $service->name,
+                'price' => $record->price,
+                'discount_price' => $record->discount_price,
+                'duration' => $service->duration,
+                'has_variants' => $service->has_variants,
+                'variants' => []
+            ];
+
+            if ($service->has_variants) {
+                $serviceVariants = $variants->where('service_master_id', $service->id);
+                foreach ($serviceVariants as $v) {
+                    $vp = $variantPrices->where('variant_id', $v->id)->first();
+                    $serviceData['variants'][] = [
+                        'id' => $v->id,
+                        'name' => $v->name,
+                        'price' => $vp ? $vp->price : $v->price,
+                        'discount_price' => $vp ? $vp->discount_price : $v->discount_percentage,
+                        'duration' => $v->duration
+                    ];
+                }
+            }
+
             if (!$record->sub_category_id) {
-
-                $data[$record->category_id]['services'][] = [
-                    'id' => $service->id,
-                    'name' => $service->name,
-                    'price' => $record->price,
-                    'discount_price' => $record->discount_price,
-                    'duration' => $service->duration
-                ];
+                $data[$record->category_id]['services'][] = $serviceData;
             } else {
-
                 if (!isset($data[$record->category_id]['subcategories'][$record->sub_category_id])) {
-
                     $sub = $subCategories->where('id', $record->sub_category_id)->first();
                     if (!$sub) continue;
 
@@ -151,14 +169,7 @@ class AppointmentsController extends Controller
                         'services' => []
                     ];
                 }
-
-                $data[$record->category_id]['subcategories'][$record->sub_category_id]['services'][] = [
-                    'id' => $service->id,
-                    'name' => $service->name,
-                    'price' => $record->price,
-                    'discount_price' => $record->discount_price,
-                    'duration' => $service->duration
-                ];
+                $data[$record->category_id]['subcategories'][$record->sub_category_id]['services'][] = $serviceData;
             }
         }
 
@@ -171,9 +182,9 @@ class AppointmentsController extends Controller
         try {
 
             $appointment = Appointment::findOrFail(decryptId($id));
-            $cities = City::select('id', 'name')->get();
+            $cities = City::select('id', 'name')->where('status', 0)->get();
 
-            return view('admin.appointments.edit', compact(
+            return view('admin.advance-appointments.edit', compact(
                 'appointment',
                 'cities'
             ));
@@ -554,7 +565,7 @@ class AppointmentsController extends Controller
                         $action_array = [
                             'is_simple_action' => 1,
                             'delete_id' => $appointment->id,
-                            'edit_route' => route('admin.appointments.edit', encryptId($appointment->id)),
+                            'edit_route' => route('admin.advance-appointments.edit', encryptId($appointment->id)),
                             // 'current_status' => $appointment->status,
                             'hidden_id' => $appointment->id,
                             'assign_id' => $appointment->id,
@@ -614,20 +625,10 @@ class AppointmentsController extends Controller
                 foreach($servicesJson['services'] as $srv) {
                     if(isset($srv['service_master_id']) && $srv['type'] == 'service') {
                         $serviceIds[] = $srv['service_master_id'];
-                    } elseif(isset($srv['service_id']) && $srv['type'] == 'service') {
-                        $serviceIds[] = $srv['service_id'];
                     }
                 }
             }
-            
-            // Also merge any direct service_id inputs just in case
-            $directServiceIds = $request->input('service_id', []);
-            if (!is_array($directServiceIds)) {
-                $directServiceIds = explode(',', $directServiceIds);
-            }
-            $serviceIds = array_merge($serviceIds, $directServiceIds);
-            
-            $serviceIdsString = implode(',', array_unique(array_filter($serviceIds)));
+            $serviceIdsString = implode(',', array_unique($serviceIds));
 
             $orderNumber = '#BD' . Str::upper(Str::random(8));
 
@@ -850,7 +851,7 @@ class AppointmentsController extends Controller
                 'team_members'  => $teamMembers,
             ];
 
-            $pdf = PDF::loadView('admin.appointments.pdf', $data)->setPaper('a4', 'portrait');
+            $pdf = PDF::loadView('admin.advance-appointments.pdf', $data)->setPaper('a4', 'portrait');
 
             $fileName = 'Invoice_'
                 . ($appointment->order_number ?? 'APT')
@@ -942,7 +943,7 @@ class AppointmentsController extends Controller
             }
             $fileName .= '.xlsx';
 
-            return Excel::download(new AppointmentsExport($month, $year), $fileName);
+            return Excel::download(new AdvanceAppointmentsExport($month, $year), $fileName);
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to export appointments: ' . $e->getMessage());
         }

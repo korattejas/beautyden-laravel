@@ -1,0 +1,1890 @@
+@extends('admin.layouts.app')
+
+@section('header_style_content')
+<style>
+     .member-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 10px;
+        margin-top: 15px;
+    }
+
+    .member-card {
+        border: 2px solid transparent;
+        border-radius: 12px;
+        padding: 15px 10px;
+        text-align: center;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .member-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        background: #fff;
+    }
+
+    .member-card.selected {
+        border-color: #1a4a7a;
+        background: #eff6ff;
+        box-shadow: 0 4px 12px rgba(26, 74, 122, 0.12);
+    }
+
+    .member-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        margin: 0 auto 10px;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e2e8f0;
+        font-weight: bold;
+        color: #64748b;
+        font-size: 1.2rem;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .member-name {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #1e293b;
+        margin-bottom: 6px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .member-role {
+        font-size: 1rem;
+        color: #64748b;
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .member-experience {
+        font-size: 0.9rem;
+        color: #7367f0;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(115, 103, 240, 0.1);
+        padding: 5px 15px;
+        border-radius: 50px;
+        margin-bottom: 8px;
+    }
+
+    .member-address {
+        font-size: 0.9rem;
+        color: #64748b;
+        display: block;
+        margin-top: 4px;
+        line-height: 1.25;
+        font-weight: 500;
+        padding: 0 5px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .selection-indicator {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 22px;
+        height: 22px;
+        background: #1a4a7a;
+        color: #fff;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .member-card.selected .selection-indicator {
+        display: flex;
+    }
+
+    /* Modal Styling */
+    #c-assignModal .c-modal-dialog {
+        max-width: 650px;
+    }
+
+    .member-search-wrap {
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .member-search-wrap i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .member-search-wrap input#memberSearch {
+        padding-left: 35px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background: #f8fafc;
+    }
+
+    .member-search-wrap input#memberSearch:focus {
+        background: #fff;
+        border-color: #1a4a7a;
+        box-shadow: 0 0 0 3px rgba(26, 74, 122, 0.1);
+    }
+
+    /* Premium Detail Modal Enhancements */
+    #c-viewAppointmentModal .c-modal-content {
+        border: none;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+
+    #c-viewAppointmentModal .c-modal-header {
+        background: linear-gradient(135deg, #102365 0%, #1a4a7a 100%);
+        padding: 20px 24px;
+    }
+
+    .detail-section-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7367f0;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .detail-info-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 16px;
+        height: 100%;
+        border: 1px solid #edf2f7;
+        transition: all 0.3s ease;
+    }
+
+    .detail-info-card:hover {
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-color: #7367f0;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-icon {
+        width: 32px;
+        height: 32px;
+        background: rgba(115, 103, 240, 0.1);
+        color: #7367f0;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .info-content label {
+        display: block;
+        font-size: 0.72rem;
+        color: #82868b;
+        font-weight: 700;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-content p {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.3;
+    }
+
+    .premium-table-container {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #edf2f7;
+        margin-top: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .premium-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .premium-table thead th {
+        background: #f8f9fa;
+        color: #475569;
+        font-weight: 800;
+        font-size: 0.8rem;
+        padding: 14px 16px;
+        text-transform: uppercase;
+        text-align: left;
+        letter-spacing: 0.8px;
+    }
+
+    .premium-table tbody td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #edf2f7;
+        font-size: 0.85rem;
+        color: #1e293b;
+    }
+
+    .premium-table thead th {
+        padding: 10px 8px;
+        font-size: 0.75rem;
+    }
+
+    .premium-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .summary-box {
+        background: #fdfdfd;
+        border: 1px solid #edf2f7;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 350px;
+        margin-left: auto;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #475569;
+    }
+
+    .summary-line:last-child {
+        margin-bottom: 0;
+    }
+
+    .summary-total {
+        border-top: 2px dashed #dbdade;
+        margin-top: 15px;
+        padding-top: 15px;
+        font-weight: 800;
+        font-size: 1.4rem;
+        color: #7367f0;
+    }
+
+    /* Stat Filter Cards */
+    .stat-filter-card {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        border: 2px solid transparent !important;
+    }
+    .stat-filter-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+        border-color: rgba(115,103,240,0.3) !important;
+    }
+    .stat-filter-card.active-stat {
+        background-color: #f0edff !important;
+        border-color: #7367f0 !important;
+        box-shadow: 0 4px 15px rgba(115,103,240,0.15) !important;
+    }
+    .stat-filter-card.active-stat h4 {
+        color: #7367f0 !important;
+    }
+
+    /* Premium Period Filter Styling */
+    .period-filter-card {
+        background: #ffffff !important;
+        border: none !important;
+        border-radius: 20px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+        overflow: hidden;
+    }
+    .period-filter-header {
+        background: #f8f9fa;
+        padding: 8px 15px;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .custom-pill-select {
+        appearance: none;
+        background-color: #f3f4f6 !important;
+        border: 2px solid transparent !important;
+        border-radius: 50px !important;
+        padding: 8px 40px 8px 20px !important;
+        font-weight: 600 !important;
+        color: #4b5563 !important;
+        cursor: pointer;
+        transition: all 0.3s ease !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 15px center !important;
+        background-size: 18px !important;
+    }
+    .custom-pill-select:hover {
+        background-color: #e5e7eb !important;
+        transform: translateY(-1px);
+    }
+    .custom-pill-select:focus {
+        border-color: #7367f0 !important;
+        background-color: #ffffff !important;
+        box-shadow: 0 0 0 4px rgba(115,103,240,0.1) !important;
+        outline: none;
+    }
+
+</style>
+@endsection
+
+@section('content')
+<div class="app-content content">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper">
+        <div class="content-header row">
+            <div class="content-header-left col-md-9 col-12 mb-2">
+                <div class="row breadcrumbs-top">
+                    <div class="col-12">
+                        <h2 class="content-header-title float-start mb-0">Appointments</h2>
+                        <div class="breadcrumb-wrapper">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="{{ route('admin.dashboard') }}">{{ trans('admin_string.home') }}</a>
+                                </li>
+                                <li class="breadcrumb-item active"><a href="#">Appointments</a></li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                <a href="{{ route('admin.advance-appointments.create') }}" class="btn btn-primary">
+                    Add Appointments
+                </a>
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end p-2" style="min-width: 300px;">
+                        <input type="hidden" id="filter-type" value="total">
+                        <div class="mb-2">
+                            <label class="form-label">Status</label>
+                            <select id="filter-status" class="form-select">
+                                <option value="">All</option>
+                                <option value="1">Pending</option>
+                                <option value="2">Assigned</option>
+                                <option value="3">Completed</option>
+                                <option value="4">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Appointment Date</label>
+                            <input type="date" id="filter-appointment-date" class="form-control">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Appointment Time</label>
+                            <input type="time" id="filter-appointment-time" class="form-control">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Created Date</label>
+                            <input type="date" id="filter-created-date" class="form-control">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">City</label>
+                            <select id="filter-city" class="form-select">
+                                <option value="">All Cities</option>
+                                @foreach ($cities as $city)
+                                <option value="{{ $city->id }}">{{ $city->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button id="btn-apply-filters" class="btn btn-sm btn-primary">
+                                Apply
+                            </button>
+                            <button id="btn-reset-filters" class="btn btn-sm btn-secondary">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-body">
+            <!-- Summary Boxes -->
+            <!-- Premium Revenue Stats & Time Filter -->
+            <div class="row g-1 mb-2">
+                <div class="col-md-3">
+                    <div class="card h-100 mb-0" style="border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; position: relative; background: #fff;">
+                        <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #7367f0;"></div>
+                        <div class="card-body p-2 d-flex align-items-center">
+                            <div class="avatar p-1 m-0 me-1" style="background: rgba(115,103,240,0.1); border-radius: 12px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-wallet2" style="font-size: 1.6rem; color: #7367f0;"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 text-uppercase fw-bold" style="color: #82868b; font-size: 0.85rem; letter-spacing: 1px;">Total Revenue</p>
+                                <h2 class="fw-bolder mb-0" style="color: #1e293b; font-size: 1.6rem;">₹{{ number_format($totalRevenue, 2) }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 mb-0" style="border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; position: relative; background: #fff;">
+                        <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #28c76f;"></div>
+                        <div class="card-body p-2 d-flex align-items-center">
+                            <div class="avatar p-1 m-0 me-1" style="background: rgba(40,199,111,0.1); border-radius: 12px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-bank2" style="font-size: 1.6rem; color: #28c76f;"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 text-uppercase fw-bold" style="color: #82868b; font-size: 0.85rem; letter-spacing: 1px;">Company Revenue</p>
+                                <h2 class="fw-bolder mb-0" style="color: #1e293b; font-size: 1.6rem;">₹{{ number_format($companyRevenue, 2) }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 mb-0 period-filter-card">
+                        <div class="period-filter-header d-flex align-items-center justify-content-center py-75">
+                            <i class="bi bi-calendar3 me-1 text-primary"></i>
+                            <span class="fw-bold text-uppercase" style="font-size: 0.8rem; letter-spacing: 1px; color: #6e6b7b;">Select Period</span>
+                        </div>
+                        <div class="card-body p-2">
+                            <div class="row g-1">
+                                <div class="col-md-5">
+                                    <select id="global-month-filter" class="form-select custom-pill-select w-100" style="padding: 10px 20px !important; font-size: 1rem !important;">
+                                        <option value="all" {{ $month == 'all' ? 'selected' : '' }}>All Months</option>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ sprintf('%02d', $m) }}" {{ $month == sprintf('%02d', $m) ? 'selected' : '' }}>
+                                                {{ date('F', mktime(0, 0, 0, $m, 1)) }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="global-year-filter" class="form-select custom-pill-select w-100" style="padding: 10px 15px !important; font-size: 1rem !important;">
+                                        <option value="all" {{ $year == 'all' ? 'selected' : '' }}>Year</option>
+                                        @php $currentYear = date('Y'); @endphp
+                                        @for ($y = $currentYear - 2; $y <= $currentYear + 1; $y++)
+                                            <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button id="btn-export-data" class="btn btn-outline-primary w-100" style="border-radius: 50px; font-weight: 700; font-size: 1rem; padding: 13px 15px;">
+                                        <i class="bi bi-download"></i> Export
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Stats Row - Quick Filters -->
+            <div class="row g-1 mb-2">
+                <div class="col-md col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card active-stat" data-type="total">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #f3e8ff !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-calendar-check" style="font-size: 1.2rem; color: #7c3aed;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $totalAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Total</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="today">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fff1f2 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-calendar-day" style="font-size: 1.2rem; color: #e11d48;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $todayAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Today</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="tomorrow">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #f0fdf4 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-calendar-plus" style="font-size: 1.2rem; color: #16a34a;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $tomorrowAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Tomorrow</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="1" data-is-status="true">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fff7ed !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-clock-history" style="font-size: 1.2rem; color: #ea580c;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $pendingAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Pending</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="2" data-is-status="true">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #e0f2fe !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-person-check" style="font-size: 1.2rem; color: #0284c7;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $assignedAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Assigned</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="3" data-is-status="true">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #dcfce7 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-check2-circle" style="font-size: 1.2rem; color: #16a34a;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $completedAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md col-sm-4 col-6">
+                    <div class="card h-100 mb-0 stat-filter-card" data-type="4" data-is-status="true">
+                        <div class="card-body d-flex align-items-center p-1">
+                            <div class="avatar p-50 m-0" style="border-radius: 12px; background: #fee2e2 !important; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-x-circle" style="font-size: 1.2rem; color: #dc2626;"></i>
+                            </div>
+                            <div class="ms-1">
+                                <h4 class="fw-bolder mb-0" style="color: #1e293b;">{{ $rejectedAppointments }}</h4>
+                                <p class="card-text mb-0" style="color: #64748b; font-weight: 500; font-size: 0.85rem;">Rejected</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-1">
+                <div class="d-flex align-items-center gap-1">
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                    <div class="input-group" style="width: 250px;">
+                        <span class="input-group-text bg-light border-end-0" style="border-radius: 10px 0 0 10px;">
+                            <i class="bi bi-calendar-event text-primary"></i>
+                        </span>
+                        <input type="text" id="main-date-filter" class="form-control border-start-0 shadow-none flatpickr-basic"
+                            placeholder="Select Date"
+                            style="border-radius: 0 10px 10px 0; font-weight: 700; color: #1a4a7a; background-color: #fff !important;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column Search -->
+            <section id="column-search-datatable">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-datatable table-responsive px-1 pt-1">
+                                <table class="dt-column-search table w-100 dataTable" id="table-advance-appointments">
+                                    <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            {{-- <th>Service Category</th> --}}
+                                            {{-- <th>Service</th> --}}
+                                            <th>Order No</th>
+                                            <th>Client</th>
+                                            <th>Phone</th>
+                                            <th>Schedule</th>
+                                            <th>Assigned To</th>
+                                            <th>Total</th>
+                                            <th>Comp. Amt</th>
+                                            <th data-search="false">Pay Type</th>
+                                            <th data-search="false">User Pay</th>
+                                            <th data-search="false">Beaut. Pay</th>
+                                            <th data-search="false">Status</th>
+                                            <th data-search="false">Action</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!--/ Column Search -->
+        </div>
+    </div>
+</div>
+<!-- Assign Team Members Modal -->
+<div id="c-assignModal" class="c-modal">
+    <div class="c-modal-dialog">
+        <div class="c-modal-content">
+
+            <!-- Header -->
+            <div class="c-modal-header">
+                <h5 class="c-modal-title"><i class="bi bi-people-fill"></i> Assign Team Members</h5>
+                <button class="c-close-btn" data-c-close>&times;</button>
+            </div>
+
+            <!-- Body -->
+            <div class="c-modal-body">
+                <form id="assignForm">
+                    <input type="hidden" id="value_id" name="value_id">
+                    
+                    <div class="member-search-wrap">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="memberSearch" class="form-control shadow-none" placeholder="Search team members...">
+                    </div>
+
+                    <div class="member-grid" id="memberGrid">
+                        @foreach ($teamMembers as $member)
+                        <div class="member-card" data-id="{{ $member->id }}" data-name="{{ strtolower($member->name) }}">
+                            <div class="selection-indicator"><i class="bi bi-check"></i></div>
+                            <div class="member-avatar" 
+                                style="{{ $member->icon && file_exists(public_path('uploads/team-member/' . $member->icon)) 
+                                    ? 'background-image: url(' . asset('uploads/team-member/' . $member->icon) . ')' 
+                                    : '' }}">
+                                @if(!($member->icon && file_exists(public_path('uploads/team-member/' . $member->icon))))
+                                    {{ strtoupper(substr($member->name, 0, 1)) }}
+                                @endif
+                            </div>
+                            <span class="member-name">{{ $member->name }}</span>
+                            <span class="member-role">{{ $member->role ?? 'Professional' }}</span>
+                            <div class="member-experience">
+                                <i class="bi bi-briefcase" style="font-size: 0.65rem;"></i> {{ $member->experience_years ?? 0 }} Years Exp.
+                            </div>
+                            <div class="member-address">
+                                <i class="bi bi-geo-alt-fill" style="font-size: 0.75rem; color: #ef4444;"></i> 
+                                {{ $member->address ? $member->address : ($member->city ? $member->city : 'Location N/A') }}
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <select id="team_members" name="team_members[]" class="d-none" multiple>
+                        @foreach ($teamMembers as $member)
+                        <option value="{{ $member->id }}">{{ $member->name }}</option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="c-modal-footer">
+                <button class="c-btn c-btn-secondary" data-c-close>
+                    <i class="bi bi-x-circle"></i> Close
+                </button>
+                <button type="button" id="saveMembers" class="c-btn c-btn-primary">
+                    <i class="bi bi-check-circle"></i> Save
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="c-viewAppointmentModal" class="c-modal">
+    <div class="c-modal-dialog" style="max-width: 1050px;">
+        <div class="c-modal-content">
+
+            <!-- Header -->
+            <div class="c-modal-header">
+                <h5 class="c-modal-title" style="margin:0;">
+                    <i class="bi bi-stars"></i> Appointment Insights
+                </h5>
+
+                <div style="display:flex; align-items:center; gap:12px;">
+
+                    <!-- 🔥 Copy Buttons -->
+                    <div style="display:flex; gap:8px;">
+                        <button id="copyAppointmentData"
+                            style="
+                                background: rgba(255,255,255,0.15);
+                                color:#fff;
+                                border: 1px solid rgba(255,255,255,0.3);
+                                padding:8px 16px;
+                                border-radius:8px;
+                                font-size:13px;
+                                font-weight: 600;
+                                cursor:pointer;
+                                display:flex;
+                                align-items:center;
+                                gap:8px;
+                                transition:all 0.3s ease;
+                                backdrop-filter: blur(5px);
+                            "
+                            onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                            <i class="bi bi-clipboard2-check"></i> <span>Copy for Client</span>
+                        </button>
+
+                        <button id="copyForBeautician"
+                            style="
+                                background: rgba(255,255,255,0.15);
+                                color:#fff;
+                                border: 1px solid rgba(255,255,255,0.3);
+                                padding:8px 16px;
+                                border-radius:8px;
+                                font-size:13px;
+                                font-weight: 600;
+                                cursor:pointer;
+                                display:flex;
+                                align-items:center;
+                                gap:8px;
+                                transition:all 0.3s ease;
+                                backdrop-filter: blur(5px);
+                            "
+                            onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                            onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                            <i class="bi bi-person-badge"></i> <span>Copy for Beautician</span>
+                        </button>
+                    </div>
+
+                    <!-- Close Button -->
+                    <button class="c-close-btn" data-c-close 
+                        style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 50%; font-size: 20px; transition: all 0.3s;">
+                        &times;
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="c-modal-body" id="c-appointment-details" style="background: #fff; padding: 24px;">
+                <div class="c-loader">
+                    <div class="c-spinner"></div>
+                    <span>Revealing information...</span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="c-modal-footer" style="background: #f8f9fa; border-top: 1px solid #edf2f7; padding: 16px 24px;">
+                <div style="display: flex; align-items: center; gap: 8px; color: #82868b; font-size: 0.85rem;">
+                    <i class="bi bi-shield-check text-success"></i>
+                    <span>Verified Appointment Record</span>
+                </div>
+                <button class="c-btn" data-c-close style="background: #444050; border-radius: 8px; padding: 10px 20px;">
+                    <i class="bi bi-x-lg me-1"></i> Close View
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Payment Type Change Modal -->
+<div id="paymentTypeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; align-items:center; justify-content:center;">
+    <!-- Backdrop -->
+    <div id="paymentTypeBackdrop" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px);"></div>
+    <!-- Modal Box -->
+    <div style="position:relative; background:#fff; border-radius:20px; padding:32px; width:380px; max-width:95%; box-shadow:0 25px 60px rgba(0,0,0,0.2); z-index:1;">
+        <input type="hidden" id="paymentTypeAppointmentId">
+        <!-- Header -->
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+            <div style="width:44px; height:44px; background:linear-gradient(135deg,#667eea,#764ba2); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                <i class="bi bi-credit-card" style="font-size:1.3rem; color:#fff;"></i>
+            </div>
+            <div>
+                <h5 style="margin:0; font-weight:800; color:#1e293b; font-size:1.1rem;">Change Payment Type</h5>
+                <p style="margin:0; font-size:0.82rem; color:#64748b;">Select payment method for this appointment</p>
+            </div>
+        </div>
+        <!-- Options -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
+            <div class="payment-opt" data-value="cash"
+                style="border:2px solid #e2e8f0; border-radius:14px; padding:18px 12px; text-align:center; cursor:pointer; transition:all 0.25s ease;">
+                <div style="width:46px; height:46px; background:#f0fdf4; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;">
+                    <i class="bi bi-cash-coin" style="font-size:1.4rem; color:#16a34a;"></i>
+                </div>
+                <div style="font-weight:800; font-size:1rem; color:#1e293b;">Cash</div>
+                <div style="font-size:0.78rem; color:#64748b; margin-top:3px;">Pay at doorstep</div>
+            </div>
+            <div class="payment-opt" data-value="online"
+                style="border:2px solid #e2e8f0; border-radius:14px; padding:18px 12px; text-align:center; cursor:pointer; transition:all 0.25s ease;">
+                <div style="width:46px; height:46px; background:#eff6ff; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;">
+                    <i class="bi bi-credit-card-2-front" style="font-size:1.4rem; color:#2563eb;"></i>
+                </div>
+                <div style="font-weight:800; font-size:1rem; color:#1e293b;">Online</div>
+                <div style="font-size:0.78rem; color:#64748b; margin-top:3px;">Digital payment</div>
+            </div>
+        </div>
+        <!-- Buttons -->
+        <div style="display:flex; gap:10px;">
+            <button id="cancelPaymentTypeModal" style="flex:1; padding:12px; border:2px solid #e2e8f0; border-radius:10px; background:#fff; font-weight:700; color:#64748b; cursor:pointer; font-size:0.95rem; transition:all 0.2s;">
+                Cancel
+            </button>
+            <button id="savePaymentTypeBtn" style="flex:1; padding:12px; border:none; border-radius:10px; background:linear-gradient(135deg,#667eea,#764ba2); font-weight:800; color:#fff; cursor:pointer; font-size:0.95rem; transition:all 0.2s; opacity:0.5; pointer-events:none;">
+                <i class="bi bi-check-circle me-1"></i> Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Appointment Review Modal -->
+<div id="c-viewReviewModal" class="c-modal">
+    <div class="c-modal-dialog" style="max-width: 850px;">
+        <div class="c-modal-content">
+            <!-- Header -->
+            <div class="c-modal-header" style="background: linear-gradient(135deg, #102365 0%, #1a4a7a 100%); padding: 20px 24px; border: none;">
+                <h5 class="c-modal-title" style="margin:0; color:#fff;">
+                    <i class="bi bi-star-fill text-warning"></i> Customer Feedback
+                </h5>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <button class="c-close-btn" data-c-close-review style="color:#fff;">&times;</button>
+                </div>
+            </div>
+            <!-- Body -->
+            <div class="c-modal-body" id="c-appointment-review-details" style="background: #fdfdfd; padding: 25px;">
+                <div class="c-loader">
+                    <div class="c-spinner"></div>
+                    <span>Loading Review...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@section('footer_script_content')
+<script>
+    const sweetalert_delete_title = "Delete Appointment?";
+    const sweetalert_change_status = "Change Status of Appointment";
+    const form_url = '/advance-appointments';
+    $(document).on('change', '#global-month-filter, #global-year-filter', function() {
+        let month = $('#global-month-filter').val();
+        let year = $('#global-year-filter').val();
+        let url = new URL(window.location.href);
+        url.searchParams.set('month', month);
+        url.searchParams.set('year', year);
+        window.location.href = url.toString();
+    });
+
+    let isInternalChange = false;
+
+    // Initialize Flatpickr for the main date filter with a clear button
+    const mainDateFilter = $('#main-date-filter').flatpickr({
+        altInput: true,
+        altFormat: "F j, Y",
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        onReady: function(selectedDates, dateStr, instance) {
+            const clearBtn = document.createElement("div");
+            clearBtn.innerHTML = '<i class="bi bi-eraser-fill me-25"></i> Clear Date';
+            clearBtn.classList.add("flatpickr-clear-btn");
+            clearBtn.style.cssText = "text-align: center; padding: 12px; cursor: pointer; color: #ea5455; font-weight: 800; border-top: 1px solid #ebe9f1; background: #fff; transition: all 0.2s ease; font-size: 0.9rem; letter-spacing: 0.5px;";
+
+            clearBtn.onmouseover = function() { this.style.backgroundColor = "#fff5f5"; this.style.color = "#d32f2f"; };
+            clearBtn.onmouseout = function() { this.style.backgroundColor = "#fff"; this.style.color = "#ea5455"; };
+
+            clearBtn.addEventListener("click", () => {
+                instance.clear();
+                instance.close();
+            });
+            instance.calendarContainer.appendChild(clearBtn);
+        },
+        onClear: function() {
+            if (isInternalChange) return;
+            $('#filter-appointment-date').val('');
+            $('.stat-filter-card').removeClass('active-stat');
+            $('[data-type="total"]').addClass('active-stat');
+            $('#filter-type').val('total');
+            $('#table-advance-appointments').DataTable().ajax.reload();
+        }
+    });
+
+    // Initial filter state
+    $('#filter-type').val('total');
+
+    // Main Date Filter - Quick Filter Without Apply Button
+    $(document).on('change', '#main-date-filter', function() {
+        if (isInternalChange) {
+            return;
+        }
+
+        let val = $(this).val();
+
+        if (val) {
+            $('.stat-filter-card').removeClass('active-stat');
+            $('#filter-type').val('');
+        } else {
+            if (!$('#filter-type').val() || $('#filter-type').val() == 'total' || !$('.stat-filter-card.active-stat').length) {
+                $('.stat-filter-card').removeClass('active-stat');
+                $('[data-type="total"]').addClass('active-stat');
+                $('#filter-type').val('total');
+            }
+        }
+
+        $('#filter-appointment-date').val(val);
+        $('#table-advance-appointments').DataTable().ajax.reload();
+    });
+
+    $(document).on('click', '.stat-filter-card', function() {
+        $('.stat-filter-card').removeClass('active-stat');
+        $(this).addClass('active-stat');
+        let type = $(this).data('type');
+        $('#filter-type').val(type);
+        
+        // Reset custom date filter when switching to predefined stats
+        if (typeof mainDateFilter !== 'undefined' && mainDateFilter) {
+            isInternalChange = true;
+            mainDateFilter.clear();
+            setTimeout(() => { isInternalChange = false; }, 50);
+        }
+        $('#filter-appointment-date').val('');
+
+        // Handle Status Filtering: Always reset status unless it's a specific status card
+        if ($(this).data('is-status')) {
+            $('#filter-status').val(type);
+        } else {
+            $('#filter-status').val(''); 
+        }
+        // Reload Table
+        $('#table-advance-appointments').DataTable().ajax.reload();
+    });
+
+    // Dropdown Filter Buttons
+    $(document).on('click', '#btn-apply-filters', function() {
+        $('#table-advance-appointments').DataTable().ajax.reload();
+        $(this).closest('.dropdown-menu').prev('.dropdown-toggle').dropdown('toggle');
+    });
+
+    $(document).on('click', '#btn-reset-filters', function() {
+        // Reset dropdown fields
+        $('#filter-status').val('');
+        $('#filter-appointment-date').val('');
+        $('#filter-appointment-time').val('');
+        $('#filter-created-date').val('');
+        $('#filter-city').val('');
+        
+        // Reset stat cards to total
+        $('.stat-filter-card').removeClass('active-stat');
+        $('[data-type="total"]').addClass('active-stat');
+        $('#filter-type').val('total');
+        
+        // Clear Flatpickr without triggering internal reset
+        if (typeof mainDateFilter !== 'undefined' && mainDateFilter) {
+            isInternalChange = true;
+            mainDateFilter.clear();
+            isInternalChange = false;
+        }
+
+        $('#table-advance-appointments').DataTable().ajax.reload();
+    });
+
+    let searchParams = new URLSearchParams(window.location.search);
+    // Convert legacy 'order' parameter to 'order_no' to avoid DataTables conflict
+    if (searchParams.has('order')) {
+        let val = searchParams.get('order');
+        searchParams.delete('order');
+        searchParams.set('order_no', val);
+    }
+    let queryStr = searchParams.toString();
+    datatable_url = '/getDataAdvanceAppointments' + (queryStr ? '?' + queryStr : '');
+    
+    // Member Selection Logic
+    $(document).on('click', '.member-card', function() {
+        let card = $(this);
+        let id = card.data('id');
+        let select = $('#team_members');
+        
+        card.toggleClass('selected');
+        
+        // Sync with hidden select
+        let option = select.find(`option[value="${id}"]`);
+        if (card.hasClass('selected')) {
+            option.prop('selected', true);
+        } else {
+            option.prop('selected', false);
+        }
+    });
+
+    // Search Filtering
+    $(document).on('keyup', '#memberSearch', function() {
+        let value = $(this).val().toLowerCase();
+        $('.member-card').each(function() {
+            let name = $(this).data('name');
+            if (name.includes(value)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+
+    $(document).on('click', '.assign-member', function() {
+        // Reset selections when opening modal
+        $('.member-card').removeClass('selected');
+        $('#team_members').val([]);
+        $('#memberSearch').val('');
+        $('.member-card').show();
+        
+        const value_id = $(this).data('id');
+        const currentMembers = $(this).data('members'); // Comma-separated IDs
+
+        if (currentMembers) {
+            const memberIds = currentMembers.toString().split(',');
+            memberIds.forEach(id => {
+                $(`.member-card[data-id="${id}"]`).addClass('selected');
+                $(`#team_members option[value="${id}"]`).prop('selected', true);
+            });
+        }
+
+        $('#value_id').val(value_id);
+        $("#c-assignModal").addClass("show");
+    });
+
+    $.extend(true, $.fn.dataTable.defaults, {
+        pageLength: 25,
+        lengthMenu: [
+            [10, 25, 50, 100, 200, -1],
+            [10, 25, 50, 100, 200, "All"]
+        ],
+        columns: [{
+                data: null,
+                name: 'id',
+                render: function(data, type, row, meta) {
+                    return meta.row + 1;
+                }
+            },
+            // {
+            //     data: 'service_category_name',
+            //     name: 'service_category_name'
+            // },
+            // {
+            //     data: 'service_name',
+            //     name: 'service_name'
+            // },
+            {
+                data: 'order_number',
+                name: 'order_number'
+            },
+            {
+                data: 'first_name',
+                name: 'first_name'
+            },
+            // {
+            //     data: 'last_name',
+            //     name: 'last_name'
+            // },
+            {
+                data: 'phone',
+                name: 'phone'
+            },
+            {
+                data: 'schedule',
+                name: 'appointment_date'
+            },
+            {
+                data: 'assigned_to_name',
+                name: 'assigned_to_name'
+            },
+            {
+                data: 'grand_total',
+                name: 'grand_total'
+            },
+            {
+                data: 'company_amount',
+                name: 'company_amount'
+            },
+            {
+                data: 'payment_type',
+                name: 'payment_type',
+                orderable: false
+            },
+            {
+                data: 'user_payment_status',
+                name: 'user_payment_status'
+            },
+            {
+                data: 'beautician_payment_status',
+                name: 'beautician_payment_status'
+            },
+            {
+                data: 'status',
+                name: 'status'
+            },
+            {
+                data: 'action',
+                name: 'action',
+                orderable: false
+            },
+        ],
+    });
+
+    $(document).on('click', '#btn-export-data', function() {
+        let month = $('#global-month-filter').val();
+        let year = $('#global-year-filter').val();
+        let exportUrl = "{{ route('admin.advance-appointments.export') }}?month=" + month + "&year=" + year;
+        window.location.href = exportUrl;
+    });
+
+    $(document).on('click', '#saveMembers', function() {
+        let selected = $('#team_members').val();
+        let value_id = $('#value_id').val();
+
+        $.ajax({
+            url: 'advance-appointments/assign_member',
+            method: 'POST',
+            data: {
+                value_id: value_id,
+                members: selected
+            },
+            success: function(res) {
+                location.reload();
+                $('#c-assignModal').removeClass("show");
+            }
+        });
+    });
+
+    $(document).on("click", "[data-c-close]", function() {
+        $("#c-assignModal").removeClass("show");
+    });
+
+    let currentAppointmentData = null
+
+    $(document).on('click', '.btn-view', function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+
+        $("#c-viewAppointmentModal").addClass("show");
+        $("#c-appointment-details").html(
+            `<div class="c-loader"><div class="c-spinner"></div><span>Loading...</span></div>`
+        );
+
+        $.ajax({
+            url: '/admin/advance-appointments-view/' + id,
+            type: 'GET',
+            success: function(response) {
+
+                let data = response.data;
+                currentAppointmentData = data;
+
+                let client = data.client || {};
+                let appointment = data.appointment || {};
+                let services = data.services || [];
+                let summary = data.summary || {};
+
+                let servicesHtml = '';
+
+                if (services.length > 0) {
+                    servicesHtml = `
+                        <div class="detail-section-label mt-4">
+                            <i class="bi bi-layers-half"></i> Service Inventory
+                        </div>
+                        <div class="premium-table-container">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">#</th>
+                                        <th>Name</th>
+                                        <th style="text-align: right;">Price</th>
+                                        <th style="text-align: center;">Qty</th>
+                                        <th style="text-align: right;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    services.forEach((s, index) => {
+                        servicesHtml += `
+                            <tr>
+                                <td style="text-align: center; color: #82868b;">${index + 1}</td>
+                                <td style="font-weight: 700; color: #1e293b;">
+                                    ${s.name ?? '-'}
+                                    <div style="font-size: 0.75rem; color: #82868b; text-transform: capitalize; font-weight: 500;">${s.type ?? 'Standard'}</div>
+                                </td>
+                                <td style="text-align: right; font-weight: 600;">₹${parseFloat(s.price).toFixed(2)}</td>
+                                <td style="text-align: center; font-weight: 600;">${s.qty}</td>
+                                <td style="text-align: right; font-weight: 800; color: #7367f0; font-size: 1rem;">
+                                    ₹${parseFloat(s.total).toFixed(2)}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    servicesHtml += `</tbody></table></div>`;
+                }
+
+                $("#c-appointment-details").html(`
+                    <div class="row align-items-stretch">
+                        <!-- Client Contact Card -->
+                        <div class="col-md-4 mb-3 d-flex flex-column">
+                            <div class="detail-section-label">
+                                <i class="bi bi-person-circle"></i> Client Information
+                            </div>
+                            <div class="detail-info-card" style="flex: 1;">
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-person"></i></div>
+                                    <div class="info-content">
+                                        <label>Full Name</label>
+                                        <p>${client.first_name ?? '-'} ${client.last_name ?? ''}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-envelope"></i></div>
+                                    <div class="info-content">
+                                        <label>Email Address</label>
+                                        <p>${client.email ?? 'Not provided'}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon"><i class="bi bi-telephone"></i></div>
+                                    <div class="info-content">
+                                        <label>Phone Number</label>
+                                        <p>${client.phone ?? 'Not provided'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Schedule & Location Card -->
+                        <div class="col-md-4 mb-3 d-flex flex-column">
+                            <div class="detail-section-label">
+                                <i class="bi bi-geo-alt-fill"></i> Schedule & Logistics
+                            </div>
+                            <div class="detail-info-card" style="border-left: 4px solid #7367f0; flex: 1;">
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(115, 103, 240, 0.2);"><i class="bi bi-calendar-check"></i></div>
+                                    <div class="info-content">
+                                        <label>Appointment Date</label>
+                                        <p>${appointment.date ?? '-'}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(115, 103, 240, 0.2);"><i class="bi bi-clock-history"></i></div>
+                                    <div class="info-content">
+                                        <label>Reserved Time</label>
+                                        <p>${appointment.time ?? '-'}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(115, 103, 240, 0.2);"><i class="bi bi-geo"></i></div>
+                                    <div class="info-content">
+                                        <label>Service Location</label>
+                                        <p>${appointment.address ?? 'On-site'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial & Payment Card -->
+                        <div class="col-md-4 mb-3 d-flex flex-column">
+                            <div class="detail-section-label" style="color: #059669;">
+                                <i class="bi bi-wallet2"></i> Payment Details
+                            </div>
+                            <div class="detail-info-card" style="border-left: 4px solid #10b981; flex: 1; background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);">
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(16, 185, 129, 0.15);"><i class="bi bi-credit-card-2-front" style="color:#059669;"></i></div>
+                                    <div class="info-content">
+                                        <label>Payment Method</label>
+                                        <p style="text-transform: capitalize; font-weight:700; color: #065f46;">${data.payment_type ?? 'N/A'}</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon" style="background: rgba(16, 185, 129, 0.15);"><i class="bi bi-patch-check" style="color:#059669;"></i></div>
+                                    <div class="info-content">
+                                        <label>User Status</label>
+                                        <p style="text-transform: capitalize; color: ${data.user_payment_status == 'paid' ? '#10b981' : (data.user_payment_status == 'failed' ? '#ef4444' : '#f59e0b')}; font-weight:800; display:flex; align-items:center; gap:4px;">
+                                            ${data.user_payment_status == 'paid' ? '<i class="bi bi-check-circle-fill"></i> ' : (data.user_payment_status == 'failed' ? '<i class="bi bi-x-circle-fill"></i> ' : '<i class="bi bi-clock-fill"></i> ')} 
+                                            ${data.user_payment_status ?? 'Pending'}
+                                        </p>
+                                    </div>
+                                </div>
+                                ${data.wallet_used > 0 ? `
+                                <div class="info-item" style="margin-top: auto;">
+                                    <div class="info-icon" style="background: rgba(16, 185, 129, 0.15);"><i class="bi bi-coin" style="color:#059669;"></i></div>
+                                    <div class="info-content">
+                                        <label>Wallet Used / Bal.</label>
+                                        <p style="font-weight:700; color:#059669;">₹${parseFloat(data.wallet_used).toFixed(2)} / ₹${parseFloat(data.wallet_balance).toFixed(2)}</p>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                ${data.coupon_code ? `
+                                <div class="info-item" style="margin-top: auto;">
+                                    <div class="info-icon" style="background: rgba(16, 185, 129, 0.15);"><i class="bi bi-ticket-perforated" style="color:#059669;"></i></div>
+                                    <div class="info-content">
+                                        <label>Coupon Applied</label>
+                                        <p style="color:#059669; font-weight:800;">${data.coupon_code}</p>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${servicesHtml}
+
+                    <div class="summary-box">
+                        <div class="summary-line">
+                            <span>Subtotal</span>
+                            <span style="font-weight: 700; color: #1e293b;">₹${parseFloat(summary.sub_total || 0).toFixed(2)}</span>
+                        </div>
+                        <div class="summary-line">
+                            <span>Traveling Charges</span>
+                            <span style="font-weight: 700; color: #1e293b;">+ ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}</span>
+                        </div>
+                        <div class="summary-line" style="background: #f0edff; margin: 0 -10px 10px; padding: 10px; border-radius: 8px;">
+                            <span style="font-weight: 700;">Company Amount</span>
+                            <span style="font-weight: 800; color: #7367f0;">₹${parseFloat(data.company_amount || 0).toFixed(2)}</span>
+                        </div>
+                        ${parseFloat(summary.discount_amount || 0) > 0 ? `
+                        <div class="summary-line text-danger">
+                            <span style="font-weight: 600;">Discount ${data.coupon_code ? '('+data.coupon_code+')' : (summary.discount_percent > 0 ? '(' + summary.discount_percent + '%)' : '')}</span>
+                            <span style="font-weight: 700;">- ₹${parseFloat(summary.discount_amount || 0).toFixed(2)}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${parseFloat(data.wallet_used || 0) > 0 ? `
+                        <div class="summary-line text-danger">
+                            <span style="font-weight: 600;">Wallet Deducted</span>
+                            <span style="font-weight: 700;">- ₹${parseFloat(data.wallet_used || 0).toFixed(2)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="summary-line summary-total">
+                            <span>Grand Total</span>
+                            <span>₹${parseFloat(summary.grand_total || 0).toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3" style="background: #fff8eb; border-radius: 12px; border: 1px solid #ffe5b4; box-shadow: 0 4px 12px rgba(255, 159, 67, 0.08);">
+                        <div class="detail-section-label" style="color: #ff9f43; margin-bottom: 8px;">
+                            <i class="bi bi-sticky"></i> Special Instructions
+                        </div>
+                        <p style="margin:0; font-size: 0.95rem; color: #1e293b; font-weight: 600; font-style: italic; line-height: 1.5;">
+                            ${data.special_notes ?? 'No special instructions provided for this appointment.'}
+                        </p>
+                    </div>
+                `);
+
+                // Update copy button text
+                $("#copyAppointmentData").html('<i class="bi bi-clipboard2-check"></i> <span>Copy for Client</span>');
+                $("#copyForBeautician").html('<i class="bi bi-person-badge"></i> <span>Copy for Beautician</span>');
+            },
+            error: function() {
+                $("#c-appointment-details").html(
+                    `<div class="text-center py-5 text-danger"><i class="bi bi-exclamation-triangle fs-1"></i><p>Failed to load data</p></div>`
+                );
+            }
+        });
+    });
+
+    $(document).on('click', '#copyAppointmentData', function() {
+        if (!currentAppointmentData) return;
+
+        let d = currentAppointmentData;
+        let client = d.client || {};
+        let appointment = d.appointment || {};
+        let summary = d.summary || {};
+        let services = d.services || [];
+
+        let text = `Hello ${client.first_name}! 👋\n\n`;
+        text += `Your appointment with BeautyDen has been successfully booked. 💖\n\n`;
+        
+        text += `📋 Appointment Details\n`;
+        text += `---------------------------------\n`;
+        text += `Order: ${d.order_number}\n`;
+        text += `Customer: ${client.first_name} ${client.last_name || ''}\n`;
+        text += `Phone: ${client.phone}\n`;
+        text += `City: ${d.city_name || 'Ahmedabad'}\n`;
+        text += `Date: ${appointment.date}\n`;
+        text += `Time: ${appointment.time}\n`;
+        text += `Address: ${appointment.address}\n\n`;
+
+        text += `🛍 Services:\n`;
+        text += `---------------------------------\n`;
+        services.forEach((s) => {
+            text += `${s.name} (${s.qty} x ₹${parseFloat(s.price).toFixed(0)}) = ₹${parseFloat(s.total).toFixed(0)}\n`;
+        });
+        text += `---------------------------------\n`;
+        
+        text += `Subtotal: ₹${parseFloat(summary.sub_total || 0).toFixed(2)}\n`;
+        if (parseFloat(summary.discount_amount || 0) > 0) {
+            let desc = summary.coupon_code ? ` (${summary.coupon_code})` : (summary.discount_percent > 0 ? ` (${summary.discount_percent}%)` : ``);
+            text += `Discount${desc}: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
+        }
+        text += `Travel Charges: + ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}\n`;
+        text += `Grand Total: ₹${parseFloat(summary.grand_total || 0).toFixed(2)}\n\n`;
+
+        text += `We’ll review your booking and confirm shortly.\n`;
+        text += `Thank you for choosing BeautyDen 💖\n\n`;
+        text += `📞 Support: +91 95747 58282`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            let btn = $('#copyAppointmentData');
+            btn.html('<i class="bi bi-check-circle"></i> Copied');
+            btn.css('background', '#28a745');
+
+            setTimeout(() => {
+                btn.html('<i class="bi bi-clipboard2-check"></i> <span>Copy for Client</span>');
+                btn.css('background', 'rgba(255,255,255,0.15)');
+            }, 2000);
+        });
+    });
+
+    $(document).on('click', '#copyForBeautician', function() {
+        if (!currentAppointmentData) return;
+
+        let d = currentAppointmentData;
+        let client = d.client || {};
+        let appointment = d.appointment || {};
+        let summary = d.summary || {};
+        let services = d.services || [];
+
+        let text = `*New Appointment Assignment* 💇‍♀️\n\n`;
+        
+        text += `📋 Appointment Details\n`;
+        text += `---------------------------------\n`;
+        text += `Order: ${d.order_number}\n`;
+        text += `Customer: ${client.first_name} ${client.last_name || ''}\n`;
+        text += `Phone: ${client.phone}\n`;
+        text += `City: ${d.city_name || 'Ahmedabad'}\n`;
+        text += `Date: ${appointment.date}\n`;
+        text += `Time: ${appointment.time}\n`;
+        text += `Address: ${appointment.address}\n\n`;
+
+        text += `🛍 Services:\n`;
+        text += `---------------------------------\n`;
+        services.forEach((s) => {
+            text += `${s.name} (${s.qty} x ₹${parseFloat(s.price).toFixed(0)}) = ₹${parseFloat(s.total).toFixed(0)}\n`;
+        });
+        text += `---------------------------------\n`;
+        
+        text += `Subtotal: ₹${parseFloat(summary.sub_total || 0).toFixed(2)}\n`;
+        if (parseFloat(summary.discount_amount || 0) > 0) {
+            let desc = summary.coupon_code ? ` (${summary.coupon_code})` : (summary.discount_percent > 0 ? ` (${summary.discount_percent}%)` : ``);
+            text += `Discount${desc}: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
+        }
+        text += `Travel Charges: + ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}\n`;
+        text += `Grand Total: ₹${parseFloat(summary.grand_total || 0).toFixed(2)}\n\n`;
+
+        text += `⚠️ *Important Instructions:*\n`;
+        text += `• Use hygienic and original products only\n`;
+        text += `• Maintain proper cleanliness and kit hygiene\n`;
+        text += `• Do not share personal contact number with client\n`;
+        text += `• Follow all BeautyDen service guidelines\n`;
+        text += `• Please arrive at the customer's location on time as per the scheduled appointment\n\n`;
+        
+        text += `Best of luck for the service! 💖`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            let btn = $('#copyForBeautician');
+            btn.html('<i class="bi bi-check-circle"></i> Copied');
+            btn.css('background', '#28a745');
+
+            setTimeout(() => {
+                btn.html('<i class="bi bi-person-badge"></i> <span>Copy for Beautician</span>');
+                btn.css('background', 'rgba(255,255,255,0.15)');
+            }, 2000);
+        });
+    });
+
+
+
+
+    $(document).on("click", "[data-c-close]", function() {
+        $("#c-viewAppointmentModal").removeClass("show");
+    });
+
+    // Inline edit for Company Amount
+    $(document).on('click', '.amount-display', function() {
+        let wrapper = $(this).closest('.editable-amount-wrapper');
+        $(this).addClass('d-none');
+        wrapper.find('.amount-input').removeClass('d-none').focus();
+    });
+
+    $(document).on('blur', '.amount-input', function() {
+        saveInlineAmount($(this));
+    });
+
+    $(document).on('keypress', '.amount-input', function(e) {
+        if (e.which == 13) {
+            $(this).blur();
+        }
+    });
+
+    function saveInlineAmount(input) {
+        let wrapper = input.closest('.editable-amount-wrapper');
+        let id = wrapper.data('id');
+        let amount = input.val();
+        let display = wrapper.find('.amount-display');
+
+        if (input.hasClass('updating')) return;
+        input.addClass('updating');
+
+        $.ajax({
+            url: '{{ route("admin.advance-appointments.updateAmount") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: id,
+                amount: amount
+            },
+            success: function(response) {
+                if (response.success) {
+                    display.text(response.formatted_amount);
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+                input.addClass('d-none').removeClass('updating');
+                display.removeClass('d-none');
+            },
+            error: function(xhr) {
+                toastr.error('Failed to update amount');
+                input.addClass('d-none').removeClass('updating');
+                display.removeClass('d-none');
+            }
+        });
+    }
+
+    // Payment Type Badge click - open popup modal
+    let selectedPaymentType = null;
+
+    $(document).on('click', '.badge-payment-type', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        selectedPaymentType = null;
+        const appointmentId = $(this).data('id');
+        const currentType = $(this).data('type');
+        $('#paymentTypeAppointmentId').val(appointmentId);
+        // Reset selections
+        $('.payment-opt').css({'border-color':'#e2e8f0','background':'#fff'});
+        $('.payment-opt[data-value="cash"] > div:first-child').css('background','#f0fdf4');
+        $('.payment-opt[data-value="online"] > div:first-child').css('background','#eff6ff');
+        // Pre-select current
+        const $current = $('.payment-opt[data-value="' + currentType + '"]');
+        $current.css({'border-color': currentType === 'cash' ? '#16a34a' : '#2563eb','background': currentType === 'cash' ? '#f0fdf4' : '#eff6ff'});
+        selectedPaymentType = currentType;
+        $('#savePaymentTypeBtn').css({'opacity':'1','pointer-events':'auto'});
+        // Show modal
+        $('#paymentTypeModal').css('display','flex');
+    });
+
+    $(document).on('click', '.payment-opt', function() {
+        selectedPaymentType = $(this).data('value');
+        $('.payment-opt').css({'border-color':'#e2e8f0','background':'#fff'});
+        $('.payment-opt[data-value="cash"] > div:first-child').css('background','#f0fdf4');
+        $('.payment-opt[data-value="online"] > div:first-child').css('background','#eff6ff');
+        if (selectedPaymentType === 'cash') {
+            $(this).css({'border-color':'#16a34a','background':'#f0fdf4'});
+        } else {
+            $(this).css({'border-color':'#2563eb','background':'#eff6ff'});
+        }
+        $('#savePaymentTypeBtn').css({'opacity':'1','pointer-events':'auto'});
+    });
+
+    $('#cancelPaymentTypeModal, #paymentTypeBackdrop').on('click', function() {
+        $('#paymentTypeModal').css('display','none');
+        selectedPaymentType = null;
+    });
+
+    $('#savePaymentTypeBtn').on('click', function() {
+        if (!selectedPaymentType) return;
+        const appointmentId = $('#paymentTypeAppointmentId').val();
+        $.ajax({
+            url: '{{ route("admin.advance-appointments.updatePaymentType") }}',
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: appointmentId,
+                payment_type: selectedPaymentType
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    $('#table-advance-appointments').DataTable().ajax.reload(false);
+                } else {
+                    toastr.error(response.message);
+                }
+                $('#paymentTypeModal').css('display','none');
+                selectedPaymentType = null;
+            },
+            error: function() {
+                toastr.error('Failed to update payment type');
+                $('#paymentTypeModal').css('display','none');
+            }
+        });
+    });
+
+    // Row click to open view modal
+    $('#table-advance-appointments tbody').on('click', 'tr', function (e) {
+        // Don't trigger if clicking on action items or inputs
+        if ($(e.target).closest('.dropdown, .amount-input, .amount-display, .badge-payment-type, button, a').length) {
+            return;
+        }
+        
+        // Find the view button in this row and trigger it
+        let viewBtn = $(this).find('.btn-view');
+        if (viewBtn.length) {
+            viewBtn.click();
+        } else {
+            // Fallback for DataTables data-driven access
+            let data = $('#table-advance-appointments').DataTable().row(this).data();
+            if (data && data.id) {
+                // If it's a manual click without the btn-view in DOM (rare in DT)
+                viewAppointment(data.id);
+            }
+        }
+    });
+
+    $(document).on('click', '.btn-view-appointment-review', function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+
+        $("#c-viewReviewModal").addClass("show");
+        $("#c-appointment-review-details").html(
+            `<div class="c-loader"><div class="c-spinner"></div><span>Loading Review...</span></div>`
+        );
+
+        $.ajax({
+            url: "{{ url('admin/advance-appointments-review-view') }}/" + id,
+            method: 'GET',
+            success: function(response) {
+                let data = response.data;
+                
+                let categoriesHtml = data.category_ratings.map(cat => `
+                    <div class="info-item" style="padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
+                        <div class="info-icon" style="background: rgba(115, 103, 240, 0.2);"><i class="bi bi-tags"></i></div>
+                        <div class="info-content" style="flex:1; display:flex; justify-content:space-between; align-items:center;">
+                            <label style="margin:0;">${cat.category_name}</label>
+                            <div style="font-weight: 800; color: #111827;">
+                                ${cat.rating} <i class="bi bi-star-fill text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                let html = `
+                    <div class="row">
+                        <!-- Overall Feedback Card -->
+                        <div class="col-md-6 mb-3">
+                            <div class="detail-section-label">
+                                <i class="bi bi-chat-quote-fill"></i> Overall Feedback
+                            </div>
+                            <div class="detail-info-card" style="border-left: 4px solid #7367f0; height: 100%;">
+                                <div style="display:flex; align-items:center; margin-bottom: 15px;">
+                                    <h2 style="margin: 0; font-weight: 800; color: #111827; margin-right: 15px; font-size: 2.5rem;">${data.overall_rating} <span style="font-size: 1rem; color: #9ca3af;">/ 5</span></h2>
+                                    <div>
+                                        ${[...Array(5)].map((_, i) => `<i class="bi bi-star-fill" style="color: ${i < data.overall_rating ? '#fbbf24' : '#e5e7eb'}; font-size: 1.2rem; margin-right: 2px;"></i>`).join('')}
+                                    </div>
+                                </div>
+                                <div style="font-size: 0.95rem; color: #374151; font-style: italic; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                    "${data.review ?? 'No written feedback provided.'}"
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category Ratings Card -->
+                        <div class="col-md-6 mb-3">
+                            <div class="detail-section-label">
+                                <i class="bi bi-ui-checks"></i> Category Ratings
+                            </div>
+                            <div class="detail-info-card" style="height: 100%;">
+                                ${categoriesHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (data.photos && data.photos.length > 0) {
+                    html += `
+                        <div class="detail-section-label mt-3">
+                            <i class="bi bi-images"></i> Customer Photos
+                        </div>
+                        <div class="detail-info-card d-flex flex-wrap" style="gap: 15px;">
+                            ${data.photos.map(photo => `
+                                <div style="border: 2px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#7367f0'" onmouseout="this.style.borderColor='#e2e8f0'" onclick="window.open('${photo}', '_blank')">
+                                    <img src="${photo}" style="width: 110px; height: 110px; object-fit: cover;">
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                $("#c-appointment-review-details").html(html);
+            },
+            error: function(xhr) {
+                let msg = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'Failed to load review data.';
+                $("#c-appointment-review-details").html(
+                    `<div class="text-center py-5 text-danger"><i class="bi bi-exclamation-circle fs-1 mb-2"></i><p>${msg}</p></div>`
+                );
+            }
+        });
+    });
+
+    $(document).on("click", "[data-c-close-review]", function() {
+        $("#c-viewReviewModal").removeClass("show");
+    });
+
+    function viewAppointment(id) {
+        $.ajax({
+            url: "{{ url('admin/advance-appointments-view') }}/" + id,
+            method: 'GET',
+            success: function(response) {
+                renderAppointmentDetail(response.data);
+                $("#c-viewAppointmentModal").addClass("show");
+            }
+        });
+    }
+</script>
+<script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
+<script>
+$(document).ready(function() {
+    let urlParams = new URLSearchParams(window.location.search);
+    let phoneParam = urlParams.get('phone');
+    if (phoneParam) {
+        let dtCheckInterval = setInterval(function() {
+            if ($.fn.DataTable.isDataTable('#table-advance-appointments')) {
+                clearInterval(dtCheckInterval);
+                let dt = $('#table-advance-appointments').DataTable();
+                // Column index 3 is Phone
+                let searchInput = $('.dt-column-search thead tr:eq(1) th:eq(3) input');
+                if (searchInput.length) {
+                    searchInput.val(phoneParam).trigger('keyup');
+                } else {
+                    dt.column(3).search(phoneParam).draw();
+                }
+            }
+        }, 200);
+    }
+
+    // Robust fix for dropdown cutoff: append to body
+    $(document).on('show.bs.dropdown', '.card-datatable .dropdown', function (e) {
+        var $dropdownMenu = $(this).find('.dropdown-menu');
+        
+        // Generate a unique ID to link them back
+        var id = 'dt-dropdown-' + new Date().getTime();
+        $(this).attr('data-dropdown-id', id);
+        $dropdownMenu.attr('data-dropdown-id', id);
+        
+        // Append to body to break out of overflow:hidden
+        $('body').append($dropdownMenu.detach());
+        
+        // Calculate position relative to document
+        var eOffset = $(this).offset();
+        // Since it's dropdown-menu-end, we align the right edge
+        $dropdownMenu.css({
+            'display': 'block',
+            'position': 'absolute',
+            'top': eOffset.top + $(this).outerHeight() + 'px',
+            'left': (eOffset.left + $(this).outerWidth() - $dropdownMenu.outerWidth()) + 'px',
+            'z-index': 9999
+        });
+    });
+
+    $(document).on('hide.bs.dropdown', '.card-datatable .dropdown', function (e) {
+        var id = $(this).attr('data-dropdown-id');
+        var $dropdownMenu = $('body').children('.dropdown-menu[data-dropdown-id="' + id + '"]');
+        
+        // Reset CSS and put it back
+        $dropdownMenu.css({
+            'display': '',
+            'position': '',
+            'top': '',
+            'left': '',
+            'z-index': ''
+        });
+        
+        $(this).append($dropdownMenu.detach());
+    });
+    $(document).on('click', '.status-change-user, .status-change-beautician', function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+        let status = $(this).data('status');
+        let type = $(this).hasClass('status-change-user') ? 'user' : 'beautician';
+        
+        let label = type == 'user' ? 'User Payment Status' : 'Beautician Payment Status';
+
+        Swal.fire({
+            title: `Change ${label}?`,
+            text: `Are you sure you want to change it to ${status}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, change it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("admin.advance-appointments.updatePaymentStatus") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id,
+                        status: status,
+                        type: type
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Updated!', response.message, 'success');
+                            $('#table-advance-appointments').DataTable().ajax.reload(null, false);
+                        } else {
+                            Swal.fire('Error!', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error!', 'Something went wrong!', 'error');
+                    }
+                });
+            }
+        });
+    });
+    
+    $(document).on('click', '.copy-order-btn', function(e) {
+        e.preventDefault();
+        let orderNum = $(this).data('order');
+        navigator.clipboard.writeText(orderNum).then(() => {
+            toastr.success('Copied: ' + orderNum);
+        }).catch(() => {
+            toastr.error('Failed to copy');
+        });
+    });
+
+});
+</script>
+@endsection

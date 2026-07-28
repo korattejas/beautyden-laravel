@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdvanceAppointmentsController;
 use App\Http\Controllers\Admin\AppointmentsController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogController;
@@ -406,6 +407,25 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('get-city-services/{cityId}', [AppointmentsController::class, 'getCityServices']);
 
 
+        /* Advance Appointments Route */
+        Route::get('advance-appointments', [AdvanceAppointmentsController::class, 'index'])->name('admin.advance-appointments.index');
+        Route::get('advance-appointments/export', [AdvanceAppointmentsController::class, 'export'])->name('admin.advance-appointments.export');
+        Route::get('advance-appointments/create', [AdvanceAppointmentsController::class, 'create'])->name('admin.advance-appointments.create');
+        Route::post('advance-appointments/store', [AdvanceAppointmentsController::class, 'store']);
+        Route::get('advance-appointments/edit/{id}', [AdvanceAppointmentsController::class, 'edit'])->name('admin.advance-appointments.edit');
+        Route::get('getDataAdvanceAppointments', [AdvanceAppointmentsController::class, 'getDataAppointments'])->name('getDataAdvanceAppointments');
+        Route::get('advance-appointments/status/{id}/{status}', [AdvanceAppointmentsController::class, 'changeStatus']);
+        Route::delete('advance-appointments/{id}', [AdvanceAppointmentsController::class, 'destroy']);
+        Route::post('advance-appointments/assign_member', [AdvanceAppointmentsController::class, 'AssignMember'])->name('assign.advance.members');
+        Route::post('advance-appointments/update-amount', [AdvanceAppointmentsController::class, 'updateAmount'])->name('admin.advance-appointments.updateAmount');
+        Route::post('advance-appointments/update-payment-type', [AdvanceAppointmentsController::class, 'updatePaymentType'])->name('admin.advance-appointments.updatePaymentType');
+        Route::post('advance-appointments/update-payment-status', [AdvanceAppointmentsController::class, 'updatePaymentStatus'])->name('admin.advance-appointments.updatePaymentStatus');
+        Route::get('advance-appointments-view/{id}', [AdvanceAppointmentsController::class, 'view']);
+        Route::get('advance-appointments-review-view/{id}', [AdvanceAppointmentsController::class, 'viewReview']);
+        Route::get('advance-appointments/get-appoinmentSubcategories/{categoryId}', [AdvanceAppointmentsController::class, 'getSubcategories']);
+        Route::get('advance-appointments/{id}/pdf', [AdvanceAppointmentsController::class, 'downloadPdf'])
+            ->name('admin.advance-appointments.pdf');
+        Route::get('get-advance-city-services/{cityId}', [AdvanceAppointmentsController::class, 'getCityServices']);
 
         /* Policies Route */
         Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');

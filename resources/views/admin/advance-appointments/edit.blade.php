@@ -12,15 +12,16 @@
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper">
-        @include('admin.layouts.crud-header', [
-            'title' => 'Edit Appointment',
-            'subtitle' => 'Update booking details, services and pricing',
-            'items' => [
-                ['label' => 'Home', 'url' => route('admin.dashboard')],
-                ['label' => 'Appointments', 'url' => route('admin.appointments.index')],
-                ['label' => 'Edit Appointment'],
-            ],
-        ])
+        <div class="pa-catalog-toolbar" style="margin-top:1rem;margin-left:1.5rem;margin-right:1.5rem;">
+            <div>
+                <h2>Edit Advance Appointment</h2>
+                <p>Update booking details, services and pricing</p>
+            </div>
+            <div class="pa-catalog-toolbar-actions">
+                <a href="{{ route('admin.advance-appointments.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" form="addEditForm" class="btn btn-primary" id="submitBtn">Update Appointment</button>
+            </div>
+        </div>
 
         <div class="content-body">
             <section class="horizontal-wizard">
@@ -42,7 +43,7 @@
                                     <input type="hidden" name="sub_total" id="hidden_subtotal">
                                     <input type="hidden" name="grand_total" id="hidden_grandtotal">
 
-                                    <div class="row g-3">
+                                    <div class="row gy-2 gx-3">
                                         <div class="col-md-6">
                                             <div class="pa-form-field">
                                                 <label for="first_name">First Name</label>
@@ -122,7 +123,7 @@
                                                     <span>Discount</span>
                                                     <span>- ₹ <span id="discountAmount">0.00</span></span>
                                                 </div>
-
+                                                
                                                 <div id="walletRow" style="display:none;justify-content:space-between;margin-bottom:8px;color:#ea5455;">
                                                     <span>Wallet Used</span>
                                                     <span>- ₹ <span id="walletUsedAmount">0.00</span></span>
@@ -153,10 +154,10 @@
                                                 </label>
                                             </div>
                                             <div id="customSection" class="pa-custom-service-box" style="display:none;">
-                                                <div class="d-flex gap-2 flex-wrap">
-                                                    <input type="text" id="customName" class="form-control flex-grow-1" placeholder="Service Name" style="min-width:200px;">
-                                                    <input type="number" id="customPrice" class="form-control" placeholder="Price" style="max-width:140px;">
-                                                    <button type="button" id="addCustomBtn" class="btn btn-primary">Add</button>
+                                                <div class="d-flex gap-2 align-items-center flex-nowrap">
+                                                    <input type="text" id="customName" class="form-control flex-grow-1" placeholder="Service Name">
+                                                    <input type="number" id="customPrice" class="form-control" placeholder="Price" style="max-width:120px;">
+                                                    <button type="button" id="addCustomBtn" class="btn btn-primary" style="white-space:nowrap;">Add</button>
                                                 </div>
                                                 <div id="customList" class="row mt-3"></div>
                                             </div>
@@ -181,12 +182,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-12 pa-form-actions">
-                                            <button type="submit" class="pa-btn pa-btn-primary">
-                                                <i class="bi bi-check2"></i> Update Appointment
-                                            </button>
-                                            <a href="{{ route('admin.appointments.index') }}" class="pa-btn pa-btn-outline">Cancel</a>
-                                        </div>
+
                                     </div>
                                 </form>
                             </div>
@@ -201,8 +197,8 @@
 
 @section('footer_script_content')
 <script>
-    var form_url = 'appointments/store';
-    var redirect_url = 'appointments';
+    var form_url = 'advance-appointments/store';
+    var redirect_url = 'advance-appointments';
     $(document).ready(function() {
         let savedData = @json($appointment->services_data);
         if (typeof savedData === 'string') savedData = JSON.parse(savedData);
@@ -223,63 +219,190 @@
         // Load Services from Server
         function loadServices(cityId, isFirstLoad) {
             if (!cityId) return;
-            $.get('/admin/get-city-services/' + cityId, function(response) {
-                let html = '';
+            $.get('/admin/get-advance-city-services/' + cityId, function(response) {
+                let tabsHtml = `<ul class="nav nav-pills mb-3" role="tablist" style="gap: 10px; overflow-x: auto; flex-wrap: wrap;">`;
+                let contentHtml = `<div class="tab-content">`;
+                let isFirst = true;
+
                 $.each(response, function(catId, cat) {
-                    html += `<div style="margin-bottom:14px;border:1px solid #ddd;border-radius:12px;overflow:hidden;">
-                    <div class="cat-toggle" data-id="cat${catId}" style="padding:14px;background:#f4f4f4;cursor:pointer;font-weight:600;">${cat.name}</div>
-                    <div id="cat${catId}" style="display:none;padding:14px;">`;
+                    let activeClass = isFirst ? 'active' : '';
+                    let activePane = isFirst ? 'show active' : '';
+                    let btnStyle = 'padding: 8px 16px; border: 1px solid #7367f0; border-radius: 8px; font-weight: 600;';
+
+                    tabsHtml += `
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link ${activeClass}" id="cat-tab-${catId}" data-bs-toggle="pill" data-bs-target="#cat-pane-${catId}" type="button" role="tab" style="${btnStyle}">
+                                ${cat.name}
+                            </button>
+                        </li>
+                    `;
+
+                    contentHtml += `
+                        <div class="tab-pane fade ${activePane}" id="cat-pane-${catId}" role="tabpanel">
+                    `;
 
                     if (cat.services) {
-                        html += `<div class="row">`;
+                        contentHtml += `<div class="row">`;
                         $.each(cat.services, function(i, s) {
-                            html += serviceCard(s);
+                            contentHtml += serviceCard(s);
                         });
-                        html += `</div>`;
+                        contentHtml += `</div>`;
                     }
 
                     if (cat.subcategories) {
-                        $.each(cat.subcategories, function(subId, sub) {
-                            html += `<div style="margin-top:10px;border:1px solid #eee;border-radius:10px;">
-                            <div class="sub-toggle" data-id="sub${subId}" style="padding:12px;background:#fafafa;cursor:pointer;font-weight:500;">${sub.name}</div>
-                            <div id="sub${subId}" style="display:none;padding:12px;"><div class="row">`;
-                            $.each(sub.services, function(i, s) {
-                                html += serviceCard(s);
+                        let hasSubcategories = Object.keys(cat.subcategories).length > 0;
+                        if (hasSubcategories) {
+                            let subTabsHtml = `<ul class="nav nav-pills mt-3 mb-3" role="tablist" style="gap: 10px; overflow-x: auto; flex-wrap: wrap;">`;
+                            let subContentHtml = `<div class="tab-content">`;
+                            let isSubFirst = true;
+
+                            $.each(cat.subcategories, function(subId, subCategory) {
+                                let subActiveClass = isSubFirst ? 'active' : '';
+                                let subActivePane = isSubFirst ? 'show active' : '';
+                                let subBtnStyle = 'padding: 6px 14px; border: 1px solid #888; border-radius: 6px; font-weight: 500; font-size: 14px;';
+
+                                subTabsHtml += `
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link ${subActiveClass}" id="sub-tab-${catId}-${subId}" data-bs-toggle="pill" data-bs-target="#sub-pane-${catId}-${subId}" type="button" role="tab" style="${subBtnStyle}">
+                                            ${subCategory.name}
+                                        </button>
+                                    </li>
+                                `;
+
+                                subContentHtml += `
+                                    <div class="tab-pane fade ${subActivePane}" id="sub-pane-${catId}-${subId}" role="tabpanel">
+                                        <div class="row">
+                                `;
+
+                                $.each(subCategory.services, function(i, service) {
+                                    subContentHtml += serviceCard(service);
+                                });
+
+                                subContentHtml += `</div></div>`;
+                                isSubFirst = false;
                             });
-                            html += `</div></div></div>`;
-                        });
+
+                            subTabsHtml += `</ul>`;
+                            subContentHtml += `</div>`;
+                            
+                            contentHtml += subTabsHtml + subContentHtml;
+                        }
                     }
-                    html += `</div></div>`;
+                    contentHtml += `</div>`;
+                    isFirst = false;
                 });
-                $('#dynamicServices').html(html);
+
+                tabsHtml += `</ul>`;
+                contentHtml += `</div>`;
+                $('#dynamicServices').html(tabsHtml + contentHtml);
 
                 if (isFirstLoad && savedData) fillFormFromJSON();
                 else calculateTotal();
             });
         }
 
-        function serviceCard(s) {
-            return `<div class="col-md-6 mb-3">
-            <div class="service-card" data-duration="${s.duration || 0}" style="border:1px solid #e5e5e5;padding:18px;border-radius:14px;background:#fff;transition:0.25s;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-            <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
-                <input type="checkbox" class="service-check" data-name="${s.name}"> ${s.name}
-            </label>
-            <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;">
-                <div>
-                    <div style="font-size:12px;color:#888;">Price</div>
-                    <input type="number" value="${s.price}" class="price" style="width:90px;border:1px solid #ddd;border-radius:8px;padding:6px;font-weight:600;color:#7367f0;background:#f8f7ff;" disabled>
-                </div>
-                <div>
-                    <div style="font-size:12px;color:#888;">Qty</div>
-                    <div style="display:flex;align-items:center;border:1px solid #ddd;border-radius:8px;overflow:hidden;width:110px;background:#fff;">
-                        <button type="button" class="qty-minus" style="width:35px;border:none;background:#f4f4f4;font-size:18px;" disabled>−</button>
-                        <input type="text" value="1" class="qty" style="width:40px;border:none;text-align:center;font-weight:600;" readonly>
-                        <button type="button" class="qty-plus" style="width:35px;border:none;background:#f4f4f4;font-size:18px;" disabled>+</button>
+        function serviceCard(service) {
+            let cardsHtml = '';
+            
+            if (service.has_variants && service.variants && service.variants.length > 0) {
+                // Return a card for EACH variant
+                $.each(service.variants, function(i, v) {
+                    let finalPrice = parseFloat(v.price) || 0;
+                    let discPercent = parseFloat(v.discount_price) || 0;
+                    let mainPrice = finalPrice;
+                    if (discPercent > 0 && discPercent < 100) {
+                        mainPrice = finalPrice / (1 - (discPercent / 100));
+                    } else if (discPercent > 0) {
+                        mainPrice = finalPrice + (finalPrice * discPercent / 100);
+                    }
+                    mainPrice = Math.round(mainPrice);
+
+                    cardsHtml += `
+        <div class="col-md-6 mb-3">
+            <div class="service-card" data-service-id="${service.id}" data-variant-id="${v.id}" data-duration="${v.duration || service.duration || 0}"
+                style="border:1px solid #e5e5e5;padding:18px;border-radius:14px;background:#fff;transition:0.25s;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+
+                <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
+                    <input type="checkbox" class="service-check">
+                    <span class="service-name">${service.name} - ${v.name}</span>
+                </label>
+
+                <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <div>
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Main Price</div>
+                        <input type="number" value="${mainPrice}" class="main-price" style="width:80px;border:1px solid #ddd;border-radius:8px;padding:6px;font-weight:600;color:#555;background:#f4f4f4;" disabled>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Disc (%)</div>
+                        <input type="number" value="${discPercent}" class="discount-percent" style="width:70px;border:1px solid #ddd;border-radius:8px;padding:6px;font-weight:600;color:#555;background:#f4f4f4;" disabled>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Final Price</div>
+                        <input type="number" value="${finalPrice.toFixed(2)}" class="price" style="width:90px;border:1px solid #ddd;border-radius:8px;padding:6px;font-weight:600;color:#7367f0;background:#f8f7ff;" disabled>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Qty</div>
+                        <div style="display:flex;align-items:center;border:1px solid #ddd;border-radius:8px;overflow:hidden;width:90px;background:#fff;">
+                            <button type="button" class="qty-minus" style="width:25px;border:none;background:#f4f4f4;font-size:18px;" disabled>−</button>
+                            <input type="text" value="1" class="qty" style="width:40px;border:none;text-align:center;font-weight:600;" readonly>
+                            <button type="button" class="qty-plus" style="width:25px;border:none;background:#f4f4f4;font-size:18px;" disabled>+</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div></div>`;
+        </div>`;
+                });
+            } else {
+                // Return a card for the service (no variants)
+                let finalPrice = parseFloat(service.price) || 0;
+                let discPercent = parseFloat(service.discount_price) || 0;
+                let mainPrice = finalPrice;
+                if (discPercent > 0 && discPercent < 100) {
+                    mainPrice = finalPrice / (1 - (discPercent / 100));
+                } else if (discPercent > 0) {
+                    mainPrice = finalPrice + (finalPrice * discPercent / 100);
+                }
+                mainPrice = Math.round(mainPrice);
+
+                cardsHtml += `
+        <div class="col-md-6 mb-3">
+            <div class="service-card" data-service-id="${service.id}" data-variant-id="" data-duration="${service.duration || 0}"
+                style="border:1px solid #e5e5e5;padding:18px;border-radius:14px;background:#fff;transition:0.25s;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+
+                <label style="display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer;">
+                    <input type="checkbox" class="service-check">
+                    <span class="service-name">${service.name}</span>
+                </label>
+
+                <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <div>
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Main Price</div>
+                        <input type="number" value="${mainPrice}" class="main-price" style="width:80px;border:1px solid #ddd;border-radius:8px;padding:6px;font-weight:600;color:#555;background:#f4f4f4;" disabled>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Disc (%)</div>
+                        <input type="number" value="${discPercent}" class="discount-percent" style="width:70px;border:1px solid #ddd;border-radius:8px;padding:6px;font-weight:600;color:#555;background:#f4f4f4;" disabled>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Final Price</div>
+                        <input type="number" value="${finalPrice.toFixed(2)}" class="price" style="width:90px;border:1px solid #ddd;border-radius:8px;padding:6px;font-weight:600;color:#7367f0;background:#f8f7ff;" disabled>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:#888;margin-bottom:4px;">Qty</div>
+                        <div style="display:flex;align-items:center;border:1px solid #ddd;border-radius:8px;overflow:hidden;width:90px;background:#fff;">
+                            <button type="button" class="qty-minus" style="width:25px;border:none;background:#f4f4f4;font-size:18px;" disabled>−</button>
+                            <input type="text" value="1" class="qty" style="width:40px;border:none;text-align:center;font-weight:600;" readonly>
+                            <button type="button" class="qty-plus" style="width:25px;border:none;background:#f4f4f4;font-size:18px;" disabled>+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+            }
+            return cardsHtml;
         }
+
+
 
         // FILL DATA FROM JSON
         function fillFormFromJSON() {
@@ -290,10 +413,38 @@
             if (savedData.services) {
                 savedData.services.forEach(item => {
                     if (item.type === "service") {
-                        $('.service-check').each(function() {
-                            if ($(this).data('name') === item.name) {
-                                let card = $(this).closest('.service-card');
-                                $(this).prop('checked', true);
+                        $('.service-card').each(function() {
+                            let card = $(this);
+                            let cardServiceId = parseInt(card.data('service-id'));
+                            let cardVariantId = parseInt(card.data('variant-id')) || null;
+                            let cardName = card.find('.service-name').text().trim();
+
+                            let itemServiceId = item.service_master_id ? parseInt(item.service_master_id) : null;
+                            let itemVariantId = item.variant_id ? parseInt(item.variant_id) : null;
+
+                            let isMatch = false;
+
+                            if (itemServiceId) {
+                                if (cardServiceId === itemServiceId && cardVariantId === itemVariantId) {
+                                    isMatch = true;
+                                }
+                            } else {
+                                let savedServiceIds = "{{ $appointment->service_id }}".split(',').map(id => id.trim());
+                                let itemName = item.name ? item.name.trim() : "";
+                                
+                                if (savedServiceIds.includes(cardServiceId.toString())) {
+                                    if (cardVariantId === null) {
+                                        // No variants
+                                        if (cardName === itemName) isMatch = true;
+                                    } else {
+                                        // Has variants
+                                        if (cardName === itemName || cardName.startsWith(itemName)) isMatch = true;
+                                    }
+                                }
+                            }
+
+                            if (isMatch) {
+                                card.find('.service-check').prop('checked', true);
                                 card.find('.price').val(item.price).prop('disabled', false);
                                 card.find('.qty').val(item.qty);
                                 card.find('.qty-plus, .qty-minus').prop('disabled', false);
@@ -321,7 +472,7 @@
         $(document).on('change', '.service-check', function() {
             let chk = $(this).is(':checked');
             let card = $(this).closest('.service-card');
-            card.find('.price, .qty-plus, .qty-minus').prop('disabled', !chk);
+            card.find('.price, .discount-percent, .qty-plus, .qty-minus').prop('disabled', !chk);
             card.css(chk ? {
                 border: '2px solid #7367f0',
                 background: '#f8f7ff',
@@ -347,6 +498,34 @@
             }
         });
 
+        $(document).on('keyup change', '.price, .main-price, .discount-percent', function() {
+            let card = $(this).closest('.service-card');
+            
+            if ($(this).hasClass('price') || $(this).hasClass('discount-percent')) {
+                // If Final Price or Disc % changes, recalculate Main Price
+                let finalPrice = parseFloat(card.find('.price').val()) || 0;
+                let discPercent = parseFloat(card.find('.discount-percent').val()) || 0;
+                let mainPrice = finalPrice;
+                if (discPercent > 0 && discPercent < 100) {
+                    mainPrice = finalPrice / (1 - (discPercent / 100));
+                } else if (discPercent > 0) {
+                    mainPrice = finalPrice + (finalPrice * discPercent / 100);
+                }
+                card.find('.main-price').val(Math.round(mainPrice));
+            } else if ($(this).hasClass('main-price')) {
+                // If Main Price changes manually, recalculate Final Price
+                let mainPrice = parseFloat(card.find('.main-price').val()) || 0;
+                let discPercent = parseFloat(card.find('.discount-percent').val()) || 0;
+                let finalPrice = mainPrice;
+                if (discPercent > 0) {
+                    finalPrice = mainPrice - (mainPrice * discPercent / 100);
+                }
+                card.find('.price').val(finalPrice.toFixed(2));
+            }
+            
+            calculateTotal();
+        });
+
         // Custom Service Logic (Create Design)
         $('#customToggle').on('change', function() {
             $('#customSection').toggle($(this).is(':checked'));
@@ -364,7 +543,10 @@
         function addCustomRow(name, price, qty) {
             $('#customList').append(`<div class="custom-item col-md-6 mb-2">
             <div style="border:1px dashed #7367f0;padding:12px;border-radius:10px;background:#fff;">
-                <div style="display:flex;justify-content:space-between;"><strong>${name}</strong><button type="button" class="btn btn-sm text-danger remove-custom">×</button></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <input type="text" value="${name}" class="custom-name" style="font-weight:600;border:1px solid #ddd;border-radius:6px;padding:4px;flex-grow:1;margin-right:10px;">
+                    <button type="button" class="btn btn-sm text-danger remove-custom" style="padding:0;font-size:20px;line-height:1;">&times;</button>
+                </div>
                 <div style="display:flex;gap:10px;margin-top:6px;">
                     <input type="number" value="${price}" class="custom-price" style="width:90px;border:1px solid #ddd;border-radius:6px;padding:4px;">
                     <div style="display:flex;border:1px solid #ddd;border-radius:6px;overflow:hidden;">
@@ -395,7 +577,18 @@
         });
 
         // LIVE JSON UPDATE on any field change
-        $(document).on('keyup change', '.live-json, #travelCharges, #discountPercent, .price, .custom-price', function() {
+        $(document).on('keyup change', '.live-json, #travelCharges, #discountPercent, .price, .custom-price, .custom-name', function() {
+            calculateTotal();
+        });
+
+        /* =====================================
+           VARIANT CHANGE
+        ===================================== */
+        $(document).on('change', '.variant-select', function() {
+            let card = $(this).closest('.service-card');
+            let selectedOption = $(this).find('option:selected');
+            let newPrice = selectedOption.data('price');
+            card.find('.price').val(newPrice);
             calculateTotal();
         });
 
@@ -407,26 +600,38 @@
 
             $('.service-check:checked').each(function() {
                 let card = $(this).closest('.service-card');
-                let n = $(this).data('name'),
-                    p = parseFloat(card.find('.price').val()) || 0,
-                    q = parseInt(card.find('.qty').val()) || 1;
-                let dur = parseInt(card.data('duration')) || 0;
+                let serviceId = card.data('service-id');
+                let name = card.find('.service-name').text().trim();
+                let price = parseFloat(card.find('.price').val()) || 0;
+                let qty = parseInt(card.find('.qty').val()) || 1;
+                let duration = parseInt(card.data('duration')) || 0;
+                
+                let variantId = card.data('variant-id') || null;
 
-                let tot = p * q;
-                subtotal += tot;
-                totalDuration += (dur * q);
+                let total = price * qty;
+                subtotal += total;
+                totalDuration += (duration * qty);
+
                 servicesArray.push({
                     type: "service",
-                    name: n,
-                    price: p,
-                    qty: q,
-                    total: tot
+                    service_master_id: serviceId,
+                    variant_id: variantId,
+                    name: name,
+                    price: price,
+                    qty: qty,
+                    total: total
                 });
-                invoiceHtml += `<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>${n} (${q}x)</span><span>₹${tot.toFixed(2)}</span></div>`;
+
+                invoiceHtml += `
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px;">
+                    <div>${name} (${qty} × ₹${price})</div>
+                    <div>₹${total.toFixed(2)}</div>
+                </div>
+            `;
             });
 
             $('.custom-item').each(function() {
-                let n = $(this).find('strong').text(),
+                let n = $(this).find('.custom-name').val(),
                     p = parseFloat($(this).find('.custom-price').val()) || 0,
                     q = parseInt($(this).find('.custom-qty').val()) || 1;
                 let tot = p * q;
@@ -451,8 +656,8 @@
             if (typeof savedData !== 'undefined' && savedData && savedData.summary) {
                 walletUsed = parseFloat(savedData.summary.wallet_used) || 0;
                 couponCode = savedData.summary.coupon_code || null;
-                totalDuration = savedData.summary.total_duration || 0;
                 
+                // If discount_percent is 0 but discount_amount was provided by the app, use it
                 if (discP === 0 && savedData.summary.discount_amount && parseFloat(savedData.summary.discount_amount) > 0) {
                     discA = parseFloat(savedData.summary.discount_amount);
                 }

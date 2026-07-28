@@ -75,6 +75,7 @@ $(function () {
                 }
             },
             orderCellsTop: true,
+            scrollX: true,
             language: {
                 paginate: {
                     previous: '‹',

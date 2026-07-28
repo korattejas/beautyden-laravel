@@ -70,6 +70,11 @@
                         <i data-feather="calendar"></i><span>Appointments</span>
                     </a>
                 </li>
+                <li class="pa-nav-item {{ Request::routeIs('admin.advance-appointments.index') ? 'active' : '' }}">
+                    <a class="pa-nav-link" href="{{ route('admin.advance-appointments.index') }}">
+                        <i data-feather="calendar"></i><span>Advance Appointments</span>
+                    </a>
+                </li>
                 @endif
 
                 @if(hasMenuAccess('team_members', $isSuperAdmin, $userPermissions))

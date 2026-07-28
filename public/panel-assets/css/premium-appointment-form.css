@@ -55,6 +55,10 @@
     padding: 1.35rem 1.5rem 1.5rem !important;
 }
 
+.pa-appointment-form-page .pa-form-field {
+    margin-bottom: 0 !important;
+}
+
 .pa-appointment-form-page .pa-form-field label {
     font-size: 0.9375rem;
     font-weight: 600;
@@ -72,6 +76,7 @@
     padding: 0.65rem 1rem;
     background: #fff;
     box-shadow: none;
+    margin-bottom: 0 !important;
 }
 
 .pa-appointment-form-page .pa-form-field textarea.form-control {
@@ -134,3 +139,41 @@
         margin-top: 1rem;
     }
 }
+
+/* -- Page toolbar -- */
+.pa-catalog-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.15rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--pa-border-light);
+}
+.pa-catalog-toolbar h2 {
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+    color: var(--pa-text) !important;
+    margin: 0 0 0.2rem !important;
+    letter-spacing: -0.02em;
+}
+.pa-catalog-toolbar p {
+    font-size: 0.9rem;
+    color: var(--pa-text-muted);
+    margin: 0;
+}
+.pa-catalog-toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+}
+.pa-catalog-toolbar-actions .btn {
+    min-height: 42px !important;
+    padding: 0.55rem 1.15rem !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    border-radius: 11px !important;
+}
+
