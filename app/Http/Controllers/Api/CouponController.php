@@ -69,14 +69,14 @@ class CouponController extends Controller
                           ->orWhereJsonContains('user_ids', (string) $user->id)
                           ->orWhereJsonContains('user_ids', $user->id);
                     })
-                    ->orWhere('code', 'BDAY50');
+                    ->orWhereRaw('UPPER(TRIM(code)) = ?', ['BDAY50']);
                 })
                 ->get();
 
             $validCoupons = [];
             foreach ($coupons as $coupon) {
                 // If this is the birthday coupon, check if user is in their birthday window
-                if ($coupon->code === 'BDAY50') {
+                if (strtoupper(trim($coupon->code)) === 'BDAY50') {
                     if (!$this->isUserInBirthdayWindow($user)) {
                         continue;
                     }
@@ -151,7 +151,7 @@ class CouponController extends Controller
                           ->orWhereJsonContains('user_ids', (string) $user->id)
                           ->orWhereJsonContains('user_ids', $user->id);
                     })
-                    ->orWhere('code', 'BDAY50');
+                    ->orWhereRaw('UPPER(TRIM(code)) = ?', ['BDAY50']);
                 })
                 ->first();
 
@@ -159,7 +159,7 @@ class CouponController extends Controller
                 return $this->sendError('Invalid coupon code', $this->validation_error_status);
             }
 
-            if ($coupon->code === 'BDAY50') {
+            if (strtoupper(trim($coupon->code)) === 'BDAY50') {
                 if (!$this->isUserInBirthdayWindow($user)) {
                     return $this->sendError('This coupon is only valid around your birthday', $this->validation_error_status);
                 }

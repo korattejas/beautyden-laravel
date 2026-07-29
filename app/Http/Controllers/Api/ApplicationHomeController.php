@@ -29,6 +29,33 @@ class ApplicationHomeController extends Controller
         $this->common_error_message = config('custom.common_error_message');
     }
 
+    private function isUserInBirthdayWindow($user)
+    {
+        if (empty($user->dob)) {
+            return false;
+        }
+
+        try {
+            $dob = \Carbon\Carbon::parse($user->dob);
+            $birthdayThisYear = \Carbon\Carbon::create(date('Y'), $dob->month, $dob->day)->startOfDay();
+            
+            $diffDays = \Carbon\Carbon::today()->diffInDays($birthdayThisYear, false);
+            
+            if ($diffDays > 180) {
+                $birthdayThisYear->subYear();
+            } elseif ($diffDays < -180) {
+                $birthdayThisYear->addYear();
+            }
+            
+            $diffDays = \Carbon\Carbon::today()->diffInDays($birthdayThisYear, false);
+            
+            // Birthday window is 7 days before up to their birthday (0 to 7 days remaining)
+            return ($diffDays >= 0 && $diffDays <= 7);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     private function getCategoryReviewStats($categoryId)
     {
         $realReviewsCount = DB::table('customer_reviews')->where('category_id', $categoryId)->where('status', 1)->count();
@@ -205,9 +232,9 @@ class ApplicationHomeController extends Controller
             $comingSoonCities = $cities->where('status', 1)->values();
 
             // Cached Coupons
-            $coupons = Cache::remember('api_home_coupons', 3600, function () {
+            $allCoupons = Cache::remember('api_home_coupons', 3600, function () {
                 return DB::table('coupon_codes')
-                    ->select('id', 'code', 'discount_type', 'discount_value', 'description', 'start_date', 'end_date')
+                    ->select('id', 'code', 'discount_type', 'discount_value', 'description', 'start_date', 'end_date', 'user_ids')
                     ->where('status', 1)
                     ->where(function($query) {
                         $query->whereNull('start_date')->orWhere('start_date', '<=', now());
@@ -217,6 +244,32 @@ class ApplicationHomeController extends Controller
                     })
                     ->get();
             });
+
+            $coupons = [];
+            foreach ($allCoupons as $coupon) {
+                $couponCodeUpper = strtoupper(trim($coupon->code));
+
+                // 1. Check Birthday coupon
+                if ($couponCodeUpper === 'BDAY50') {
+                    if (!$user || !$this->isUserInBirthdayWindow($user)) {
+                        continue;
+                    }
+                }
+
+                // 2. Check user-specific coupons
+                if (!empty($coupon->user_ids)) {
+                    if (!$user) {
+                        continue;
+                    }
+                    $userIds = json_decode($coupon->user_ids, true);
+                    if (!is_array($userIds) || (!in_array($user->id, $userIds) && !in_array((string)$user->id, $userIds))) {
+                        continue;
+                    }
+                }
+
+                unset($coupon->user_ids);
+                $coupons[] = $coupon;
+            }
 
             if ($cityId == 0) {
                 return $this->sendResponse(
