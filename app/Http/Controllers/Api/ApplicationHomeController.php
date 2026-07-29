@@ -254,6 +254,15 @@ class ApplicationHomeController extends Controller
                     if (!$user || !$this->isUserInBirthdayWindow($user)) {
                         continue;
                     }
+                    // Check if already used in the current calendar year
+                    $usedThisYear = DB::table('coupon_usages')
+                        ->where('coupon_id', $coupon->id)
+                        ->where('user_id', $user->id)
+                        ->whereYear('created_at', date('Y'))
+                        ->exists();
+                    if ($usedThisYear) {
+                        continue;
+                    }
                 }
 
                 // 2. Check user-specific coupons

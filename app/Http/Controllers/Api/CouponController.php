@@ -80,6 +80,14 @@ class CouponController extends Controller
                     if (!$this->isUserInBirthdayWindow($user)) {
                         continue;
                     }
+                    // Check if already used in the current calendar year
+                    $usedThisYear = CouponUsage::where('coupon_id', $coupon->id)
+                        ->where('user_id', $user->id)
+                        ->whereYear('created_at', date('Y'))
+                        ->exists();
+                    if ($usedThisYear) {
+                        continue;
+                    }
                 }
 
                 // Check usage limit
@@ -162,6 +170,14 @@ class CouponController extends Controller
             if (strtoupper(trim($coupon->code)) === 'BDAY50') {
                 if (!$this->isUserInBirthdayWindow($user)) {
                     return $this->sendError('This coupon is only valid around your birthday', $this->validation_error_status);
+                }
+                // Check if already used in the current calendar year
+                $usedThisYear = CouponUsage::where('coupon_id', $coupon->id)
+                    ->where('user_id', $user->id)
+                    ->whereYear('created_at', date('Y'))
+                    ->exists();
+                if ($usedThisYear) {
+                    return $this->sendError('You have already used this birthday coupon this year.', $this->validation_error_status);
                 }
             }
 
