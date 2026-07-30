@@ -965,8 +965,8 @@ class AppointmentsController extends Controller
                 $urgentContactPhone = \App\Models\AppSetting::where('key', 'whatsapp_phone_number')->value('value') ?? '9574758282';
                 $urgentContactData = [
                     'text' => 'Need urgent service?',
-                    'sub_text' => 'Please call or WhatsApp us on ' . $urgentContactPhone,
-                    'phone' => $urgentContactPhone
+                    'sub_text' => 'Please call or WhatsApp us on',
+                    'phone' => '+91' . $urgentContactPhone
                 ];
             }
         
