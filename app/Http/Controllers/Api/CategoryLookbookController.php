@@ -43,13 +43,26 @@ class CategoryLookbookController extends Controller
                 ->where('category_lookbooks.status', 1)
                 ->where('service_categories.status', 1);
                 
-            if ($request->has('category_id') && $request->has('sub_category_id')) {
+            $showAll = false;
+            if ($request->has('category_id')) {
+                $category = DB::table('service_categories')
+                    ->where('id', $request->category_id)
+                    ->first();
+                if ($category) {
+                    $categoryName = strtolower($category->name);
+                    if (str_contains($categoryName, 'bridal') || str_contains($categoryName, 'pre wedding') || str_contains($categoryName, 'pre-wedding')) {
+                        $showAll = true;
+                    }
+                }
+            }
+
+            if (!$showAll && $request->has('category_id') && $request->has('sub_category_id')) {
                 $query->where('category_lookbooks.category_id', $request->category_id)
                       ->where(function($q) use ($request) {
                           $q->where('category_lookbooks.sub_category_id', $request->sub_category_id)
                             ->orWhereNull('category_lookbooks.sub_category_id');
                       });
-            } elseif ($request->has('category_id')) {
+            } elseif (!$showAll && $request->has('category_id')) {
                 $query->where('category_lookbooks.category_id', $request->category_id);
             } elseif ($request->has('sub_category_id')) {
                 $query->where('category_lookbooks.sub_category_id', $request->sub_category_id);

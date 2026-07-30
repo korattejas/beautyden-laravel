@@ -297,6 +297,18 @@ class ReviewApiController extends Controller
 
             $limit = $request->limit ?? 50;
 
+            $category = \Illuminate\Support\Facades\DB::table('service_categories')
+                ->where('id', $request->category_id)
+                ->first();
+
+            $showAll = false;
+            if ($category) {
+                $categoryName = strtolower($category->name);
+                if (str_contains($categoryName, 'bridal') || str_contains($categoryName, 'pre wedding') || str_contains($categoryName, 'pre-wedding')) {
+                    $showAll = true;
+                }
+            }
+
             $customerReviewsQuery = \Illuminate\Support\Facades\DB::table('customer_reviews as r')
                 ->select(
                     'r.id',
@@ -306,16 +318,25 @@ class ReviewApiController extends Controller
                     'r.review',
                     'r.review_date'
                 )
-                ->where('r.category_id', $request->category_id)
+                ->when(!$showAll, function ($q) use ($request) {
+                    return $q->where('r.category_id', $request->category_id);
+                })
                 ->where('r.status', 1)
                 ->orderByDesc('r.is_popular')
                 ->orderByDesc('r.review_date')
                 ->limit($limit)
                 ->get();
 
-            // Calculate overall rating and count for this category
-            $realReviewsCount = \Illuminate\Support\Facades\DB::table('customer_reviews')->where('category_id', $request->category_id)->where('status', 1)->count();
-            $realRatingAvg = \Illuminate\Support\Facades\DB::table('customer_reviews')->where('category_id', $request->category_id)->where('status', 1)->avg('rating');
+            // Calculate overall rating and count
+            $reviewsStatsQuery = \Illuminate\Support\Facades\DB::table('customer_reviews')
+                ->where('status', 1);
+
+            if (!$showAll) {
+                $reviewsStatsQuery->where('category_id', $request->category_id);
+            }
+
+            $realReviewsCount = (clone $reviewsStatsQuery)->count();
+            $realRatingAvg = (clone $reviewsStatsQuery)->avg('rating');
 
             $data = [
                 'total_reviews' => (int) $realReviewsCount,
