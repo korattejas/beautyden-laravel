@@ -309,6 +309,57 @@ class ReviewApiController extends Controller
                 }
             }
 
+            if ($showAll) {
+                $lookbookCategories = \Illuminate\Support\Facades\DB::table('category_lookbooks')
+                    ->join('service_categories', 'category_lookbooks.category_id', '=', 'service_categories.id')
+                    ->where('category_lookbooks.status', 1)
+                    ->where('service_categories.status', 1)
+                    ->whereNotNull('category_lookbooks.photos')
+                    ->where('category_lookbooks.photos', '!=', '')
+                    ->where('category_lookbooks.photos', '!=', '[]')
+                    ->select('category_lookbooks.category_id', 'service_categories.name as category_name')
+                    ->distinct()
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'category_id' => $item->category_id,
+                            'category_name' => $item->category_name
+                        ];
+                    })
+                    ->values()
+                    ->all();
+
+                $portfolioCategories = \Illuminate\Support\Facades\DB::table('portfolios')
+                    ->join('service_categories', 'portfolios.category_id', '=', 'service_categories.id')
+                    ->where('portfolios.status', 1)
+                    ->where('service_categories.status', 1)
+                    ->whereNotNull('portfolios.photos')
+                    ->where('portfolios.photos', '!=', '')
+                    ->where('portfolios.photos', '!=', '[]')
+                    ->select('portfolios.category_id', 'service_categories.name as category_name')
+                    ->distinct()
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'category_id' => $item->category_id,
+                            'category_name' => $item->category_name
+                        ];
+                    })
+                    ->values()
+                    ->all();
+
+                $data = [
+                    'is_bridal_prewedding' => true,
+                    'portfolio_categories' => $portfolioCategories,
+                    'lookbook_categories' => $lookbookCategories
+                ];
+
+                return $this->sendResponse(
+                    $data,
+                    'Categories for bridal/pre-wedding retrieved successfully'
+                );
+            }
+
             $customerReviewsQuery = \Illuminate\Support\Facades\DB::table('customer_reviews as r')
                 ->select(
                     'r.id',

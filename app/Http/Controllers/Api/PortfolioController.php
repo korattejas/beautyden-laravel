@@ -34,6 +34,71 @@ class PortfolioController extends Controller
                 ->select('portfolios.id', 'portfolios.name', 'portfolios.photos', 'portfolios.category_id', 'service_categories.name as category_name')
                 ->where('portfolios.status', 1);
 
+            $showAll = false;
+            if ($request->has('category_id')) {
+                $category = DB::table('service_categories')
+                    ->where('id', $request->category_id)
+                    ->first();
+                if ($category) {
+                    $categoryName = strtolower($category->name);
+                    if (str_contains($categoryName, 'bridal') || str_contains($categoryName, 'pre wedding') || str_contains($categoryName, 'pre-wedding')) {
+                        $showAll = true;
+                    }
+                }
+            }
+
+            if ($showAll) {
+                $lookbookCategories = DB::table('category_lookbooks')
+                    ->join('service_categories', 'category_lookbooks.category_id', '=', 'service_categories.id')
+                    ->where('category_lookbooks.status', 1)
+                    ->where('service_categories.status', 1)
+                    ->whereNotNull('category_lookbooks.photos')
+                    ->where('category_lookbooks.photos', '!=', '')
+                    ->where('category_lookbooks.photos', '!=', '[]')
+                    ->select('category_lookbooks.category_id', 'service_categories.name as category_name')
+                    ->distinct()
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'category_id' => $item->category_id,
+                            'category_name' => $item->category_name
+                        ];
+                    })
+                    ->values()
+                    ->all();
+
+                $portfolioCategories = DB::table('portfolios')
+                    ->join('service_categories', 'portfolios.category_id', '=', 'service_categories.id')
+                    ->where('portfolios.status', 1)
+                    ->where('service_categories.status', 1)
+                    ->whereNotNull('portfolios.photos')
+                    ->where('portfolios.photos', '!=', '')
+                    ->where('portfolios.photos', '!=', '[]')
+                    ->select('portfolios.category_id', 'service_categories.name as category_name')
+                    ->distinct()
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'category_id' => $item->category_id,
+                            'category_name' => $item->category_name
+                        ];
+                    })
+                    ->values()
+                    ->all();
+
+                $data = [
+                    'is_bridal_prewedding' => true,
+                    'portfolio_categories' => $portfolioCategories,
+                    'lookbook_categories' => $lookbookCategories
+                ];
+
+                return $this->sendResponse(
+                    $data,
+                    'Categories for bridal/pre-wedding retrieved successfully',
+                    $this->success_status
+                );
+            }
+
             if ($request->has('category_id')) {
                 $query->where('portfolios.category_id', $request->category_id);
             }
