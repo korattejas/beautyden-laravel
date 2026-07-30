@@ -198,6 +198,7 @@ Route::middleware([])->group(function () {
         Route::get('appSettings', [AppSettingController::class, 'getAppSettings']);
         Route::post('testFast2Sms', [AuthenticationController::class, 'testFast2Sms']);
         Route::get('categoryLookbook', [CategoryLookbookController::class, 'getCategoryLookbooks']);
+        Route::get('lookbookPortfolioCategories', [CategoryLookbookController::class, 'getLookbookPortfolioCategories']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
     });
 });
