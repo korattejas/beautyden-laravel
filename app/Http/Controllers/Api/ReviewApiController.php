@@ -297,69 +297,6 @@ class ReviewApiController extends Controller
 
             $limit = $request->limit ?? 50;
 
-            $category = \Illuminate\Support\Facades\DB::table('service_categories')
-                ->where('id', $request->category_id)
-                ->first();
-
-            $showAll = false;
-            if ($category) {
-                $categoryName = strtolower($category->name);
-                if (str_contains($categoryName, 'bridal') || str_contains($categoryName, 'pre wedding') || str_contains($categoryName, 'pre-wedding')) {
-                    $showAll = true;
-                }
-            }
-
-            if ($showAll) {
-                $lookbookCategories = \Illuminate\Support\Facades\DB::table('category_lookbooks')
-                    ->join('service_categories', 'category_lookbooks.category_id', '=', 'service_categories.id')
-                    ->where('category_lookbooks.status', 1)
-                    ->where('service_categories.status', 1)
-                    ->whereNotNull('category_lookbooks.photos')
-                    ->where('category_lookbooks.photos', '!=', '')
-                    ->where('category_lookbooks.photos', '!=', '[]')
-                    ->select('category_lookbooks.category_id', 'service_categories.name as category_name')
-                    ->distinct()
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'category_id' => $item->category_id,
-                            'category_name' => $item->category_name
-                        ];
-                    })
-                    ->values()
-                    ->all();
-
-                $portfolioCategories = \Illuminate\Support\Facades\DB::table('portfolios')
-                    ->join('service_categories', 'portfolios.category_id', '=', 'service_categories.id')
-                    ->where('portfolios.status', 1)
-                    ->where('service_categories.status', 1)
-                    ->whereNotNull('portfolios.photos')
-                    ->where('portfolios.photos', '!=', '')
-                    ->where('portfolios.photos', '!=', '[]')
-                    ->select('portfolios.category_id', 'service_categories.name as category_name')
-                    ->distinct()
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'category_id' => $item->category_id,
-                            'category_name' => $item->category_name
-                        ];
-                    })
-                    ->values()
-                    ->all();
-
-                $data = [
-                    'is_bridal_prewedding' => true,
-                    'portfolio_categories' => $portfolioCategories,
-                    'lookbook_categories' => $lookbookCategories
-                ];
-
-                return $this->sendResponse(
-                    $data,
-                    'Categories for bridal/pre-wedding retrieved successfully'
-                );
-            }
-
             $customerReviewsQuery = \Illuminate\Support\Facades\DB::table('customer_reviews as r')
                 ->select(
                     'r.id',
@@ -369,25 +306,16 @@ class ReviewApiController extends Controller
                     'r.review',
                     'r.review_date'
                 )
-                ->when(!$showAll, function ($q) use ($request) {
-                    return $q->where('r.category_id', $request->category_id);
-                })
+                ->where('r.category_id', $request->category_id)
                 ->where('r.status', 1)
                 ->orderByDesc('r.is_popular')
                 ->orderByDesc('r.review_date')
                 ->limit($limit)
                 ->get();
 
-            // Calculate overall rating and count
-            $reviewsStatsQuery = \Illuminate\Support\Facades\DB::table('customer_reviews')
-                ->where('status', 1);
-
-            if (!$showAll) {
-                $reviewsStatsQuery->where('category_id', $request->category_id);
-            }
-
-            $realReviewsCount = (clone $reviewsStatsQuery)->count();
-            $realRatingAvg = (clone $reviewsStatsQuery)->avg('rating');
+            // Calculate overall rating and count for this category
+            $realReviewsCount = \Illuminate\Support\Facades\DB::table('customer_reviews')->where('category_id', $request->category_id)->where('status', 1)->count();
+            $realRatingAvg = \Illuminate\Support\Facades\DB::table('customer_reviews')->where('category_id', $request->category_id)->where('status', 1)->avg('rating');
 
             $data = [
                 'total_reviews' => (int) $realReviewsCount,

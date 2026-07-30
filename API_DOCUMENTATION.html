@@ -1233,11 +1233,16 @@
                     "reviews": 200,
                     "icon": "https://...",
                     "icon_type": "image",
+                    "category_id": 2,
                     "category_name": "Waxing",
+                    "sub_category_id": 5,
                     "sub_category_name": "Facial",
                     "is_popular": 1,
                     "status": 1,
                     "has_variants": 0,
+                    "catalog_lookbook": 1,
+                    "portfolio": 0,
+                    "is_bridal_prewedding": false,
                     "variants": []
                 }
             },
@@ -4183,6 +4188,35 @@
             ]
         }
     ]
+}</code></pre>
+
+            <h3>Get Lookbook and Portfolio Categories</h3>
+            <p>Fetches the list of active categories that contain lookbook or portfolio photos. Used for displaying category lists when Bridal/Pre-wedding or general category lists are requested.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /Test/V1/customer/lookbookPortfolioCategories
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Lookbook and Portfolio categories retrieved successfully",
+    "data": {
+        "portfolio_categories": [
+            {
+                "id": 2,
+                "name": "Bridal Makeup",
+                "icon": "https://yourdomain.com/uploads/service-category/icon1.png"
+            }
+        ],
+        "lookbook_categories": [
+            {
+                "id": 2,
+                "name": "Bridal Makeup",
+                "icon": "https://yourdomain.com/uploads/service-category/icon1.png"
+            }
+        ]
+    }
 }</code></pre>
         </section>
 

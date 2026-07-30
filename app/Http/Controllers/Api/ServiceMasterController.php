@@ -767,6 +767,14 @@ class ServiceMasterController extends Controller
 
             $pageLayout = [];
 
+            $isBridalPrewedding = false;
+            if ($service->category) {
+                $categoryName = strtolower($service->category->name);
+                if (str_contains($categoryName, 'bridal') || str_contains($categoryName, 'pre wedding') || str_contains($categoryName, 'pre-wedding')) {
+                    $isBridalPrewedding = true;
+                }
+            }
+
             $serviceInfoData = [
                 'id' => $service->id,
                 'name' => $service->name,
@@ -774,13 +782,16 @@ class ServiceMasterController extends Controller
                 'reviews' => $service->reviews,
                 'icon' => $service->icon,
                 'icon_type' => $service->icon_type,
+                'category_id' => $service->category_id,
                 'category_name' => $service->category_name,
+                'sub_category_id' => $service->sub_category_id,
                 'sub_category_name' => $service->sub_category_name,
                 'is_popular' => $service->is_popular,
                 'status' => $service->status,
                 'has_variants' => $service->has_variants,
                 'catalog_lookbook' => (int) $service->catalog_lookbook,
                 'portfolio' => (int) $service->portfolio,
+                'is_bridal_prewedding' => $isBridalPrewedding,
             ];
 
             if ($service->has_variants == 1 && !empty($service->variants)) {

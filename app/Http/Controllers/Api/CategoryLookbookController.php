@@ -43,71 +43,6 @@ class CategoryLookbookController extends Controller
                 ->where('category_lookbooks.status', 1)
                 ->where('service_categories.status', 1);
                 
-            $showAll = false;
-            if ($request->has('category_id')) {
-                $category = DB::table('service_categories')
-                    ->where('id', $request->category_id)
-                    ->first();
-                if ($category) {
-                    $categoryName = strtolower($category->name);
-                    if (str_contains($categoryName, 'bridal') || str_contains($categoryName, 'pre wedding') || str_contains($categoryName, 'pre-wedding')) {
-                        $showAll = true;
-                    }
-                }
-            }
-
-            if ($showAll) {
-                $lookbookCategories = DB::table('category_lookbooks')
-                    ->join('service_categories', 'category_lookbooks.category_id', '=', 'service_categories.id')
-                    ->where('category_lookbooks.status', 1)
-                    ->where('service_categories.status', 1)
-                    ->whereNotNull('category_lookbooks.photos')
-                    ->where('category_lookbooks.photos', '!=', '')
-                    ->where('category_lookbooks.photos', '!=', '[]')
-                    ->select('category_lookbooks.category_id', 'service_categories.name as category_name')
-                    ->distinct()
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'category_id' => $item->category_id,
-                            'category_name' => $item->category_name
-                        ];
-                    })
-                    ->values()
-                    ->all();
-
-                $portfolioCategories = DB::table('portfolios')
-                    ->join('service_categories', 'portfolios.category_id', '=', 'service_categories.id')
-                    ->where('portfolios.status', 1)
-                    ->where('service_categories.status', 1)
-                    ->whereNotNull('portfolios.photos')
-                    ->where('portfolios.photos', '!=', '')
-                    ->where('portfolios.photos', '!=', '[]')
-                    ->select('portfolios.category_id', 'service_categories.name as category_name')
-                    ->distinct()
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'category_id' => $item->category_id,
-                            'category_name' => $item->category_name
-                        ];
-                    })
-                    ->values()
-                    ->all();
-
-                $data = [
-                    'is_bridal_prewedding' => true,
-                    'portfolio_categories' => $portfolioCategories,
-                    'lookbook_categories' => $lookbookCategories
-                ];
-
-                return $this->sendResponse(
-                    $data,
-                    'Categories for bridal/pre-wedding retrieved successfully',
-                    $this->success_status
-                );
-            }
-
             if ($request->has('category_id') && $request->has('sub_category_id')) {
                 $query->where('category_lookbooks.category_id', $request->category_id)
                       ->where(function($q) use ($request) {
@@ -155,6 +90,61 @@ class CategoryLookbookController extends Controller
             return $this->sendResponse(
                 $data,
                 'Category lookbooks retrieved successfully',
+                $this->success_status
+            );
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
+
+    public function getLookbookPortfolioCategories(Request $request): JsonResponse
+    {
+        $function_name = 'getLookbookPortfolioCategories';
+
+        try {
+            $lookbookCategories = DB::table('category_lookbooks')
+                ->join('service_categories', 'category_lookbooks.category_id', '=', 'service_categories.id')
+                ->where('category_lookbooks.status', 1)
+                ->where('service_categories.status', 1)
+                ->whereNotNull('category_lookbooks.photos')
+                ->where('category_lookbooks.photos', '!=', '')
+                ->where('category_lookbooks.photos', '!=', '[]')
+                ->select(
+                    'category_lookbooks.category_id as id',
+                    'service_categories.name',
+                    DB::raw('IF(service_categories.icon IS NULL OR service_categories.icon = "", "", CONCAT("' . asset('uploads/service-category') . '/", service_categories.icon)) AS icon')
+                )
+                ->distinct()
+                ->get();
+
+            $portfolioCategories = DB::table('portfolios')
+                ->join('service_categories', 'portfolios.category_id', '=', 'service_categories.id')
+                ->where('portfolios.status', 1)
+                ->where('service_categories.status', 1)
+                ->whereNotNull('portfolios.photos')
+                ->where('portfolios.photos', '!=', '')
+                ->where('portfolios.photos', '!=', '[]')
+                ->select(
+                    'portfolios.category_id as id',
+                    'service_categories.name',
+                    DB::raw('IF(service_categories.icon IS NULL OR service_categories.icon = "", "", CONCAT("' . asset('uploads/service-category') . '/", service_categories.icon)) AS icon')
+                )
+                ->distinct()
+                ->get();
+
+            $data = [
+                'portfolio_categories' => $portfolioCategories,
+                'lookbook_categories'  => $lookbookCategories,
+            ];
+
+            return $this->sendResponse(
+                $data,
+                'Lookbook and Portfolio categories retrieved successfully',
                 $this->success_status
             );
         } catch (Exception $e) {
