@@ -56,6 +56,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/delete-account', function () {
+    return view('delete-account');
+});
+
 Route::get('/api-docs/BeautyDen@admin.com/0126', function () {
     $path = base_path('API_DOCUMENTATION.html');
     if (file_exists($path)) {
