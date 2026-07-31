@@ -37,7 +37,8 @@ class ServiceController extends Controller
                     DB::raw('CONCAT("' . asset('uploads/service-types') . '/", icon) AS icon'),
                     'description',
                     'is_popular',
-                    'is_new'
+                    'is_new',
+                    DB::raw('COALESCE((SELECT id FROM service_categories WHERE name = service_types.name AND status = 1 LIMIT 1), 0) AS category_id')
                 )
                 ->where('status', 1)
                 ->orderByDesc('is_popular')
