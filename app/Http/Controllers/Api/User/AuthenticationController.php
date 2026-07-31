@@ -161,7 +161,11 @@ class AuthenticationController extends Controller
 
             $user = User::where('mobile_number', $mobile_number)->first();
 
-            $otp = rand(100000, 999999);
+            // [TESTING ONLY - REMOVE AFTER GO LIVE] Fixed OTP for App Store / Play Store review testing
+            $cleanedTestNumber = preg_replace('/\D/', '', $mobile_number);
+            $isTestNumber = in_array($cleanedTestNumber, ['6352755075', '916352755075']);
+            $otp = $isTestNumber ? 123456 : rand(100000, 999999);
+
             $otpExpirationTime = (int) config('custom.otp_expiration_time');
             $expiry = now()->addSeconds($otpExpirationTime);
 
@@ -184,7 +188,10 @@ class AuthenticationController extends Controller
                 ]);
             }
 
-            $this->sendWhatsAppOtp($mobile_number, $user->name, $otp);
+            // [TESTING ONLY - REMOVE AFTER GO LIVE] Skip WhatsApp for test number
+            if (!$isTestNumber) {
+                $this->sendWhatsAppOtp($mobile_number, $user->name, $otp);
+            }
 
             $success = [
                 'otp_expiration_time' => $otpExpirationTime,
@@ -285,7 +292,10 @@ class AuthenticationController extends Controller
                 return $this->sendError('User not found.', $this->backend_error_status);
             }
 
-            if ($user->otp_expiration_at < now()) {
+            // [TESTING ONLY - REMOVE AFTER GO LIVE] Skip expiry check for test number
+            $isVerifyTestNumber = in_array($mobile_number, ['6352755075', '916352755075']);
+
+            if (!$isVerifyTestNumber && $user->otp_expiration_at < now()) {
                 return $this->sendError('OTP expired.', $this->backend_error_status);
             }
 
