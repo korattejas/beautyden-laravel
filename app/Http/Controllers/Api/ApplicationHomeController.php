@@ -214,7 +214,7 @@ class ApplicationHomeController extends Controller
             // 3. Service Types (New Feature) - Cached for 1 hour
             $serviceTypes = Cache::remember('api_home_service_types', 3600, function () {
                 return \App\Models\ServiceType::where('status', 1)
-                    ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/service-types') . '/", icon) AS icon'), 'description', 'is_popular', 'is_new')
+                    ->select('id', 'name', DB::raw('CONCAT("' . asset('uploads/service-types') . '/", icon) AS icon'), 'description', 'is_popular', 'is_new', DB::raw('COALESCE((SELECT id FROM service_categories WHERE name = service_types.name AND status = 1 LIMIT 1), 0) AS category_id'))
                     ->orderByDesc('is_popular')
                     ->get();
             });
