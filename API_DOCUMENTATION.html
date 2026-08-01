@@ -4409,6 +4409,37 @@
     "message": "All notifications cleared.",
     "data": {}
 }</code></pre>
+
+            <h3>Delete Notification</h3>
+            <p>Deletes a specific notification for the logged-in user by ID.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/deleteNotification
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>notification_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. ID of the notification to delete.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Notification deleted successfully.",
+    "data": {}
+}</code></pre>
         </section>
 
         <section id="testing">

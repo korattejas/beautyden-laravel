@@ -89,6 +89,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
         Route::post('getNotifications', [NotificationController::class, 'getNotifications']);
         Route::post('markNotificationAsRead', [NotificationController::class, 'markAsRead']);
         Route::post('clearAllNotifications', [NotificationController::class, 'clearAll']);
+        Route::post('deleteNotification', [NotificationController::class, 'deleteNotification']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);
@@ -219,6 +220,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('getNotifications', [NotificationController::class, 'getNotifications']);
         Route::post('markNotificationAsRead', [NotificationController::class, 'markAsRead']);
         Route::post('clearAllNotifications', [NotificationController::class, 'clearAll']);
+        Route::post('deleteNotification', [NotificationController::class, 'deleteNotification']);
         Route::post('applyCoupon', [CouponController::class, 'applyCoupon']);
         Route::post('buyMembership', [MembershipController::class, 'buyMembership']);
         Route::post("submitReview", [ReviewApiController::class, "submitReview"]);

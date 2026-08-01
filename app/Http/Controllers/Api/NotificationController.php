@@ -251,4 +251,42 @@ class NotificationController extends Controller
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
+
+    /**
+     * Delete a specific notification
+     */
+    public function deleteNotification(Request $request): JsonResponse
+    {
+        $function_name = 'deleteNotification';
+        try {
+            $user = auth('user')->user();
+            if (!$user) {
+                return $this->sendError('Unauthorised.', $this->validation_error_status);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'notification_id' => 'required|integer|exists:notifications,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors()->first(), $this->validation_error_status);
+            }
+
+            $notification = Notification::where('id', $request->notification_id)
+                ->where('user_id', $user->id)
+                ->first();
+
+            if (!$notification) {
+                return $this->sendError('Notification not found or doesn\'t belong to you.', $this->validation_error_status);
+            }
+
+            $notification->delete();
+
+            return $this->sendResponse((object)[], 'Notification deleted successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
 }
+
