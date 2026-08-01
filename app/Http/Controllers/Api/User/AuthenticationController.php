@@ -148,13 +148,13 @@ class AuthenticationController extends Controller
             $attempts++;
             \Illuminate\Support\Facades\Cache::put($cacheKeyAttempts, $attempts, now()->endOfDay());
 
-            if ($attempts == 3) {
+            if ($attempts == 9) {
                 \Illuminate\Support\Facades\Cache::put($cacheKeyBlock, time() + 120, 120); // 2 minutes
-            } elseif ($attempts == 4) {
+            } elseif ($attempts == 10) {
                 \Illuminate\Support\Facades\Cache::put($cacheKeyBlock, time() + 900, 900); // 15 minutes
-            } elseif ($attempts == 5) {
+            } elseif ($attempts == 11) {
                 \Illuminate\Support\Facades\Cache::put($cacheKeyBlock, time() + 21600, 21600); // 6 hours
-            } elseif ($attempts >= 6) {
+            } elseif ($attempts >= 12) {
                 \Illuminate\Support\Facades\Cache::put($cacheKeyBlock, time() + 86400, 86400); // 24 hours
             }
             // --- CUSTOM OTP PROGRESSIVE DELAY LOGIC END ---
