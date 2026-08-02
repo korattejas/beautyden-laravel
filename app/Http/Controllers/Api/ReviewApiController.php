@@ -327,7 +327,7 @@ class ReviewApiController extends Controller
 
             foreach ($allCategoryReviews as $reviewRow) {
                 $ratingVal = (float) $reviewRow->rating;
-                $rounded = (int) round($ratingVal);
+                $rounded = (int) floor($ratingVal);
                 if ($rounded > 5) $rounded = 5;
                 if ($rounded < 1) $rounded = 1;
                 $counts[$rounded]++;
