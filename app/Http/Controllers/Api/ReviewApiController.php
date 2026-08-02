@@ -339,6 +339,7 @@ class ReviewApiController extends Controller
                 $pct = $realReviewsCount > 0 ? (int) round(($count / $realReviewsCount) * 100) : 0;
                 $ratingBreakdown[] = [
                     'star' => $star,
+                    'count' => $count,
                     'pct' => $pct
                 ];
             }
