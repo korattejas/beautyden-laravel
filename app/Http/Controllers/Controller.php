@@ -38,20 +38,18 @@ abstract class Controller
             return $duration;
         }
 
-        if (stripos((string)$duration, 'min') !== false) {
-            if (preg_match('/(\d+)/', (string)$duration, $matches)) {
-                $totalMinutes = (int) $matches[1];
-                if ($totalMinutes >= 60) {
-                    $hours = floor($totalMinutes / 60);
-                    $minutes = $totalMinutes % 60;
-                    if ($minutes > 0) {
-                        return $hours . ' hrs ' . $minutes . ' mins';
-                    } else {
-                        return $hours . ' hrs';
-                    }
+        if (preg_match('/(\d+)/', (string)$duration, $matches)) {
+            $totalMinutes = (int) $matches[1];
+            if ($totalMinutes >= 60) {
+                $hours = floor($totalMinutes / 60);
+                $minutes = $totalMinutes % 60;
+                if ($minutes > 0) {
+                    return $hours . ' hrs ' . $minutes . ' mins';
                 } else {
-                    return $totalMinutes . ' mins';
+                    return $hours . ' hrs';
                 }
+            } else {
+                return $totalMinutes . ' mins';
             }
         }
         return $duration;
