@@ -317,9 +317,36 @@ class ReviewApiController extends Controller
             $realReviewsCount = \Illuminate\Support\Facades\DB::table('customer_reviews')->where('category_id', $request->category_id)->where('status', 1)->count();
             $realRatingAvg = \Illuminate\Support\Facades\DB::table('customer_reviews')->where('category_id', $request->category_id)->where('status', 1)->avg('rating');
 
+            // Calculate rating breakdown
+            $counts = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+            $allCategoryReviews = \Illuminate\Support\Facades\DB::table('customer_reviews')
+                ->where('category_id', $request->category_id)
+                ->where('status', 1)
+                ->select('rating')
+                ->get();
+
+            foreach ($allCategoryReviews as $reviewRow) {
+                $ratingVal = (float) $reviewRow->rating;
+                $rounded = (int) round($ratingVal);
+                if ($rounded > 5) $rounded = 5;
+                if ($rounded < 1) $rounded = 1;
+                $counts[$rounded]++;
+            }
+
+            $ratingBreakdown = [];
+            foreach ([5, 4, 3, 2, 1] as $star) {
+                $count = $counts[$star];
+                $pct = $realReviewsCount > 0 ? (int) round(($count / $realReviewsCount) * 100) : 0;
+                $ratingBreakdown[] = [
+                    'star' => $star,
+                    'pct' => $pct
+                ];
+            }
+
             $data = [
                 'total_reviews' => (int) $realReviewsCount,
                 'average_rating' => (string) ($realReviewsCount > 0 ? round($realRatingAvg, 1) : 0),
+                'rating_breakdown' => $ratingBreakdown,
                 'reviews' => $customerReviewsQuery
             ];
 
