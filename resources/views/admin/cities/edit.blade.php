@@ -126,6 +126,33 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Latitude -->
+                                            <div class="col-4 mt-2">
+                                                <div class="form-group">
+                                                    <label>Latitude</label>
+                                                    <input type="text" class="form-control" name="latitude"
+                                                        value="{{ old('latitude', $city->latitude) }}" placeholder="e.g. 23.0225">
+                                                </div>
+                                            </div>
+
+                                            <!-- Longitude -->
+                                            <div class="col-4 mt-2">
+                                                <div class="form-group">
+                                                    <label>Longitude</label>
+                                                    <input type="text" class="form-control" name="longitude"
+                                                        value="{{ old('longitude', $city->longitude) }}" placeholder="e.g. 72.5714">
+                                                </div>
+                                            </div>
+
+                                            <!-- Radius (KM) -->
+                                            <div class="col-4 mt-2">
+                                                <div class="form-group">
+                                                    <label>Service Radius (in KM)</label>
+                                                    <input type="number" class="form-control" name="radius_km"
+                                                        value="{{ old('radius_km', $city->radius_km ?? 25) }}" placeholder="e.g. 25" min="1">
+                                                </div>
+                                            </div>
+
                                             <!-- Submit -->
                                             <div class="col-12">
                                                 <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">

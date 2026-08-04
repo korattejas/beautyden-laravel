@@ -126,6 +126,9 @@ class CityController extends Controller
             'area'   => 'nullable|string|max:50',
             'slug'   => $id == 0 ? 'nullable|unique:cities,slug' : 'nullable|unique:cities,slug,' . $id,
             'icon'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'radius_km' => 'nullable|integer|min:1',
         ];
 
         $validator = Validator::make($request->all(), $validateArray);
@@ -157,6 +160,9 @@ class CityController extends Controller
                 'slug'           => $request->slug,
                 'launch_quarter' => $request->launch_quarter,
                 'icon'           => $icon,
+                'latitude'       => $request->latitude,
+                'longitude'      => $request->longitude,
+                'radius_km'      => $request->radius_km,
                 'is_popular'     => (int) $request->is_popular,
                 'status'         => (int) $request->status,
             ];

@@ -39,6 +39,9 @@ class CityController extends Controller
                     'c.area',
                     'c.slug',
                     DB::raw('CONCAT("' . asset('uploads/city') . '/", c.icon) AS icon'),
+                    'c.latitude',
+                    'c.longitude',
+                    'c.radius_km',
                     'c.launch_quarter',
                     'c.status',
                     'c.is_popular'

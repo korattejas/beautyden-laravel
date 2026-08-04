@@ -110,6 +110,30 @@
                                             </div>
                                         </div>
 
+                                        <!-- Latitude -->
+                                        <div class="col-4 mt-2">
+                                            <div class="form-group">
+                                                <label>Latitude</label>
+                                                <input type="text" class="form-control" name="latitude" placeholder="e.g. 23.0225">
+                                            </div>
+                                        </div>
+
+                                        <!-- Longitude -->
+                                        <div class="col-4 mt-2">
+                                            <div class="form-group">
+                                                <label>Longitude</label>
+                                                <input type="text" class="form-control" name="longitude" placeholder="e.g. 72.5714">
+                                            </div>
+                                        </div>
+
+                                        <!-- Radius (KM) -->
+                                        <div class="col-4 mt-2">
+                                            <div class="form-group">
+                                                <label>Service Radius (in KM)</label>
+                                                <input type="number" class="form-control" name="radius_km" placeholder="e.g. 25" min="1" value="25">
+                                            </div>
+                                        </div>
+
                                         <!-- Submit -->
                                         <div class="col-12">
                                             <div class="form-group mb-0 mt-3 justify-content-end" style="text-align: right;">
