@@ -14,10 +14,11 @@ use Illuminate\Support\Facades\Validator;
 
 class CouponController extends Controller
 {
-    protected $success_status, $exception_status, $backend_error_status, $validation_error_status, $common_error_message;
+    protected $success_status, $exception_status, $backend_error_status, $validation_error_status, $common_error_message, $controller_name;
 
     public function __construct()
     {
+        $this->controller_name = 'API/CouponController';
         $this->success_status = config('custom.status_code_for_success');
         $this->exception_status = config('custom.status_code_for_exception_error');
         $this->backend_error_status = config('custom.status_code_for_backend_error');
