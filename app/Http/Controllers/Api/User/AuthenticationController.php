@@ -622,9 +622,9 @@ class AuthenticationController extends Controller
             } else {
                 $addressCount = UserAddress::where('user_id', $authUser->id)->count();
 
-                if ($addressCount >= 3) {
-                    return $this->sendError('You can only add up to 3 addresses.', $this->validation_error_status);
-                }
+                 if ($addressCount >= 10) {
+                     return $this->sendError('You can only add up to 10 addresses.', $this->validation_error_status);
+                 }
 
                 $userAddress = UserAddress::create([
                     'user_id' => $authUser->id,
