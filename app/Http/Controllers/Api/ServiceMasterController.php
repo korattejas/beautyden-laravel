@@ -792,6 +792,7 @@ class ServiceMasterController extends Controller
                 'catalog_lookbook' => (int) $service->catalog_lookbook,
                 'portfolio' => (int) $service->portfolio,
                 'is_bridal_prewedding' => $isBridalPrewedding,
+                'requestedVariantId' => $requestedVariantId,
             ];
 
             if ($service->has_variants == 1 && !empty($service->variants)) {
