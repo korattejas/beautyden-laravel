@@ -159,6 +159,7 @@ class ReviewApiController extends Controller
                 'appointment_time' => date('h:i A', strtotime($appointment->appointment_time)),
                 'order_number' => $appointment->order_number,
                 'status_text' => 'Completed',
+                'status' => (int) $appointment->status,
                 'total_services' => $totalServices,
                 'assigned_beautician_name' => $beauticianName,
                 'booked_on' => date('D, d M Y - h:i A', strtotime($appointment->created_at)),
