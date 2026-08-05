@@ -385,7 +385,7 @@ class AuthenticationController extends Controller
 
             $validateArray = [
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
+                'email' => 'nullable|email|max:255',
                 'dob' => 'nullable|date',
             ];
 
