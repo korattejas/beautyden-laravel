@@ -741,7 +741,7 @@ class AuthenticationController extends Controller
                     'appointments.assigned_to',
                     'ct.name as city_name'
                 )
-                ->where('appointments.phone', $mobile_number);
+                ->where('appointments.user_id', $authUser->id);
 
             if ($request->has('year') && !empty($request->year)) {
                 $query->whereYear('appointments.appointment_date', $request->year);
