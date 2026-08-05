@@ -367,6 +367,9 @@ class ApplicationHomeController extends Controller
                 'coupons' => $coupons,
                 'service_types' => $serviceTypes,
                 'categories' => $categories,
+                'categories_rows' => $categories->chunk(5)->map(function ($chunk) {
+                    return $chunk->values();
+                })->values(),
 
                 // 'trending_services' => $trendingData,
                 // 'reviews' => $reviews,
