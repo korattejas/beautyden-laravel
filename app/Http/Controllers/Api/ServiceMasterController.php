@@ -491,8 +491,15 @@ class ServiceMasterController extends Controller
             $cityId = $request->city_id;
             $requestedVariantId = $request->variant_id; // Optional variant ID
 
-            if (!$serviceId || !$cityId) {
-                return $this->sendError('Service ID and City ID are required.', $this->validation_error_status);
+            if (!$serviceId) {
+                return $this->sendError('Service ID are required.', $this->validation_error_status);
+            }
+
+            if ($cityId == 0) {
+                $ahmedabad = DB::table('cities')->where('name', 'like', '%Ahmedabad%')->first();
+                if ($ahmedabad) {
+                    $cityId = $ahmedabad->id;
+                }
             }
 
             $service = ServiceMaster::with(['category', 'subcategory', 'variants'])
