@@ -354,6 +354,14 @@ class AppointmentsController extends Controller
                 }
             }
 
+            $minOrderAmountSetting = \App\Models\AppSetting::where('key', 'min_order_amount')->value('value');
+            if ($minOrderAmountSetting !== null && $minOrderAmountSetting !== '') {
+                $minOrderAmount = (float) $minOrderAmountSetting;
+                if ($subTotal < $minOrderAmount) {
+                    return $this->sendError("Minimum order amount of ₹{$minOrderAmount} is required to book an appointment.", $this->validation_error_status);
+                }
+            }
+
             $discountAmount = $request->discount_price ?? 0;
             $couponCode = null;
 
