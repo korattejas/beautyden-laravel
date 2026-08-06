@@ -974,7 +974,12 @@ class AuthenticationController extends Controller
             $appointment = Appointment::leftJoin('cities as ct', 'ct.id', '=', 'appointments.city_id')
                 ->select('appointments.*', 'ct.name as city_name')
                 ->where('appointments.id', $request->appointment_id)
-                ->where('appointments.phone', $authUser->mobile_number)
+                ->where(function ($q) use ($authUser) {
+                    $q->where('appointments.user_id', $authUser->id);
+                    if (!empty($authUser->mobile_number)) {
+                        $q->orWhere('appointments.phone', $authUser->mobile_number);
+                    }
+                })
                 ->first();
 
             if (!$appointment) {
