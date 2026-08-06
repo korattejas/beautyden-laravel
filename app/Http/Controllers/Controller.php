@@ -38,6 +38,10 @@ abstract class Controller
             return $duration;
         }
 
+        if (stripos((string)$duration, 'day') !== false) {
+            return $duration;
+        }
+
         if (preg_match('/(\d+)/', (string)$duration, $matches)) {
             $totalMinutes = (int) $matches[1];
             if ($totalMinutes >= 60) {
