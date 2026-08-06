@@ -242,4 +242,23 @@ class CartController extends Controller
             return $this->sendError($this->common_error_message, $this->exception_status);
         }
     }
+
+    public function clearCart(Request $request): JsonResponse
+    {
+        try {
+            $userId = auth('user')->id();
+
+            if (!$userId) {
+                return $this->sendError('User ID is required.', $this->validation_error_status);
+            }
+
+            Cart::where('user_id', $userId)->delete();
+
+            return $this->sendResponse([], 'Cart cleared successfully', $this->success_status);
+
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, 'clearCart');
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
 }

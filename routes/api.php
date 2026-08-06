@@ -233,6 +233,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
         Route::post('cart/add', [CartController::class, 'addToCart']);
         Route::post('cart/get', [CartController::class, 'getCart']);
         Route::post('cart/update', [CartController::class, 'updateCartItem']);
+        Route::post('cart/clear', [CartController::class, 'clearCart']);
     });
 });
 

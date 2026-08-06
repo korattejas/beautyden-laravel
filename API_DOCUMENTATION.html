@@ -231,6 +231,7 @@
         <a href="#addresses" class="nav-item">Address Management</a>
         <a href="#services" class="nav-item">Services &amp; Categories</a>
         <a href="#service-variants" class="nav-item">&nbsp;&nbsp;&nbsp;↳ Service Variant Details</a>
+        <a href="#cart" class="nav-item">Cart Management</a>
         <a href="#booking" class="nav-item">Booking & History</a>
         <a href="#offers" class="nav-item">Offers & Coupons</a>
         <a href="#membership" class="nav-item">Membership</a>
@@ -1453,6 +1454,172 @@
                 • Service has <code>has_variants = 0</code> &rarr; validation error<br>
                 • No variants available / enabled for this city &rarr; <code>404</code> error
             </div>
+        </section>
+
+        <section id="cart">
+            <h2><i class="bi bi-cart3 text-primary"></i> 6. Cart Management</h2>
+
+            <h3>Add to Cart</h3>
+            <p>Adds one or more services or variants to the user's cart. If the item already exists in the cart, the quantity is incremented.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/cart/add
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. City ID context for pricing.</td>
+                    </tr>
+                    <tr>
+                        <td>items</td>
+                        <td>Array of Objects</td>
+                        <td><strong>Required</strong>. List of items to add. Each object must contain `service_id`. Can optionally contain `variant_id` and `qty`.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre><code>{
+    "code": 200,
+    "status": true,
+    "message": "Cart retrieved successfully",
+    "data": {
+        "cart_items": [
+            {
+                "cart_id": 1,
+                "service_id": 10,
+                "variant_id": null,
+                "name": "Lotus Facial",
+                "icon": "https://...",
+                "duration": "45 min",
+                "qty": "1",
+                "price": 699,
+                "discount_price": 599,
+                "discount_percentage": 14
+            }
+        ],
+        "bill_summary": {
+            "sub_total": 699,
+            "total_discount": 100,
+            "final_amount": 699
+        }
+    }
+}</code></pre>
+
+            <h3>Get Cart</h3>
+            <p>Retrieves all items in the user's cart for the specified city, along with the bill summary details.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/cart/get
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>city_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. City ID context for pricing.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre><code>{
+    "code": 200,
+    "status": true,
+    "message": "Cart retrieved successfully",
+    "data": {
+        "cart_items": [
+            {
+                "cart_id": 1,
+                "service_id": 10,
+                "variant_id": null,
+                "name": "Lotus Facial",
+                "icon": "https://...",
+                "duration": "45 min",
+                "qty": "1",
+                "price": 699,
+                "discount_price": 599,
+                "discount_percentage": 14
+            }
+        ],
+        "bill_summary": {
+            "sub_total": 699,
+            "total_discount": 100,
+            "final_amount": 699
+        }
+    }
+}</code></pre>
+
+            <h3>Update Cart Item</h3>
+            <p>Increments, decrements, updates quantity, or deletes a specific cart item.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/cart/update
+                <span class="badge auth">Token Required</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>cart_id</td>
+                        <td>Integer</td>
+                        <td><strong>Required</strong>. The ID of the cart item.</td>
+                    </tr>
+                    <tr>
+                        <td>action</td>
+                        <td>String</td>
+                        <td><strong>Required</strong>. Must be one of: <code>increment</code>, <code>decrement</code>, <code>delete</code>, <code>update</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>qty</td>
+                        <td>Integer</td>
+                        <td>Optional. Quantity to increment/decrement/update (default is 1).</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre><code>{
+    "code": 200,
+    "status": true,
+    "message": "Cart retrieved successfully",
+    "data": {
+        "cart_items": [],
+        "bill_summary": null
+    }
+}</code></pre>
+
+            <h3>Clear Cart</h3>
+            <p>Clears all items in the user's cart.</p>
+            <div class="endpoint-wrapper">
+                <span class="badge post">POST</span> /V1/customer/cart/clear
+                <span class="badge auth">Token Required</span>
+            </div>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre><code>{
+    "code": 200,
+    "status": true,
+    "message": "Cart cleared successfully",
+    "data": []
+}</code></pre>
         </section>
 
         <section id="booking">
