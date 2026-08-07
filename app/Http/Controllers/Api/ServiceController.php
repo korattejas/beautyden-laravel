@@ -78,6 +78,10 @@ class ServiceController extends Controller
                 $categories->where('c.service_type_id', $request->service_type_id);
             }
 
+            if ($request->has('city_id') && $request->input('city_id') !== null && $request->input('city_id') !== '' && $request->input('city_id') == 0) {
+                $categories->whereIn('c.name', ['Pre Wedding Package', 'Bridal Package']);
+            }
+
             $categories = $categories->orderByDesc('c.is_popular')->get();
 
             if ($categories->isEmpty()) {
