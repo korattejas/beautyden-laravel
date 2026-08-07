@@ -789,6 +789,7 @@ class ServiceMasterController extends Controller
                 'reviews' => $service->reviews,
                 'icon' => $service->icon,
                 'icon_type' => $service->icon_type,
+                'description' => $service->description,
                 'category_id' => $service->category_id,
                 'category_name' => $service->category_name,
                 'sub_category_id' => $service->sub_category_id,
