@@ -30,6 +30,10 @@ class CartController extends Controller
     public function addToCart(Request $request): JsonResponse
     {
         try {
+            if ($request->has('city_id') && $request->input('city_id') == 0) {
+                $request->merge(['city_id' => 24]);
+            }
+
             $userId = auth('user')->id(); 
 
             if (!$userId) {
@@ -90,6 +94,10 @@ class CartController extends Controller
     public function getCart(Request $request): JsonResponse
     {
         try {
+            if ($request->has('city_id') && $request->input('city_id') == 0) {
+                $request->merge(['city_id' => 24]);
+            }
+
             $userId = auth('user')->id();
             $cityId = $request->city_id;
 
@@ -197,6 +205,10 @@ class CartController extends Controller
     public function updateCartItem(Request $request): JsonResponse
     {
         try {
+            if ($request->has('city_id') && $request->input('city_id') == 0) {
+                $request->merge(['city_id' => 24]);
+            }
+
             $userId = auth('user')->id();
             
             $validator = Validator::make($request->all(), [
@@ -234,7 +246,8 @@ class CartController extends Controller
             }
 
             // Return updated cart directly
-            $request->merge(['city_id' => $cartItem->city_id]);
+            $targetCityId = $cartItem->city_id == 0 ? 24 : $cartItem->city_id;
+            $request->merge(['city_id' => $targetCityId]);
             return $this->getCart($request);
 
         } catch (Exception $e) {
