@@ -219,6 +219,12 @@ class ApplicationHomeController extends Controller
                     ->get();
             });
 
+            if ($request->has('city_id') && $request->input('city_id') !== null && $request->input('city_id') !== '' && $request->input('city_id') == 0) {
+                $serviceTypes = $serviceTypes->filter(function ($type) {
+                    return in_array($type->name, ['Pre Wedding Package', 'Bridal Package', 'Pre-wedding packages', 'Bridal & Groom packages']);
+                })->values();
+            }
+
             // Cached Cities
             $cities = Cache::remember('api_home_cities', 3600, function () {
                 return DB::table('cities')
