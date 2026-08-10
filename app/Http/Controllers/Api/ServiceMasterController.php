@@ -511,6 +511,9 @@ class ServiceMasterController extends Controller
                 return $this->sendError('Service not found.', $this->backend_error_status);
             }
 
+            $serviceMasterId = $service->id;
+            $serviceMasterName = $service->name;
+
             $service->category_name = $service->category->name ?? '';
             $service->sub_category_name = $service->subcategory->name ?? '';
 
@@ -781,10 +784,11 @@ class ServiceMasterController extends Controller
                     $isBridalPrewedding = true;
                 }
             }
-
-            $serviceInfoData = [
+             $serviceInfoData = [
                 'id' => $service->id,
                 'name' => $service->name,
+                'service_master_id' => $serviceMasterId,
+                'service_master_name' => $serviceMasterName,
                 'rating' => $service->rating,
                 'reviews' => $service->reviews,
                 'icon' => $service->icon,
