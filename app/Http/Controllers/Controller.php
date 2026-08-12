@@ -38,7 +38,7 @@ abstract class Controller
             return $duration;
         }
 
-        if (stripos((string)$duration, 'day') !== false) {
+        if (stripos((string)$duration, 'day') !== false || stripos((string)$duration, 'hr') !== false || stripos((string)$duration, 'hour') !== false) {
             return $duration;
         }
 

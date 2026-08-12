@@ -1197,7 +1197,7 @@ class ServiceMasterController extends Controller
                     'id'                  => $variant->id,
                     'service_master_id'   => $variant->service_master_id,
                     'name'                => $variant->name,
-                    'duration'            => $variant->duration,
+                    'duration'            => $this->formatDuration($variant->duration),
                     'description'         => $variant->description ?? null,
                     'thumbnail_image'     => $thumbnailImage,
                     'price'               => $price,
