@@ -73,4 +73,50 @@ class OfferController extends Controller
             );
         }
     }
+
+    public function getPortfolioReels(): JsonResponse
+    {
+        $function_name = 'getPortfolioReels';
+
+        try {
+            $offers = Offer::where('status', 1)
+                ->where('media_type', 'video')
+                ->orderBy('priority', 'asc')
+                ->get();
+            
+            if ($offers->isEmpty()) {
+                return $this->sendError('No reels found.', $this->backend_error_status);
+            }
+
+            $offers->transform(function ($offer) {
+                $media = [];
+                if (!empty($offer->media)) {
+                    $dir = 'uploads/offers/videos/';
+                    foreach ($offer->media as $file) {
+                        $media[] = asset($dir . $file);
+                    }
+                }
+                $offer->media_urls = $media;
+                if ($offer->video_thumbnail) {
+                    $offer->video_thumbnail_url = asset('uploads/offers/images/' . $offer->video_thumbnail);
+                } else {
+                    $offer->video_thumbnail_url = null;
+                }
+                return $offer;
+            });
+
+            return $this->sendResponse(
+                $offers,
+                'Reels retrieved successfully',
+                $this->success_status
+            );
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+
+            return $this->sendError(
+                $this->common_error_message,
+                $this->exception_status
+            );
+        }
+    }
 }

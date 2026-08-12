@@ -112,6 +112,7 @@ Route::middleware([JWTTokenMiddleware::class, RequestModifier::class, ResponseMo
 Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInput::class])->group(function () {
     Route::prefix('V1/')->group(function () {
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
+        Route::get('getAllCategories', [ServiceController::class, 'getAllCategories']);
         Route::post('services', [ServiceController::class, 'getServices']);
         Route::get('blogCategory', [BlogController::class, 'getBlogCategory']);
         Route::post('blogs', [BlogController::class, 'getBlogs']);
@@ -133,6 +134,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
+        Route::get('portfolioReels', [OfferController::class, 'getPortfolioReels']);
        
     });
 });
@@ -243,6 +245,7 @@ Route::middleware([JWTTokenMiddleware::class])->group(function () {
 Route::middleware([])->group(function () {
     Route::prefix('Test/V1/')->group(function () {
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
+        Route::get('getAllCategories', [ServiceController::class, 'getAllCategories']);
         Route::post('services', [ServiceController::class, 'getServices']);
         Route::get('blogCategory', [BlogController::class, 'getBlogCategory']);
         Route::post('blogs', [BlogController::class, 'getBlogs']);
@@ -263,6 +266,7 @@ Route::middleware([])->group(function () {
         Route::post('contactFormSubmit', [ContactSubmissionsController::class, 'contactFormSubmit']);
         Route::post('policies', [PoliciesController::class, 'getPolicies']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
+        Route::get('portfolioReels', [OfferController::class, 'getPortfolioReels']);
 
     });
 });

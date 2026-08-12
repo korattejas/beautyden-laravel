@@ -191,6 +191,72 @@ class ServiceController extends Controller
         }
     }
 
+    public function getAllCategories(): JsonResponse
+    {
+        $function_name = 'getAllCategories';
+
+        try {
+            $categories = DB::table('service_categories')
+                ->select(
+                    'id',
+                    'service_type_id',
+                    'name',
+                    DB::raw('CONCAT("' . asset('uploads/service-category') . '/", icon) AS icon'),
+                    DB::raw('IF(icon LIKE "%.mp4" OR icon LIKE "%.mov" OR icon LIKE "%.avi" OR icon LIKE "%.wmv", "video", "image") AS icon_type'),
+                    'description',
+                    'is_popular',
+                    'is_new',
+                    'status',
+                )
+                ->where('status', 1)
+                ->get()
+                ->map(function ($category) {
+                    $category->is_popular = (int) $category->is_popular;
+                    $category->is_new = (int) $category->is_new;
+                    $category->status = (int) $category->status;
+                    
+                    // Format media_json with full URLs
+                    $media = $category->media_json ? json_decode($category->media_json, true) : ['images' => [], 'videos' => []];
+                    
+                    if (isset($media['images']) && is_array($media['images'])) {
+                        $media['images'] = array_map(function($img) {
+                            $ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
+                            return [
+                                'url' => asset('uploads/service-media/' . $img),
+                                'type' => in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image'
+                            ];
+                        }, $media['images']);
+                    } else {
+                        $media['images'] = [];
+                    }
+
+                    if (isset($media['videos']) && is_array($media['videos'])) {
+                        $media['videos'] = array_map(function($vid) {
+                            $ext = strtolower(pathinfo($vid, PATHINFO_EXTENSION));
+                            return [
+                                'url' => asset('uploads/service-media/' . $vid),
+                                'type' => in_array($ext, ['mp4', 'mov', 'avi', 'wmv']) ? 'video' : 'image'
+                            ];
+                        }, $media['videos']);
+                    } else {
+                        $media['videos'] = [];
+                    }
+
+                    $category->media_json = $media;
+                    return $category;
+                });
+
+            if ($categories->isEmpty()) {
+                return $this->sendError('No categories found.', $this->backend_error_status);
+            }
+
+            return $this->sendResponse($categories, 'All categories retrieved successfully.', $this->success_status);
+        } catch (Exception $e) {
+            logCatchException($e, $this->controller_name, $function_name);
+            return $this->sendError($this->common_error_message, $this->exception_status);
+        }
+    }
+
     // public function getServiceCategory(): JsonResponse
     // {
     //     $function_name = 'getServiceCategory';
