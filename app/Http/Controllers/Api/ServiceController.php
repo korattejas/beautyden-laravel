@@ -207,6 +207,7 @@ class ServiceController extends Controller
                     'is_popular',
                     'is_new',
                     'status',
+                    'media_json',
                 )
                 ->where('status', 1)
                 ->get()
