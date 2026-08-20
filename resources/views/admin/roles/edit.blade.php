@@ -12,6 +12,7 @@
         'reviews' => 'Customer Reviews',
         'blogs' => 'Blogs',
         'contact_submissions' => 'Contact Submissions',
+        'home_counters' => 'Home Counters',
         'settings' => 'Settings (App, Masters)'
     ];
     $rolePermissions = is_array($role->permissions) ? $role->permissions : (json_decode($role->permissions, true) ?? []);

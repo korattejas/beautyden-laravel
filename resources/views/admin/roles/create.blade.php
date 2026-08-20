@@ -12,6 +12,7 @@
         'reviews' => 'Customer Reviews',
         'blogs' => 'Blogs',
         'contact_submissions' => 'Contact Submissions',
+        'home_counters' => 'Home Counters',
         'settings' => 'Settings (App, Masters)'
     ];
 @endphp

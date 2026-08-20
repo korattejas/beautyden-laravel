@@ -435,6 +435,15 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('policies', [PoliciesController::class, 'createOrUpdate'])->name('admin.policies.index');
         Route::post('policies/store', [PoliciesController::class, 'store']);
 
+        /* Home Counters Route */
+        Route::get('home-counters', [HomeCounterController::class, 'index'])->name('admin.home-counters.index');
+        Route::get('home-counters/create', [HomeCounterController::class, 'create'])->name('admin.home-counters.create');
+        Route::post('home-counters/store', [HomeCounterController::class, 'store'])->name('admin.home-counters.store');
+        Route::get('home-counters/edit/{id}', [HomeCounterController::class, 'edit'])->name('admin.home-counters.edit');
+        Route::get('getDataHomeCounters', [HomeCounterController::class, 'getDataHomeCounters'])->name('getDataHomeCounters');
+        Route::get('home-counters/status/{id}/{status}', [HomeCounterController::class, 'changeStatus']);
+        Route::delete('home-counters/{id}', [HomeCounterController::class, 'destroy']);
+
         /* Coupon Codes Route */
         Route::get('coupon-codes', [CouponCodeController::class, 'index'])->name('admin.coupon-codes.index');
         Route::get('coupon-codes/create', [CouponCodeController::class, 'create'])->name('admin.coupon-codes.create');

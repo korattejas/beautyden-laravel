@@ -210,8 +210,11 @@
             </li>
             @endif
 
-            @if(hasMenuAccess('blogs', $isSuperAdmin, $userPermissions))
+            @if(hasMenuAccess('blogs', $isSuperAdmin, $userPermissions) || hasMenuAccess('home_counters', $isSuperAdmin, $userPermissions))
             <li class="pa-nav-label">Content</li>
+            @endif
+
+            @if(hasMenuAccess('blogs', $isSuperAdmin, $userPermissions))
             <li class="pa-nav-item {{ Request::routeIs('admin.portfolio.index') ? 'active' : '' }}">
                 <a class="pa-nav-link" href="{{ route('admin.portfolio.index') }}"><i data-feather="image"></i><span>Portfolio</span></a>
             </li>
@@ -220,6 +223,12 @@
             </li>
             <li class="pa-nav-item {{ Request::routeIs('admin.blogs.index') ? 'active' : '' }}">
                 <a class="pa-nav-link" href="{{ route('admin.blogs.index') }}"><i data-feather="edit-3"></i><span>Blog Posts</span></a>
+            </li>
+            @endif
+
+            @if(hasMenuAccess('home_counters', $isSuperAdmin, $userPermissions))
+            <li class="pa-nav-item {{ Request::routeIs('admin.home-counters.*') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.home-counters.index') }}"><i data-feather="sliders"></i><span>Home Counters</span></a>
             </li>
             @endif
 
