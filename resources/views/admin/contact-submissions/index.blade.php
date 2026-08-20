@@ -68,6 +68,7 @@
                                                 <th>Last Name</th>
                                                 <th>Email</th>
                                                 <th>Phone</th>
+                                                <th>Date</th>
                                                 <th data-stuff="Active,InActive">Status</th>
                                                 <th data-search="false">Action</th>
 
@@ -146,6 +147,15 @@
                 {
                     data: 'phone',
                     name: 'phone'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                    render: function(data) {
+                        if (!data) return '-';
+                        let date = new Date(data);
+                        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    }
                 },
                 {
                     data: 'status',
