@@ -185,7 +185,7 @@ class ProcessNotifications extends Command
                     // Ensure we only send one notification per user every 24 hours
                     if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
                         NotificationService::trigger($userId, 'abandoned_cart', [
-                            '{coupon_code}' => 'CART15'
+                            '{coupon_code}' => 'SAVE250'
                         ]);
                         \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addHours(24));
                         $this->info("Sent abandoned cart reminder to user #{$userId}");
