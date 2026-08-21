@@ -228,6 +228,7 @@
         <a href="#profile" class="nav-item">Profile Operations</a>
         <a href="#fcm" class="nav-item">Device Management</a>
         <a href="#cities" class="nav-item">Geography</a>
+        <a href="#payment-types" class="nav-item">Payment Types</a>
         <a href="#addresses" class="nav-item">Address Management</a>
         <a href="#services" class="nav-item">Services &amp; Categories</a>
         <a href="#service-variants" class="nav-item">&nbsp;&nbsp;&nbsp;↳ Service Variant Details</a>
@@ -674,7 +675,41 @@
 }</code></pre>
         </section>
 
-        <h2 id="addresses"><i class="bi bi-geo-alt text-primary"></i> 5. Address Management</h2>
+        <h2 id="payment-types"><i class="bi bi-credit-card text-primary"></i> 5. Payment Types</h2>
+        <section>
+            <h3>List Payment Types</h3>
+            <div class="endpoint-wrapper">
+                <span class="badge get">GET</span> /V1/customer/paymentTypes
+            </div>
+            <p>Returns an array of active payment types (e.g. Cash, Razorpay, etc.) along with their status and icons.</p>
+            <div class="response-title"><i class="bi bi-code-square"></i> Exact Response</div>
+            <pre>
+<code>{
+    "code": 200,
+    "status": true,
+    "message": "Payment types retrieved successfully",
+    "data": [
+        {
+            "id": 1,
+            "name": "Cash",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/payment-type/68ca3b2b887cd.png",
+            "status": 1,
+            "created_at": "2026-08-21T16:45:00.000000Z",
+            "updated_at": "2026-08-21T16:45:00.000000Z"
+        },
+        {
+            "id": 2,
+            "name": "Razorpay",
+            "icon": "https://laravelappversionone.beautyden.in/uploads/payment-type/68ca39f6ba758.png",
+            "status": 1,
+            "created_at": "2026-08-21T16:45:00.000000Z",
+            "updated_at": "2026-08-21T16:45:00.000000Z"
+        }
+    ]
+}</code></pre>
+        </section>
+
+        <h2 id="addresses"><i class="bi bi-geo-alt text-primary"></i> 6. Address Management</h2>
         <section>
             <h3>Save/Update Address</h3>
             <p>Saves a new address or updates an existing one (up to 3 addresses). If marked as default, it updates the
