@@ -346,7 +346,7 @@ class ReviewApiController extends Controller
             }
 
             $data = [
-                'total_reviews' => (int) $realReviewsCount,
+                'total_reviews' => (int) ($realReviewsCount + 3000),
                 'average_rating' => (string) ($realReviewsCount > 0 ? round($realRatingAvg, 1) : 0),
                 'rating_breakdown' => $ratingBreakdown,
                 'reviews' => $customerReviewsQuery

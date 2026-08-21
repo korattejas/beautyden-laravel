@@ -183,6 +183,9 @@
             <li class="pa-nav-item {{ Request::routeIs('admin.razorpay.index') ? 'active' : '' }}">
                 <a class="pa-nav-link" href="{{ route('admin.razorpay.index') }}"><i data-feather="credit-card"></i><span>Razorpay</span></a>
             </li>
+            <li class="pa-nav-item {{ Request::routeIs('admin.payment-type.index') ? 'active' : '' }}">
+                <a class="pa-nav-link" href="{{ route('admin.payment-type.index') }}"><i data-feather="credit-card"></i><span>Payment Types</span></a>
+            </li>
             <li class="pa-nav-item {{ Request::routeIs('admin.settlement.index') ? 'active' : '' }}">
                 <a class="pa-nav-link" href="{{ route('admin.settlement.index') }}"><i data-feather="dollar-sign"></i><span>Settlements</span></a>
             </li>
