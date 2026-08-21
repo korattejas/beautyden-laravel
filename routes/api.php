@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ProductBrandController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\FaqsController;
+use App\Http\Controllers\Api\PaymentTypeController;
+
 
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\ContactSubmissionsController;
@@ -56,6 +58,7 @@ Route::middleware([RequestModifier::class, ResponseModifier::class, SanitizeInpu
         Route::get('listCoupons', [CouponController::class, 'listCoupons']);
         Route::get('membershipPlans', [MembershipController::class, 'listPlans']);
         Route::get('cities', [CityController::class, 'getCities']);
+        Route::get('paymentTypes', [PaymentTypeController::class, 'getPaymentTypes']);
         Route::get('serviceType', [ServiceController::class, 'getServiceType']);
         Route::get('serviceCategory', [ServiceController::class, 'getServiceCategory']);
         Route::post('serviceMasters', [ServiceMasterController::class, 'getServiceMasters']);
@@ -204,6 +207,7 @@ Route::middleware([])->group(function () {
         Route::get('categoryLookbook', [CategoryLookbookController::class, 'getCategoryLookbooks']);
         Route::get('lookbookPortfolioCategories', [CategoryLookbookController::class, 'getLookbookPortfolioCategories']);
         Route::get('portfolio', [PortfolioController::class, 'getPortfolio']);
+        Route::get('paymentTypes', [PaymentTypeController::class, 'getPaymentTypes']);
     });
 });
 

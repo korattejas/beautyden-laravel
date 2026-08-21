@@ -43,6 +43,7 @@ use App\Http\Controllers\Admin\ProductItemController;
 use App\Http\Controllers\Admin\ProductOrderController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ReportsController;
+use App\Http\Controllers\Admin\PaymentTypeController;
 use App\Http\Controllers\ContractController;
 
 
@@ -142,6 +143,16 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('product-brand/edit/{id}', [ProductBrandController::class, 'edit'])->name('admin.product-brand.edit');
         Route::get('getDataProductBrand', [ProductBrandController::class, 'getDataProductBrand'])->name('getDataProductBrand');
         Route::get('product-brand/status/{id}/{status}', [ProductBrandController::class, 'changeStatus']);
+
+        /* Payment Type Route */
+        Route::get('payment-type', [PaymentTypeController::class, 'index'])->name('admin.payment-type.index');
+        Route::get('payment-type/create', [PaymentTypeController::class, 'create'])->name('admin.payment-type.create');
+        Route::post('payment-type/store', [PaymentTypeController::class, 'store']);
+        Route::delete('payment-type/{id}', [PaymentTypeController::class, 'destroy']);
+        Route::get('payment-type/edit/{id}', [PaymentTypeController::class, 'edit'])->name('admin.payment-type.edit');
+        Route::get('getDataPaymentType', [PaymentTypeController::class, 'getDataPaymentType'])->name('getDataPaymentType');
+        Route::get('payment-type/status/{id}/{status}', [PaymentTypeController::class, 'changeStatus']);
+
 
         /* Product Category Route */
         Route::get('product-category', [ProductCategoryController::class, 'index'])->name('admin.product-category.index');

@@ -36,7 +36,7 @@ class ServiceMasterController extends Controller
         $realRatingAvg = DB::table('customer_reviews')->where('category_id', $categoryId)->where('status', 1)->avg('rating');
 
         // $totalReviews = $dummyReviewsSum + $realReviewsCount;
-        $totalReviews = $realReviewsCount;
+        $totalReviews = $realReviewsCount + 3000;
         
         $totalRatingPoints = 0;
         $pointsCount = 0;
