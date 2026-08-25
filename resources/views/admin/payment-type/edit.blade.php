@@ -40,6 +40,26 @@
 
                                                 <div class="col-12">
                                                     <div class="form-group">
+                                                        <label>Type</label>
+                                                        <input type="text" class="form-control" name="type"
+                                                            value="{{ $paymentType->type }}"
+                                                            placeholder="Type (e.g. online, offline)" required>
+                                                        <div class="valid-feedback"></div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 mt-2">
+                                                    <div class="form-group">
+                                                        <label>Code</label>
+                                                        <input type="text" class="form-control" name="code"
+                                                            value="{{ $paymentType->code }}"
+                                                            placeholder="Code (e.g. gpay)" required>
+                                                        <div class="valid-feedback"></div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 mt-2">
+                                                    <div class="form-group">
                                                         <label>{{ trans('admin_string.name') }}</label>
                                                         <input type="text" class="form-control" name="name"
                                                             value="{{ $paymentType->name }}"

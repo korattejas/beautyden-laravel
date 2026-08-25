@@ -34,17 +34,19 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-datatable">
-                                    <table class="dt-column-search table w-100 dataTable" id="table-1">
-                                        <thead>
-                                            <tr>
-                                                <th>Id</th>
-                                                <th>Name</th>
-                                                <th data-search="false">Icon</th>
-                                                <th data-stuff="Active,InActive">Status</th>
-                                                <th data-search="false">Action</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                                     <table class="dt-column-search table w-100 dataTable" id="table-1">
+                                         <thead>
+                                             <tr>
+                                                 <th>Id</th>
+                                                 <th>Name</th>
+                                                 <th>Code</th>
+                                                 <th>Type</th>
+                                                 <th data-search="false">Icon</th>
+                                                 <th data-stuff="Active,InActive">Status</th>
+                                                 <th data-search="false">Action</th>
+                                             </tr>
+                                         </thead>
+                                     </table>
                                 </div>
                             </div>
                         </div>
@@ -79,6 +81,14 @@
                 {
                     data: 'name',
                     name: 'name'
+                },
+                {
+                    data: 'code',
+                    name: 'code'
+                },
+                {
+                    data: 'type',
+                    name: 'type'
                 },
                 {
                     data: 'icon',

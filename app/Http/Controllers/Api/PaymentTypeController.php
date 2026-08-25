@@ -32,6 +32,8 @@ class PaymentTypeController extends Controller
                 ->select(
                     'id',
                     'name',
+                    'code',
+                    'type',
                     DB::raw('CONCAT("' . asset('uploads/payment-type') . '/", icon) AS icon'),
                     'status',
                     'created_at',

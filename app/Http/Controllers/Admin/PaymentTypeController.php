@@ -72,12 +72,16 @@ class PaymentTypeController extends Controller
                     'required',
                     $id == 0 ? 'unique:payment_types,name' : 'unique:payment_types,name,' . $id . ',id',
                 ],
+                'code' => 'required',
+                'type' => 'required',
                 'icon' => $id == 0 ? 'image|mimes:jpeg,png,jpg,gif,svg,webp' : 'image|mimes:jpeg,png,jpg,gif,svg,webp',
             ];
 
             $validateMessage = [
                 'name.required' => 'The payment type name is required.',
                 'name.unique' => 'The payment type name has already been taken.',
+                'code.required' => 'The payment type code is required.',
+                'type.required' => 'The payment type type is required.',
                 'icon.image' => 'The file must be an image.',
                 'icon.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
             ];
@@ -104,6 +108,8 @@ class PaymentTypeController extends Controller
 
             $data = [
                 'name' => $request->name,
+                'code' => $request->code,
+                'type' => $request->type,
                 'icon' => $photoFilename ?? null,
                 'status' => (int) $request->input('status', 1),
             ];

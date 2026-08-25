@@ -40,6 +40,24 @@
                                             <div class="row row-sm">
                                                 <div class="col-12">
                                                     <div class="form-group">
+                                                        <label>Type</label>
+                                                        <input type="text" class="form-control" name="type"
+                                                            placeholder="Type (e.g. online, offline)" required>
+                                                        <div class="valid-feedback"></div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 mt-2">
+                                                    <div class="form-group">
+                                                        <label>Code</label>
+                                                        <input type="text" class="form-control" name="code"
+                                                            placeholder="Code (e.g. gpay)" required>
+                                                        <div class="valid-feedback"></div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 mt-2">
+                                                    <div class="form-group">
                                                         <label>Name</label>
                                                         <input type="text" class="form-control" name="name"
                                                             placeholder="Name" required>
