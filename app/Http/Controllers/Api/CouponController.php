@@ -28,7 +28,7 @@ class CouponController extends Controller
 
     private function isUserInBirthdayWindow($user)
     {
-        if (empty($user->dob)) {
+        if (empty($user) || empty($user->dob)) {
             return false;
         }
 
@@ -66,9 +66,11 @@ class CouponController extends Controller
                 })
                 ->where(function($query) use ($user) {
                     $query->where(function($q) use ($user) {
-                        $q->whereNull('user_ids')
-                          ->orWhereJsonContains('user_ids', (string) $user->id)
-                          ->orWhereJsonContains('user_ids', $user->id);
+                        $q->whereNull('user_ids');
+                        if ($user) {
+                            $q->orWhereJsonContains('user_ids', (string) $user->id)
+                              ->orWhereJsonContains('user_ids', $user->id);
+                        }
                     })
                     ->orWhereRaw('UPPER(TRIM(code)) = ?', ['BDAY50']);
                 })
@@ -78,7 +80,7 @@ class CouponController extends Controller
             foreach ($coupons as $coupon) {
                 // If this is the birthday coupon, check if user is in their birthday window
                 if (strtoupper(trim($coupon->code)) === 'BDAY50') {
-                    if (!$this->isUserInBirthdayWindow($user)) {
+                    if (!$user || !$this->isUserInBirthdayWindow($user)) {
                         continue;
                     }
                     // Check if already used in the current calendar year
@@ -99,15 +101,20 @@ class CouponController extends Controller
 
                 // Check first order only
                 if ($coupon->is_first_order_only) {
+                    if (!$user) {
+                        continue; // Coupon is for first order only, cannot be verified for guests
+                    }
                     $hasPreviousOrder = Appointment::where('phone', $user->mobile_number)->exists();
                     if ($hasPreviousOrder) continue;
                 }
 
                 // Check per user limit
-                $userUsage = CouponUsage::where('coupon_id', $coupon->id)
-                    ->where('user_id', $user->id)
-                    ->count();
-                if ($userUsage >= $coupon->usage_per_user) continue;
+                if ($user) {
+                    $userUsage = CouponUsage::where('coupon_id', $coupon->id)
+                        ->where('user_id', $user->id)
+                        ->count();
+                    if ($userUsage >= $coupon->usage_per_user) continue;
+                }
 
                 $isExpire = false;
                 if ($coupon->end_date && $coupon->end_date->format('Y-m-d') < $now) {
