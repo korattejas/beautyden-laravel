@@ -39,10 +39,41 @@ class NotificationController extends Controller
                     return '<span class="badge bg-warning">Pending</span>';
                 })
                 ->addColumn('action', function($item) {
-                    return '<button class="btn btn-sm btn-primary" onclick="resendNotification('.$item->id.')">Resend</button>';
+                    $logUrl = route('admin.notifications.log', $item->id);
+                    $btn = '<a href="'.$logUrl.'" target="_blank" class="btn btn-sm btn-info me-1"><i class="fa fa-file-text"></i> Log</a>';
+                    $btn .= '<button class="btn btn-sm btn-primary" onclick="resendNotification('.$item->id.')"><i class="fa fa-refresh"></i> Resend</button>';
+                    return $btn;
                 })
                 ->rawColumns(['status', 'action'])
                 ->make(true);
+        }
+    }
+
+    public function resend($id)
+    {
+        try {
+            $notification = PushNotification::findOrFail($id);
+            
+            // Reset counts and set status to unsent to allow re-sending
+            $notification->update([
+                'is_sent' => 0,
+                'success_count' => 0,
+                'failure_count' => 0
+            ]);
+
+            // Resend now
+            $customData = $notification->custom_data ? (array)$notification->custom_data : [];
+            $specificUsers = null;
+            if ($notification->target_type == 'specific') {
+                $specificUsers = $customData['_specific_users'] ?? null;
+            }
+            
+            $this->sendNotificationNow($notification, $specificUsers);
+
+            return response()->json(['success' => true, 'message' => 'Notification resent successfully']);
+        } catch (\Exception $e) {
+            logCatchException($e, $this->controller_name, 'resend');
+            return response()->json(['error' => $this->error_message], $this->exception_error_code);
         }
     }
 
@@ -116,7 +147,7 @@ class NotificationController extends Controller
             });
         }
 
-        $tokens = $tokensQuery->pluck('fcm_token')->toArray();
+        $tokens = $tokensQuery->distinct()->pluck('fcm_token')->filter()->toArray();
         
         if (empty($tokens)) {
             \Illuminate\Support\Facades\Log::warning("Notification failed: No FCM tokens found for the selected users.");
@@ -131,7 +162,8 @@ class NotificationController extends Controller
             $notification->title,
             $notification->message,
             $notification->image,
-            $customDataArray
+            $customDataArray,
+            $notification->id
         );
 
         if (isset($response['success']) && $response['success'] > 0) {
@@ -147,5 +179,15 @@ class NotificationController extends Controller
             ]);
             \Illuminate\Support\Facades\Log::error("Notification failed completely.", ['response' => $response]);
         }
+    }
+
+    public function showLog($id)
+    {
+        $logPath = storage_path("logs/notifications/notification_{$id}.log");
+        if (File::exists($logPath)) {
+            $content = File::get($logPath);
+            return response($content, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+        }
+        return response('No detailed logs found for this notification yet.', 404);
     }
 }

@@ -64,7 +64,7 @@ class ProcessNotifications extends Command
                     unset($customData['_specific_users']);
                 }
 
-                $tokens = $tokensQuery->pluck('fcm_token')->toArray();
+                $tokens = $tokensQuery->distinct()->pluck('fcm_token')->filter()->toArray();
 
                 if (!empty($tokens)) {
                     $response = FcmHelper::sendPushNotification(

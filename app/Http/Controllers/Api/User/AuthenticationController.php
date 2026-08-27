@@ -59,6 +59,11 @@ class AuthenticationController extends Controller
                 return $this->sendError($validator->errors()->first(), $this->validation_error_status);
             }
 
+            // Delete the token association from any other users to prevent multiple notifications on the same device
+            UserFcmToken::where('fcm_token', $request->fcm_token)
+                ->where('user_id', '!=', $authUser->id)
+                ->delete();
+
             $token = UserFcmToken::where('user_id', $authUser->id)
                 ->where('fcm_token', $request->fcm_token)
                 ->first();

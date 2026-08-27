@@ -510,6 +510,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('notifications/create', [NotificationController::class, 'create'])->name('admin.notifications.create');
         Route::post('notifications/store', [NotificationController::class, 'store'])->name('admin.notifications.store');
         Route::get('getDataNotifications', [NotificationController::class, 'getData'])->name('getDataNotifications');
+        Route::get('notifications/{id}/log', [NotificationController::class, 'showLog'])->name('admin.notifications.log');
+        Route::post('notifications/{id}/resend', [NotificationController::class, 'resend'])->name('admin.notifications.resend');
 
         /* Razorpay Transaction Routes */
         Route::get('razorpay', [RazorpayTransactionController::class, 'index'])->name('admin.razorpay.index');

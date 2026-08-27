@@ -42,6 +42,7 @@
                                             <th>Failure</th>
                                             <th>Scheduled At</th>
                                             <th>Created At</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -99,11 +100,71 @@
                     data: 'created_at',
                     name: 'created_at'
                 },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
             ],
             order: [
                 [0, 'DESC']
             ],
         });
+
+        function resendNotification(id) {
+            Swal.fire({
+                title: 'Resend Notification?',
+                text: "Are you sure you want to resend this notification?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, resend it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Sending...',
+                        text: 'Please wait while we process the notifications.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.ajax({
+                        url: '/admin/notifications/' + id + '/resend',
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sent!',
+                                    text: response.message
+                                });
+                                $('#table-1').DataTable().ajax.reload(null, false);
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: response.error || 'Failed to resend.'
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'An error occurred while resending the notification.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
     </script>
     <script src="{{ URL::asset('panel-assets/js/core/datatable.js') }}?v={{ time() }}"></script>
 @endsection

@@ -13,4 +13,9 @@ class UserFcmToken extends Model
         'device_name',
         'ip_address',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

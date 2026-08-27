@@ -66,7 +66,7 @@ class NotificationService
             ]);
 
             // 4. Send Push Notification via FCM
-            $tokens = UserFcmToken::where('user_id', $userId)->pluck('fcm_token')->toArray();
+            $tokens = UserFcmToken::where('user_id', $userId)->distinct()->pluck('fcm_token')->filter()->toArray();
             
             if (!empty($tokens)) {
                 $customData = [
