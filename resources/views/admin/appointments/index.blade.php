@@ -1448,6 +1448,9 @@
             text += `Discount${desc}: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
         }
         text += `Travel Charges: + ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}\n`;
+        if (parseFloat(d.wallet_used || 0) > 0) {
+            text += `Wallet Deducted: - ₹${parseFloat(d.wallet_used).toFixed(2)}\n`;
+        }
         text += `Grand Total: ₹${parseFloat(summary.grand_total || 0).toFixed(2)}\n\n`;
 
         text += `We’ll review your booking and confirm shortly.\n`;
@@ -1500,6 +1503,9 @@
             text += `Discount${desc}: - ₹${parseFloat(summary.discount_amount).toFixed(2)}\n`;
         }
         text += `Travel Charges: + ₹${parseFloat(summary.travel_charges || 0).toFixed(2)}\n`;
+        if (parseFloat(d.wallet_used || 0) > 0) {
+            text += `Wallet Deducted: - ₹${parseFloat(d.wallet_used).toFixed(2)}\n`;
+        }
         text += `Grand Total: ₹${parseFloat(summary.grand_total || 0).toFixed(2)}\n\n`;
 
         text += `⚠️ *Important Instructions:*\n`;
