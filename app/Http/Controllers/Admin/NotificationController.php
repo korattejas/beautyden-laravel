@@ -152,6 +152,11 @@ class NotificationController extends Controller
         if (empty($tokens)) {
             \Illuminate\Support\Facades\Log::warning("Notification failed: No FCM tokens found for the selected users.");
             $notification->update(['is_sent' => 2, 'failure_count' => 1]); // Mark failed if no tokens
+            
+            // Create a log entry explaining that no tokens were found
+            $logPath = storage_path("logs/notification_{$notification->id}.log");
+            $logMsg = "[" . date('Y-m-d H:i:s') . "] [FAILURE] No active FCM tokens found in database for the target: " . $notification->target_type;
+            file_put_contents($logPath, $logMsg . "\n");
             return;
         }
 
@@ -183,7 +188,7 @@ class NotificationController extends Controller
 
     public function showLog($id)
     {
-        $logPath = storage_path("logs/notifications/notification_{$id}.log");
+        $logPath = storage_path("logs/notification_{$id}.log");
         if (File::exists($logPath)) {
             $content = File::get($logPath);
             return response($content, 200)->header('Content-Type', 'text/plain; charset=UTF-8');

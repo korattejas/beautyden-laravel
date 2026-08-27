@@ -50,6 +50,8 @@ class FcmHelper
             ->get()
             ->keyBy('fcm_token');
 
+        $logEntries = [];
+
         // Chunk tokens into batches of 50 to send concurrently and avoid timeouts
         $chunks = array_chunk($tokensArray, 50);
 
@@ -92,6 +94,7 @@ class FcmHelper
 
                 if ($response instanceof \Illuminate\Http\Client\Response && $response->successful()) {
                     $successCount++;
+                    $logMsg = "[SUCCESS] Token: {$fcmToken} | {$userInfo}";
                     \Illuminate\Support\Facades\Log::info("FCM Send Success | Token: {$fcmToken} | {$userInfo}");
                 } else {
                     $failureCount++;
@@ -99,9 +102,16 @@ class FcmHelper
                     if ($response instanceof \Illuminate\Http\Client\Response) {
                         $errorMessage = $response->body();
                     }
+                    $logMsg = "[FAILURE] Token: {$fcmToken} | {$userInfo} | Error: {$errorMessage}";
                     \Illuminate\Support\Facades\Log::error("FCM Send Failure | Token: {$fcmToken} | {$userInfo} | Error: {$errorMessage}");
                 }
+                $logEntries[] = "[" . date('Y-m-d H:i:s') . "] " . $logMsg;
             }
+        }
+
+        if ($notificationId && !empty($logEntries)) {
+            $logPath = storage_path("logs/notification_{$notificationId}.log");
+            file_put_contents($logPath, implode("\n", $logEntries) . "\n", FILE_APPEND);
         }
 
         return [
