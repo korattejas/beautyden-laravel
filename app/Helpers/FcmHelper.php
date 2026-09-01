@@ -7,7 +7,7 @@ class FcmHelper
     /**
      * Send Push Notification using FCM
      */
-    public static function sendPushNotification($tokens, $title, $body, $image = null, $data = [])
+    public static function sendPushNotification($tokens, $title, $body, $image = null, $data = [], $notificationId = null)
     {
         $projectId = env('FIREBASE_PROJECT_ID');
         $credentialsPath = base_path(env('FIREBASE_CREDENTIALS'));
@@ -42,6 +42,10 @@ class FcmHelper
             foreach ($data as $key => $val) {
                 $dataMap[(string)$key] = (string)$val;
             }
+        }
+
+        if (empty($notificationId) && isset($data['notification_id'])) {
+            $notificationId = $data['notification_id'];
         }
 
         // Fetch user details for the tokens to make the logs highly informative

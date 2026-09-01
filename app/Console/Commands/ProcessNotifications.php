@@ -72,7 +72,8 @@ class ProcessNotifications extends Command
                         $notification->title,
                         $notification->message,
                         $notification->image,
-                        $customData
+                        $customData,
+                        $notification->id
                     );
                     
                     if (isset($response['success']) && $response['success'] > 0) {
