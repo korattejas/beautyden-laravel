@@ -368,7 +368,7 @@ class ServiceController extends Controller
             $perPage = $request->per_page ?? 24;
             $page = $request->page ?? 1;
 
-            $services = $query->orderByDesc('s.is_popular')
+            $services = $query->orderBy('s.price', 'asc')
                 ->paginate($perPage, ['*'], 'page', $page)
                 ->through(function ($service) {
                     $service->includes = $service->includes ? json_decode($service->includes, true) : [];
