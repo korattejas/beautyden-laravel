@@ -553,7 +553,7 @@ class ApplicationHomeController extends Controller
                             if (!empty($availableVariants)) {
                                 $item->starts_at = collect($availableVariants)->min('price') ?? 0;
                                 $item->total_option = count($availableVariants);
-                                $item->variants = $availableVariants;
+                                $item->variants = collect($availableVariants)->sortBy('price')->values()->all();
                                 unset($item->price, $item->discount_price, $item->discount_percentage, $item->duration);
                             } else {
                                 $item->has_variants = 0;

@@ -607,7 +607,7 @@ class ServiceMasterController extends Controller
                         unset($service->variants);
                         $service->has_variants = 0;
                     } else {
-                        $service->variants = $availableVariants;
+                        $service->variants = collect($availableVariants)->sortBy('price')->values()->all();
                     }
                 }
             }
@@ -995,7 +995,7 @@ class ServiceMasterController extends Controller
 
                         $availableVariants[] = $variant;
                     }
-                    $service->variants = $availableVariants;
+                    $service->variants = collect($availableVariants)->sortBy('price')->values()->all();
                 }
             }
 
@@ -1207,6 +1207,9 @@ class ServiceMasterController extends Controller
                     'reviews'             => (string) $catStats['reviews'],
                 ];
             }
+
+            // Sort variants by price low to high
+            $variantsList = collect($variantsList)->sortBy('price')->values()->toArray();
 
             if (empty($variantsList)) {
                 return $this->sendError('No variants available for this service in the selected city.', $this->backend_error_status);
