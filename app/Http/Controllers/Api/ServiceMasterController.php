@@ -239,6 +239,10 @@ class ServiceMasterController extends Controller
                 return $service;
             });
 
+            $services->setCollection($services->getCollection()->sortBy(function ($service) {
+                return $service->has_variants == 1 ? ($service->starts_at ?? 0) : ($service->price ?? 0);
+            })->values());
+
             if ($services->total() === 0) {
                 return $this->sendError('No service found.', $this->backend_error_status);
             }
@@ -460,6 +464,10 @@ class ServiceMasterController extends Controller
 
                 return $service;
             });
+
+            $services->setCollection($services->getCollection()->sortBy(function ($service) {
+                return $service->has_variants == 1 ? ($service->starts_at ?? 0) : ($service->price ?? 0);
+            })->values());
 
             $responseData = [
                 'categories' => $categories,
@@ -774,6 +782,10 @@ class ServiceMasterController extends Controller
                 }
                 return $item;
             });
+
+            $relatedServices = $relatedServices->sortBy(function ($item) {
+                return $item->has_variants == 1 ? ($item->starts_at ?? 0) : ($item->price ?? 0);
+            })->values();
 
             $pageLayout = [];
 

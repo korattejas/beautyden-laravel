@@ -572,10 +572,14 @@ class ApplicationHomeController extends Controller
                         return $item;
                     });
                     
+                    $sortedItems = $items->sortBy(function ($item) {
+                        return $item->has_variants == 1 ? ($item->starts_at ?? 0) : ($item->price ?? 0);
+                    })->values();
+
                     $trendingData[] = [
                         'category_id' => $catId,
                         'category_name' => $category->name,
-                        'services' => $items
+                        'services' => $sortedItems
                     ];
                 }
             }
